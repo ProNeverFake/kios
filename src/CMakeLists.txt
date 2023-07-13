@@ -1,6 +1,9 @@
+
+add_subdirectory(library)
 add_executable(bt_node bt_node.cpp)
 
-ament_target_dependencies(bt_node rclcpp std_msgs)
+ament_target_dependencies(bt_node rclcpp std_msgs rclcpp_action example_interfaces)
+
 target_link_libraries(bt_node behaviortree_cpp)
 
 target_include_directories(bt_node

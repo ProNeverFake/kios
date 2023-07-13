@@ -1,0 +1,2 @@
+/usr/bin/ar qc libactions.a CMakeFiles/actions.dir/src/action/bt_action_client.cpp.o
+/usr/bin/ranlib libactions.a

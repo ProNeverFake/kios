@@ -1,0 +1,6 @@
+bool raise_exception
+bool recover
+bool empty_queue
+---
+bool result
+string error_message

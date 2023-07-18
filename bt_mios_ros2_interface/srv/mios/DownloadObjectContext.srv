@@ -1,0 +1,5 @@
+string object
+---
+bool result
+string error_message
+string context

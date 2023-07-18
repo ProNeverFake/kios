@@ -1,0 +1,13 @@
+string name
+float32[] o_t_ob
+float32[] ob_t_gp
+float32[] ob_t_tcp
+float32[] ob_i
+float32[] q
+float32 grasp_width
+float32 grasp_force
+float32 mass
+string geometry
+---
+bool result
+string error_message

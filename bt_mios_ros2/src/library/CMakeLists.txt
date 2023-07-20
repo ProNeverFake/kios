@@ -1,4 +1,4 @@
-######################### action library
+########################################################## action library
 set(MODULE_NAME action)
 
 set(${MODULE_NAME}_SRC
@@ -42,6 +42,7 @@ target_include_directories(${MODULE_NAME}
 #     ${PROJECT_NAME} rosidl_typesupport_cpp)
 
 # target_link_libraries(${MODULE_NAME} "${cpp_typesupport_target}")
+##############
 
 ament_target_dependencies(${MODULE_NAME}
     "rclcpp"
@@ -52,15 +53,8 @@ ament_target_dependencies(${MODULE_NAME}
     )
 
 
-# target_link_libraries(${MODULE_NAME}
-#     PRIVATE
-#         rclcpp
-#         rclcpp_action
-#         example_interfaces
-#     )
 
-
-################### nodes
+################################################################## nodes
 # add_executable(bt_node src/node/bt_node.cpp)
 
 # ament_target_dependencies(bt_node rclcpp std_msgs rclcpp_action example_interfaces)
@@ -80,7 +74,94 @@ ament_target_dependencies(${MODULE_NAME}
 # #     PRIVATE
 # #         $<BUILD_INTERFACE:${INCLUDE_DIR}/${PROJECT_NAME}>
 # #     )   
-    
+
+###########################################################################
+   
+######################################################### ws_client library
+set(MODULE_NAME ws_client)
+
+set(${MODULE_NAME}_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ws_client/ws_client.cpp
+)
+
+set(${MODULE_NAME}_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/ws_client/ws_client.hpp
+)
+
+# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/action/*.cpp")
+# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/action/*.hpp")
+
+add_library(${MODULE_NAME}
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
+    )
+
+add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
+
+# pthread issues
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+target_include_directories(${MODULE_NAME}
+    PRIVATE
+        src
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
+
+# Attention: target_link_libraries() should not apply any keyword
+# since no keyword is applied in ament_target_dependencies()
+target_link_libraries(${MODULE_NAME}
+    Threads::Threads
+)
+
+ament_target_dependencies(${MODULE_NAME}
+    "rclcpp"
+    "rclcpp_action"
+    "example_interfaces"
+    "action_tutorials_interfaces"
+    "bt_mios_ros2_interface"
+    )
+#########################################################################
+
+
+################################################### behavior_tree library
+set(MODULE_NAME behavior_tree)
+
+
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/action_node/*.cpp")
+list(APPEND ${MODULE_NAME}_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/node_list.cpp
+)
+
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp")
+list(APPEND ${MODULE_NAME}_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/node_list.hpp
+)
+
+add_library(${MODULE_NAME}
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
+    )
+
+add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
+
+target_include_directories(${MODULE_NAME}
+    PRIVATE
+        src
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
+
+find_package(behaviortree_cpp REQUIRED)
+
+ament_target_dependencies(${MODULE_NAME}
+    behaviortree_cpp
+    )
+
+######################################################################
 
 # install(TARGETS
 #     # mios_node

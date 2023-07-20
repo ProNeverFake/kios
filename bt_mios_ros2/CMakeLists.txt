@@ -5,13 +5,16 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Default to C++14
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif()
 
-# set variable
+# set CPP standard as 17 according to package behavior_tree library
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# set variable (TO BE REMOVED IN THE FUTURE)
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+
+# add static library directory (prefix) to the library finding path
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/static-lib-dir")
 
 
 # find dependencies
@@ -42,6 +45,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# add_subdirectory(lib/BehaviorTree.CPP)
 add_subdirectory(src)
 
 ################## Install launch files.

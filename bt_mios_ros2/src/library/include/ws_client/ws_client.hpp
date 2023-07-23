@@ -98,3 +98,18 @@ public:
     // Close the specified connection
     void close(int id, websocketpp::close::status::value code, std::string reason);
 };
+
+class BTMessenger
+{
+public:
+    BTMessenger(const std::string &uri);
+    void call_method(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
+    bool connect();
+    void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
+    void close();
+
+private:
+    websocket_endpoint m_ws_endpoint;
+    std::string m_uri;
+    int connection_id;
+};

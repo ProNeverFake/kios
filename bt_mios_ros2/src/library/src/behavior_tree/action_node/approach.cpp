@@ -3,8 +3,9 @@
 namespace Insertion
 {
     Approach::Approach(const std::string &name, const BT::NodeConfig &config)
-        : BT::StatefulActionNode(name, config)
+        : MetaNode(name, config)
     {
+        node_context_ptr = std::make_shared<ActionNodeContext>(node_context);
     }
 
     BT::PortsList Approach::providedPorts()
@@ -13,11 +14,35 @@ namespace Insertion
 
         // return {BT::InputPort<std::vector<double>>("target_position")};
     }
+    /**
+     * @brief Here to apply the success condition check.
+     *
+     * @return true
+     * @return false
+     */
+    bool Approach::is_success(){
+        //
+    };
+    void Approach::node_context_initialize()
+    {
+        std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
+        context_ptr->node_name = "approach";
+        // todo add more command context here.
+    };
 
     BT::NodeStatus Approach::onStart()
     {
         // getInput("target_position", target_position);
-
+        // * get the current state from data_pool class
+        // * check the state
+        if (is_success())
+        {
+            return BT::NodeStatus::SUCCESS;
+        }
+        else
+        {
+            return BT::NodeStatus::RUNNING;
+        }
         // if (msec <= 0)
         // {
         //     // no need to go into the RUNNING state
@@ -35,7 +60,7 @@ namespace Insertion
     /// method invoked by an action in the RUNNING state.
     BT::NodeStatus Approach::onRunning()
     {
-        if (std::chrono::system_clock::now() >= deadline_)
+        if (is_success())
         {
             return BT::NodeStatus::SUCCESS;
         }
@@ -48,7 +73,7 @@ namespace Insertion
     void Approach::onHalted()
     {
         // nothing to do here...
-        std::cout << "SleepNode interrupted" << std::endl;
+        std::cout << "Action stoped" << std::endl;
     }
 
 } // namespace Insertion

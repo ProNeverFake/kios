@@ -138,6 +138,7 @@ list(APPEND ${MODULE_NAME}_SRC
 file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp")
 list(APPEND ${MODULE_NAME}_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/node_list.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/tree_map.hpp
 )
 
 add_library(${MODULE_NAME}
@@ -154,11 +155,55 @@ target_include_directories(${MODULE_NAME}
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     )
-
+find_package(spdlog REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
 
 ament_target_dependencies(${MODULE_NAME}
     behaviortree_cpp
+    spdlog
+    )
+
+########## copy the xml tree file into the corresponding dir
+# file(GLOB FILENAMES "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/xml/*.xml")
+
+# foreach(FILENAME ${FILENAMES})
+#     message(STATUS "FILENAME: ${FILENAME}\n")
+#     message(STATUS "copied to: ${CMAKE_CURRENT_BINARY_DIR}/xml/\n")
+#     configure_file(${FILENAME} ${CMAKE_CURRENT_BINARY_DIR}/xml/ COPYONLY) 
+
+# endforeach(FILENAME ${FILENAMES})
+##########
+
+######################################################################
+
+################################################### bt_ros2 library
+set(MODULE_NAME bt_ros2)
+
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/bt_ros2/*.cpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/bt_ros2/*.hpp")
+
+add_library(${MODULE_NAME}
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
+    )
+
+add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
+
+target_include_directories(${MODULE_NAME}
+    PRIVATE
+        src
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
+find_package(spdlog REQUIRED)
+find_package(behaviortree_cpp REQUIRED)
+
+ament_target_dependencies(${MODULE_NAME}
+    behaviortree_cpp
+    spdlog
+    rclcpp
+    rclcpp_action
     )
 
 ######################################################################

@@ -1,26 +1,26 @@
-// #include <behaviortree_cpp/behavior_tree.h>
-// #include <behaviortree_cpp/bt_factory.h>
+#include <behaviortree_cpp/behavior_tree.h>
+#include <behaviortree_cpp/bt_factory.h>
 
-// namespace Insertion
+namespace Insertion
 
-// {
-//     class Reach : public BT::StatefulActionNode
-//     {
-//     public:
-//         Reach(const std::string &name, const BT::NodeConfig &config);
+{
+    class Reach : public BT::StatefulActionNode
+    {
+    public:
+        Reach(const std::string &name, const BT::NodeConfig &config);
 
-//         static BT::PortsList providedPorts();
+        static BT::PortsList providedPorts();
 
-//         BT::NodeStatus onStart() override;
+        BT::NodeStatus onStart() override;
 
-//         /// method invoked by an action in the RUNNING state.
-//         BT::NodeStatus onRunning() override;
-//         // Method invoked when interrupted
-//         void onHalted() override;
+        /// method invoked by an action in the RUNNING state.
+        BT::NodeStatus onRunning() override;
+        // Method invoked when interrupted
+        void onHalted() override;
 
-//     private:
-//         std::vector<double> target_position;
-//         std::chrono::system_clock::time_point deadline_;
-//     };
+    private:
+        std::vector<double> target_position;
+        std::chrono::system_clock::time_point deadline_;
+    };
 
-// } // namespace Insertion
+} // namespace Insertion

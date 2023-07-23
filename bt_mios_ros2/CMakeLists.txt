@@ -25,6 +25,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(example_interfaces REQUIRED)
 find_package(bt_mios_ros2_interface REQUIRED)
+find_package(spdlog REQUIRED)
 
 # rosidl dependencies
 find_package(rosidl_default_generators REQUIRED)

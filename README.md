@@ -1,92 +1,155 @@
-# BT_Mios_Ros2
 
+# ROS2 package for Behavior-Tree & MIOS
 
+This is the package for implementation of behavior tree in ROS2 (based on distro Humble in principle). Code for the communication with MIOS using websocketpp and nlohman json library is also included.
 
-## Getting started
+## Intro
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+So you just decided to add a README to your project. You want to create an easy
+to read and easy to navigate file.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+The question is: What should you do next?
 
-## Add your files
+Should you create one from scratch? Find a silver bullet solution? Or is it
+better to customize an already existing file?
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+I'm going to show you how to create a README that fits your project, is easy
+to read and contains everyting you will ever need.
+
+## Feature overview
+
+*   [x] **Easy to read** like an article
+*   [x] **Feature overview and Contents** for fast orientation
+*   [ ] **Visuals** to keep users engaged
+
+## Contents
+
+*   [What is this?](#what-is-this)
+*   [When should I use this?](#when-should-i-use-this)
+*   [Getting started](#getting-started)
+    *   [Requirements](#requirements)
+    *   [Install](#install)
+    *   [Usage](#usage)
+*   [Here is where it's your turn](#here-is-where-its-your-turn)
+*   [Don't forget anything](#dont-forget-anything)
+    * [Used Technologies](#used-technologies)
+    * [Testing](#testing)
+    * [Logging](#logging)
+*   [Contribute](#contribute)
+*   [License](#license)
+*   [Sources](#sources)
+*   [Conclusion](#conclusion)
+
+## What is this?
+
+This project is an exhaustive README template that you can customize to your needs.
+You can either add sections you like or remove sections you don't like. But you have
+every time an example in front of you, from which you can derive from.
+
+## Why should I use this?
+
+There are many README templates out there so why this one? The two main reasons for this are
+that they contain often too little content or they are not easy to read or navigate through.
+
+## Getting Started
+
+So how do you get this template to work for your project? It is easier than you think.
+
+### Requirements
+
+* Have a project ready where you can add a README
+* Basic knowledge of [Markdown][about-markdown] (here is a [Cheatsheet][markdown-cheatsheet])
+
+### Install
+
+Install ROS2 humble or foxy
+
+Install BehaviorTree.CPP
+
+Install websocketpp apt package
+
+Install nlohman apt package
+
+Use git to clone this repository into your computer.
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.lrz.de/bblab/ma/bt_mios_ros2.git
-git branch -M main
-git push -uf origin main
+git clone https://gitlab.com/kopino4-templates/readme-template
 ```
 
-## Integrate with your tools
+### Usage
 
-- [ ] [Set up project integrations](https://gitlab.lrz.de/bblab/ma/bt_mios_ros2/-/settings/integrations)
+Use the well known command to copy the template
 
-## Collaborate with your team
+```bash
+# Copy the content
+CTRL + C
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+# Pase into your project
+CTRL + V
+```
 
-## Test and Deploy
+## Here is where it's your turn
 
-Use the built-in continuous integration in GitLab.
+Here starts the main content of your README. This is why you did it for in the first place.
+To describe to future users of this project (including yourself) everything they need to know
+to be able to use it and understand it.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Use visuals to help the reader understand better. An image, diagram, chart or code example says
+more than thousand words
 
-***
+![Diagram](doc/diagram.jpg)
 
-# Editing this README
+## Don't forget anything
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Think hard about anything that is clear to you but might not be clear for others. Why are you
+using this aproach or why did you pick this solution instead?
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Used technologies
 
-## Name
-Choose a self-explaining name for your project.
+For sure mention all the technologies you used. If the technologies age in time you don't forget
+they are used and need to be replaced.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Testing
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+No tests no sucess. You SHOULD have tests for every project, but do new users know how to run them?
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+No ofc not so there is no test
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Logging
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Logging is essential. How do you know something went wrong if the computer doesn't tell you? Logs
+are the first place to search for bugs. Explain to everybody how you can customize it or used it
+in the right way.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Contribute
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Please make sure to update tests as appropriate.
 
 ## License
-For open source projects, say how it is licensed.
+[MIT](https://choosealicense.com/licenses/mit/)
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Sources
+
+[react-markdown][react-markdown] - Project which served as an inspiration for this README
+
+[Blog post templates][blog-post-templates] - Used to structure this template as an easy to read blog post
+
+[About markdown][about-markdown] - Why should you use markdown?
+
+[Markdown Cheat Sheet][markdown-cheatsheet] - Get a fast overview of the syntax
+
+[//]: # "Source definitions"
+[react-markdown]: https://github.com/remarkjs/react-markdown "React-markdown project"
+[blog-post-templates]: https://backlinko.com/hub/content/blog-post-templates "Backlinko blog post templates"
+[about-markdown]: https://www.markdownguide.org/getting-started/ "Introduction to markdown"
+[markdown-cheatsheet]: https://www.markdownguide.org/cheat-sheet/ "Markdown Cheat Sheet"
+
+## Conclusion
+
+To summarize..
+
+We have an exhaustive README template with many features. The README is easy to read and navigate like an article.
+In our future projects we can use this template to get a great head start in creating a custom README.
+

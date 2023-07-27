@@ -1,0 +1,4 @@
+float32 speed
+---
+bool result
+string error_message

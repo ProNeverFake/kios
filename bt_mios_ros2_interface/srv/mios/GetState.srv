@@ -1,0 +1,6 @@
+---
+bool result
+string error_message
+string grasped_object
+float32[] q
+float32[] b_t_ee

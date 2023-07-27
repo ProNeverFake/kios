@@ -1,0 +1,122 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "src/library/libactions.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"add_compile_options",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"src/library/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 6,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 5,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 15,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-Wextra"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-Wpedantic"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/home/blackbird/ros_workspace/src/bt_mios_ros2/src/library/src"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/blackbird/ros_workspace/src/bt_mios_ros2/src/library/include"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/blackbird/ros_workspace/src/bt_mios_ros2/include"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"id" : "actions::@07a51f879e5ec2b49499",
+	"name" : "actions",
+	"nameOnDisk" : "libactions.a",
+	"paths" : 
+	{
+		"build" : "src/library",
+		"source" : "src/library"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/library/src/action/bt_action_client.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

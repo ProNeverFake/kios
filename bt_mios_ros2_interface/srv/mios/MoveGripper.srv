@@ -1,0 +1,5 @@
+float32 width
+float32 speed
+---
+bool result
+string error_message

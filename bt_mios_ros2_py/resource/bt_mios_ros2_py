@@ -1,0 +1,103 @@
+# Copyright 2016 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import rclpy
+from rclpy.node import Node
+
+import socket
+import time
+import json
+
+from ws_client import *
+
+
+class BTUdpNode(Node):
+
+    def __init__(self):
+        super().__init__('bt_upd_node')
+        #  self.publisher_ = self.create_publisher(String, 'topic', 10)
+        timer_period = 0.05  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+
+    def timer_callback(self):
+        pass
+        # msg = String()
+        # msg.data = 'Hello World: %d' % self.i
+        # self.publisher_.publish(msg)
+        # self.get_logger().info('Publishing: "%s"' % msg.data)
+        # self.i += 1
+
+    def test_telemetry_udp(address: str, subscriber_addr: str, subscriber_port: int = 12346):
+        print("Testing Telemtry_UDP module...")
+        print("subscribe to Telemetry_UDP with \"tau_ext\", \"q\"...")
+        result_1 = call_method(address, 12000, "subscribe_telemetry",
+                               {"ip": subscriber_addr, "port": subscriber_port, "subscribe": ["tau_ext", "q"]}, silent=False, timeout=7)
+        if result_1["result"]["result"]:
+            print("successfull subscribed.")
+        else:
+            print("Error while subscribing: ", result_1)
+        print("receiving subscribed telemetry packages for next 10 seconds...")
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind((subscriber_addr, subscriber_port))
+        cnt = 0
+        received_pkgs = []
+        start_time = time.time()
+        try:
+            print("\n    --Interrupt with ctrl+c--\n")
+            while True:
+                data, adrr = s.recvfrom(8192)
+                received_pkgs.append(json.loads(data.decode("utf-8")))
+                cnt += 1
+                if time.time() - start_time > 10:
+                    break
+        except KeyboardInterrupt:
+            pass
+        end_time = time.time()
+        print("received ", cnt, " packages over last",
+              end_time - start_time, " seconds")
+        pkg_validation_cnt = 0
+        for pkg in received_pkgs:
+            if pkg.get("tau_ext", False) != False and pkg.get("q", False) != False:
+                pkg_validation_cnt += 1
+        print(cnt - pkg_validation_cnt, " package(s) are corrupted.")
+        print("unsubscribe...")
+        result_2 = call_method(address, 12000, "unsubscribe_telemetry", {
+                               "ip": subscriber_addr})
+        if result_2["result"]["result"]:
+            print("successfull unsibscribed.")
+        if cnt < 1:
+            print("Received no package. Test failed!")
+        elif result_1["result"]["result"] and cnt - pkg_validation_cnt == 0 and result_2["result"]["result"]:
+            print("\nEverything works fine :)")
+        else:
+            print("\nTest failed!")
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    bt_udp_node = BTUdpNode()
+
+    rclpy.spin(bt_udp_node)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    bt_udp_node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

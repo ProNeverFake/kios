@@ -1,0 +1,5 @@
+string task_uuid
+---
+bool result
+string error_message
+string task_result

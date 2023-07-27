@@ -23,11 +23,11 @@ public:
           m_messenger(ws_url)
     {
         // * websocket connection
-        // m_messenger.connect();
+        m_messenger.connect();
         // * waiting time for the connection
-        // std::this_thread::sleep_for(std::chrono::seconds(5));
-        // * call udp communication for
-        // publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        // * establish udp communication
+        register_udp();
         //* the ros spin method:
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(500),
@@ -36,6 +36,14 @@ public:
     }
 
 private:
+    void register_udp()
+    {
+        nlohmann::json payload;
+        payload["ip"] = "localhost";
+        payload["port"] = 0;
+        payload["subscribe"] = {"tau_ext", "q"};
+        m_messenger.send("subscribe_telemetry", payload);
+    }
     bool check_tick_result()
     {
         if (tick_result == BT::NodeStatus::RUNNING)

@@ -13,15 +13,14 @@ from .resource.ws_client import *
 
 class BTUdpNode(Node):
 
-    subsriber = ''
-    # ! COMPLETE
-    subscriber_ip = ""
+    subscriber = ''
+    subscriber_ip = "127.0.0.1"
     subscriber_port = 12346
 
     def __init__(self):
         super().__init__('bt_upd_node')
         # register flag parameter for updating robot
-        self.declare_parameter('is_update', 'false')
+        self.declare_parameter('is_update', True)
 
         # declare parameters with a json file
         # Get the path to the 'resources' directory
@@ -39,18 +38,20 @@ class BTUdpNode(Node):
         # setup the udp
         self.udp_setup()
         #  self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.05  # seconds
+        timer_period = 0.01  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
     def is_update(self):
         flag = self.get_parameter('is_update').get_parameter_value().bool_value
+        print("flag:", flag)
         return flag
 
     def timer_callback(self):
         if self.is_update():
             self.udp_update_parameter()
         else:
+            print("pass\n")
             pass
         # msg = String()
         # msg.data = 'Hello World: %d' % self.i
@@ -60,12 +61,10 @@ class BTUdpNode(Node):
 
     def udp_get_package(self):
         udp_pkg = []
-        start_time = time.time()
-        while True:
-            data, adrr = self.subscriber.recvfrom(8192)
-            udp_pkg.append(json.loads(data.decode("utf-8")))
-            if time.time() - start_time > 0.04:
-                break
+        # ! the frequency is too low.
+        data, adrr = self.subscriber.recvfrom(8192)
+        udp_pkg.append(json.loads(data.decode("utf-8")))
+
         if len(udp_pkg) > 0:
             pkg = udp_pkg[-1]
             return pkg
@@ -85,6 +84,7 @@ class BTUdpNode(Node):
             new_parameters.append(new_param)
             self.set_parameters(new_parameters)
             self.get_logger().info('udp_update_parameter done.')
+            print(pkg.get('TF_F_ext_K'))
         else:
             self.get_logger().info('udp_update_parameter pass.')
 

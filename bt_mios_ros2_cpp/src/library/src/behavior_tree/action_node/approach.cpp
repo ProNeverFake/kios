@@ -23,7 +23,7 @@ namespace Insertion
      */
     bool Approach::is_success()
     {
-        return true;
+        return m_robot_state_ptr->is_approach_finished;
     };
     void Approach::node_context_initialize()
     {
@@ -39,7 +39,7 @@ namespace Insertion
         // * check the state
         if (is_success())
         {
-            return BT::NodeStatus::RUNNING;
+            return BT::NodeStatus::SUCCESS;
         }
         else
         {
@@ -64,7 +64,7 @@ namespace Insertion
     {
         if (is_success())
         {
-            return BT::NodeStatus::RUNNING;
+            return BT::NodeStatus::SUCCESS;
         }
         else
         {

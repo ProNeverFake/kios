@@ -103,7 +103,6 @@ class BTMessenger
 {
 public:
     BTMessenger(const std::string &uri);
-    void call_method(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     bool connect();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void close();

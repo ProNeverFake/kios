@@ -17,15 +17,13 @@ class BTRos2Node : public rclcpp::Node
 public:
     BTRos2Node(std::shared_ptr<Insertion::TreeRoot> tree_root)
         : Node("bt_ros2_node"), m_tree_root(tree_root),
-          // ! COMPLETE
+          // ? localhost invalid?
           ws_url("ws://localhost:12000/mios/core"),
-          udp_ip(""),
-          m_messenger(ws_url)
+          udp_ip("127.0.0.1")
     {
+        m_messenger = std::make_shared<BTMessenger>(ws_url); 
         // websocket connection
-        m_messenger.connect();
-        // waiting time for the connection
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        m_messenger->connect();
         // register the udp subscriber
         mios_register_udp();
         // the ros spin method:
@@ -36,29 +34,29 @@ public:
     }
 
 private:
-    void update_context()
+    void start_update_context()
     {
         // ! set the flag parameter ON
     }
     void mios_register_udp()
     {
-        m_messenger.register_udp();
+        m_messenger->register_udp();
     }
     void mios_interrupt()
-    // ! COMPLETE
+    // ! MOVE TO MESSENGER
     {
-        nlohmann::json payload;
-        payload["ip"] = "";
-        payload["port"] = 0;
-        payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
-        if (m_messenger.check_connection())
-        {
-            m_messenger.send("subscribe_telemetry", payload);
-        }
+        // nlohmann::json payload;
+        // payload["ip"] = udp_ip;
+        // payload["port"] = udp;
+        // payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
+        // if (m_messenger.check_connection())
+        // {
+        //     m_messenger.send("subscribe_telemetry", payload);
+        // }
     }
     void mios_unregister_udp()
     {
-        m_messenger.unregister_udp();
+        m_messenger->unregister_udp();
         // nlohmann::json payload;
         // payload["ip"] = "localhost";
         // if (m_messenger.check_connection())
@@ -91,7 +89,7 @@ private:
         // * get command context from the tree by tick it
         tick_result = m_tree_root->tick_once();
         RCLCPP_INFO(this->get_logger(), "Tick once.\n");
-        // // * check tick_result
+        // * check tick_result
         if (check_tick_result())
         {
             RCLCPP_INFO(this->get_logger(), "RUNNING.\n");
@@ -117,7 +115,7 @@ private:
     // rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
     // ws_client rel
-    BTMessenger m_messenger;
+    std::shared_ptr<BTMessenger> m_messenger;
     std::string ws_url;
     // udp subscriber ip
     std::string udp_ip;

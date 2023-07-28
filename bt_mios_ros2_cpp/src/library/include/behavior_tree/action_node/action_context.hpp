@@ -19,6 +19,7 @@ namespace Insertion
     {
         std::vector<double> q;
         std::vector<double> F_ext;
+        bool is_approach_finished = false;
     };
 
     // extern std::shared_ptr<ActionNodeContext> node_context_ptr;

@@ -1,4 +1,5 @@
 #include "ws_client/ws_client.hpp"
+#include <chrono>
 
 // Getter for connection handle
 websocketpp::connection_hdl connection_metadata::get_hdl() const
@@ -169,69 +170,17 @@ bool BTMessenger::check_connection()
     return true;
 }
 
-// ! discarded
-void call_method(const std::string &hostname, int port, const std::string &method, nlohmann::json payload = nlohmann::json(), const std::string &endpoint = "mios/core", int timeout = 100, bool silent = false)
-{
-    // Create JSON request
-    nlohmann::json request;
-    request["method"] = method;
-    request["request"] = payload;
-
-    // Construct URI
-    std::string uri = "ws://" + hostname + ":" + std::to_string(port) + "/" + endpoint;
-
-    // Initialize a websocket_endpoint
-    websocket_endpoint endpoint_client;
-
-    // Establish connection
-    int connection_id = endpoint_client.connect(uri);
-    if (connection_id < 0)
-    {
-        std::cout << "Failed to connect to " << uri << std::endl;
-        return;
-    }
-    else
-    {
-        std::cout << "Successfully connected to " << uri << std::endl;
-    }
-
-    // wait until the connection is ready
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // Send request
-    endpoint_client.send(connection_id, request.dump());
-
-    // dirty trick
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-
-    // end the connection
-    endpoint_client.close(connection_id, websocketpp::close::status::going_away, "");
-
-    // Here, we don't implement timeout and silent parameters in C++ as it's a bit more complex
-    // and beyond the scope of this simple implementation
-}
-// ! discarded
-void move_gripper(double width)
-{
-    // Create payload
-    nlohmann::json payload;
-    payload["width"] = width;
-    payload["speed"] = 0.05;
-
-    // Call the method
-    call_method("localhost", 12000, "move_gripper", payload); // Replace "localhost" with the actual robot IP
-}
-
 BTMessenger::BTMessenger(const std::string &uri)
     : m_uri(uri), connection_id(-1)
 {
-    // ! COMPLETE
-    udp_ip = "";
+    udp_ip = "127.0.0.1";
     udp_port = 12346;
 }
 bool BTMessenger::connect()
 {
     connection_id = m_ws_endpoint.connect(m_uri);
+    // waiting time for the connection
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     if (connection_id < 0)
     {
         std::cout << "Failed to connect to " << m_uri << std::endl;
@@ -315,42 +264,6 @@ void BTMessenger::stop_task(const std::string &method, nlohmann::json payload)
     {
         send("stop_task", payload);
     }
-}
-
-// ! discarded
-void BTMessenger::call_method(const std::string &method, nlohmann::json payload, int timeout, bool silent)
-{
-    // Create JSON request
-    nlohmann::json request;
-    request["method"] = method;
-    request["request"] = payload;
-
-    // Establish connection
-    int connection_id = m_ws_endpoint.connect(m_uri);
-    if (connection_id < 0)
-    {
-        std::cout << "Failed to connect to " << m_uri << std::endl;
-        return;
-    }
-    else
-    {
-        std::cout << "Successfully connected to " << m_uri << std::endl;
-    }
-
-    // wait until the connection is ready
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // Send request
-    m_ws_endpoint.send(connection_id, request.dump());
-
-    // dirty trick
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-
-    // end the connection
-    m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
-
-    // Here, we don't implement timeout and silent parameters in C++ as it's a bit more complex
-    // and beyond the scope of this simple implementation
 }
 
 // using namespace std;

@@ -2,10 +2,11 @@
 
 namespace Insertion
 {
-    Approach::Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr)
+    Approach::Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr)
         : MetaNode(name, config)
     {
         m_node_context_ptr = context_ptr;
+        m_robot_state_ptr = state_ptr;
     }
 
     BT::PortsList Approach::providedPorts()

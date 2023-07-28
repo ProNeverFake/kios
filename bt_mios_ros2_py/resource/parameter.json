@@ -1,8 +1,0 @@
-{
-    "my_complex_parameter": {
-        "field1": "value1",
-        "field2": 42
-    },
-    "another_parameter": 3.14,
-    "yet_another_parameter": "Hello, ROS 2!"
-}

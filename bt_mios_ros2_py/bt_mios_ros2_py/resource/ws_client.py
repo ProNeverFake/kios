@@ -13,6 +13,7 @@ if mios_communication_root not in sys.path:
     sys.path.insert(0, os.path.abspath(mios_communication_root))
     # print("add path mios_communication_root in the file", __file__)
 
+
 async def send(hostname, port=12000, endpoint="mios/core", request=None, timeout=100, silent=False):
     """sending msg to the wbesoecket server
 
@@ -27,7 +28,7 @@ async def send(hostname, port=12000, endpoint="mios/core", request=None, timeout
     Returns:
         _type_: reponse or None
     """
-    uri = "ws://" + hostname + ":" + str(port) + "/" +endpoint
+    uri = "ws://" + hostname + ":" + str(port) + "/" + endpoint
     try:
         async with websockets.connect(uri, close_timeout=1000) as websocket:
             message = json.dumps(request)
@@ -38,43 +39,51 @@ async def send(hostname, port=12000, endpoint="mios/core", request=None, timeout
         if silent is False:
             print("ConnectionRefusedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
     except ConnectionResetError as e:
         if silent is False:
             print("ConnectionResetError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
     except ConnectionAbortedError as e:
         if silent is False:
             print("ConnectionAbortedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
     except websockets.ConnectionClosedError as e:
         if silent is False:
             print("ConnectionClosedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
     except ConnectionTimeoutError as e:
         if silent is False:
             print("ConnectionTimeoutError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
     except websockets.exceptions.InvalidMessage as e:
         if silent is False:
             print("InvalidMessage: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " + str(port) + ", endpoint: " + endpoint)
+            print("Hostname: " + hostname + ", port: " +
+                  str(port) + ", endpoint: " + endpoint)
         return None
+
 
 def call_server(hostname, port, endpoint, request, timeout):
     asyncio.set_event_loop(asyncio.new_event_loop())
     return asyncio.get_event_loop().run_until_complete(send(hostname, request=request, port=port,
                                                             endpoint=endpoint, timeout=timeout))
+
 
 def call_method(hostname: str, port: int, method, payload=None, endpoint="mios/core", timeout=100, silent=False):
     """sending request to websocket server
@@ -101,8 +110,10 @@ def call_method(hostname: str, port: int, method, payload=None, endpoint="mios/c
                                                                 endpoint=endpoint, timeout=timeout, silent=silent))
     except socket.gaierror as e:
         print(e)
-        print("Hostname: " + hostname + ", port:" + str(port) + ", endpoint: " + endpoint)
+        print("Hostname: " + hostname + ", port:" +
+              str(port) + ", endpoint: " + endpoint)
         return None
+
 
 def start_task(hostname: str, task: str, parameters={}, queue=False):
     """start a task in mios
@@ -164,5 +175,3 @@ def start_task_and_wait(hostname, task, parameters, queue=False):
     response = start_task(hostname, task, parameters, queue)
     response = wait_for_task(hostname, response["result"]["task_uuid"])
     return response
-
-

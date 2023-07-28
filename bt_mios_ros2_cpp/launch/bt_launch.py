@@ -13,7 +13,6 @@ from launch_ros.actions import Node
 from launch_ros.actions import PushRosNamespace
 
 
-
 def generate_launch_description():
 
     # # args that can be set from the command line or a default will be used
@@ -58,7 +57,6 @@ def generate_launch_description():
     #         executable='turtlesim_node',
     #         name='sim'
     #     )
-    
 
     # # start another turtlesim_node in the turtlesim2 namespace
     # # and use args to set parameters
@@ -84,21 +82,20 @@ def generate_launch_description():
     #             ('/output/cmd_vel', '/turtlesim2/turtle1/cmd_vel'),
     #         ]
     #     )
-    
-    bt_server_node = Node(
-            package='bt_mios_ros2',
-            namespace='bt_mios_ros2',
-            executable='bt_server',
-            name='bt_server'
-        )
-    
-    bt_client_node = Node(
-            package='bt_mios_ros2',
-            namespace='bt_mios_ros2',
-            executable='bt_client',
-            name='bt_client'
-        )
-    
+
+    bt_ros2_node = Node(
+        package='bt_mios_ros2_cpp',
+        namespace='bt_mios_ros2',
+        executable='bt_ros2_node',
+        name='bt_ros2_node'
+    )
+
+    bt_udp_node = Node(
+        package='bt_mios_ros2_py',
+        namespace='bt_mios_ros2',
+        executable='bt_udp_node',
+        name='bt_udp_node'
+    )
 
     return LaunchDescription([
         # background_r_launch_arg,
@@ -110,6 +107,6 @@ def generate_launch_description():
         # turtlesim_node,
         # turtlesim_node_with_parameters,
         # forward_turtlesim_commands_to_second_turtlesim_node,
-        bt_client_node,
-        bt_server_node
+        bt_ros2_node,
+        bt_udp_node
     ])

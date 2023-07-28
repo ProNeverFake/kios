@@ -29,11 +29,15 @@ namespace Insertion
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();
         std::shared_ptr<ActionNodeContext> get_context_ptr();
+        std::shared_ptr<RobotState> get_state_ptr();
+        bool is_action_switch();
 
     private:
+        std::string m_action_name;
         BT::BehaviorTreeFactory m_factory;
         BT::Tree m_tree;
         std::shared_ptr<ActionNodeContext> m_context_ptr;
+        std::shared_ptr<RobotState> m_state_ptr;
     };
 
 } // namespace Insertion

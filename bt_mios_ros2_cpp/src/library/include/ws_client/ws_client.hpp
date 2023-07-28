@@ -107,9 +107,17 @@ public:
     bool connect();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void close();
+    bool check_connection();
+    // call mios methods
+    void start_task(const std::string &method, nlohmann::json payload = nlohmann::json());
+    void stop_task(const std::string &method, nlohmann::json payload = nlohmann::json());
+    void unregister_udp();
+    void register_udp();
 
 private:
     websocket_endpoint m_ws_endpoint;
     std::string m_uri;
+    std::string udp_ip;
+    int udp_port;
     int connection_id;
 };

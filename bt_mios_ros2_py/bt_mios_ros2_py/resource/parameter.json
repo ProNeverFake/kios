@@ -1,0 +1,6 @@
+{
+    "test_parameter": "",
+    "double_parameter": 3.14,
+    "string_parameter": "Hello, ROS 2!",
+    "TF_F_ext_K": [0,0,0,0,0,0]
+}

@@ -163,7 +163,13 @@ void websocket_endpoint::close(int id, websocketpp::close::status::value code, s
     m_connection_list.erase(metadata_it);
 }
 
-// TODO new library
+bool BTMessenger::check_connection()
+{
+    // todo
+    return true;
+}
+
+// ! discarded
 void call_method(const std::string &hostname, int port, const std::string &method, nlohmann::json payload = nlohmann::json(), const std::string &endpoint = "mios/core", int timeout = 100, bool silent = false)
 {
     // Create JSON request
@@ -218,7 +224,11 @@ void move_gripper(double width)
 
 BTMessenger::BTMessenger(const std::string &uri)
     : m_uri(uri), connection_id(-1)
-{}
+{
+    // ! COMPLETE
+    udp_ip = "";
+    udp_port = 12346;
+}
 bool BTMessenger::connect()
 {
     connection_id = m_ws_endpoint.connect(m_uri);
@@ -245,12 +255,66 @@ void BTMessenger::send(const std::string &method, nlohmann::json payload, int ti
     m_ws_endpoint.send(connection_id, request.dump());
 
     // Dirty trick to wait for response
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    // std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 void BTMessenger::close()
 {
     m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
+}
+
+void BTMessenger::register_udp()
+{
+    nlohmann::json payload;
+    payload["ip"] = udp_ip;
+    payload["port"] = udp_port;
+    payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
+    if (check_connection())
+    {
+        send("subscribe_telemetry", payload);
+    }
+}
+
+void BTMessenger::unregister_udp()
+{
+    nlohmann::json payload;
+
+    payload["ip"] = udp_ip;
+    if (check_connection())
+    {
+        send("unsubscribe_telemetry", payload);
+    }
+}
+/**
+ * @brief
+ *
+ * @param method
+ * @param payload
+ */
+void BTMessenger::start_task(const std::string &method, nlohmann::json payload)
+{
+    // TODO
+    if (check_connection())
+    {
+        send("start_task", payload);
+    }
+}
+/**
+ * @brief
+ *
+ * @param method
+ * @param payload
+ */
+void BTMessenger::stop_task(const std::string &method, nlohmann::json payload)
+{
+    payload["raise_exception"] = false;
+    payload["recover"] = false;
+    payload["empty_queue"] = false;
+
+    if (check_connection())
+    {
+        send("stop_task", payload);
+    }
 }
 
 // ! discarded

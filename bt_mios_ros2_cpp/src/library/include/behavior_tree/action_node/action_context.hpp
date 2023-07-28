@@ -11,10 +11,17 @@ namespace Insertion
     struct ActionNodeContext
     {
         std::string node_name;
+        std::string action_name;
         std::string command;
     };
 
-    extern std::shared_ptr<ActionNodeContext> node_context_ptr;
+    struct RobotState
+    {
+        std::vector<double> q;
+        std::vector<double> F_ext;
+    };
+
+    // extern std::shared_ptr<ActionNodeContext> node_context_ptr;
 
     // class ActionContext
     // {

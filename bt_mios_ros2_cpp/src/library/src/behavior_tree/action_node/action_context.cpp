@@ -20,7 +20,7 @@ namespace Insertion
     //     return std::make_shared<ActionNodeContext>(m_tree_action_context);
     // }
 
-    std::shared_ptr<ActionNodeContext> node_context_ptr =
-        std::make_shared<ActionNodeContext>();
+    // std::shared_ptr<ActionNodeContext> node_context_ptr =
+    //     std::make_shared<ActionNodeContext>();
 
 } // namespace Insertion

@@ -4,6 +4,10 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
+
+#include "rcl_interfaces/srv/set_parameters_atomically.hpp"
+#include "rcl_interfaces/srv/get_parameters.hpp"
+#include "rcl_interfaces/msg/parameter.hpp"
 // #include "std_msgs/msg/string.hpp"
 
 #include "behavior_tree/node_list.hpp"
@@ -15,33 +19,70 @@
 class BTRos2Node : public rclcpp::Node
 {
 public:
-    BTRos2Node(std::shared_ptr<Insertion::TreeRoot> tree_root)
-        : Node("bt_ros2_node"), m_tree_root(tree_root),
+    BTRos2Node()
+        : Node("bt_ros2_node"),
+          //   m_tree_root(tree_root),
           // ? localhost invalid?
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1")
     {
-        m_messenger = std::make_shared<BTMessenger>(ws_url); 
+        // * initialize the tree_root
+        m_tree_root = std::make_shared<Insertion::TreeRoot>();
+        // * initialize the websocket messenger
+        m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         m_messenger->connect();
         // register the udp subscriber
         mios_register_udp();
         // the ros spin method:
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(500),
+            std::chrono::milliseconds(100),
             std::bind(&BTRos2Node::timer_callback, this));
+        // * set the grasped object
+        m_messenger->send_grasped_object();
+        // set parameter of bt_udp_node to start context and state update
+        start_update_state();
         // TODO the web_socket receiver of the message from the server:
+        // m_messenger->
     }
 
 private:
-    void start_update_context()
+    /**
+     * @brief set the param "is_update" in node bt_udp_node as true
+     * TODO make a generic set param method
+     *
+     */
+    void start_update_state()
     {
-        // ! set the flag parameter ON
+        auto parameter = rcl_interfaces::msg::Parameter();
+        auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
+
+        std::string service_name = "bt_udp_node/set_parameters_atomically";
+        auto client = this->create_client<rcl_interfaces::srv::SetParametersAtomically>(service_name);
+
+        parameter.name = "is_update";
+        parameter.value.type = 1;          //  bool = 1,    int = 2,        float = 3,     string = 4
+        parameter.value.bool_value = true; // .bool_value, .integer_value, .double_value, .string_value
+
+        request->parameters.push_back(parameter);
+
+        while (!client->wait_for_service(std::chrono::milliseconds(10)))
+        {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+                return;
+            }
+            RCLCPP_INFO(this->get_logger(), "service %s not available, waiting again...", service_name.c_str());
+        }
+        auto result = client->async_send_request(request);
     }
+
     void mios_register_udp()
     {
         m_messenger->register_udp();
     }
+
     void mios_interrupt()
     // ! MOVE TO MESSENGER
     {
@@ -57,29 +98,28 @@ private:
     void mios_unregister_udp()
     {
         m_messenger->unregister_udp();
-        // nlohmann::json payload;
-        // payload["ip"] = "localhost";
-        // if (m_messenger.check_connection())
-        // {
-        //     m_messenger.send("unsubscribe_telemetry", payload);
-        // }
     }
+    /**
+     * @brief check the tree state
+     *
+     * @return true
+     * @return false
+     */
     bool check_tick_result()
     {
-        if (tick_result == BT::NodeStatus::RUNNING)
+        switch (tick_result)
         {
+        case BT::NodeStatus::RUNNING: {
             return true;
-        }
-        else
-        {
+        };
+        case BT::NodeStatus::SUCCESS: {
+            return false;
+        };
+        default: {
             return false;
         }
+        }
     }
-    bool check_action_context()
-    {
-        return true;
-    }
-    // nlohmann::json context_transform();
     /**
      * @brief
      *
@@ -92,34 +132,38 @@ private:
         // * check tick_result
         if (check_tick_result())
         {
-            RCLCPP_INFO(this->get_logger(), "RUNNING.\n");
             // * go ahead
+            RCLCPP_INFO(this->get_logger(), "RUNNING.\n");
+
+            // * check if action changed
+            if (m_tree_root->is_action_switch())
+            {
+                // * stop the current task
+                // ! m_messenger->stop_task();
+                // * use wait request
+                // * send new context
+                m_messenger->start_task(m_tree_root->get_context_ptr()->parameter);
+                // * use wait request
+            }
+            else
+            {
+                // do nothing
+            }
         }
         else
         {
-            RCLCPP_INFO(this->get_logger(), "???? NOT RUNNING.\n");
+            RCLCPP_INFO(this->get_logger(), "Action succeeds.\n");
             // * stop
         }
-        // * check
-        // * action_context --- json context
-        // m_context = context_transform();
-        // * send json context
-        // m_messenger.send("dummy_skill", m_context);
-        // *
-        // auto message = std_msgs::msg::String();
-        // message.data = "test_message";
-        //  RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-        // publisher_->publish(message);
     }
     rclcpp::TimerBase::SharedPtr timer_;
-    // rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
     // ws_client rel
     std::shared_ptr<BTMessenger> m_messenger;
     std::string ws_url;
+
     // udp subscriber ip
     std::string udp_ip;
-    // nlohmann::json m_context;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
@@ -130,8 +174,7 @@ int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
     // register the nodes
-    auto tree_root_ptr = std::make_shared<Insertion::TreeRoot>();
-    auto bt_ros2_node = std::make_shared<BTRos2Node>(tree_root_ptr);
+    auto bt_ros2_node = std::make_shared<BTRos2Node>();
 
     rclcpp::spin(bt_ros2_node);
     rclcpp::shutdown();

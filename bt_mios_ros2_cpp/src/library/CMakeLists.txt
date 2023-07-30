@@ -100,7 +100,6 @@ add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
 
 # pthread issues
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
 
 target_include_directories(${MODULE_NAME}
     PRIVATE
@@ -114,6 +113,8 @@ target_include_directories(${MODULE_NAME}
 # since no keyword is applied in ament_target_dependencies()
 target_link_libraries(${MODULE_NAME}
     Threads::Threads
+    nlohmann_json::nlohmann_json
+    websocketpp::websocketpp
 )
 
 ament_target_dependencies(${MODULE_NAME}
@@ -153,9 +154,6 @@ target_include_directories(${MODULE_NAME}
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     )
-find_package(spdlog REQUIRED)
-# find_package(behaviortree_cpp REQUIRED)
-find_package(fmt REQUIRED)
 
 target_link_libraries(${MODULE_NAME} 
     PUBLIC

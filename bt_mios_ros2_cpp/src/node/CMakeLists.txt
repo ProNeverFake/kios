@@ -2,12 +2,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(ament_cmake REQUIRED)
-
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
-
-
 # add_executable(bt_client bt_client.cpp)
 
 # target_link_libraries(bt_client
@@ -46,6 +40,7 @@ target_link_libraries(bt_ros2_node
 
 ament_target_dependencies(bt_ros2_node
   rclcpp
+  rcl_interfaces
 )
 
 if(BUILD_TESTING)

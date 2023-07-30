@@ -13,6 +13,8 @@
 #include "behavior_tree/action_node/align.hpp"
 #include "behavior_tree/action_node/push.hpp"
 #include "behavior_tree/action_node/reach.hpp"
+#include "behavior_tree/action_node/contact.hpp"
+#include "behavior_tree/action_node/wiggle.hpp"
 
 #include "behavior_tree/tree_map.hpp"
 
@@ -33,7 +35,7 @@ namespace Insertion
         bool is_action_switch();
 
     private:
-        std::string m_action_name;
+        std::string m_current_action_name = "dummy_action";
         BT::BehaviorTreeFactory m_factory;
         BT::Tree m_tree;
         std::shared_ptr<ActionNodeContext> m_context_ptr;

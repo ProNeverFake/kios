@@ -20,14 +20,9 @@ class BTUdpNode(Node):
     def __init__(self):
         super().__init__('bt_upd_node')
         # register flag parameter for updating robot
-        self.declare_parameter('is_update', True)
+        self.declare_parameter('is_update', False)
 
-        # declare parameters with a json file
-        # Get the path to the 'resources' directory
-        # package_path = os.path.dirname(__file__)
-        # resources_path = os.path.join(package_path, 'resource')
-        # # Get the path to the 'parameter.json' file
-        # parameter_file_path = os.path.join(resources_path, 'parameter.json')
+        # set param with json file
         pkg_share_dir = get_package_share_directory('bt_mios_ros2_py')
         parameter_file_path = os.path.join(
             pkg_share_dir, 'resource', 'parameter.json')

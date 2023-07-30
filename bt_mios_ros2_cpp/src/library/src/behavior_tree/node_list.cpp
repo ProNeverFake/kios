@@ -14,11 +14,14 @@ namespace Insertion
         // factory.registerSimpleCondition("CheckBattery", std::bind(CheckBattery));
         // factory.registerSimpleAction("OpenGripper", std::bind(&GripperInterface::open, &grip_singleton));
         m_factory.registerNodeType<Approach>("Approach", m_context_ptr, m_state_ptr);
+        m_factory.registerNodeType<Contact>("Contact", m_context_ptr, m_state_ptr);
+        m_factory.registerNodeType<Wiggle>("Wiggle", m_context_ptr, m_state_ptr);
         // factory.registerNodeType<Reach>("Reach");
     }
     void TreeRoot::initialize_tree()
     {
         register_node();
+        // TODO
         m_tree = m_factory.createTreeFromText(test_tree);
     }
     std::shared_ptr<ActionNodeContext> TreeRoot::get_context_ptr()
@@ -34,14 +37,17 @@ namespace Insertion
     {
         return m_tree.tickOnce();
     }
+
     BT::NodeStatus TreeRoot::tick_while_running()
     {
         return m_tree.tickWhileRunning();
     }
+
     bool TreeRoot::is_action_switch()
     {
-        if (m_action_name != get_context_ptr()->action_name)
+        if (m_current_action_name != get_context_ptr()->action_name)
         {
+            m_current_action_name = get_context_ptr()->action_name;
             return true;
         }
         else

@@ -1,15 +1,24 @@
-#include <websocketpp/config/asio_no_tls_client.hpp>
-#include <websocketpp/client.hpp>
-#include <websocketpp/common/thread.hpp>
-#include <websocketpp/common/memory.hpp>
+// #include <websocketpp/config/asio_no_tls_client.hpp>
+// #include <websocketpp/client.hpp>
+// #include <websocketpp/common/thread.hpp>
+// #include <websocketpp/common/memory.hpp>
 
-#include <nlohmann/json.hpp>
+#include "websocketpp/config/asio_no_tls_client.hpp"
+#include "websocketpp/client.hpp"
+#include "websocketpp/common/thread.hpp"
+#include "websocketpp/common/memory.hpp"
+
+#include "nlohmann/json.hpp"
+
 #include <memory>
 #include <iostream>
 #include <map>
 #include <string>
 
+#include <condition_variable>
+#include <mutex>
 #include <thread>
+#include <queue>
 #include <chrono>
 
 // Define types for convenience
@@ -68,6 +77,11 @@ class websocket_endpoint
     con_list m_connection_list;
     // Counter to generate unique IDs for connections
     int m_next_id;
+    /**
+     * @brief Set the message handler callback function
+     *
+     * @param handler the callback function
+     */
 
 public:
     // Constructor
@@ -97,6 +111,8 @@ public:
 
     // Close the specified connection
     void close(int id, websocketpp::close::status::value code, std::string reason);
+
+    void set_message_handler(std::function<void(const std::string &)> handler);
 };
 
 class BTMessenger
@@ -104,14 +120,19 @@ class BTMessenger
 public:
     BTMessenger(const std::string &uri);
     bool connect();
+    void thread_connect();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void close();
+    void thread_close();
     bool check_connection();
     // call mios methods
-    void start_task(const std::string &method, nlohmann::json payload = nlohmann::json());
-    void stop_task(const std::string &method, nlohmann::json payload = nlohmann::json());
+    void start_task(nlohmann::json payload = nlohmann::json());
+    void stop_task();
     void unregister_udp();
     void register_udp();
+    void set_message_handler(std::function<void(const std::string &)> handler);
+    nlohmann::json request_response(const std::string &method, nlohmann::json payload = nlohmann::json());
+    void send_grasped_object();
 
 private:
     websocket_endpoint m_ws_endpoint;
@@ -119,4 +140,9 @@ private:
     std::string udp_ip;
     int udp_port;
     int connection_id;
+    // thread management
+    std::thread m_thread;
+    std::mutex m_mutex;
+    std::condition_variable m_cv;
+    std::queue<std::string> m_message_queue;
 };

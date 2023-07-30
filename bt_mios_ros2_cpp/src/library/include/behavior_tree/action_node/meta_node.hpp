@@ -1,7 +1,8 @@
-#include <behaviortree_cpp/behavior_tree.h>
-#include <behaviortree_cpp/bt_factory.h>
+#pragma once
 
-// #include "behavior_tree/tree_map.hpp"
+#include "behaviortree_cpp/behavior_tree.h"
+#include "behaviortree_cpp/bt_factory.h"
+
 #include "behavior_tree/action_node/action_context.hpp"
 
 #include <any>
@@ -43,12 +44,16 @@ namespace Insertion
         // choose an action depending on the current situation.
         auto chose_action(); // todo
         std::shared_ptr<ActionNodeContext> get_context_ptr();
+        nlohmann::json get_action_parameter();
+        void set_action_parameter(nlohmann::json parameter);
 
     private:
+        virtual void action_parameter_initialize();
         virtual void node_context_initialize();
         virtual bool is_success();       // here to set the check condition
         MongoInterface m_data_interface; // data member
         ActionNodeContext m_context;     // node and command context
+        nlohmann::json action_parameter;
     };
 
 } // namespace Insertion

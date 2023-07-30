@@ -1,5 +1,4 @@
 #include "behavior_tree/action_node/action_context.hpp"
-// #include "behaviortree_cpp"
 
 namespace Insertion
 {
@@ -19,8 +18,5 @@ namespace Insertion
     // {
     //     return std::make_shared<ActionNodeContext>(m_tree_action_context);
     // }
-
-    // std::shared_ptr<ActionNodeContext> node_context_ptr =
-    //     std::make_shared<ActionNodeContext>();
 
 } // namespace Insertion

@@ -164,6 +164,14 @@ void websocket_endpoint::close(int id, websocketpp::close::status::value code, s
     m_connection_list.erase(metadata_it);
 }
 
+void websocket_endpoint::set_message_handler(std::function<void(const std::string &)> handler)
+{
+    m_endpoint.set_message_handler(
+        [this, handler](websocketpp::connection_hdl hdl, client::message_ptr msg) {
+            handler(msg->get_payload());
+        });
+}
+
 bool BTMessenger::check_connection()
 {
     // todo
@@ -192,24 +200,62 @@ bool BTMessenger::connect()
         return true;
     }
 }
+/**
+ * @brief thread connection, close with thread close
+ *
+ */
+void BTMessenger::thread_connect()
+{
+    m_ws_endpoint.connect(m_uri);
+
+    // set message handler to a member function
+    m_ws_endpoint.set_message_handler([this](const std::string &msg) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_message_queue.push(msg);
+        m_cv.notify_one();
+    });
+
+    // start a separate thread to handle messages
+    m_thread = std::thread([this]() {
+        for (;;)
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_cv.wait(lock, [this]() { return !m_message_queue.empty(); });
+
+            while (!m_message_queue.empty())
+            {
+                std::string message = m_message_queue.front();
+                m_message_queue.pop();
+
+                // handle the message (you can replace this with your own logic)
+                std::cout << "Received message: " << message << std::endl;
+            }
+        }
+    });
+}
 
 void BTMessenger::send(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
-    // Create JSON request
     nlohmann::json request;
     request["method"] = method;
     request["request"] = payload;
 
     // Send request
     m_ws_endpoint.send(connection_id, request.dump());
-
-    // Dirty trick to wait for response
-    // std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 void BTMessenger::close()
 {
     m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
+}
+
+void BTMessenger::thread_close()
+{
+    m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
+    if (m_thread.joinable())
+    {
+        m_thread.join();
+    }
 }
 
 void BTMessenger::register_udp()
@@ -220,7 +266,7 @@ void BTMessenger::register_udp()
     payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
     if (check_connection())
     {
-        send("subscribe_telemetry", payload);
+        request_response("subscribe_telemetry", payload);
     }
 }
 
@@ -235,77 +281,80 @@ void BTMessenger::unregister_udp()
     }
 }
 /**
- * @brief
+ * @brief start a task with "general skill" added.
  *
- * @param method
- * @param payload
+ * @param skill_context
  */
-void BTMessenger::start_task(const std::string &method, nlohmann::json payload)
+void BTMessenger::start_task(nlohmann::json skill_context)
 {
     // TODO
+    nlohmann::json task_context =
+        {{"parameters",
+          {{"skill_names", "insertion"},
+           {"skill_types", "BBGeneralSkill"},
+           {"as_queue", false}}},
+         {"skills", skill_context}};
+    nlohmann::json call_context =
+        {{"task", "GenericTask"},
+         {"parameters", task_context},
+         {"queue", false}};
     if (check_connection())
     {
-        send("start_task", payload);
+        send("start_task", call_context);
     }
 }
+
 /**
- * @brief
+ * @brief stop the current task.
+ *
+ */
+void BTMessenger::stop_task()
+{
+    nlohmann::json payload =
+        {{"raise_exception", false},
+         {"recover", false},
+         {"empty_queue", false}};
+    if (check_connection())
+    {
+        // send("stop_task", payload);
+        request_response("stop_task", payload);
+    }
+}
+
+void BTMessenger::set_message_handler(std::function<void(const std::string &)> handler)
+{
+    m_ws_endpoint.set_message_handler(handler);
+}
+
+/**
+ * @brief send a request and wait until a response is received.
  *
  * @param method
  * @param payload
+ * @return nlohmann::json
  */
-void BTMessenger::stop_task(const std::string &method, nlohmann::json payload)
+nlohmann::json BTMessenger::request_response(const std::string &method, nlohmann::json payload)
 {
-    payload["raise_exception"] = false;
-    payload["recover"] = false;
-    payload["empty_queue"] = false;
+    // Send request
+    send(method, payload);
 
-    if (check_connection())
+    // Wait for response
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_cv.wait(lock, [this]() { return !m_message_queue.empty(); });
+
+    if (!m_message_queue.empty())
     {
-        send("stop_task", payload);
+        std::string response = m_message_queue.front();
+        m_message_queue.pop();
+        return response;
     }
+
+    return ""; // If no response, return an empty string
 }
 
-// using namespace std;
-
-// int main()
-// {
-//     move_gripper(0.02);
-//     return 0;
-
-// //   // Create an endpoint.
-// //   websocket_endpoint endpoint;
-
-// //   // Specify the URI of the server to connect to.
-// //   std::string uri = "ws://localhost:12000/mios/core";
-
-// //   int id = endpoint.connect(uri);
-
-// //   if (id == -1)
-// //   {
-// //     return -1;
-// //   }
-
-// //   // Check if the connection was successful.
-// //   if (id != -1)
-// //   {
-// //     // Prepare a JSON message to send.
-// //     nlohmann::json j;
-// //     j["method"] = "test_method";
-// //     j["request"] = "test_request";
-
-// //     std::string message = j.dump();
-
-// //     // Send the message.
-// //     endpoint.send(id, message);
-
-// //     // Sleep for a few seconds to allow the server to process and respond.
-// //     // Note: You should use a more robust method of waiting for a response in production code.
-// //     std::this_thread::sleep_for(std::chrono::seconds(2));
-
-// //     // Close the connection.
-// //     endpoint.close(id, websocketpp::close::status::going_away, "");
-// //   }
-
-// //   return 0;
-// }
+void BTMessenger::send_grasped_object()
+{
+    nlohmann::json payload;
+    payload["object"] = "ring";
+    request_response("set_grasped_object", payload);
+}

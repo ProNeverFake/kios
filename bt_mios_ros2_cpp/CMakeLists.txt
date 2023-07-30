@@ -22,13 +22,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# find_package(behaviortree_cpp REQUIRED)
+find_package(behaviortree_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(example_interfaces REQUIRED)
 # find_package(bt_mios_ros2_interface REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(websocketpp REQUIRED)
+find_package(Threads REQUIRED)
+find_package(spdlog REQUIRED)
+
+find_package(fmt REQUIRED)
 
 # rosidl dependencies
 find_package(rosidl_default_generators REQUIRED)

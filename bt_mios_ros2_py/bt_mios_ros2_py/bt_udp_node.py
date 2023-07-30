@@ -18,7 +18,7 @@ class BTUdpNode(Node):
     subscriber_port = 12346
 
     def __init__(self):
-        super().__init__('bt_upd_node')
+        super().__init__('bt_udp_node')
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
 

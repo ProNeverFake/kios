@@ -32,13 +32,16 @@ public:
         m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         m_messenger->connect();
+
         // register the udp subscriber
         mios_register_udp();
+        RCLCPP_INFO(this->get_logger(), "DEBUUUUUUUUUUUUUUUUUUUUUUUUUG\n");
         // the ros spin method:
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&BTRos2Node::timer_callback, this));
         // * set the grasped object
+        RCLCPP_INFO(this->get_logger(), "DEBUUUUUUUUUUUUUUUUUUUUUUUUUG\n");
         m_messenger->send_grasped_object();
         // set parameter of bt_udp_node to start context and state update
         start_update_state();
@@ -57,7 +60,7 @@ private:
         auto parameter = rcl_interfaces::msg::Parameter();
         auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
 
-        std::string service_name = "bt_udp_node/set_parameters_atomically";
+        std::string service_name = "/bt_udp_node/set_parameters_atomically";
         auto client = this->create_client<rcl_interfaces::srv::SetParametersAtomically>(service_name);
 
         parameter.name = "is_update";
@@ -139,14 +142,16 @@ private:
             if (m_tree_root->is_action_switch())
             {
                 // * stop the current task
-                // ! m_messenger->stop_task();
+                m_messenger->stop_task();
                 // * use wait request
                 // * send new context
                 m_messenger->start_task(m_tree_root->get_context_ptr()->parameter);
                 // * use wait request
+                RCLCPP_INFO(this->get_logger(), "Action Switched.\n");
             }
             else
             {
+                RCLCPP_INFO(this->get_logger(), "Action Running.\n");
                 // do nothing
             }
         }

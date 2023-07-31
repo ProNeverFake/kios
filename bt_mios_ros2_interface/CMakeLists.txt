@@ -25,6 +25,19 @@ endif()
 
 find_package(rosidl_default_generators REQUIRED)
 
+################################### bt_service
+set(MODULE_NAME bt_srv)
+
+file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/srv/bt/*.srv")
+
+set(${MODULE_NAME}_FILE_NAMES)
+
+foreach(file ${${MODULE_NAME}_FILES})
+    get_filename_component(file_name ${file} NAME)
+    list(APPEND ${MODULE_NAME}_FILE_NAMES "srv/bt/${file_name}")
+endforeach()
+
+message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
 ################################### mios_service
 set(MODULE_NAME mios_srv)
@@ -74,9 +87,11 @@ endforeach()
 
 ################################ generate the interface
 rosidl_generate_interfaces(${PROJECT_NAME}
+      # ${bt_srv_FILE_NAMES}      
       ${mios_srv_FILE_NAMES}
       ${mios_msg_FILE_NAMES}
       ${action_FILE_NAMES}
+      "srv/RequestState.srv"
     )
 
 ament_package()

@@ -10,12 +10,16 @@ from ament_index_python.packages import get_package_share_directory
 
 from .resource.ws_client import *
 
+from bt_mios_ros2_interface.srv import RequestState
+
 
 class BTUdpNode(Node):
 
     subscriber = ''
     subscriber_ip = "127.0.0.1"
     subscriber_port = 12346
+    # robot state variable dictionary.
+    robot_state = {"tf_f_ext_k": [0, 0, 0, 0, 0, 0]}
 
     def __init__(self):
         super().__init__('bt_upd_node')
@@ -36,6 +40,12 @@ class BTUdpNode(Node):
         timer_period = 0.01  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
+        self.srv = self.create_service(
+            RequestState, 'request_state', self.request_state_callback)
+
+    def request_state_callback(self, request, response):
+        response.tf_f_ext_k = self.robot_state['tf_f_ext_k']
+        return response
 
     def is_update(self):
         flag = self.get_parameter('is_update').get_parameter_value().bool_value
@@ -79,6 +89,7 @@ class BTUdpNode(Node):
             new_parameters.append(new_param)
             self.set_parameters(new_parameters)
             self.get_logger().info('udp_update_parameter done.')
+            self.robot_state['tf_f_ext_k'] = pkg.get('TF_F_ext_K')
             print(pkg.get('TF_F_ext_K'))
         else:
             self.get_logger().info('udp_update_parameter pass.')

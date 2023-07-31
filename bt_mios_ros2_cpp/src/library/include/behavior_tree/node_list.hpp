@@ -33,6 +33,7 @@ namespace Insertion
         std::shared_ptr<ActionNodeContext> get_context_ptr();
         std::shared_ptr<RobotState> get_state_ptr();
         bool is_action_switch();
+        void update_state();
 
     private:
         std::string m_current_action_name = "dummy_action";

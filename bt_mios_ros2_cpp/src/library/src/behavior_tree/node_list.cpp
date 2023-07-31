@@ -56,6 +56,11 @@ namespace Insertion
         }
     }
 
+    void TreeRoot::update_state()
+    {
+        // ! TODO
+    }
+
 } // namespace Insertion
 
 ////////////////////////////////////////////////////////////////////////

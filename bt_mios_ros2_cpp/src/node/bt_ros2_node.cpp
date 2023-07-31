@@ -13,6 +13,8 @@
 #include "behavior_tree/node_list.hpp"
 #include "ws_client/ws_client.hpp"
 
+#include "bt_mios_ros2_interface/srv/request_state.hpp"
+
 /* This example creates a subclass of Node and uses std::bind() to register a
  * member function as a callback from the timer. */
 
@@ -24,7 +26,8 @@ public:
           //   m_tree_root(tree_root),
           // ? localhost invalid?
           ws_url("ws://localhost:12000/mios/core"),
-          udp_ip("127.0.0.1")
+          udp_ip("127.0.0.1"),
+          m_client_ptr(nullptr)
     {
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
@@ -42,11 +45,58 @@ public:
         m_messenger->send_grasped_object();
         // set parameter of bt_udp_node to start context and state update
         start_update_state();
+        // * initilize the client
+        m_client_ptr = this->create_client<bt_mios_ros2_interface::srv::RequestState>("request_state");
         // TODO the web_socket receiver of the message from the server:
         // m_messenger->
     }
 
 private:
+    // srv client
+    rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedPtr m_client_ptr;
+
+    rclcpp::TimerBase::SharedPtr timer_;
+
+    // ws_client rel
+    std::shared_ptr<BTMessenger> m_messenger;
+    std::string ws_url;
+
+    // udp subscriber ip
+    std::string udp_ip;
+
+    // behavior tree rel
+    std::shared_ptr<Insertion::TreeRoot> m_tree_root;
+    BT::NodeStatus tick_result;
+    void update_state_context()
+    {
+        while (!m_client_ptr->wait_for_service(std::chrono::seconds(1)))
+        {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_ERROR(this->get_logger(), "client interrupted while waiting.");
+                break;
+            }
+            RCLCPP_INFO(this->get_logger(), "waiting for service to appear...");
+        }
+        auto request = std::make_shared<bt_mios_ros2_interface::srv::RequestState::Request>();
+        request->object = "state";
+        auto result_future = m_client_ptr->async_send_request(request);
+        if (result_future.wait_for(std::chrono::milliseconds(5)) == std::future_status::ready) // wait for the result for 5 seconds
+        {
+            handle_service_result(result_future);
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "Service call timed out!");
+        }
+    }
+
+    void handle_service_result(rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedFuture result_future)
+    {
+        auto result = result_future.get();
+        m_tree_root->get_state_ptr()->TF_F_ext_K = result->tf_f_ext_k;
+    }
+
     /**
      * @brief set the param "is_update" in node bt_udp_node as true
      * TODO make a generic set param method
@@ -126,6 +176,8 @@ private:
      */
     void timer_callback()
     {
+        // * update the state
+        update_state_context();
         // * get command context from the tree by tick it
         tick_result = m_tree_root->tick_once();
         RCLCPP_INFO(this->get_logger(), "Tick once.\n");
@@ -156,18 +208,6 @@ private:
             // * stop
         }
     }
-    rclcpp::TimerBase::SharedPtr timer_;
-
-    // ws_client rel
-    std::shared_ptr<BTMessenger> m_messenger;
-    std::string ws_url;
-
-    // udp subscriber ip
-    std::string udp_ip;
-
-    // behavior tree rel
-    std::shared_ptr<Insertion::TreeRoot> m_tree_root;
-    BT::NodeStatus tick_result;
 };
 
 int main(int argc, char *argv[])

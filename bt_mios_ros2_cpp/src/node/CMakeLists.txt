@@ -41,6 +41,7 @@ target_link_libraries(bt_ros2_node
 ament_target_dependencies(bt_ros2_node
   rclcpp
   rcl_interfaces
+  bt_mios_ros2_interface
 )
 
 if(BUILD_TESTING)

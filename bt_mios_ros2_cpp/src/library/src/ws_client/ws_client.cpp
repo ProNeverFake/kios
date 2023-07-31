@@ -266,7 +266,7 @@ void BTMessenger::register_udp()
     payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
     if (check_connection())
     {
-        request_response("subscribe_telemetry", payload);
+        send("subscribe_telemetry", payload);
     }
 }
 
@@ -317,7 +317,7 @@ void BTMessenger::stop_task()
     if (check_connection())
     {
         // send("stop_task", payload);
-        request_response("stop_task", payload);
+        send("stop_task", payload);
     }
 }
 
@@ -356,5 +356,5 @@ void BTMessenger::send_grasped_object()
 {
     nlohmann::json payload;
     payload["object"] = "ring";
-    request_response("set_grasped_object", payload);
+    send("set_grasped_object", payload);
 }

@@ -15,6 +15,9 @@
 
 #include "bt_mios_ros2_interface/srv/request_state.hpp"
 
+#include "example_interfaces/srv/add_two_ints.hpp"
+
+
 class BTRos2Node : public rclcpp::Node
 {
 public:
@@ -40,17 +43,20 @@ public:
         // * set the grasped object
         RCLCPP_INFO(this->get_logger(), "DEBUUUUUUUUUUUUUUUUUUUUUUUUUG\n");
         m_messenger->send_grasped_object();
-        // set parameter of bt_udp_node to start context and state update
-        start_update_state();
+        //*  set parameter of bt_udp_node to start context and state update
+        // start_update_state();
         // * initilize the client
         m_client_ptr = this->create_client<bt_mios_ros2_interface::srv::RequestState>("request_state");
         // TODO the web_socket receiver of the message from the server:
+        m_add_two_ints_ptr = this->create_client<example_interfaces::srv::AddTwoInts>("add_two_ints");
         // m_messenger->
     }
 
 private:
     // srv client
     rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedPtr m_client_ptr;
+
+    rclcpp::Client<example_interfaces::srv::AddTwoInts>::SharedPtr m_add_two_ints_ptr;
 
     rclcpp::TimerBase::SharedPtr timer_;
 
@@ -64,6 +70,54 @@ private:
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
+
+    void add_two_ints_request()
+    {
+        while (!m_add_two_ints_ptr->wait_for_service(std::chrono::seconds(1)))
+        {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_ERROR(this->get_logger(), "client interrupted while waiting.");
+                break;
+            }
+            RCLCPP_INFO(this->get_logger(), "waiting for service to appear...");
+        }
+        auto request = std::make_shared<example_interfaces::srv::AddTwoInts::Request>();
+        request->a = 1;
+        request->b = 2;
+        auto result_future = m_add_two_ints_ptr->async_send_request(request);
+        RCLCPP_INFO(this->get_logger(), "start to wait for the service.");
+
+        if (result_future.wait_for(std::chrono::milliseconds(500)) == std::future_status::ready)
+        {
+            RCLCPP_INFO(this->get_logger(), "the result is: %ld.\n", result_future.get()->sum);
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "the result is: GG.");    
+        }
+
+        // if (result_future.valid())
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "test: valid.");
+        //     auto result = result_future.get();
+        //     RCLCPP_INFO(this->get_logger(), "test: get finished.");
+        //     RCLCPP_INFO(this->get_logger(), "result handling: the result = %i\n.", result->sum);
+
+        // }
+        // RCLCPP_INFO(this->get_logger(), "test: not valid.");
+        // result_future.wait_for(std::chrono::milliseconds(500));
+        // if (result_future.wait_for(std::chrono::milliseconds(500)) == std::future_status::ready)
+        // {
+        //     handle_service_result(result_future);
+        // }
+        // else
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "Service call timed out!");
+        // }
+    }
+
+
     // TODO service not stable. change it to action
     void update_state_context()
     {
@@ -186,8 +240,10 @@ private:
      */
     void timer_callback()
     {
+        // ! service test
+        add_two_ints_request();
         // * update the state
-        update_state_context();
+        // update_state_context();
         // * get command context from the tree by tick it
         tick_result = m_tree_root->tick_once();
         RCLCPP_INFO(this->get_logger(), "Tick once.\n");

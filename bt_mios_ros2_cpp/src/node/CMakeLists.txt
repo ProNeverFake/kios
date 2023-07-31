@@ -32,7 +32,6 @@ endif()
 
 add_executable(bt_ros2_node bt_ros2_node.cpp)
 
-
 target_link_libraries(bt_ros2_node
     ${PROJECT_NAME}::behavior_tree
     ${PROJECT_NAME}::ws_client
@@ -49,10 +48,28 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+######################################################### test node
+
+add_executable(test_node test_node.cpp)
+
+target_link_libraries(test_node
+    ${PROJECT_NAME}::behavior_tree
+    ${PROJECT_NAME}::ws_client
+)
+
+ament_target_dependencies(test_node
+  rclcpp
+  rcl_interfaces
+  bt_mios_ros2_interface
+  example_interfaces
+)
+
+
 install(TARGETS
     # bt_server
     # bt_client
     bt_ros2_node
+    test_node
 
     DESTINATION lib/${PROJECT_NAME}
     )

@@ -12,6 +12,8 @@ from .resource.ws_client import *
 
 from bt_mios_ros2_interface.srv import RequestState
 
+from example_interfaces.srv import AddTwoInts
+
 
 class BTUdpNode(Node):
 
@@ -19,7 +21,7 @@ class BTUdpNode(Node):
     subscriber_ip = "127.0.0.1"
     subscriber_port = 12346
     # robot state variable dictionary.
-    robot_state = {"tf_f_ext_k": [0, 0, 0, 0, 0, 0]}
+    robot_state = {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
 
     def __init__(self):
         super().__init__('bt_udp_node')
@@ -42,9 +44,18 @@ class BTUdpNode(Node):
         self.i = 0
         self.srv = self.create_service(
             RequestState, 'request_state', self.request_state_callback)
+        self.srv = self.create_service(
+            AddTwoInts, 'add_two_ints', self.add_two_ints_callback)
 
     def request_state_callback(self, request, response):
+        print("the request is : ",  request.object)
         response.tf_f_ext_k = self.robot_state['tf_f_ext_k']
+        print('service triggered. the response is : ', response.tf_f_ext_k)
+        return response
+    
+    def add_two_ints_callback(self, request, response):
+        response.sum = request.a + request.b
+        print('service triggered, the response is :', response.sum)
         return response
 
     def is_update(self):

@@ -85,14 +85,14 @@ def generate_launch_description():
 
     bt_ros2_node = Node(
         package='bt_mios_ros2_cpp',
-        namespace='bt_mios_ros2',
+        namespace='',
         executable='bt_ros2_node',
         name='bt_ros2_node'
     )
 
     bt_udp_node = Node(
         package='bt_mios_ros2_py',
-        namespace='bt_mios_ros2',
+        namespace='',
         executable='bt_udp_node',
         name='bt_udp_node'
     )

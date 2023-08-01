@@ -7,6 +7,8 @@
   <maintainer email="jicong_ao@163.com">blackbird</maintainer>
   <license>TODO: License declaration</license>
 
+  <exec_depend>example_interfaces</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>bt_mios_ros2_interface</exec_depend>
   

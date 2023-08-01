@@ -22,8 +22,15 @@ public:
         : Node("bt_ros2_node"),
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
-          m_client_ptr(nullptr)
+          is_update(false)
     {
+        //* initialize the callback groups
+        client_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::MutuallyExclusive);
+        timer_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::MutuallyExclusive);
+        is_update_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::Reentrant);
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
         // * initialize the websocket messenger
@@ -33,25 +40,37 @@ public:
 
         // register the udp subscriber
         mios_register_udp();
+
+        // * set the grasped object
+        m_messenger->send_grasped_object();
+
         // the ros spin method:
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(500),
-            std::bind(&BTRos2Node::timer_callback, this));
-        // * set the grasped object
-        RCLCPP_INFO(this->get_logger(), "DEBUUUUUUUUUUUUUUUUUUUUUUUUUG\n");
-        m_messenger->send_grasped_object();
-        // set parameter of bt_udp_node to start context and state update
-        start_update_state();
+            std::chrono::milliseconds(1000),
+            std::bind(&BTRos2Node::timer_callback, this), timer_callback_group_);
+        // * state the update of the udp
         // * initilize the client
-        m_client_ptr = this->create_client<bt_mios_ros2_interface::srv::RequestState>("request_state");
+        m_client_ptr = this->create_client<bt_mios_ros2_interface::srv::RequestState>(
+            "request_state",
+            rmw_qos_profile_services_default,
+            client_callback_group_);
+        m_is_update_client_ptr = this->create_client<rcl_interfaces::srv::SetParametersAtomically>(
+            "/bt_udp_node/set_parameters_atomically",
+            rmw_qos_profile_services_default,
+            is_update_callback_group_);
+
         // TODO the web_socket receiver of the message from the server:
-        // m_messenger->
     }
 
 private:
+    // callback group
+    rclcpp::CallbackGroup::SharedPtr client_callback_group_;
+    rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
+    rclcpp::CallbackGroup::SharedPtr is_update_callback_group_;
+
     // srv client
     rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedPtr m_client_ptr;
-
+    rclcpp::Client<rcl_interfaces::srv::SetParametersAtomically>::SharedPtr m_is_update_client_ptr;
     rclcpp::TimerBase::SharedPtr timer_;
 
     // ws_client rel
@@ -60,6 +79,8 @@ private:
 
     // udp subscriber ip
     std::string udp_ip;
+
+    bool is_update;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
@@ -81,30 +102,29 @@ private:
         auto result_future = m_client_ptr->async_send_request(request);
         RCLCPP_INFO(this->get_logger(), "start to wait for the service.");
 
-        if (result_future.valid())
+        std::future_status status = result_future.wait_for(
+            std::chrono::seconds(1));
+        if (status == std::future_status::ready)
         {
-            RCLCPP_INFO(this->get_logger(), "test: valid.");
-            handle_service_result(result_future);
+            auto result = result_future.get();
+            RCLCPP_INFO(this->get_logger(), "test: get finished.");
+            m_tree_root->get_state_ptr()->TF_F_ext_K = result->tf_f_ext_k;
+            RCLCPP_INFO(this->get_logger(), "result handling: the result = %d\n.", result->tf_f_ext_k[2]);
+            // handle_service_result(result_future);
         }
-        RCLCPP_INFO(this->get_logger(), "test: not valid.");
-        // result_future.wait_for(std::chrono::milliseconds(500));
-        // if (result_future.wait_for(std::chrono::milliseconds(500)) == std::future_status::ready)
-        // {
-        //     handle_service_result(result_future);
-        // }
-        // else
-        // {
-        //     RCLCPP_INFO(this->get_logger(), "Service call timed out!");
-        // }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "Service call timed out!");
+        }
     }
 
-    void handle_service_result(rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedFuture result_future)
-    {
-        auto result = result_future.get();
-        RCLCPP_INFO(this->get_logger(), "test: get finished.");
-        m_tree_root->get_state_ptr()->TF_F_ext_K = result->tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "result handling: the result = %d\n.", result->tf_f_ext_k[2]);
-    }
+    // void handle_service_result(rclcpp::Client<bt_mios_ros2_interface::srv::RequestState>::SharedFuture result_future)
+    // {
+    //     auto result = result_future.get();
+    //     RCLCPP_INFO(this->get_logger(), "test: get finished.");
+    //     m_tree_root->get_state_ptr()->TF_F_ext_K = result->tf_f_ext_k;
+    //     RCLCPP_INFO(this->get_logger(), "result handling: the result = %d\n.", result->tf_f_ext_k[2]);
+    // }
 
     /**
      * @brief set the param "is_update" in node bt_udp_node as true
@@ -113,29 +133,44 @@ private:
      */
     void start_update_state()
     {
-        auto parameter = rcl_interfaces::msg::Parameter();
-        auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
-
-        std::string service_name = "/bt_udp_node/set_parameters_atomically";
-        auto client = this->create_client<rcl_interfaces::srv::SetParametersAtomically>(service_name);
-
-        parameter.name = "is_update";
-        parameter.value.type = 1;          //  bool = 1,    int = 2,        float = 3,     string = 4
-        parameter.value.bool_value = true; // .bool_value, .integer_value, .double_value, .string_value
-
-        request->parameters.push_back(parameter);
-
-        while (!client->wait_for_service(std::chrono::milliseconds(10)))
+        if (is_update == false)
         {
-            if (!rclcpp::ok())
+            auto parameter = rcl_interfaces::msg::Parameter();
+            auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
+
+            parameter.name = "is_update";
+            parameter.value.type = 1;          //  bool = 1,    int = 2,        float = 3,     string = 4
+            parameter.value.bool_value = true; // .bool_value, .integer_value, .double_value, .string_value
+
+            request->parameters.push_back(parameter);
+
+            while (!m_is_update_client_ptr->wait_for_service(std::chrono::milliseconds(500)))
             {
-                RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-                return;
+                if (!rclcpp::ok())
+                {
+                    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+                    return;
+                }
+                RCLCPP_INFO(this->get_logger(), "service is_update not available, waiting again...");
             }
-            RCLCPP_INFO(this->get_logger(), "service %s not available, waiting again...", service_name.c_str());
+            // !!!! CHECK
+            auto result_future = m_is_update_client_ptr->async_send_request(request);
+            std::future_status status = result_future.wait_for(
+                std::chrono::milliseconds(500));
+            if (status == std::future_status::ready)
+            {
+                auto result = result_future.get();
+            }
+            else
+            {
+                RCLCPP_INFO(this->get_logger(), "is update: response timed out!");
+            }
+            is_update = true;
         }
-        // !!!! CHECK
-        auto result = client->async_send_request(request);
+        else
+        {
+            // is update == true, do nothing
+        }
     }
 
     void mios_register_udp()
@@ -143,18 +178,6 @@ private:
         m_messenger->register_udp();
     }
 
-    void mios_interrupt()
-    // ! MOVE TO MESSENGER
-    {
-        // nlohmann::json payload;
-        // payload["ip"] = udp_ip;
-        // payload["port"] = udp;
-        // payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
-        // if (m_messenger.check_connection())
-        // {
-        //     m_messenger.send("subscribe_telemetry", payload);
-        // }
-    }
     void mios_unregister_udp()
     {
         m_messenger->unregister_udp();
@@ -186,6 +209,17 @@ private:
      */
     void timer_callback()
     {
+        start_update_state();
+        // RCLCPP_INFO(this->get_logger(), "Sending request");
+        // auto request = std::make_shared<bt_mios_ros2_interface::srv::RequestState::Request>();
+        // request->object = "state";
+        // auto result_future = m_client_ptr->async_send_request(request);
+        // std::future_status status = result_future.wait_for(
+        //     std::chrono::milliseconds(500)); // timeout to guarantee a graceful finish
+        // if (status == std::future_status::ready)
+        // {
+        //     RCLCPP_INFO(this->get_logger(), "Received response.");
+        // }
         // * update the state
         update_state_context();
         // * get command context from the tree by tick it
@@ -227,8 +261,10 @@ int main(int argc, char *argv[])
     rclcpp::init(argc, argv);
     // register the nodes
     auto bt_ros2_node = std::make_shared<BTRos2Node>();
+    rclcpp::executors::MultiThreadedExecutor executor;
+    executor.add_node(bt_ros2_node);
 
-    rclcpp::spin(bt_ros2_node);
+    executor.spin();
     rclcpp::shutdown();
     return 0;
 }

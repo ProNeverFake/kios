@@ -1,5 +1,7 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 
 import socket
 import time
@@ -27,6 +29,8 @@ class BTUdpNode(Node):
         super().__init__('bt_udp_node')
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
+        client_callback_group = ReentrantCallbackGroup()
+        timer_callback_group = client_callback_group
 
         # set param with json file
         pkg_share_dir = get_package_share_directory('bt_mios_ros2_py')
@@ -39,35 +43,38 @@ class BTUdpNode(Node):
         # setup the udp
         self.udp_setup()
         #  self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.01  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        timer_period = 0.05  # seconds
+        self.timer = self.create_timer(
+            timer_period, self.timer_callback, callback_group=timer_callback_group)
         self.i = 0
+        # ! the service should be in different callback group
         self.srv = self.create_service(
-            RequestState, 'request_state', self.request_state_callback)
-        self.srv = self.create_service(
-            AddTwoInts, 'add_two_ints', self.add_two_ints_callback)
+            RequestState, 'request_state', self.request_state_callback, callback_group=client_callback_group)
+        # self.srv = self.create_service(
+        #     AddTwoInts, 'add_two_ints', self.add_two_ints_callback, callback_group=client_callback_group)
 
     def request_state_callback(self, request, response):
-        print("the request is : ",  request.object)
+        self.get_logger().info('the request is : %s' % request.object)
         response.tf_f_ext_k = self.robot_state['tf_f_ext_k']
-        print('service triggered. the response is : ', response.tf_f_ext_k)
+        self.get_logger().info('service triggered')
         return response
-    
-    def add_two_ints_callback(self, request, response):
-        response.sum = request.a + request.b
-        print('service triggered, the response is :', response.sum)
-        return response
+
+    # def add_two_ints_callback(self, request, response):
+    #     response.sum = request.a + request.b
+    #     print('service triggered, the response is :', response.sum)
+    #     return response
 
     def is_update(self):
         flag = self.get_parameter('is_update').get_parameter_value().bool_value
-        print("flag:", flag)
+        self.get_logger().info('flag: %s' % flag)
         return flag
 
     def timer_callback(self):
         if self.is_update():
-            self.udp_update_parameter()
+            #
+            pass
         else:
-            print("pass\n")
+            self.get_logger().info('timer pass.')
             pass
         # msg = String()
         # msg.data = 'Hello World: %d' % self.i
@@ -101,7 +108,7 @@ class BTUdpNode(Node):
             self.set_parameters(new_parameters)
             self.get_logger().info('udp_update_parameter done.')
             self.robot_state['tf_f_ext_k'] = pkg.get('TF_F_ext_K')
-            print(pkg.get('TF_F_ext_K'))
+            # print(pkg.get('TF_F_ext_K'))
         else:
             self.get_logger().info('udp_update_parameter pass.')
 
@@ -109,64 +116,18 @@ class BTUdpNode(Node):
         self.subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.subscriber.bind((self.subscriber_ip, self.subscriber_port))
 
-    def test_telemetry_udp(self, address: str, subscriber_addr: str, subscriber_port: int = 12346):
-        # ! discarded
-        # # This line makes a call to the server to subscribe to the telemetry topics "tau_ext" and "q"
-        # result_1 = call_method(address, 12000, "subscribe_telemetry",
-        #                        {"ip": subscriber_addr, "port": subscriber_port, "subscribe": ["tau_ext", "q"]}, silent=False, timeout=7)
-        # # Checking if the subscription was successful, if true print a success message, else print the error
-        # if result_1["result"]["result"]:
-        #     print("successfull subscribed.")
-        # else:
-        #     print("Error while subscribing: ", result_1)
-
-        # Sets up a UDP socket and binds it to the subscriber's address and port
-        self.subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.subscriber.bind((self.subscriber_ip, self.subscriber_port))
-
-        received_pkgs = []
-        start_time = time.time()
-        try:
-            print("\n    --Interrupt with ctrl+c--\n")
-
-            # Receives packages for 10 seconds or until interrupted by a KeyboardInterrupt (ctrl+c)
-            while True:
-                data, adrr = self.subscriber.recvfrom(8192)
-                received_pkgs.append(json.loads(data.decode("utf-8")))
-                if time.time() - start_time > 10:
-                    break
-        # If a KeyboardInterrupt happens, the loop is broken
-        except KeyboardInterrupt:
-            pass
-
-        # Record the end time
-        end_time = time.time()
-
-        # Check the received packages for validation
-        pkg_validation_cnt = 0
-        for pkg in received_pkgs:
-            if pkg.get("tau_ext", False) != False and pkg.get("q", False) != False:
-                pkg_validation_cnt += 1
-
-        # Makes a call to the server to unsubscribe from the telemetry
-        result_2 = call_method(address, 12000, "unsubscribe_telemetry", {
-                               "ip": subscriber_addr})
-
-        # Check if unsubscription was successful
-        if result_2["result"]["result"]:
-            print("successfull unsibscribed.")
-
 
 def main(args=None):
     rclpy.init(args=args)
 
     bt_udp_node = BTUdpNode()
 
-    rclpy.spin(bt_udp_node)
+    # rclpy.spin(bt_udp_node)
+    executor = MultiThreadedExecutor()
+    executor.add_node(bt_udp_node)
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
+    executor.spin()
+
     bt_udp_node.destroy_node()
     rclpy.shutdown()
 

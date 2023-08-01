@@ -1,3 +1,1 @@
-string robot_name
-bool ready
-int32 iq
+float64[] tf_f_ext_k

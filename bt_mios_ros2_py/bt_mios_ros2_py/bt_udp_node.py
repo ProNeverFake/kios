@@ -13,24 +13,28 @@ from ament_index_python.packages import get_package_share_directory
 
 from .resource.ws_client import *
 
-from bt_mios_ros2_interface.srv import RequestState
+# from bt_mios_ros2_interface.srv import RequestState
+
+from bt_mios_ros2_interface.msg import RobotState
+
 
 class BTUdpNode(Node):
 
-    subscriber = ''
-    subscriber_ip = "127.0.0.1"
-    subscriber_port = 12346
+    udp_subscriber = ''
+    udp_ip = "127.0.0.1"
+    udp_port = 12346
     # robot state variable dictionary.
-    robot_state = {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
-    data = ""
-    adrr = ""
+    robot_state = {
+        {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
+    }
 
     def __init__(self):
         super().__init__('bt_udp_node')
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
-        client_callback_group = ReentrantCallbackGroup()
-        timer_callback_group = client_callback_group
+        # server_callback_group = ReentrantCallbackGroup()
+        timer_callback_group = ReentrantCallbackGroup()
+        publisher_callback_group = timer_callback_group
 
         # set param with json file
         pkg_share_dir = get_package_share_directory('bt_mios_ros2_py')
@@ -40,42 +44,58 @@ class BTUdpNode(Node):
             parameters = json.load(file)
             for name, value in parameters.items():
                 self.declare_parameter(name, value)
-        
-        #  self.publisher_ = self.create_publisher(String, 'topic', 10)
+
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(
-            timer_period, self.timer_callback, callback_group=timer_callback_group)
-        self.i = 0
-        # ! the service should be in different callback group
-        self.srv = self.create_service(
-            RequestState, 'request_state', self.request_state_callback, callback_group=client_callback_group)
-        
+            timer_period,
+            self.timer_callback,
+            callback_group=timer_callback_group)
+
+        # ! server discarded
+        # self.service = self.create_service(
+        #     RequestState,
+        #     'request_state',
+        #     self.request_state_callback,
+        #     callback_group=client_callback_group)
+
+        self.publisher = self.create_publisher(
+            RobotState,
+            'mios_state_topic',
+            10,
+            callback_group=publisher_callback_group
+        )
         # setup the udp (listen to the port)
         self.udp_setup()
 
-    def request_state_callback(self, request, response):
-        self.get_logger().info('the request is : %s' % request.object)
-        response.tf_f_ext_k = self.robot_state['tf_f_ext_k']
-        self.get_logger().info('service triggered')
-        return response
+    # # ! server discarded
+    # def request_state_callback(self, request, response):
+    #     self.get_logger().info('the request is : %s' % request.object)
+    #     response.tf_f_ext_k = self.robot_state['tf_f_ext_k']
+    #     self.get_logger().info('service triggered')
+    #     return response
 
     def is_update(self):
         flag = self.get_parameter('is_update').get_parameter_value().bool_value
-        self.get_logger().info('flag: %s' % flag)
+        self.get_logger().info('udp update state context: %s' % flag)
         return flag
 
     def timer_callback(self):
+        # udp update state
         if self.is_update():
             self.udp_update_parameter()
         else:
-            self.get_logger().info('timer pass.')
             pass
 
-    # def udp_get_package(self):
+        # publisher publish msg
+        self.get_logger().info('timer hit.')
+        msg = RobotState()
+        msg.tf_f_ext_k = self.robot_state["tf_f_ext_k"]
+        self.publisher.publish(msg)
+        self.get_logger().info('Publishing: "%s"' % msg.data)
 
+    def udp_get_package(self):
         try:
-            self.subscriber.setblocking(False)
-            # data, adrr = self.subscriber.recvfrom(8192)
+            data, adrr = self.udp_subscriber.recvfrom(8192)
             pkg = json.loads(data.decode("utf-8"))
             return pkg
         except socket.error as e:
@@ -87,41 +107,21 @@ class BTUdpNode(Node):
         except json.JSONDecodeError:
             self.get_logger().error('Failed to decode JSON from received data')
             return {}
-        # udp_pkg = []
-        # # ! the frequency is too low.
-        # data, adrr = self.subscriber.recvfrom(8192)
-        # udp_pkg.append(json.loads(data.decode("utf-8")))
-
-        # if len(udp_pkg) > 0:
-        #     pkg = udp_pkg[-1]
-        #     return pkg
-        # else:
-        #     self.get_logger().info('udp_get_package: no pkg received.')
-        #     return {}
 
     def udp_update_parameter(self):
         pkg = self.udp_get_package()
         if len(pkg) > 0:
-            new_parameters = []
-            new_param = rclpy.parameter.Parameter(
-                'TF_F_ext_K',
-                rclpy.Parameter.Type.DOUBLE_ARRAY,
-                pkg.get('TF_F_ext_K')
-            )
-            new_parameters.append(new_param)
-            self.set_parameters(new_parameters)
-            self.get_logger().info('udp_update_parameter done.')
+            self.get_logger().info('udp_update_parameter hit.')
             self.robot_state['tf_f_ext_k'] = pkg.get('TF_F_ext_K')
             print(pkg.get('TF_F_ext_K')[2])
-            # print(pkg.get('TF_F_ext_K'))
         else:
             self.get_logger().info('udp_update_parameter pass.')
 
     def udp_setup(self):
-        self.subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.subscriber.bind((self.subscriber_ip, self.subscriber_port))
-        self.subscriber.setblocking(False)
-        self.data, self.adrr = self.subscriber.recvfrom(8192)
+        self.udp_subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+        # ! enable block
+        # self.udp_subscriber.setblocking(False)
 
 
 def main(args=None):
@@ -129,7 +129,6 @@ def main(args=None):
 
     bt_udp_node = BTUdpNode()
 
-    # rclpy.spin(bt_udp_node)
     executor = MultiThreadedExecutor()
     executor.add_node(bt_udp_node)
 

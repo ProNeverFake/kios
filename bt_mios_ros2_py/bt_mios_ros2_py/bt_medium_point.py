@@ -15,7 +15,7 @@ from .resource.ws_client import *
 
 from bt_mios_ros2_interface.srv import RequestState
 
-class BTUdpNode(Node):
+class BTMediumPoint(Node):
 
     subscriber = ''
     subscriber_ip = "127.0.0.1"
@@ -26,22 +26,12 @@ class BTUdpNode(Node):
     adrr = ""
 
     def __init__(self):
-        super().__init__('bt_udp_node')
+        super().__init__('BTMediumPoint')
         # register flag parameter for updating robot
-        self.declare_parameter('is_update', False)
-        client_callback_group = ReentrantCallbackGroup()
-        timer_callback_group = client_callback_group
-
-        # set param with json file
-        pkg_share_dir = get_package_share_directory('bt_mios_ros2_py')
-        parameter_file_path = os.path.join(
-            pkg_share_dir, 'resource', 'parameter.json')
-        with open(parameter_file_path, 'r') as file:
-            parameters = json.load(file)
-            for name, value in parameters.items():
-                self.declare_parameter(name, value)
+        server_callback_group = ReentrantCallbackGroup()
+        subscriber_callback_group = server_callback_group
         
-        #  self.publisher_ = self.create_publisher(String, 'topic', 10)
+        # self.publisher_ = self.create_publisher(String, 'topic', 10)
         timer_period = 0.05  # seconds
         self.timer = self.create_timer(
             timer_period, self.timer_callback, callback_group=timer_callback_group)
@@ -49,9 +39,6 @@ class BTUdpNode(Node):
         # ! the service should be in different callback group
         self.srv = self.create_service(
             RequestState, 'request_state', self.request_state_callback, callback_group=client_callback_group)
-        
-        # setup the udp (listen to the port)
-        self.udp_setup()
 
     def request_state_callback(self, request, response):
         self.get_logger().info('the request is : %s' % request.object)
@@ -71,7 +58,7 @@ class BTUdpNode(Node):
             self.get_logger().info('timer pass.')
             pass
 
-    # def udp_get_package(self):
+    def udp_get_package(self):
 
         try:
             self.subscriber.setblocking(False)

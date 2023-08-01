@@ -46,7 +46,7 @@ public:
 
         // the ros spin method:
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(50),
             std::bind(&BTRos2Node::timer_callback, this), timer_callback_group_);
         // * state the update of the udp
         // * initilize the client
@@ -103,13 +103,13 @@ private:
         RCLCPP_INFO(this->get_logger(), "start to wait for the service.");
 
         std::future_status status = result_future.wait_for(
-            std::chrono::seconds(1));
+            std::chrono::milliseconds(20));
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();
             RCLCPP_INFO(this->get_logger(), "test: get finished.");
             m_tree_root->get_state_ptr()->TF_F_ext_K = result->tf_f_ext_k;
-            RCLCPP_INFO(this->get_logger(), "result handling: the result = %d\n.", result->tf_f_ext_k[2]);
+            RCLCPP_INFO(this->get_logger(), "result handling: the result = %f\n.", result->tf_f_ext_k[2]);
             // handle_service_result(result_future);
         }
         else
@@ -156,7 +156,7 @@ private:
             // !!!! CHECK
             auto result_future = m_is_update_client_ptr->async_send_request(request);
             std::future_status status = result_future.wait_for(
-                std::chrono::milliseconds(500));
+                std::chrono::milliseconds(50));
             if (status == std::future_status::ready)
             {
                 auto result = result_future.get();
@@ -209,18 +209,9 @@ private:
      */
     void timer_callback()
     {
+        // * make the udp node start to get pkg
         start_update_state();
-        // RCLCPP_INFO(this->get_logger(), "Sending request");
-        // auto request = std::make_shared<bt_mios_ros2_interface::srv::RequestState::Request>();
-        // request->object = "state";
-        // auto result_future = m_client_ptr->async_send_request(request);
-        // std::future_status status = result_future.wait_for(
-        //     std::chrono::milliseconds(500)); // timeout to guarantee a graceful finish
-        // if (status == std::future_status::ready)
-        // {
-        //     RCLCPP_INFO(this->get_logger(), "Received response.");
-        // }
-        // * update the state
+        // * update the state with client
         update_state_context();
         // * get command context from the tree by tick it
         tick_result = m_tree_root->tick_once();

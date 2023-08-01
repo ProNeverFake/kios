@@ -14,9 +14,7 @@ from bt_mios_ros2_interface.srv import RequestState
 
 class BTMediumNode(Node):
     # robot state variable dictionary.
-    robot_state = {
-        {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
-    }
+    robot_state = {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
 
     def __init__(self):
         super().__init__('BTMediumPoint')

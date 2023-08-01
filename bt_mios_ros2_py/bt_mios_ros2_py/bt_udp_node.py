@@ -9,6 +9,8 @@ import time
 import json
 import os
 
+import threading
+
 from ament_index_python.packages import get_package_share_directory
 
 from .resource.ws_client import *
@@ -20,18 +22,17 @@ from bt_mios_ros2_interface.msg import RobotState
 
 class BTUdpNode(Node):
 
+    is_udp_on = False
     udp_subscriber = ''
     udp_ip = "127.0.0.1"
     udp_port = 12346
     # robot state variable dictionary.
-    robot_state = {
-        {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
-    }
+    robot_state = {"tf_f_ext_k": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
 
     def __init__(self):
         super().__init__('bt_udp_node')
         # register flag parameter for updating robot
-        self.declare_parameter('is_update', False)
+        self.declare_parameter('is_update', True)
         # server_callback_group = ReentrantCallbackGroup()
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group
@@ -80,6 +81,7 @@ class BTUdpNode(Node):
         return flag
 
     def timer_callback(self):
+        self.udp_setup()
         # udp update state
         if self.is_update():
             self.udp_update_parameter()
@@ -91,7 +93,7 @@ class BTUdpNode(Node):
         msg = RobotState()
         msg.tf_f_ext_k = self.robot_state["tf_f_ext_k"]
         self.publisher.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
+        self.get_logger().info('Publishing: "%s"' % msg.tf_f_ext_k)
 
     def udp_get_package(self):
         try:
@@ -118,10 +120,64 @@ class BTUdpNode(Node):
             self.get_logger().info('udp_update_parameter pass.')
 
     def udp_setup(self):
-        self.udp_subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+        # if self.is_udp_on == False:
+
+        #     self.udp_subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #     self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+        #     self.is_udp_on = True
+        # else:
+        #     pass
+        if self.is_udp_on == False:
+            self.udp_subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+
+
+
+            address = "local_host"
+            subscriber_addr = "local_host"
+            subscriber_port = 12346
+            result_1 = call_method(address, 12000, "subscribe_telemetry",
+                                    {"ip": subscriber_addr, "port": subscriber_port, "subscribe": ["TF_F_ext_K"]},silent=False, timeout=7)
+            # if result_1["result"]["result"]:
+            #     print("successfull subscribed.")
+            # else:
+            #     print("Error while subscribing: ", result_1)
+            self.udp_subscriber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+        else:
+            pass
+        
+
         # ! enable block
         # self.udp_subscriber.setblocking(False)
+
+def test_telemetry_udp():
+    address = "local_host"
+    subscriber_addr = "local_host"
+    subscriber_port = 12346
+    result_1 = call_method(address, 12000, "subscribe_telemetry",
+                           {"ip": subscriber_addr, "port": subscriber_port, "subscribe": ["TF_F_ext_K"]},silent=False, timeout=7)
+    if result_1["result"]["result"]:
+        print("successfull subscribed.")
+    else:
+        print("Error while subscribing: ", result_1)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind((subscriber_addr, subscriber_port))
+    try:
+        print("\n    --Interrupt with ctrl+c--\n")
+        while True:
+            data, adrr = s.recvfrom(8192)
+            target = json.loads(data.decode("utf-8")) 
+            print(target["TF_F_ext_K"][2])                     
+
+    except KeyboardInterrupt:
+        pass
+
+    print("unsubscribe...")
+    result_2 = call_method(address, 12000, "unsubscribe_telemetry", {"ip": subscriber_addr})
+    if result_2["result"]["result"]:
+        print("successfull unsibscribed.")
+
 
 
 def main(args=None):

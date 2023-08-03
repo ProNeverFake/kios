@@ -27,7 +27,8 @@ setup(
         'console_scripts': [
                 'bt_udp_node = bt_mios_ros2_py.bt_udp_node:main',
                 'test_node_py = bt_mios_ros2_py.test_node_py:main',
-                'bt_medium_node = bt_mios_ros2_py.bt_medium_node:main'
+                'bt_medium_node = bt_mios_ros2_py.bt_medium_node:main',
+                'bt_state_reader = bt_mios_ros2_py.bt_state_reader:main'
         ],
     },
 

@@ -31,6 +31,7 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
+            
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(1000),
             std::bind(&BTRos2Node::timer_callback, this), timer_callback_group_);

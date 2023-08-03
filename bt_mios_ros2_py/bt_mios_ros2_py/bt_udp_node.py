@@ -28,9 +28,10 @@ class BTUdpNode(Node):
 
     def __init__(self):
         super().__init__('bt_udp_node')
+        
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
-        # server_callback_group = ReentrantCallbackGroup()
+
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group
 

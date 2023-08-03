@@ -2,33 +2,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# add_executable(bt_client bt_client.cpp)
-
-# target_link_libraries(bt_client
-#   ${PROJECT_NAME}::action 
-# )
-
-# ament_target_dependencies(bt_client
-#   "rclcpp"
-#   "rclcpp_action"
-#   "example_interfaces"
-#   "bt_mios_ros2_interface"
-# )
-
-
-
-# add_executable(bt_server bt_server.cpp)
-
-# target_link_libraries(bt_server
-#   ${PROJECT_NAME}::action 
-# )
-
-# ament_target_dependencies(bt_server
-#   "rclcpp"
-#   "rclcpp_action"
-#   "example_interfaces"
-#   "bt_mios_ros2_interface"
-# )
 
 add_executable(bt_ros2_node bt_ros2_node.cpp)
 
@@ -64,6 +37,21 @@ ament_target_dependencies(test_node_cpp
   example_interfaces
 )
 
+######################################################### robot_state_subscription
+
+add_executable(robot_state_subscription robot_state_subscription.cpp)
+
+target_link_libraries(robot_state_subscription
+    ${PROJECT_NAME}::ws_client
+)
+
+ament_target_dependencies(robot_state_subscription
+  rclcpp
+  rcl_interfaces
+  bt_mios_ros2_interface
+)
+
+
 ######################################################### callback example node
 
 add_executable(callback_example callback_example.cpp)
@@ -79,11 +67,10 @@ ament_target_dependencies(callback_example
 
 
 install(TARGETS
-    # bt_server
-    # bt_client
     bt_ros2_node
     test_node_cpp
     callback_example
+    robot_state_subscription
 
     DESTINATION lib/${PROJECT_NAME}
     )

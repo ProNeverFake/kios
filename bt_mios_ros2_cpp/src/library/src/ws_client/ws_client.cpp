@@ -263,7 +263,7 @@ void BTMessenger::register_udp()
     nlohmann::json payload;
     payload["ip"] = udp_ip;
     payload["port"] = udp_port;
-    payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K"};
+    payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K", "system_time"};
     if (check_connection())
     {
         send("subscribe_telemetry", payload);

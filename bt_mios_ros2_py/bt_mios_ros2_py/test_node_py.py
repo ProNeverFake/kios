@@ -4,6 +4,7 @@ import threading
 import rclpy
 from rclpy.node import Node
 import json
+import time
 
 from bt_mios_ros2_interface.msg import RobotState
 
@@ -33,6 +34,7 @@ class UDPReceiver:
             data, addr = self.sock.recvfrom(1024)
             decoded_data = json.loads(data.decode())
             self.shared_data.update(decoded_data)
+            time.sleep(0.1)
 
 
 class ROSPublisher(Node):
@@ -46,11 +48,8 @@ class ROSPublisher(Node):
             data = self.shared_data.read()
             if data is not None:
                 msg = RobotState()
-                # msg.layout.dim[0].size = len(data)
-                # msg.layout.dim[0].stride = 1
-                # msg.layout.dim[0].label = "double_array"
-                msg.tf_f_ext_k = data
-                self.pub.publish(msg)
+                print("state read: ", data["TF_F_ext_K"][2])
+                time.sleep(1)
             rclpy.spin_once(self)
 
 

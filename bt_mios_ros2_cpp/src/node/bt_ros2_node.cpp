@@ -45,27 +45,29 @@ public:
         mios_register_udp();
 
         // * set the grasped object
-        m_messenger->send_grasped_object();
+        // m_messenger->send_grasped_object();
 
         // the ros spin method:
-        timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(50),
-            std::bind(&BTRos2Node::timer_callback, this),
-            timer_callback_group_);
+        // timer_ = this->create_wall_timer(
+        //     std::chrono::milliseconds(50),
+        //     std::bind(&BTRos2Node::timer_callback, this),
+        //     timer_callback_group_);
 
         // * initilize the client
         m_is_update_client_ptr = this->create_client<rcl_interfaces::srv::SetParametersAtomically>(
             "/bt_udp_node/set_parameters_atomically",
             rmw_qos_profile_services_default,
-            is_update_callback_group_);
-
+            is_update_callback_group_
+            );
         // * initialize the subscription
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         // ! applied new QoS
+
         subscription_ = this->create_subscription<bt_mios_ros2_interface::msg::RobotState>(
             "mios_state_topic",
             qos,
-            std::bind(&BTRos2Node::subscription_callback, this, _1));
+            std::bind(&BTRos2Node::subscription_callback, this, _1)
+            );
 
         // TODO the web_socket receiver of the message from the server:
     }
@@ -87,10 +89,12 @@ private:
     rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
 
     // callbacks
-    // ! discarded service!!
     rclcpp::Client<rcl_interfaces::srv::SetParametersAtomically>::SharedPtr m_is_update_client_ptr;
     rclcpp::TimerBase::SharedPtr timer_;
+
     rclcpp::Subscription<bt_mios_ros2_interface::msg::RobotState>::SharedPtr subscription_;
+
+
 
     // ws_client rel
     std::shared_ptr<BTMessenger> m_messenger;
@@ -104,11 +108,12 @@ private:
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
 
-    void subscription_callback(const bt_mios_ros2_interface::msg::RobotState &msg) const
+
+    void subscription_callback(const bt_mios_ros2_interface::msg::RobotState::SharedPtr msg) const
     {
         RCLCPP_INFO(this->get_logger(), "subscription hit.");
-        m_tree_root->get_state_ptr()->TF_F_ext_K = msg.tf_f_ext_k;
-        // RCLCPP_INFO(this->get_logger(), "subscription hit.");
+        m_tree_root->get_state_ptr()->TF_F_ext_K = msg->tf_f_ext_k;
+        RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
     }
 
     /**
@@ -182,6 +187,7 @@ private:
 
     void timer_callback()
     {
+         RCLCPP_INFO(this->get_logger(), "time hit.\n");
         // * make the udp node start to get pkg
         start_update_state();
         // // * get command context from the tree by tick it

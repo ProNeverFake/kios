@@ -1,92 +1,76 @@
-# from example_interfaces.srv import AddTwoInts
-
-# import rclpy
-# from rclpy.node import Node
-
-
-# class TestNode(Node):
-
-#     def __init__(self):
-#         super().__init__('test_node_py')
-#         self.srv = self.create_service(
-#             AddTwoInts, 'add_two_ints', self.add_two_ints_callback)
-
-#     def add_two_ints_callback(self, request, response):
-#         response.sum = request.a + request.b
-#         self.get_logger().info('Incoming request\na: %d b: %d' % (request.a, request.b))
-
-#         return response
-
-
-# def main(args=None):
-#     rclpy.init(args=args)
-
-#     test_node_py = TestNode()
-
-#     rclpy.spin(test_node_py)
-
-#     rclpy.shutdown()
-
-
-# if __name__ == '__main__':
-#     main()
-
-#     import rclpy
-# from rclpy.node import Node
-# from std_srvs.srv import Empty
-
-# class ServiceNode(Node):
-#     def __init__(self):
-#         super().__init__('service_node')
-#         self.srv = self.create_service(Empty, 'test_service', callback=self.service_callback)
-
-#     def service_callback(self, request, result):
-#         self.get_logger().info('Received request, responding...')
-#         return result
-
-
-# if __name__ == '__main__':
-#     rclpy.init()
-#     node = ServiceNode()
-#     try:
-#         node.get_logger().info("Starting server node, shut down with CTRL-C")
-#         rclpy.spin(node)
-#     except KeyboardInterrupt:
-#         node.get_logger().info('Keyboard interrupt, shutting down.\n')
-#     node.destroy_node()
-#     rclpy.shutdown()
-
-
+import socket
+import struct
+import threading
 import rclpy
 from rclpy.node import Node
-from std_srvs.srv import Empty
-from example_interfaces.srv import AddTwoInts
-from bt_mios_ros2_interface.srv import RequestState
+import json
+
+from bt_mios_ros2_interface.msg import RobotState
 
 
-class ServiceNode(Node):
+class SharedData:
     def __init__(self):
-        super().__init__('service_node')
-        # self.srv = self.create_service(
-        #     Empty, 'test_service', callback=self.service_callback)
-        self.srv = self.create_service(
-            RequestState, 'request_state', callback=self.service_callback)
+        self.lock = threading.Lock()
+        self.data = None
 
-    def service_callback(self, request, result):
-        self.get_logger().info('Received request, responding...')
-        result.tf_f_ext_k = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
-        return result
+    def update(self, new_data):
+        with self.lock:
+            self.data = new_data
+
+    def read(self):
+        with self.lock:
+            return self.data
 
 
-def main():
-    rclpy.init()
-    node = ServiceNode()
-    try:
-        node.get_logger().info("Starting server node, shut down with CTRL-C")
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        node.get_logger().info('Keyboard interrupt, shutting down.\n')
-    node.destroy_node()
+class UDPReceiver:
+    def __init__(self, shared_data, host='localhost', port=12346):
+        self.shared_data = shared_data
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind((host, port))
+
+    def run(self):
+        while True:
+            data, addr = self.sock.recvfrom(1024)
+            decoded_data = json.loads(data.decode())
+            self.shared_data.update(decoded_data)
+
+
+class ROSPublisher(Node):
+    def __init__(self, shared_data):
+        super().__init__('ros_publisher')
+        self.shared_data = shared_data
+        self.pub = self.create_publisher(RobotState, 'mios_state_topic', 10)
+
+    def run(self):
+        while rclpy.ok():
+            data = self.shared_data.read()
+            if data is not None:
+                msg = RobotState()
+                # msg.layout.dim[0].size = len(data)
+                # msg.layout.dim[0].stride = 1
+                # msg.layout.dim[0].label = "double_array"
+                msg.tf_f_ext_k = data
+                self.pub.publish(msg)
+            rclpy.spin_once(self)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    shared_data = SharedData()
+
+    udp_receiver = UDPReceiver(shared_data)
+    ros_publisher = ROSPublisher(shared_data)
+
+    t1 = threading.Thread(target=udp_receiver.run)
+    t2 = threading.Thread(target=ros_publisher.run)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
     rclpy.shutdown()
 
 

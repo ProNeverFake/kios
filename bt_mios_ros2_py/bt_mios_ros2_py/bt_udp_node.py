@@ -10,8 +10,6 @@ import time
 import json
 import os
 
-import threading
-
 from ament_index_python.packages import get_package_share_directory
 
 from .resource.ws_client import *
@@ -28,7 +26,7 @@ class BTUdpNode(Node):
 
     def __init__(self):
         super().__init__('bt_udp_node')
-        
+
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
 

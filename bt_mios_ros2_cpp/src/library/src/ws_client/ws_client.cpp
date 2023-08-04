@@ -258,8 +258,9 @@ void BTMessenger::thread_close()
     }
 }
 
-void BTMessenger::register_udp()
+void BTMessenger::register_udp(int &port)
 {
+    udp_port = port;
     nlohmann::json payload;
     payload["ip"] = udp_ip;
     payload["port"] = udp_port;

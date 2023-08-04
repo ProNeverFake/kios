@@ -129,7 +129,7 @@ public:
     void start_task(nlohmann::json payload = nlohmann::json());
     void stop_task();
     void unregister_udp();
-    void register_udp();
+    void register_udp(int &port);
     void set_message_handler(std::function<void(const std::string &)> handler);
     nlohmann::json request_response(const std::string &method, nlohmann::json payload = nlohmann::json());
     void send_grasped_object();

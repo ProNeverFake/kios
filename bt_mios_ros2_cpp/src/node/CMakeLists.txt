@@ -51,6 +51,15 @@ ament_target_dependencies(robot_state_subscription
   bt_mios_ros2_interface
 )
 
+######################################################### tree_node
+add_executable(tree_node tree_node.cpp)
+
+ament_target_dependencies(robot_state_subscription
+  rclcpp
+  rcl_interfaces
+  bt_mios_ros2_interface
+)
+
 
 ######################################################### callback example node
 

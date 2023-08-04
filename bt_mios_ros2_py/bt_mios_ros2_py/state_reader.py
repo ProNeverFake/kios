@@ -14,7 +14,7 @@ from .resource.ws_client import *
 from bt_mios_ros2_interface.msg import RobotState
 
 
-class BTStateReader(Node):
+class StateReader(Node):
 
     udp_subscriber = ''
     # robot state variable dictionary.
@@ -23,7 +23,7 @@ class BTStateReader(Node):
     def __init__(self):
         self.is_udp_on = False
         super().__init__('bt_state_reader')
-        
+
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
 
@@ -34,7 +34,7 @@ class BTStateReader(Node):
         self.udp_port = 12346
 
         self.timer = self.create_timer(
-            0.002, # sec
+            0.002,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
 
@@ -56,15 +56,15 @@ class BTStateReader(Node):
             msg.tf_f_ext_k = robot_state["TF_F_ext_K"]
             self.publisher.publish(msg)
             self.get_logger().info("Published RobotState to topic")
-            print("check: ", robot_state["TF_F_ext_K"][2], 
-                " sender time: ", robot_state["system_time"],
-                "receiver time: ", datetime.now())
+            print("check: ", robot_state["TF_F_ext_K"][2],
+                  " sender time: ", robot_state["system_time"],
+                  "receiver time: ", datetime.now())
         else:
             self.get_logger().info('is_udp_on off, timer pass ...')
             pass
 
     def udp_setup(self):
-        
+
         self.udp_subscriber = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_subscriber.bind((self.udp_ip, self.udp_port))
@@ -72,12 +72,10 @@ class BTStateReader(Node):
         self.get_logger().info('udp setup hit.')
 
 
-
-
 def main(args=None):
     rclpy.init(args=args)
 
-    bt_state_reader = BTStateReader()
+    bt_state_reader = StateReader()
 
     executor = MultiThreadedExecutor()
     executor.add_node(bt_state_reader)
@@ -90,4 +88,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-

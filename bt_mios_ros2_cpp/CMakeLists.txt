@@ -34,6 +34,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(websocketpp REQUIRED)
 find_package(Threads REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(std_srvs REQUIRED)
 
 find_package(fmt REQUIRED)
 

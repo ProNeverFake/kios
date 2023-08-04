@@ -77,11 +77,6 @@ class websocket_endpoint
     con_list m_connection_list;
     // Counter to generate unique IDs for connections
     int m_next_id;
-    /**
-     * @brief Set the message handler callback function
-     *
-     * @param handler the callback function
-     */
 
 public:
     // Constructor
@@ -105,6 +100,8 @@ public:
     // Create a new connection to the specified URI
     int connect(std::string const &uri);
 
+    bool is_open(int connection_id);
+
     void send(int id, const std::string &message);
 
     connection_metadata::ptr get_metadata(int id);
@@ -120,19 +117,20 @@ class BTMessenger
 public:
     BTMessenger(const std::string &uri);
     bool connect();
-    void thread_connect();
+    bool connect_o();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
+    void send_and_wait(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void close();
-    void thread_close();
-    bool check_connection();
+    bool is_connected();
     // call mios methods
     void start_task(nlohmann::json payload = nlohmann::json());
     void stop_task();
     void unregister_udp();
     void register_udp(int &port);
     void set_message_handler(std::function<void(const std::string &)> handler);
-    nlohmann::json request_response(const std::string &method, nlohmann::json payload = nlohmann::json());
     void send_grasped_object();
+    bool wait_for_open_connection(int deadline);
+    void message_handler_callback(const std::string &msg);
 
 private:
     websocket_endpoint m_ws_endpoint;
@@ -141,8 +139,8 @@ private:
     int udp_port;
     int connection_id;
     // thread management
-    std::thread m_thread;
-    std::mutex m_mutex;
-    std::condition_variable m_cv;
     std::queue<std::string> m_message_queue;
+    // promise future object
+    std::promise<nlohmann::json> response_promise;
+    std::future<nlohmann::json> response_future;
 };

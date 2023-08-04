@@ -18,17 +18,32 @@ public:
     Commander()
         : Node("commander"),
           ws_url("ws://localhost:12000/mios/core"),
-          udp_ip("localhost"),
+          udp_ip("127.0.0.1"),
           udp_port(12346)
     {
+        // callback group
+        timer_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::MutuallyExclusive);
+
         // * initialize the websocket messenger
         m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         m_messenger->connect();
         // register the udp subscriber
+
+        while (!m_messenger->wait_for_open_connection(3))
+        {
+            RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
+        }
+
         mios_register_udp();
+
         // * set the grasped object
-        m_messenger->send_grasped_object();
+        // the ros spin method:
+        timer_ = this->create_wall_timer(
+            std::chrono::seconds(1),
+            std::bind(&Commander::timer_callback, this), timer_callback_group_);
+        // m_messenger->send_grasped_object();
         // subscription_ = this->create_subscription<std_msgs::msg::String>(
         //     "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
     }
@@ -43,6 +58,12 @@ public:
         m_messenger->unregister_udp();
     }
 
+    void shut_down_connection()
+    {
+        m_messenger->unregister_udp();
+        m_messenger->close();
+    }
+
 private:
     rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr is_update_callback_group_;
@@ -51,8 +72,6 @@ private:
     // callbacks
     rclcpp::Client<rcl_interfaces::srv::SetParametersAtomically>::SharedPtr m_is_update_client_ptr;
     rclcpp::TimerBase::SharedPtr timer_;
-
-    rclcpp::Subscription<bt_mios_ros2_interface::msg::RobotState>::SharedPtr subscription_;
 
     // ws_client rel
     std::shared_ptr<BTMessenger> m_messenger;
@@ -63,11 +82,10 @@ private:
     int udp_port;
     bool is_update;
 
-    void topic_callback(const std_msgs::msg::String &msg) const
+    void timer_callback()
     {
-        RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg.data.c_str());
+        RCLCPP_INFO(this->get_logger(), "timer hit.");
     }
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 
     /**
      * @brief set the param "is_update" in node bt_udp_node as true
@@ -128,7 +146,7 @@ int main(int argc, char *argv[])
     executor.spin();
 
     // * unregister the udp before shutdown.
-    commander->mios_unregister_udp();
+    commander->shut_down_connection();
     rclcpp::shutdown();
     return 0;
 }

@@ -23,6 +23,7 @@ public:
         : Node("bt_ros2_node"),
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
+          udp_port(12346),
           is_update(false)
     {
         //* initialize the callback groups
@@ -63,13 +64,14 @@ public:
 
     void mios_register_udp()
     {
-        m_messenger->register_udp();
+        m_messenger->register_udp(udp_port);
     }
 
     void mios_unregister_udp()
     {
         m_messenger->unregister_udp();
-    }
+    }    
+
 
 private:
     // callback group
@@ -90,6 +92,7 @@ private:
 
     // udp subscriber ip
     std::string udp_ip;
+    int udp_port;
     bool is_update;
 
     void subscription_callback(const bt_mios_ros2_interface::msg::RobotState::SharedPtr msg) const

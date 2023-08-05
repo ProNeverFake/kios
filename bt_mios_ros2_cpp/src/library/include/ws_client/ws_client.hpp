@@ -20,6 +20,7 @@
 #include <thread>
 #include <queue>
 #include <chrono>
+#include <optional>
 
 // Define types for convenience
 typedef websocketpp::client<websocketpp::config::asio_client> client;
@@ -54,13 +55,22 @@ public:
         cv.notify_one(); // Notify a waiting thread, if any
     }
 
-    T pop()
+    std::optional<T> pop()
     {
         std::unique_lock<std::mutex> lock(mtx);
-        cv.wait(lock, [this]() { return !queue.empty(); }); // Block until the queue is not empty
-        T value = queue.front();
-        queue.pop();
-        return value;
+        auto now = std::chrono::steady_clock::now();
+        if (cv.wait_until(lock, now + std::chrono::seconds(2), [this]() { return !queue.empty(); });)
+        {
+            std::cout << "message queue: Response caught." << std::endl;
+            T value = queue.front();
+            queue.pop();
+            return value;
+        }
+        else
+        {
+            std::cout << "message queue: Response timed out." << std::endl;
+            return std::nullopt;
+        }
     }
 };
 

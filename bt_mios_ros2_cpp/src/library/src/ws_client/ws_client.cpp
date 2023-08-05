@@ -515,17 +515,25 @@ void BTMessenger::stop_task()
 void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
     send(method, payload);
-    std::string response_str = m_ws_endpoint.get_message_queue().pop();
-    try
+    auto response_opt = m_ws_endpoint.get_message_queue().pop();
+
+    if (response_opt.has_value())
     {
-        nlohmann::json result = nlohmann::json::parse(response_str);
-        // The parsing succeeded, the data is JSON.
-        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
-        // Here you can handle the incomingJson object accordingly.
+        try
+        {
+            nlohmann::json result = nlohmann::json::parse(response_opt.value());
+            // The parsing succeeded, the data is JSON.
+            std::cout << "condition value hit. response: " << result["result"] << std::endl;
+            // Here you can handle the incomingJson object accordingly.
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+        }
     }
-    catch (nlohmann::json::parse_error &e)
+    else
     {
-        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+        std::cerr << "Response timed out, waiting skipped." << std::endl;
     }
 
     // TODO
@@ -543,6 +551,7 @@ void BTMessenger::send_grasped_object()
     send("set_grasped_object", payload);
 }
 
+// ! DISCARDED
 void BTMessenger::on_message_default(websocketpp::connection_hdl hdl, client::message_ptr &msg)
 {
     try

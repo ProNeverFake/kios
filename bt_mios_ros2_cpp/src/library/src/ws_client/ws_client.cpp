@@ -550,19 +550,3 @@ void BTMessenger::send_grasped_object()
     payload["object"] = "ring";
     send("set_grasped_object", payload);
 }
-
-// ! DISCARDED
-void BTMessenger::on_message_default(websocketpp::connection_hdl hdl, client::message_ptr &msg)
-{
-    try
-    {
-        nlohmann::json result = nlohmann::json::parse(msg->get_payload());
-        // The parsing succeeded, the data is JSON.
-        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
-        // Here you can handle the incomingJson object accordingly.
-    }
-    catch (nlohmann::json::parse_error &e)
-    {
-        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
-    }
-}

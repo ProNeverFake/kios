@@ -1,5 +1,7 @@
 #include "ws_client/ws_client.hpp"
+/***************** asynchronized response ***************/
 
+/******************* connection_metadata ****************/
 // Getter for connection handle
 websocketpp::connection_hdl connection_metadata::get_hdl() const
 {
@@ -117,6 +119,7 @@ int websocket_endpoint::connect(std::string const &uri)
         metadata_ptr,
         &m_endpoint,
         websocketpp::lib::placeholders::_1));
+    // * set message handler for the connection *(here default method)
     con->set_message_handler(websocketpp::lib::bind(
         &connection_metadata::on_message,
         metadata_ptr,
@@ -128,6 +131,60 @@ int websocket_endpoint::connect(std::string const &uri)
     m_endpoint.connect(con);
 
     return new_id;
+}
+
+// Create a new connection to the specified URI
+int websocket_endpoint::special_connect(std::string const &uri)
+{
+    websocketpp::lib::error_code ec;
+
+    // Create a new connection to the given URI
+    client::connection_ptr con = m_endpoint.get_connection(uri, ec);
+
+    if (ec)
+    {
+        std::cout << "Connect initialization error: " << ec.message() << std::endl;
+        return -1;
+    }
+
+    // Create a new metadata object for this connection
+    int new_id = m_next_id++;
+    connection_metadata::ptr metadata_ptr = websocketpp::lib::make_shared<connection_metadata>(con->get_handle(), uri);
+    m_connection_list[new_id] = metadata_ptr;
+
+    // Bind the handlers
+    con->set_open_handler(websocketpp::lib::bind(
+        &connection_metadata::on_open,
+        metadata_ptr,
+        &m_endpoint,
+        websocketpp::lib::placeholders::_1));
+    con->set_fail_handler(websocketpp::lib::bind(
+        &connection_metadata::on_fail,
+        metadata_ptr,
+        &m_endpoint,
+        websocketpp::lib::placeholders::_1));
+    con->set_close_handler(websocketpp::lib::bind(
+        &connection_metadata::on_close,
+        metadata_ptr,
+        &m_endpoint,
+        websocketpp::lib::placeholders::_1));
+    // * set message handler for the connection *(here default method)
+    con->set_message_handler(websocketpp::lib::bind(
+        &websocket_endpoint::message_handler_callback,
+        this,
+        websocketpp::lib::placeholders::_1,
+        websocketpp::lib::placeholders::_2));
+    // Note that connect here only requests a connection. No network messages are
+    // exchanged until the event loop starts running in the next line.
+    m_endpoint.connect(con);
+
+    return new_id;
+}
+
+void websocket_endpoint::message_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr msg)
+{
+    message_queue_.push(msg->get_payload());
+    std::cout << "message_handler: message received!" << std::endl;
 }
 
 void websocket_endpoint::send(int id, const std::string &message)
@@ -148,6 +205,11 @@ void websocket_endpoint::send(int id, const std::string &message)
     {
         std::cout << "> No connection found with id " << id << std::endl;
     }
+}
+
+ThreadSafeQueue<std::string> &websocket_endpoint::get_message_queue()
+{
+    return message_queue_;
 }
 
 connection_metadata::ptr websocket_endpoint::get_metadata(int id)
@@ -200,7 +262,6 @@ BTMessenger::BTMessenger(const std::string &uri)
 {
     udp_ip = "127.0.0.1";
     udp_port = 12346;
-    response_future = response_promise.get_future();
 }
 /**
  * @brief the original raw connect method
@@ -233,6 +294,66 @@ bool BTMessenger::connect_o()
 bool BTMessenger::connect()
 {
     std::future<int> connection_future = std::async(std::launch::async, &websocket_endpoint::connect, &m_ws_endpoint, m_uri);
+
+    switch (connection_future.wait_for(std::chrono::seconds(5)))
+    {
+    case std::future_status::deferred: {
+        std::cout << "websocket connection: deferred." << std::endl;
+        break;
+    };
+    case std::future_status::timeout: {
+        std::cout << "websocket connection attempt: timed out!" << std::endl;
+        break;
+    };
+    case std::future_status::ready: {
+        std::cout << "websocket connection request: affirmative." << std::endl;
+        connection_id = connection_future.get();
+        std::cout << "connection id: " << connection_id << std::endl;
+        if (connection_id < 0)
+        {
+            std::cout << "Connecting result: failed to connect to " << m_uri << std::endl;
+            return false;
+        }
+        else
+        {
+            std::cout << "Connecting result: Successfully connected to " << m_uri << std::endl;
+
+            try
+            {
+                set_message_handler([](const std::string &msg) {
+                    try
+                    {
+                        nlohmann::json result = nlohmann::json::parse(msg);
+                        // The parsing succeeded, the data is JSON.
+                        std::cout << "set_message_handler run..." << std::endl;
+                        std::cout << "the result is : " << result["result"] << std::endl;
+                        // Here you can handle the incomingJson object accordingly.
+                    }
+                    catch (nlohmann::json::parse_error &e)
+                    {
+                        // If we are here, the data is not JSON.
+                        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+                    }
+                });
+            }
+            catch (...)
+            {
+                std::cout << "something happened... PLS CHECK CONNECT()" << std::endl;
+            }
+            return true;
+        }
+        break;
+    };
+    default: {
+        std::cout << "UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() " << m_uri << std::endl;
+        return false;
+    }
+    }
+}
+// !
+bool BTMessenger::special_connect()
+{
+    std::future<int> connection_future = std::async(std::launch::async, &websocket_endpoint::special_connect, &m_ws_endpoint, m_uri);
 
     switch (connection_future.wait_for(std::chrono::seconds(5)))
     {
@@ -335,7 +456,8 @@ void BTMessenger::register_udp(int &port)
     payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K", "system_time"};
     if (is_connected())
     {
-        send("subscribe_telemetry", payload);
+        // !! DEBUG
+        send_and_wait("subscribe_telemetry", payload);
     }
 }
 
@@ -393,6 +515,19 @@ void BTMessenger::stop_task()
 void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
     send(method, payload);
+    std::string response_str = m_ws_endpoint.get_message_queue().pop();
+    try
+    {
+        nlohmann::json result = nlohmann::json::parse(response_str);
+        // The parsing succeeded, the data is JSON.
+        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
+        // Here you can handle the incomingJson object accordingly.
+    }
+    catch (nlohmann::json::parse_error &e)
+    {
+        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+    }
+
     // TODO
 }
 
@@ -406,4 +541,19 @@ void BTMessenger::send_grasped_object()
     nlohmann::json payload;
     payload["object"] = "ring";
     send("set_grasped_object", payload);
+}
+
+void BTMessenger::on_message_default(websocketpp::connection_hdl hdl, client::message_ptr &msg)
+{
+    try
+    {
+        nlohmann::json result = nlohmann::json::parse(msg->get_payload());
+        // The parsing succeeded, the data is JSON.
+        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
+        // Here you can handle the incomingJson object accordingly.
+    }
+    catch (nlohmann::json::parse_error &e)
+    {
+        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+    }
 }

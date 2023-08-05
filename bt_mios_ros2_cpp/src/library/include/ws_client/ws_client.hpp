@@ -25,6 +25,45 @@
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 typedef websocketpp::lib::shared_ptr<websocketpp::lib::thread> thread_ptr;
 
+template <typename T>
+class ThreadSafeQueue
+{
+private:
+    std::queue<T> queue;
+    std::mutex mtx;
+    std::condition_variable cv;
+
+public:
+    // ThreadSafeQueue();
+    // ! don't need move constructor
+    // ThreadSafeQueue(ThreadSafeQueue &&other)
+    // {
+    //     // Implement move construction
+    // }
+
+    // ThreadSafeQueue &operator=(ThreadSafeQueue &&other)
+    // {
+    //     // Implement move assignment
+    //     return *this;
+    // }
+
+    void push(const T &value)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        queue.push(value);
+        cv.notify_one(); // Notify a waiting thread, if any
+    }
+
+    T pop()
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this]() { return !queue.empty(); }); // Block until the queue is not empty
+        T value = queue.front();
+        queue.pop();
+        return value;
+    }
+};
+
 // Class to hold connection metadata
 class connection_metadata
 {
@@ -77,11 +116,14 @@ class websocket_endpoint
     con_list m_connection_list;
     // Counter to generate unique IDs for connections
     int m_next_id;
+    // concurrency
+    ThreadSafeQueue<std::string> message_queue_;
 
 public:
     // Constructor
     websocket_endpoint()
-        : m_next_id(0)
+        : m_next_id(0),
+          message_queue_()
     {
         // Set logging to be pretty verbose (everything except message payloads)
         m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
@@ -100,6 +142,8 @@ public:
     // Create a new connection to the specified URI
     int connect(std::string const &uri);
 
+    int special_connect(std::string const &uri);
+
     bool is_open(int connection_id);
 
     void send(int id, const std::string &message);
@@ -110,6 +154,10 @@ public:
     void close(int id, websocketpp::close::status::value code, std::string reason);
 
     void set_message_handler(std::function<void(const std::string &)> handler);
+
+    void message_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr msg);
+
+    ThreadSafeQueue<std::string> &get_message_queue();
 };
 
 class BTMessenger
@@ -117,6 +165,7 @@ class BTMessenger
 public:
     BTMessenger(const std::string &uri);
     bool connect();
+    bool special_connect();
     bool connect_o();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void send_and_wait(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
@@ -130,7 +179,8 @@ public:
     void set_message_handler(std::function<void(const std::string &)> handler);
     void send_grasped_object();
     bool wait_for_open_connection(int deadline);
-    void message_handler_callback(const std::string &msg);
+    // void get_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr &msg);
+    void on_message_default(websocketpp::connection_hdl hdl, client::message_ptr &msg);
 
 private:
     websocket_endpoint m_ws_endpoint;
@@ -139,8 +189,7 @@ private:
     int udp_port;
     int connection_id;
     // thread management
-    std::queue<std::string> m_message_queue;
-    // promise future object
-    std::promise<nlohmann::json> response_promise;
-    std::future<nlohmann::json> response_future;
+    std::mutex mutex_;
+    std::queue<std::string> message_queue_;
+    std::condition_variable cv_;
 };

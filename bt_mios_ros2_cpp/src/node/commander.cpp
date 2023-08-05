@@ -28,7 +28,7 @@ public:
         // * initialize the websocket messenger
         m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
-        m_messenger->connect();
+        m_messenger->special_connect();
         // register the udp subscriber
 
         while (!m_messenger->wait_for_open_connection(3))

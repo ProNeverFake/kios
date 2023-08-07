@@ -1,154 +1,100 @@
-# ROS2 package for Behavior-Tree & MIOS
+# KIOS --- Knowledge-based Intelligent Operation System
 
-This is the package for implementation of behavior tree in ROS2 (based on distro Humble in principle). Code for the communication with MIOS using websocketpp and nlohman json library is also included.
+This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle). 
+
+The decision making part is realized based on project BehaviorTree.CPP. Code for the communication with MIOS using websocketpp and nlohmann json library is also included.
 
 ## Intro
 
-So you just decided to add a README to your project. You want to create an easy
-to read and easy to navigate file.
+Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my master thesis and maybe after finishing that I'll finally figure out what this system is really about. 
 
-The question is: What should you do next?
+## NEWS
 
-Should you create one from scratch? Find a silver bullet solution? Or is it
-better to customize an already existing file?
-
-I'm going to show you how to create a README that fits your project, is easy
-to read and contains everyting you will ever need.
-
-## Feature overview
-
-*   [x] **Easy to read** like an article
-*   [x] **Feature overview and Contents** for fast orientation
-*   [ ] **Visuals** to keep users engaged
+SEE [DEVELOPMENT LOG](#development-log)
 
 ## Contents
 
-*   [What is this?](#what-is-this)
-*   [When should I use this?](#when-should-i-use-this)
+*   [What is KIOS?](#what-is-KIOS)
 *   [Getting started](#getting-started)
     *   [Requirements](#requirements)
     *   [Install](#install)
     *   [Usage](#usage)
-*   [Here is where it's your turn](#here-is-where-its-your-turn)
-*   [Don't forget anything](#dont-forget-anything)
-    * [Used Technologies](#used-technologies)
-    * [Testing](#testing)
-    * [Logging](#logging)
+    *   [Used Technologies](#used-technologies)
+    *   [Testing](#testing)
+    *   [Development Log](#development-log)
 *   [Contribute](#contribute)
 *   [License](#license)
 *   [Sources](#sources)
 *   [Conclusion](#conclusion)
 
-## What is this?
+## What is KIOS?
 
-This project is an exhaustive README template that you can customize to your needs.
-You can either add sections you like or remove sections you don't like. But you have
-every time an example in front of you, from which you can derive from.
-
-## Why should I use this?
-
-There are many README templates out there so why this one? The two main reasons for this are
-that they contain often too little content or they are not easy to read or navigate through.
+kIOS, Short for "Knowledge-based Intelligent Operation System", is a robot skill learing and selecting system developed by BlackBird for his master thesis. The system is built based on ROS2 and should be used along with the mios developed by @Lars. 
 
 ## Getting Started
 
-So how do you get this template to work for your project? It is easier than you think.
+BB: Don't need to.
 
 ### Requirements
 
-* Have a project ready where you can add a README
-* Basic knowledge of [Markdown][about-markdown] (here is a [Cheatsheet][markdown-cheatsheet])
+- Ubuntu 22.04 recommanded. But Ubuntu 20.04 is also fine (which means you need to install ros2 foxy instead of humble)
+- linux Realtime kernal. This is the requirement mios (or more precisely the requirement of robot control frequency).
+...
 
 ### Install
 
-Install ROS2 humble or foxy
+1. Install ROS2 humble (or foxy).
 
-Install BehaviorTree.CPP
+2. Install BehaviorTree.CPP. 
 
-Install websocketpp apt package
+- **update:** Now you don't need to do that. It is now a built-in library.
 
-Install nlohman apt package
+3. Install websocketpp apt package.
 
-Use git to clone this repository into your computer.
+4. Install nlohmann apt package.
+
+5. clone the project and build.
 
 ```
 git clone https://gitlab.com/kopino4-templates/readme-template
 ```
 
+6. There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
+
 ### Usage
 
-Use the well known command to copy the template
+I'm sorry to inform you that the system is still not finished yet. Before finishing the system I have no time to provide any tutorial of this system. So LEARN BY YOURSELF, just like how you have learned to use mios.
 
-```bash
-# Copy the content
-CTRL + C
-
-# Pase into your project
-CTRL + V
-```
-
-## Here is where it's your turn
-
-Here starts the main content of your README. This is why you did it for in the first place.
-To describe to future users of this project (including yourself) everything they need to know
-to be able to use it and understand it.
-
-Use visuals to help the reader understand better. An image, diagram, chart or code example says
-more than thousand words
-
-![Diagram](doc/diagram.jpg)
-
-## Don't forget anything
-
-Think hard about anything that is clear to you but might not be clear for others. Why are you
-using this aproach or why did you pick this solution instead?
+BB: GOOD LUCK.
 
 ### Used technologies
 
-For sure mention all the technologies you used. If the technologies age in time you don't forget
-they are used and need to be replaced.
+- Behavior-tree.
+- Websocket communication.
+...
 
 ### Testing
 
-No tests no sucess. You SHOULD have tests for every project, but do new users know how to run them?
+Blackbird: I'll just skip this part. Don't ask me why.
 
-No ofc not so there is no test
+### Development Log
 
-### Logging
-
-Logging is essential. How do you know something went wrong if the computer doesn't tell you? Logs
-are the first place to search for bugs. Explain to everybody how you can customize it or used it
-in the right way.
+- *07.08.2023:* 
+    1. Change the project name into KIOS. The old name bt_mios_ros2 is discarded.
+    2. Add README.md. 
 
 ## Contribute
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+Please make yourself a new branch if you want to contribute.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[BBLAB](https://github.com/ProNeverFake)
 
 ## Sources
 
-[react-markdown][react-markdown] - Project which served as an inspiration for this README
-
-[Blog post templates][blog-post-templates] - Used to structure this template as an easy to read blog post
-
-[About markdown][about-markdown] - Why should you use markdown?
-
-[Markdown Cheat Sheet][markdown-cheatsheet] - Get a fast overview of the syntax
-
-[//]: # "Source definitions"
-[react-markdown]: https://github.com/remarkjs/react-markdown "React-markdown project"
-[blog-post-templates]: https://backlinko.com/hub/content/blog-post-templates "Backlinko blog post templates"
-[about-markdown]: https://www.markdownguide.org/getting-started/ "Introduction to markdown"
-[markdown-cheatsheet]: https://www.markdownguide.org/cheat-sheet/ "Markdown Cheat Sheet"
+[BehaviorTree.CPP](https://github.com/BehaviorTree/BehaviorTree.CPP)
+...
 
 ## Conclusion
 
-To summarize..
-
-We have an exhaustive README template with many features. The README is easy to read and navigate like an article.
-In our future projects we can use this template to get a great head start in creating a custom README.
-
+If you have problems, feel free to ask. I appologize for any inconvenience in your use of this project.

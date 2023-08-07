@@ -1,0 +1,7 @@
+string command
+kios_interface/SkillContext command_context
+bool is_new_command
+---
+bool is_received
+bool is_responsed
+bool is_accepted

@@ -1,2 +1,0 @@
-bt_mios_ros2_interface/Parameter0 p0
-bt_mios_ros2_interface/Parameter1 p1

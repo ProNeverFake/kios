@@ -7,7 +7,7 @@
       },
       "includePath": [
         "/opt/ros/humble/include/**",
-        "/home/blackbird/ros_workspace/src/bt_mios_ros2/include/**",
+        "/home/blackbird/ros_workspace/src/kios/include/**",
         "include/**",
         "/usr/include/**"
       ],
@@ -15,7 +15,7 @@
       "intelliSenseMode": "gcc-x64",
       "compilerPath": "/usr/bin/gcc",
       "cStandard": "gnu11",
-      "cppStandard": "c++14"
+      "cppStandard": "c++17"
     }
   ],
   "version": 4

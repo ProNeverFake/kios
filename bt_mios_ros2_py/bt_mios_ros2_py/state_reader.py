@@ -26,6 +26,7 @@ class StateReader(Node):
 
         # register flag parameter for updating robot
         self.declare_parameter('is_update', False)
+        self.declare_parameter('power', True)
 
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group

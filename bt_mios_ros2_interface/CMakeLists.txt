@@ -54,20 +54,21 @@ endforeach()
 
 # message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
-############################ mios_msg
-set(MODULE_NAME mios_msg)
+################################### msg
+set(MODULE_NAME msgs)
 
-file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/msg/mios/*.msg")
+file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/msg/*.msg")
 # message("the result of glob: ${${MODULE_NAME}_FILES}\n")
 
 set(${MODULE_NAME}_FILE_NAMES)
 
 foreach(file ${${MODULE_NAME}_FILES})
     get_filename_component(file_name ${file} NAME)
-    list(APPEND ${MODULE_NAME}_FILE_NAMES "msg/mios/${file_name}")
+    list(APPEND ${MODULE_NAME}_FILE_NAMES "msg/${file_name}")
 endforeach()
 
 # message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
+
 
 ############################ bt_action
 set(MODULE_NAME action)
@@ -89,8 +90,8 @@ endforeach()
 rosidl_generate_interfaces(${PROJECT_NAME}
       # ${bt_srv_FILE_NAMES}      
       ${mios_srv_FILE_NAMES}
-      ${mios_msg_FILE_NAMES}
       ${action_FILE_NAMES}
+      ${msgs_FILE_NAMES}
       "srv/RequestState.srv"
     )
 

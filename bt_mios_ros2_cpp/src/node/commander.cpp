@@ -21,6 +21,8 @@ public:
           udp_ip("127.0.0.1"),
           udp_port(12346)
     {
+        // declare mission parameter
+        this->declare_parameter("my_parameter", "world");
         // callback group
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -133,6 +135,8 @@ private:
             // is update == true, do nothing
         }
     }
+
+    bool is_switch_action();
 };
 
 int main(int argc, char *argv[])

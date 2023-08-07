@@ -524,7 +524,7 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
             std::cout << "condition value hit. response: " << result["result"] << std::endl;
-            // Here you can handle the incomingJson object accordingly.
+            // TODO handle the result.
         }
         catch (nlohmann::json::parse_error &e)
         {
@@ -539,7 +539,7 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
     // TODO
 }
 
-void BTMessenger::set_message_handler(std::function<void(const std::string &)> handler)
+[[maybe_unused]] void BTMessenger::set_message_handler(std::function<void(const std::string &)> handler)
 {
     m_ws_endpoint.set_message_handler(handler);
 }
@@ -548,5 +548,6 @@ void BTMessenger::send_grasped_object()
 {
     nlohmann::json payload;
     payload["object"] = "ring";
-    send("set_grasped_object", payload);
+    // ! THIS MAY TIME OUT
+    send_and_wait("set_grasped_object", payload);
 }

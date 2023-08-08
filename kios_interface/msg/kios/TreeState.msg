@@ -4,4 +4,6 @@ int32 APPROACH=1
 int32 CONTACT=2
 int32 WIGGLE=3
 
-int32 action_node
+int32 action_phase
+bool is_switch_action_phase
+bool is_runnning

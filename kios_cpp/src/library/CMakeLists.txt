@@ -95,6 +95,35 @@ target_link_libraries(${MODULE_NAME}
 # endforeach(FILENAME ${FILENAMES})
 ##########
 
+######################################################### kios_utils library
+set(MODULE_NAME kios_utils)
+
+set(${MODULE_NAME}_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/kios_utils/kios_utils.cpp
+)
+
+set(${MODULE_NAME}_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kios_utils/kios_utils.hpp
+)
+
+# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/action/*.cpp")
+# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/action/*.hpp")
+
+add_library(${MODULE_NAME} STATIC
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
+    )
+
+target_include_directories(${MODULE_NAME}
+PRIVATE
+    src
+PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+)
+
+add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
+
 ######################################################################
 
 # install(TARGETS

@@ -1,20 +1,52 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
-// #include <mutex>
-// #include <thread>
-// #include <optional>
-// #include <chrono>
-// #include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <optional>
+#include <chrono>
+#include <condition_variable>
 
 namespace Insertion
 {
+    // class ThreadSafeActionNodeContext
+    // {
+    //     void write_data_1()
+    //     {
+    //         std::lock_guard<std::mutex> lock(data_mutex);
+    //         for (int i = 0; i < 50; ++i)
+    //         { // thread 1 writes to the first half
+    //             data[i] = i;
+    //         }
+    //     }
+
+    //     void write_data_2()
+    //     {
+    //         std::lock_guard<std::mutex> lock(data_mutex);
+    //         for (int i = 50; i < 100; ++i)
+    //         { // thread 2 writes to the second half
+    //             data[i] = i;
+    //         }
+    //     }
+
+    //     void read_data()
+    //     {
+    //         std::lock_guard<std::mutex> lock(data_mutex);
+    //         for (int val : data)
+    //         {
+    //             std::cout << val << " ";
+    //         }
+    //         std::cout << std::endl;
+    //     }
+    // };
+
     enum class ActionPhase
     {
-        APPROACH,
-        CONTACT,
-        WIGGLE,
-        DUMMY
+        ERROR = -1,
+        INITIALIZATION = 0,
+        APPROACH = 1,
+        CONTACT = 2,
+        WIGGLE = 3
     };
     /**
      * @brief param for approach
@@ -62,9 +94,9 @@ namespace Insertion
      */
     struct ActionNodeContext
     {
-        std::string node_name = "dummy_node";
-        std::string action_name = "dummy_action";
-        ActionPhase action_phase = ActionPhase::DUMMY;
+        std::string node_name = "INI";
+        std::string action_name = "INI";
+        ActionPhase action_phase = ActionPhase::INITIALIZATION;
         std::string command;
         nlohmann::json parameter = {
             {"skill",
@@ -74,8 +106,8 @@ namespace Insertion
                 {"Insertable", "ring"}}},
               {"time_max", 17},
               {"action_context",
-               {{"action_name", "dummy_action"},
-                {"action_phase", ActionPhase::DUMMY}}},
+               {{"action_name", "INI"},
+                {"action_phase", ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.1, 1}},
                 {"ddX_d", {0.5, 4}},
@@ -114,8 +146,6 @@ namespace Insertion
         std::vector<double> TF_F_ext_K = {0, 0, 0, 0, 0, 0};
         bool is_approach_finished = false;
     };
-
-    // extern std::shared_ptr<ActionNodeContext> node_context_ptr;
 
     // class ActionContext
     // {

@@ -87,7 +87,7 @@ namespace Insertion
               {"time_max", 17},
               {"action_context",
                {{"action_name", "dummy_action"},
-                {"action_phase", ActionPhase::DUMMY}}},
+                {"action_phase", ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.1, 1}},
                 {"ddX_d", {0.5, 4}},

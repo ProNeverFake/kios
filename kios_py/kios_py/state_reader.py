@@ -11,14 +11,14 @@ import json
 
 from .resource.ws_client import *
 
-from kios_interface.msg import RobotState
+from kios_interface.msg import MiosState
 
 
 class StateReader(Node):
 
     udp_subscriber = ''
     # robot state variable dictionary.
-    robot_state_default = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    mios_state_default = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     def __init__(self):
         super().__init__('bt_state_reader')
@@ -42,7 +42,7 @@ class StateReader(Node):
             callback_group=timer_callback_group)
 
         self.publisher = self.create_publisher(
-            RobotState,
+            MiosState,
             'mios_state_topic',
             10,
             callback_group=publisher_callback_group
@@ -54,14 +54,14 @@ class StateReader(Node):
         if self.is_running:
             data, addr = self.udp_subscriber.recvfrom(1024)
             self.get_logger().info("Received message: %s" % data.decode())
-            robot_state = json.loads(data.decode())
+            mios_state = json.loads(data.decode())
             # publish msg
-            msg = RobotState()
-            msg.tf_f_ext_k = robot_state["TF_F_ext_K"]
+            msg = MiosState()
+            msg.tf_f_ext_k = mios_state["TF_F_ext_K"]
             self.publisher.publish(msg)
             self.get_logger().info("Published RobotState to topic")
-            print("check: ", robot_state["TF_F_ext_K"][2],
-                  "sender time: ", robot_state["system_time"],
+            print("check: ", mios_state["TF_F_ext_K"][2],
+                  "sender time: ", mios_state["system_time"],
                   "receiver time: ", datetime.now())
         else:
             self.get_logger().info('not runnning, timer pass ...')
@@ -78,14 +78,14 @@ class StateReader(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    bt_state_reader = StateReader()
+    state_reader = StateReader()
 
     executor = MultiThreadedExecutor()
-    executor.add_node(bt_state_reader)
+    executor.add_node(state_reader)
 
     executor.spin()
 
-    bt_state_reader.destroy_node()
+    state_reader.destroy_node()
     rclpy.shutdown()
 
 

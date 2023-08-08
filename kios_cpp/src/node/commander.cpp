@@ -3,14 +3,19 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+#include "nlohmann/json.hpp"
 
 #include "rcl_interfaces/srv/set_parameters_atomically.hpp"
 #include "rcl_interfaces/srv/get_parameters.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
 
+#include "behavior_tree/node_list.hpp"
+
 #include "ws_client/ws_client.hpp"
 
 #include "kios_interface/srv/command_request.hpp"
+
+#include "kios_utils/kios_utils.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -23,13 +28,16 @@ public:
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
           udp_port(12346),
-          is_runnning(false)
+          is_runnning(true),
+          is_busy(false)
     {
         // declare mission parameter
         this->declare_parameter("power_on", true);
         // callback group
-        timer_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
+        // timer_callback_group_ = this->create_callback_group(
+        //     rclcpp::CallbackGroupType::MutuallyExclusive);
+        service_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::Reentrant);
 
         // * initialize the websocket messenger
         m_messenger = std::make_shared<BTMessenger>(ws_url);
@@ -44,12 +52,11 @@ public:
 
         mios_register_udp();
 
-        // * set the grasped object
-        // the ros spin method:
-        timer_ = this->create_wall_timer(
-            std::chrono::seconds(1),
-            std::bind(&Commander::timer_callback, this), timer_callback_group_);
-        // m_messenger->send_grasped_object();
+        // timer_ = this->create_wall_timer(
+        //     std::chrono::seconds(1),
+        //     std::bind(&Commander::timer_callback, this), timer_callback_group_);
+        // ! NOT VARIFIED
+        m_messenger->send_grasped_object();
         // subscription_ = this->create_subscription<std_msgs::msg::String>(
         //     "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
         // ! QoS not varified
@@ -62,16 +69,15 @@ public:
         is_runnning = true;
     }
 
+    // connection rel
     void mios_register_udp()
     {
         m_messenger->register_udp(udp_port);
     }
-
     void mios_unregister_udp()
     {
         m_messenger->unregister_udp();
     }
-
     void shut_down_connection()
     {
         m_messenger->unregister_udp();
@@ -81,8 +87,14 @@ public:
 private:
     // flags
     bool is_runnning;
+    bool is_busy;
+
+    //! TEMP STATE
+    kios::ActionPhaseContext action_phase_context_;
+    kios::CommandRequest command_request_;
+
     // callback group
-    rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
+    // rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
     rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
 
@@ -91,26 +103,34 @@ private:
     rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr service_;
 
     // ws_client rel
-    std::shared_ptr<BTMessenger>
-        m_messenger;
+    std::shared_ptr<BTMessenger> m_messenger;
     std::string ws_url;
 
     // udp subscriber ip
     std::string udp_ip;
     int udp_port;
-    bool is_update;
+    // bool is_update;
 
     void service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
-        // request.get()->command
+        // * read the command request
+        command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
+        try
+        {
+            command_request_.command_context = nlohmann::json::parse(request->command_context);
+        }
+        catch (...)
+        {
+            std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
+        }
     }
 
-    void timer_callback()
-    {
-        RCLCPP_INFO(this->get_logger(), "timer hit.");
-    }
+    // void timer_callback()
+    // {
+    //     RCLCPP_INFO(this->get_logger(), "timer hit.");
+    // }
 
     /**
      * @brief set the param "is_update" in node bt_udp_node as true
@@ -159,7 +179,25 @@ private:
     //     }
     // }
 
-    bool is_switch_action();
+    bool issue_command(const kios::CommandRequest &command_request)
+    {
+        // ! TODO
+        switch (command_request.command_type)
+        {
+        case kios::CommandType::INITIALIZATION: {
+            // * DO NOTHING
+            break;
+        }
+        case kios::CommandType::STOP_OLD_START_NEW: {
+            // * DO NOTHING
+            break;
+        }
+        default:
+            break;
+        }
+        return true;
+        // passing
+    };
 
     bool stop_task();
 

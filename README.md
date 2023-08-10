@@ -14,6 +14,9 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 - velocity limits are always violated with node Contact in the tree. (10082023)
 
 **DEVELOPER'S PLAN:**
+- [ ] **ERGENT** enable mongoDB w/r
+- [ ] **ERGENT** add node manipulator to control other nodes.
+- [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
 - [ ] move ActionContext to kios_utils.

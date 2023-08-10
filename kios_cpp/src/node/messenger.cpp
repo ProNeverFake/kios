@@ -64,7 +64,7 @@ public:
         timer_callback_group_ = publisher_callback_group_;
         //* initialize timer
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(50),
+            std::chrono::milliseconds(500),
             std::bind(&Messenger::timer_callback, this),
             timer_callback_group_);
         //* initialize ros pub sub options

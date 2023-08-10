@@ -524,12 +524,16 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
             // !!! TODO return the result bool value
-            std::cout << "condition value hit. response: " << result["result"] << std::endl;
+            std::cout << "Call method " << method << "get response if_success: " << result["result"]["result"] << std::endl;
             // TODO handle the result.
         }
         catch (nlohmann::json::parse_error &e)
         {
             std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+        }
+        catch (...)
+        {
+            std::cerr << "SEND_AND_WAIT: UNDEFINED ERROR!" << std::endl;
         }
     }
     else

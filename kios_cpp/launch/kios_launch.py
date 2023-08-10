@@ -83,18 +83,39 @@ def generate_launch_description():
     #         ]
     #     )
 
-    bt_ros2_node = Node(
-        package='kios_cpp',
-        namespace='',
-        executable='bt_ros2_node',
-        name='bt_ros2_node'
-    )
-
-    bt_udp_node = Node(
+    state_reader = Node(
         package='kios_py',
         namespace='',
-        executable='bt_udp_node',
-        name='bt_udp_node'
+        executable='state_reader',
+        name='state_reader'
+    )
+
+    messenger = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='messenger',
+        name='messenger'
+    )
+
+    tree_node = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='tree_node',
+        name='tree_node'
+    )
+
+    tactician = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='tactician',
+        name='tactician'
+    )
+
+    commander = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='commander',
+        name='commander'
     )
 
     return LaunchDescription([
@@ -107,6 +128,9 @@ def generate_launch_description():
         # turtlesim_node,
         # turtlesim_node_with_parameters,
         # forward_turtlesim_commands_to_second_turtlesim_node,
-        bt_ros2_node,
-        bt_udp_node
+        state_reader,
+        messenger,
+        tree_node,
+        tactician,
+        commander,
     ])

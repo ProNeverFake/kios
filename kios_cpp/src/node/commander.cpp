@@ -64,8 +64,6 @@ public:
             std::bind(&Commander::service_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             service_callback_group_);
-
-        is_runnning = true;
     }
 
     // connection rel

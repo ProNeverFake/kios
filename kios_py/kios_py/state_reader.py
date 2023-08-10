@@ -37,7 +37,7 @@ class StateReader(Node):
         self.udp_port = 12346
 
         self.timer = self.create_timer(
-            0.002,  # sec
+            0.5,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
 

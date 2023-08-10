@@ -69,7 +69,7 @@ public:
             rclcpp::CallbackGroupType::Reentrant);
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(50),
+            std::chrono::milliseconds(500),
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
         // TODO A PARAM CHECK TIMER

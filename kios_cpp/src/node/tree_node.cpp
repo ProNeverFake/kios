@@ -38,7 +38,7 @@ public:
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(50),
+            std::chrono::milliseconds(500),
             std::bind(&TreeNode::timer_callback, this),
             timer_callback_group_);
 

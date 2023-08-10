@@ -1,0 +1,13 @@
+int32 INITIALIZATION=0
+int32 STOP_OLD_START_NEW=1
+int32 START_NEW_TASK=2
+int32 STOP_OLD_TASK=3
+
+
+int32 command_type
+# kios_interface/SkillContext command_context
+string command_context
+bool is_new_command
+---
+bool is_accepted
+

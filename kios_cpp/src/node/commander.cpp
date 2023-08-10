@@ -34,8 +34,6 @@ public:
         // declare mission parameter
         this->declare_parameter("power_on", true);
         // callback group
-        // timer_callback_group_ = this->create_callback_group(
-        //     rclcpp::CallbackGroupType::MutuallyExclusive);
         service_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
 
@@ -43,21 +41,16 @@ public:
         m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         m_messenger->special_connect();
-        // register the udp subscriber
-
         while (!m_messenger->wait_for_open_connection(3))
         {
             RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
         }
 
+        // udp register
         mios_register_udp();
-        // timer_ = this->create_wall_timer(
-        //     std::chrono::seconds(1),
-        //     std::bind(&Commander::timer_callback, this), timer_callback_group_);
-        // ! NOT VARIFIED
+        // object announcement
         m_messenger->send_grasped_object();
-        // subscription_ = this->create_subscription<std_msgs::msg::String>(
-        //     "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+
         // ! QoS not varified
         service_ = this->create_service<kios_interface::srv::CommandRequest>(
             "command_request_service",
@@ -91,12 +84,9 @@ private:
     kios::CommandRequest command_request_;
 
     // callback group
-    // rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
-    rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
 
     // callbacks
-    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr service_;
 
     // ws_client rel
@@ -106,7 +96,6 @@ private:
     // udp subscriber ip
     std::string udp_ip;
     int udp_port;
-    // bool is_update;
 
     void service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
@@ -123,14 +112,8 @@ private:
             std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
         }
         issue_command(command_request_);
-        // ! TODO: return the websocket send and wait result!
         response->is_accepted = true;
     }
-
-    // void timer_callback()
-    // {
-    //     RCLCPP_INFO(this->get_logger(), "timer hit.");
-    // }
 
     /**
      * @brief set the param "is_update" in node bt_udp_node as true

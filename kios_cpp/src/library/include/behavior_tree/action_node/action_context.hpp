@@ -92,6 +92,7 @@ namespace Insertion
      * @brief
      *
      */
+    // ! TO BE DISCARDED
     struct ActionNodeContext
     {
         std::string node_name = "INI";

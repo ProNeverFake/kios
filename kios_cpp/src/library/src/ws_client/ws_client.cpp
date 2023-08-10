@@ -561,6 +561,5 @@ void BTMessenger::send_grasped_object()
 {
     nlohmann::json payload;
     payload["object"] = "ring";
-    // ! THIS MAY TIME OUT
     send_and_wait("set_grasped_object", payload);
 }

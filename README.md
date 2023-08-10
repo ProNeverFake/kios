@@ -10,9 +10,13 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 
 ## NEWS
 
+**KNOWN BUGS:**
+- velocity limits are always violated with node Contact in the tree. (10082023)
+
 **DEVELOPER'S PLAN:**
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
+- [ ] move ActionContext to kios_utils.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -79,6 +83,12 @@ BB: GOOD LUCK.
 Blackbird: I'll just skip this part. Don't ask me why.
 
 ### Development Log
+
+- *10.08.2023:*
+  1. Context inconsistency with mios fixed. Now a single command execution along with mios is possible.
+  2. Bugs in tactician, commander and tree_node are fixed.
+  3. New launch file debug_launch.py added for debugging.
+  4. add new library kios_utils for containing common data structure.
 
 - *07.08.2023:*
   1. Change the project name into KIOS. The old name bt_mios_ros2 is discarded.

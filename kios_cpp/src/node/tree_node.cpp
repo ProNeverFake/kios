@@ -103,8 +103,10 @@ private:
 
                 // * publish tree state
                 kios_interface::msg::TreeState msg;
+                msg.action_name = m_tree_root->get_context_ptr()->action_name;
                 msg.action_phase = static_cast<int32_t>(m_tree_root->get_context_ptr()->action_phase);
                 msg.is_runnning = true;
+                RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.\n", msg.action_name.c_str());
                 publisher_->publish(msg);
             }
             else

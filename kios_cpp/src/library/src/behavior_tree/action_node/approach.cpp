@@ -23,6 +23,7 @@ namespace Insertion
      */
     bool Approach::is_success()
     {
+        // ! BUG
         return m_robot_state_ptr->is_approach_finished;
     };
     /**
@@ -32,6 +33,7 @@ namespace Insertion
     void Approach::set_action_context()
     {
         m_node_context_ptr->parameter["skill"]["action_name"] = "approach";
+        m_node_context_ptr->action_name = "approach";
         m_node_context_ptr->action_phase = ActionPhase::APPROACH;
         m_node_context_ptr->parameter["skill"]["action_phase"] = ActionPhase::APPROACH;
     }

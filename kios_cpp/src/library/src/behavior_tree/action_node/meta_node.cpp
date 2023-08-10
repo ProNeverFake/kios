@@ -5,15 +5,6 @@ namespace Insertion
     // * MongoInterface
     MongoInterface::MongoInterface()
     {
-        // try
-        // {
-        //     data_pool_register(m_entity_list);
-        //     data_pool_update();
-        // }
-        // catch (std::exception exception)
-        // {
-        //     // do nothing....
-        // }
         data_pool_register(m_entity_list);
         data_pool_update();
     }
@@ -55,7 +46,7 @@ namespace Insertion
     std::shared_ptr<ActionNodeContext> MetaNode::get_context_ptr()
     {
         return std::make_shared<ActionNodeContext>(m_context);
-    };
+    }
 
     void MetaNode::node_context_initialize()
     {}

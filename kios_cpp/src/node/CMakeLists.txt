@@ -48,8 +48,6 @@ target_link_libraries(commander
 ament_target_dependencies(commander
   rclcpp
   rcl_interfaces
-  example_interfaces
-  std_srvs
   kios_interface
 )
 

@@ -40,9 +40,10 @@ namespace Insertion
      */
     void Contact::set_action_context()
     {
-        m_node_context_ptr->parameter["skill"]["action_name"] = "contact";
+        m_node_context_ptr->parameter["skill"]["action_context"]["action_name"] = "contact";
         m_node_context_ptr->action_phase = ActionPhase::CONTACT;
-        m_node_context_ptr->parameter["skill"]["action_phase"] = ActionPhase::CONTACT;
+        m_node_context_ptr->action_name = "contact";
+        m_node_context_ptr->parameter["skill"]["action_context"]["action_phase"] = ActionPhase::CONTACT;
     }
     void Contact::node_context_initialize()
     {

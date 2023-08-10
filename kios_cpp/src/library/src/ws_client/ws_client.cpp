@@ -479,19 +479,27 @@ void BTMessenger::unregister_udp()
 void BTMessenger::start_task(nlohmann::json skill_context)
 {
     // TODO
+    std::vector<std::string> skill_names;
+    std::vector<std::string> skill_types;
+    std::unordered_map<std::string, nlohmann::json> skill_contexts;
+
+    skill_names.push_back("insertion");
+    skill_types.push_back("BBGeneralSkill");
+    skill_contexts["insertion"] = skill_context;
+
     nlohmann::json task_context =
         {{"parameters",
-          {{"skill_names", "insertion"},
-           {"skill_types", "BBGeneralSkill"},
+          {{"skill_names", skill_names},
+           {"skill_types", skill_types},
            {"as_queue", false}}},
-         {"skills", skill_context}};
+         {"skills", skill_contexts}};
     nlohmann::json call_context =
         {{"task", "GenericTask"},
          {"parameters", task_context},
          {"queue", false}};
     if (is_connected())
     {
-        send("start_task", call_context);
+        send_and_wait("start_task", call_context);
     }
 }
 

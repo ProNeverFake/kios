@@ -66,7 +66,7 @@ void connection_metadata::on_message(websocketpp::connection_hdl hdl, client::me
     // ! ERROR
     // Do something with the payload_json object here.
     // todo
-    // This is where you would define your application logic to handle the data received from the server.
+    // This is where to define application logic to handle the data received from the server.
 }
 
 /***************** websocket_endpoint **********************/
@@ -508,7 +508,7 @@ void BTMessenger::stop_task()
     if (is_connected())
     {
         // send("stop_task", payload);
-        send("stop_task", payload);
+        send_and_wait("stop_task", payload);
     }
 }
 
@@ -523,6 +523,7 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
+            // !!! TODO return the result bool value
             std::cout << "condition value hit. response: " << result["result"] << std::endl;
             // TODO handle the result.
         }

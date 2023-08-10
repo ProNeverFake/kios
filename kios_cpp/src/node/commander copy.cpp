@@ -51,6 +51,7 @@ public:
         }
 
         mios_register_udp();
+
         // timer_ = this->create_wall_timer(
         //     std::chrono::seconds(1),
         //     std::bind(&Commander::timer_callback, this), timer_callback_group_);
@@ -124,9 +125,6 @@ private:
         {
             std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
         }
-        issue_command(command_request_);
-        // ! TODO: return the websocket send and wait result!
-        response->is_accepted = true;
     }
 
     // void timer_callback()
@@ -181,36 +179,29 @@ private:
     //     }
     // }
 
-    void issue_command(const kios::CommandRequest &command_request)
+    bool issue_command(const kios::CommandRequest &command_request)
     {
         // ! TODO
         switch (command_request.command_type)
         {
         case kios::CommandType::INITIALIZATION: {
-            // DO NOTHING
+            // * DO NOTHING
             break;
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
-            stop_task();
-            start_task(command_request.command_context);
+            // * DO NOTHING
             break;
         }
         default:
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED COMMANDTYPE!\n");
             break;
         }
+        return true;
         // passing
     };
 
-    void stop_task()
-    {
-        m_messenger->stop_task();
-    }
+    bool stop_task();
 
-    void start_task(const nlohmann::json &skill_context)
-    {
-        m_messenger->start_task(skill_context);
-    }
+    bool start_task();
 };
 
 int main(int argc, char *argv[])

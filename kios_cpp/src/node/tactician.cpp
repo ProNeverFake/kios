@@ -15,6 +15,8 @@
 
 #include "kios_interface/srv/command_request.hpp"
 
+#include "kios_utils/kios_utils.hpp"
+
 using std::placeholders::_1;
 
 enum class ActionPhase
@@ -24,12 +26,6 @@ enum class ActionPhase
     APPROACH = 1,
     CONTACT = 2,
     WIGGLE = 3
-};
-struct TreeState
-{
-    ActionPhase action_phase = ActionPhase::INITIALIZATION;
-    ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-    bool is_running = false;
 };
 
 template <typename T>
@@ -59,7 +55,6 @@ public:
     Tactician()
         : Node("tactician"),
           is_running(true),
-          task_state({0, 0, 0, 0, 0, 0}),
           is_switch_action_phase(false),
           is_busy(false)
     {
@@ -114,12 +109,12 @@ private:
     bool is_busy;
 
     // ! TEMP STATE
-    std::vector<double> task_state;
-    TreeState tree_state_;
-    ThreadSafeData<TreeState> ts_tree_state_;
-    Insertion::ActionNodeContext action_node_context_;
+    kios::TaskState task_state;
+    kios::ThreadSafeData<kios::TreeState> ts_tree_state_;
+    // Insertion::ActionNodeContext action_node_context_;
 
-    // kios::ActionPhaseContext action_phase_context_;
+    kios::ActionPhaseContext action_phase_context_;
+    kios::CommandRequest command_request_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
@@ -134,18 +129,23 @@ private:
 
     void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
-        task_state = msg->tf_f_ext_k;
+        task_state.tf_f_ext_k = msg->tf_f_ext_k;
         RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k);
     }
 
     void tree_subscription_callback(const kios_interface::msg::TreeState::SharedPtr msg)
     {
-        tree_state_.action_phase = static_cast<ActionPhase>(msg->action_phase);
-        tree_state_.is_running = msg->is_runnning;
-        if (tree_state_.action_phase != tree_state_.last_action_phase)
+        if (is_busy == false)
         {
-            if (is_busy == false) // in zeno time
+            kios::TreeState tree_state_temp_ = ts_tree_state_.read_data();
+            tree_state_temp_.action_phase = static_cast<kios::ActionPhase>(msg->action_phase);
+            tree_state_temp_.is_running = msg->is_runnning;
+
+            // if action phase switched
+            if (tree_state_temp_.action_phase != tree_state_temp_.last_action_phase)
             {
+                // update the last action phase
+                tree_state_temp_.last_action_phase = tree_state_temp_.action_phase;
                 // flag to start a command request
                 is_switch_action_phase = true;
             }
@@ -153,39 +153,83 @@ private:
             {
                 // pass
             }
+            // * update tree state in node
+            ts_tree_state_.write_data(tree_state_temp_);
         }
+        else
+        {
+            // pass
+        }
+        // update tree state
     }
 
-    // void parameter_check_timer_callback()
-    // {
-    //     // TODO check the parameter and set the member flag
-    // }
-
-    void generate_skill_context()
+    void update_command_request()
     {
+        kios::TreeState tree_state_temp_ = ts_tree_state_.read_data();
+
+        command_request_.command_type = kios::CommandType::STOP_OLD_START_NEW;
+        // * handle the command context here
+        command_request_.command_context["skill"]["action_name"] = tree_state_temp_.action_name;
+        command_request_.command_context["skill"]["action_phase"] = tree_state_temp_.action_phase;
     }
 
     /**
      * @brief tick the tree and publish the context
      *
      */
-    void timer_callback()
+    int timer_callback()
     {
-        RCLCPP_INFO(this->get_logger(), "timer hit.\n");
         if (is_running)
         {
             if (is_switch_action_phase)
             {
                 is_busy = true;
                 // update context
-                // encode the msg
+                update_command_request();
+                auto request = std::make_shared<kios_interface::srv::CommandRequest::Request>();
+                request->command_type = static_cast<int32_t>(command_request_.command_type);
+                request->command_context = command_request_.command_context.dump();
                 // client send request
+                while (!client_->wait_for_service(std::chrono::seconds(1)))
+                {
+                    if (!rclcpp::ok())
+                    {
+                        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+                        return 0;
+                    }
+                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+                }
+
+                auto result_future = client_->async_send_request(request);
+                std::future_status status = result_future.wait_until(
+                    std::chrono::steady_clock::now() + std::chrono::seconds(5));
+                if (status == std::future_status::ready)
+                {
+                    auto result = result_future.get();
+                    if (result->is_accepted == true)
+                    {
+                        RCLCPP_INFO(this->get_logger(), "Command accepted.\n");
+                    }
+                    else
+                    {
+                        RCLCPP_ERROR(this->get_logger(), "Command refused!\n");
+                    }
+                }
+                else
+                {
+                    RCLCPP_ERROR(this->get_logger(), "Service call timed out!\n");
+                }
+
                 is_busy = false;
             }
             else
             {
-                // pass
+                RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.\n");
             }
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "Timer: not running.\n");
         }
     }
 };

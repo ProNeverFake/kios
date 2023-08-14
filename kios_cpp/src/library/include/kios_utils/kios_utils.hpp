@@ -149,4 +149,5 @@ namespace kios
               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
               {"F_ext_contact", {3.0, 2.0}}}}};
     };
+
 } // namespace kios

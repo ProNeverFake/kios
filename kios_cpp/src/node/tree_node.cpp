@@ -15,6 +15,8 @@
 #include "kios_interface/msg/task_state.hpp"
 #include "kios_interface/msg/skill_context.hpp"
 
+#include "kios_interface/srv/get_object_request.hpp"
+
 using std::placeholders::_1;
 
 class TreeNode : public rclcpp::Node
@@ -24,6 +26,10 @@ public:
         : Node("tree_node"),
           is_running(true)
     {
+        // initialize object list
+        object_list_.push_back("contact");
+        object_list_.push_back("approach");
+
         // declare mission parameter
         this->declare_parameter("is_update_object", true);
         this->declare_parameter("is_mission_success", false);
@@ -61,11 +67,18 @@ public:
             "tree_state_topic",
             qos,
             publisher_options);
+        get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
+            "get_object_service",
+            rmw_qos_profile_services_default,
+            client_callback_group_);
     }
 
 private:
     // flags
     bool is_running;
+
+    // object list
+    std::vector<std::string> object_list_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr client_callback_group_;
@@ -76,9 +89,11 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
     rclcpp::Publisher<kios_interface::msg::TreeState>::SharedPtr publisher_;
+    rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
-    std::shared_ptr<Insertion::TreeRoot> m_tree_root;
+    std::shared_ptr<Insertion::TreeRoot>
+        m_tree_root;
     BT::NodeStatus tick_result;
 
     void subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg) const
@@ -93,11 +108,53 @@ private:
      */
     void timer_callback()
     {
-        // * update the object
+        // * get_object_service: update the objects
         if (this->get_parameter("is_update_object").as_bool() == true)
         {
             // * send request to update the object
-            // * deactivate the flag param
+            auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
+            request->object_list = object_list_;
+            while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
+            {
+                if (!rclcpp::ok())
+                {
+                    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+                    rclcpp::shutdown();
+                }
+                RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service get_object_service not available, waiting ...");
+            }
+            auto result_future = get_object_client_->async_send_request(request);
+            std::future_status status = result_future.wait_until(
+                std::chrono::steady_clock::now() + std::chrono::seconds(1));
+            if (status == std::future_status::ready)
+            {
+                auto result = result_future.get();
+                if (result->is_success == true)
+                {
+                    RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
+                    try
+                    {
+                        nlohmann::json object_data = nlohmann::json::parse(result->object_data);
+                    }
+                    catch (...)
+                    {
+                        RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
+                        // * BBDEBUG: SHUTDOWN
+                        rclcpp::shutdown();
+                    }
+                    // TODO handle the object_data
+                }
+                else
+                {
+                    RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
+                }
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
+            }
+
+            // * reset the flag in node param
             std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
             this->set_parameters(all_new_parameters);
         }

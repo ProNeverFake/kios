@@ -7,6 +7,9 @@
   <maintainer email="jicong_ao@163.com">blackbird</maintainer>
   <license>BBLAB</license>
 
+  <exec_depend>python3-argcomplete</exec_depend>
+  <depend>kios_interface</depend>
+
   <depend>ros2cli</depend>
   <depend>rclpy</depend>
   <depend>setuptools</depend>

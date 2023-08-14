@@ -14,6 +14,7 @@
 #include "ws_client/ws_client.hpp"
 
 #include "kios_interface/srv/command_request.hpp"
+#include "kios_interface/srv/teach_object_service.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -31,43 +32,44 @@ public:
           is_runnning(true),
           is_busy(false)
     {
-        // initialize the spdlog for ws_client
-        std::string verbosity = "trace";
-        spdlog::level::level_enum info_level;
-        if (verbosity == "trace")
-        {
-            info_level = spdlog::level::trace;
-        }
-        else if (verbosity == "debug")
-        {
-            info_level = spdlog::level::debug;
-        }
-        else if (verbosity == "info")
-        {
-            info_level = spdlog::level::info;
-        }
-        else
-        {
-            info_level = spdlog::level::info;
-        }
+        // ! DISCARDED
+        // //*  initialize the spdlog for ws_client
+        // std::string verbosity = "trace";
+        // spdlog::level::level_enum info_level;
+        // if (verbosity == "trace")
+        // {
+        //     info_level = spdlog::level::trace;
+        // }
+        // else if (verbosity == "debug")
+        // {
+        //     info_level = spdlog::level::debug;
+        // }
+        // else if (verbosity == "info")
+        // {
+        //     info_level = spdlog::level::info;
+        // }
+        // else
+        // {
+        //     info_level = spdlog::level::info;
+        // }
 
-        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        console_sink->set_level(info_level);
-        console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
+        // auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        // console_sink->set_level(info_level);
+        // console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
 
-        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
-        file_sink->set_level(spdlog::level::debug);
+        // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
+        // file_sink->set_level(spdlog::level::debug);
 
-        auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
-        logger->set_level(info_level);
-        spdlog::set_default_logger(logger);
-        spdlog::info("spdlog: initialized.");
+        // auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+        // logger->set_level(info_level);
+        // spdlog::set_default_logger(logger);
+        // spdlog::info("spdlog: initialized.");
 
         // declare mission parameter
         this->declare_parameter("power_on", true);
         // callback group
         service_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
+            rclcpp::CallbackGroupType::MutuallyExclusive);
 
         // * initialize the websocket messenger
         m_messenger = std::make_shared<BTMessenger>(ws_url);
@@ -83,9 +85,16 @@ public:
         // object announcement
         m_messenger->send_grasped_object();
         // * initialize service
-        service_ = this->create_service<kios_interface::srv::CommandRequest>(
+        command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
             "command_request_service",
-            std::bind(&Commander::service_callback, this, _1, _2),
+            std::bind(&Commander::command_service_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            service_callback_group_);
+
+        // * CLI service
+        teach_object_service_ = this->create_service<kios_interface::srv::TeachObjectService>(
+            "teach_object_cli",
+            std::bind(&Commander::teach_object_service_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             service_callback_group_);
     }
@@ -118,7 +127,8 @@ private:
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
 
     // callbacks
-    rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr service_;
+    rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr command_service_;
+    rclcpp::Service<kios_interface::srv::TeachObjectService>::SharedPtr teach_object_service_;
 
     // ws_client rel
     std::shared_ptr<BTMessenger> m_messenger;
@@ -128,7 +138,7 @@ private:
     std::string udp_ip;
     int udp_port;
 
-    void service_callback(
+    void command_service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
@@ -183,6 +193,31 @@ private:
     void start_task(const nlohmann::json &skill_context)
     {
         m_messenger->start_task(skill_context);
+    }
+
+    void teach_object(const nlohmann::json &object_context)
+    {
+        m_messenger->send_and_wait("teach_object", object_context);
+    }
+
+    void teach_object_service_callback(
+        const std::shared_ptr<kios_interface::srv::TeachObjectService::Request> request,
+        const std::shared_ptr<kios_interface::srv::TeachObjectService::Response> response)
+    {
+        if (is_runnning)
+        {
+            // * read the command request
+
+            std::string object_name = request->object_name;
+            nlohmann::json object_context = {{"object", object_name}};
+            teach_object(object_context);
+            response->is_success = true;
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "commander not running, request refused!");
+            response->is_success = false;
+        }
     }
 };
 

@@ -68,14 +68,20 @@ BB: Don't need to.
 ```
 git clone https://gitlab.com/kopino4-templates/readme-template
 ```
+6. enable global auto-fill
 
-6. There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
+```
+pip3 install argcomplete
+sudo activate-global-python-argcomplete3
+```
+
+> BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
 
 I'm sorry to inform you that the system is still not finished yet. Before finishing the system I have no time to provide any tutorial of this system. So LEARN BY YOURSELF, just like how you have learned to use mios.
 
-BB: GOOD LUCK.
+> BB: GOOD LUCK.
 
 ### Used technologies
 
@@ -92,6 +98,8 @@ Blackbird: I'll just skip this part. Don't ask me why.
 - *14.08.2023:*
   1. Realize mongo_reader in kios_py.
   2. DEBUG: action_name is empty. check task module in mios.
+  3. Fix auto-fill error in CLI.
+  4. Add CLI service TeachObjectService in commander. Add CLI_node in kios_cli to enable service call.
 
 - *13.08.2023:*
   1. Add kios_cli for inplementing command line interface. Add a test method "say".

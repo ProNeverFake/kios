@@ -263,6 +263,37 @@ BTMessenger::BTMessenger(const std::string &uri)
 {
     udp_ip = "127.0.0.1";
     udp_port = 12346;
+    //*  initialize the spdlog for ws_client
+    std::string verbosity = "trace";
+    spdlog::level::level_enum info_level;
+    if (verbosity == "trace")
+    {
+        info_level = spdlog::level::trace;
+    }
+    else if (verbosity == "debug")
+    {
+        info_level = spdlog::level::debug;
+    }
+    else if (verbosity == "info")
+    {
+        info_level = spdlog::level::info;
+    }
+    else
+    {
+        info_level = spdlog::level::info;
+    }
+
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(info_level);
+    console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
+
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
+    file_sink->set_level(spdlog::level::debug);
+
+    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+    logger->set_level(info_level);
+    spdlog::set_default_logger(logger);
+    spdlog::info("spdlog: initialized.");
 }
 /**
  * @brief the original raw connect method
@@ -433,6 +464,14 @@ bool BTMessenger::is_connected()
     return m_ws_endpoint.is_open(connection_id);
 }
 
+/**
+ * @brief "call_method"
+ *
+ * @param method
+ * @param payload
+ * @param timeout
+ * @param silent
+ */
 void BTMessenger::send(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
     nlohmann::json request;
@@ -521,6 +560,14 @@ void BTMessenger::stop_task()
     }
 }
 
+/**
+ * @brief "call_method" and wait for result.
+ * TODO enable result check
+ * @param method
+ * @param payload
+ * @param timeout
+ * @param silent
+ */
 void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
     send(method, payload);

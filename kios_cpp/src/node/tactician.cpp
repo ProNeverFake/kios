@@ -182,16 +182,16 @@ private:
                     auto result = result_future.get();
                     if (result->is_accepted == true)
                     {
-                        RCLCPP_INFO(this->get_logger(), "Command accepted.\n");
+                        RCLCPP_INFO(this->get_logger(), "Command accepted.");
                     }
                     else
                     {
-                        RCLCPP_ERROR(this->get_logger(), "Command refused!\n");
+                        RCLCPP_ERROR(this->get_logger(), "Command refused!");
                     }
                 }
                 else
                 {
-                    RCLCPP_ERROR(this->get_logger(), "Service call timed out!\n");
+                    RCLCPP_ERROR(this->get_logger(), "Service call timed out!");
                 }
 
                 is_busy = false;

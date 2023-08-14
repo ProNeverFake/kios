@@ -61,6 +61,7 @@ void connection_metadata::on_message(websocketpp::connection_hdl hdl, client::me
     catch (nlohmann::json::parse_error &e)
     {
         // If we are here, the data is not JSON.
+        spdlog::error("JSON parsing failed: ", e.what());
         std::cerr << "JSON parsing failed: " << e.what() << std::endl;
     }
     // ! ERROR

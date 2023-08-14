@@ -31,6 +31,38 @@ public:
           is_runnning(true),
           is_busy(false)
     {
+        // initialize the spdlog for ws_client
+        std::string verbosity = "trace";
+        spdlog::level::level_enum info_level;
+        if (verbosity == "trace")
+        {
+            info_level = spdlog::level::trace;
+        }
+        else if (verbosity == "debug")
+        {
+            info_level = spdlog::level::debug;
+        }
+        else if (verbosity == "info")
+        {
+            info_level = spdlog::level::info;
+        }
+        else
+        {
+            info_level = spdlog::level::info;
+        }
+
+        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        console_sink->set_level(info_level);
+        console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
+
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
+        file_sink->set_level(spdlog::level::debug);
+
+        auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+        logger->set_level(info_level);
+        spdlog::set_default_logger(logger);
+        spdlog::info("spdlog: initialized.");
+
         // declare mission parameter
         this->declare_parameter("power_on", true);
         // callback group
@@ -50,8 +82,7 @@ public:
         mios_register_udp();
         // object announcement
         m_messenger->send_grasped_object();
-
-        // ! QoS not varified
+        // * initialize service
         service_ = this->create_service<kios_interface::srv::CommandRequest>(
             "command_request_service",
             std::bind(&Commander::service_callback, this, _1, _2),
@@ -101,83 +132,44 @@ private:
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
-        // * read the command request
-        command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
-        try
+        if (is_runnning)
         {
-            command_request_.command_context = nlohmann::json::parse(request->command_context);
+            // * read the command request
+            command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
+            try
+            {
+                command_request_.command_context = nlohmann::json::parse(request->command_context);
+            }
+            catch (...)
+            {
+                std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
+            }
+            issue_command(command_request_);
+            response->is_accepted = true;
         }
-        catch (...)
+        else
         {
-            std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
+            RCLCPP_ERROR(this->get_logger(), "Not running, request refused!");
+            response->is_accepted = false;
         }
-        issue_command(command_request_);
-        response->is_accepted = true;
     }
-
-    /**
-     * @brief set the param "is_update" in node bt_udp_node as true
-     * TODO make a generic set param method
-     *
-     */
-    // void start_update_state()
-    // {
-    //     if (is_update == false)
-    //     {
-    //         auto parameter = rcl_interfaces::msg::Parameter();
-    //         auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
-
-    //         parameter.name = "is_update";
-    //         parameter.value.type = 1;          //  bool = 1,    int = 2,        float = 3,     string = 4
-    //         parameter.value.bool_value = true; // .bool_value, .integer_value, .double_value, .string_value
-
-    //         request->parameters.push_back(parameter);
-
-    //         while (!m_is_update_client_ptr->wait_for_service(std::chrono::milliseconds(500)))
-    //         {
-    //             if (!rclcpp::ok())
-    //             {
-    //                 RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-    //                 return;
-    //             }
-    //             RCLCPP_INFO(this->get_logger(), "service is_update not available, waiting again...");
-    //         }
-    //         // !!!! CHECK
-    //         auto result_future = m_is_update_client_ptr->async_send_request(request);
-    //         std::future_status status = result_future.wait_for(
-    //             std::chrono::milliseconds(50));
-    //         if (status == std::future_status::ready)
-    //         {
-    //             auto result = result_future.get();
-    //         }
-    //         else
-    //         {
-    //             RCLCPP_INFO(this->get_logger(), "is update: response timed out!");
-    //         }
-    //         is_update = true;
-    //     }
-    //     else
-    //     {
-    //         // is update == true, do nothing
-    //     }
-    // }
 
     void issue_command(const kios::CommandRequest &command_request)
     {
-        // ! TODO
         switch (command_request.command_type)
         {
         case kios::CommandType::INITIALIZATION: {
-            // DO NOTHING
+            RCLCPP_INFO(this->get_logger(), "Issuing command: initialization...");
             break;
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
+            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
             stop_task();
             start_task(command_request.command_context);
             break;
         }
         default:
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED COMMANDTYPE!\n");
+            RCLCPP_ERROR(this->get_logger(), "ISSUING COMMAND: UNDEFINED COMMANDTYPE!");
             break;
         }
         // passing

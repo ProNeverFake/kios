@@ -25,6 +25,7 @@ public:
           is_running(true)
     {
         // declare mission parameter
+        this->declare_parameter("is_update_object", true);
         this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power_on", true);
         //* initialize the callback groups
@@ -33,6 +34,7 @@ public:
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
         publisher_callback_group_ = timer_callback_group_;
+        client_callback_group_ = timer_callback_group_;
 
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
@@ -66,6 +68,7 @@ private:
     bool is_running;
 
     // callback group
+    rclcpp::CallbackGroup::SharedPtr client_callback_group_;
     rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
     rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
@@ -90,9 +93,17 @@ private:
      */
     void timer_callback()
     {
+        // * update the object
+        if (this->get_parameter("is_update_object").as_bool() == true)
+        {
+            // * send request to update the object
+            // * deactivate the flag param
+            std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
+            this->set_parameters(all_new_parameters);
+        }
+        // * tick the tree
         if (is_running)
         {
-            // * tick the tree
             tick_result = m_tree_root->tick_once();
             RCLCPP_INFO(this->get_logger(), "Tick tree once.\n");
             // * check tick_result
@@ -115,6 +126,10 @@ private:
                 // * stop
                 is_running = false;
             }
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "the tree has been finished!");
         }
     }
 

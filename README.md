@@ -15,7 +15,7 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 
 **DEVELOPER'S PLAN:**
 - [ ] **ERGENT** enable mongoDB w/r
-- [ ] **ERGENT** add node manipulator to control other nodes.
+- [ ] add node manipulator to control other nodes.
 - [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 

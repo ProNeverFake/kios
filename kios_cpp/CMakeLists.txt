@@ -57,6 +57,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# ########################## fetch libs
+# ! DISCARDED
+# include(FetchContent)
+
+# FetchContent_Declare(
+#     spdlog
+#     GIT_REPOSITORY https://github.com/gabime/spdlog.git
+#     GIT_TAG v1.12.0  # Adjust the version as needed
+# )
+
+# FetchContent_MakeAvailable(spdlog)
+
 add_subdirectory(lib/BehaviorTree.CPP)
 add_subdirectory(src)
 

@@ -4,21 +4,16 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 from rclpy.qos import qos_profile_sensor_data
 
-import socket
-import time
-from datetime import datetime
 import json
 
 from .resource.mongodb_client import MongoDBClient
 
-# from kios_interface.msg import MiosState
+from kios_interface.srv import GetObject
 
 
 class MongoReader(Node):
 
     udp_subscriber = ''
-    # robot state variable dictionary.
-    mios_state_default = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     def __init__(self):
         super().__init__('mongo_reader')
@@ -32,32 +27,65 @@ class MongoReader(Node):
         # intialize mongoDB client
         self.mongo_client_ = MongoDBClient(port=27017)
 
+        # initialize timer
         timer_callback_group = ReentrantCallbackGroup()
-        publisher_callback_group = timer_callback_group
-
-        self.timer = self.create_timer(
-            0.5,  # sec
+        self.timer_ = self.create_timer(
+            2,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
+        
+        # initialize get_object server
+        server_callback_group = MutuallyExclusiveCallbackGroup()
+        self.server_ = self.create_service(
+            GetObject,
+            "get_object_service",
+            self.server_callback,
+            callback_group=server_callback_group
+        )
 
-        self.udp_setup()
 
     def timer_callback(self):
         if self.is_running:
-            data, addr = self.udp_subscriber.recvfrom(1024)
-            self.get_logger().info("Received message: %s" % data.decode())
-            mios_state = json.loads(data.decode())
-            # publish msg
-            msg = MiosState()
-            msg.tf_f_ext_k = mios_state["TF_F_ext_K"]
-            self.publisher.publish(msg)
-            self.get_logger().info("Published RobotState to topic")
-            print("check: ", mios_state["TF_F_ext_K"][2],
-                  "sender time: ", mios_state["system_time"],
-                  "receiver time: ", datetime.now())
+            self.get_logger().info('start')
+            result = self.mongo_client_.read("miosL", "environment", {"name": "housing"})
+            print(result[0]['O_T_OB'])
+            self.get_logger().info('stop')
+
         else:
-            self.get_logger().info('not runnning, timer pass ...')
+            self.get_logger().error('not runnning, timer pass ...')
             pass
+
+    def server_callback(self, request, response):
+        response.object_data = ""
+        response.error_message = ""
+        response.is_success = False
+        if self.is_running:
+            object_list = request.object_list
+            if len(object_list) <= 0:
+                self.get_logger().error('null object list!')
+                response.error_message = "null object list"
+                return response
+            else:
+                object_result = {}
+                for object_name in object_list:
+                    try:
+                        result = self.mongo_client_.read("miosL", "environment", {"name": object_name})[0]
+                        object_result[object_name] = result
+                    except:
+                        self.get_logger().error('UNKNOWN ERROR IN MONGO CLIENT READ() OF OBEJCT %s', object_name)
+                
+                if len(object_result) <= 0:
+                    response.error_message = "read result == null"
+                    return
+
+                response.is_success = True
+                response.object_data = json.dumps(object_result)
+                return response
+
+        else:
+            self.get_logger().error('not runnning, server pass ...')
+            response.error_message = "is_running == False"
+            return response 
 
 
 def main(args=None):

@@ -109,6 +109,7 @@ private:
             RCLCPP_INFO(this->get_logger(), "tree_subscription hit.");
 
             kios::TreeState tree_state_temp_ = ts_tree_state_.read_data();
+            tree_state_temp_.action_name = msg->action_name;
             tree_state_temp_.action_phase = static_cast<kios::ActionPhase>(msg->action_phase);
             tree_state_temp_.is_running = msg->is_runnning;
 

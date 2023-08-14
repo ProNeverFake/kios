@@ -12,8 +12,10 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 
 **KNOWN BUGS:**
 - velocity limits are always violated with node Contact in the tree. (10082023)
+- check: mios task context saving. (14082023)
 
 **DEVELOPER'S PLAN:**
+- [ ] add service and client for mongoDB w/r
 - [ ] **ERGENT** enable mongoDB w/r
 - [ ] add node manipulator to control other nodes.
 - [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
@@ -86,6 +88,14 @@ BB: GOOD LUCK.
 Blackbird: I'll just skip this part. Don't ask me why.
 
 ### Development Log
+
+- *14.08.2023:*
+  1. Realize mongo_reader in kios_py.
+  2. DEBUG: action_name is empty. check task module in mios.
+
+- *13.08.2023:*
+  1. Add kios_cli for inplementing command line interface. Add a test method "say".
+  2. Add mongoDB source file.
 
 - *10.08.2023:*
   1. Context inconsistency with mios fixed. Now a single command execution along with mios is possible.

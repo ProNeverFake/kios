@@ -8,11 +8,10 @@ import socket
 import errno
 import time
 import json
-import os
 
 from ament_index_python.packages import get_package_share_directory
 
-from .resource.ws_client import *
+from ..resource.ws_client import *
 
 from kios_interface.msg import RobotState
 

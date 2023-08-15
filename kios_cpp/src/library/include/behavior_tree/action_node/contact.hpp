@@ -2,6 +2,7 @@
 
 namespace Insertion
 
+// TODO: design meta one-time point
 {
     class Contact : public MetaNode
     {

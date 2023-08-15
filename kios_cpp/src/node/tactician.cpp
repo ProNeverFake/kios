@@ -24,13 +24,11 @@ class Tactician : public rclcpp::Node
 public:
     Tactician()
         : Node("tactician"),
-          is_running(true),
           is_switch_action_phase(false),
-          is_busy(false),
-          power_on(true)
+          is_busy(false)
     {
         // declare mission parameter
-        this->declare_parameter("power_on", true);
+        this->declare_parameter("power", true);
 
         //* initialize the callback groups
         subscription_callback_group_ = this->create_callback_group(
@@ -70,10 +68,20 @@ public:
             subscription_options);
     }
 
+    bool check_power()
+    {
+        if (this->get_parameter("power").as_bool() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 private:
     // flags
-    bool power_on;
-    bool is_running;
     bool is_switch_action_phase;
     bool is_busy;
 
@@ -151,9 +159,7 @@ private:
      */
     void timer_callback()
     {
-        RCLCPP_INFO(this->get_logger(), "The value of is_running as an integer is: %d", is_running);
-        // std::cout << "DEBUG: IS_RUNNING: " << is_running << std::endl;
-        if (is_running == true)
+        if (check_power() == true)
         {
             if (is_switch_action_phase == true)
             {

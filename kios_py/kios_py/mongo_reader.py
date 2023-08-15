@@ -8,7 +8,7 @@ import json
 
 from .resource.mongodb_client import MongoDBClient
 
-from kios_interface.srv import GetObject
+from kios_interface.srv import GetObjectRequest
 
 
 class MongoReader(Node):
@@ -22,7 +22,7 @@ class MongoReader(Node):
         self.is_running = True
 
         # declare parameters
-        self.declare_parameter('power_on', True)
+        self.declare_parameter('power', True)
 
         # intialize mongoDB client
         self.mongo_client_ = MongoDBClient(port=27017)
@@ -37,7 +37,7 @@ class MongoReader(Node):
         # initialize get_object server
         server_callback_group = MutuallyExclusiveCallbackGroup()
         self.server_ = self.create_service(
-            GetObject,
+            GetObjectRequest,
             "get_object_service",
             self.server_callback,
             callback_group=server_callback_group

@@ -11,17 +11,18 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 ## NEWS
 
 **KNOWN BUGS:**
-- velocity limits are always violated with node Contact in the tree. (10082023)
-- check: mios task context saving. (14082023)
+- ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
+- ~~check: mios task context saving. (14082023)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] add service and client for mongoDB w/r
+- [x] add service and client for mongoDB w/r
 - [ ] **ERGENT** enable mongoDB w/r
 - [ ] add node manipulator to control other nodes.
 - [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
 - [ ] move ActionContext to kios_utils.
+- [ ] add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -94,6 +95,10 @@ I'm sorry to inform you that the system is still not finished yet. Before finish
 Blackbird: I'll just skip this part. Don't ask me why.
 
 ### Development Log
+
+- *15.08.2023:*
+  1. BUG of velocity violation fixed (ActionPhase inconsistency).
+  2. CLI teach_object test succeeded.
 
 - *14.08.2023:*
   1. Realize mongo_reader in kios_py.

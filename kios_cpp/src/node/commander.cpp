@@ -29,7 +29,6 @@ public:
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
           udp_port(12346),
-          is_runnning(true),
           is_busy(false)
     {
         // ! DISCARDED
@@ -66,7 +65,7 @@ public:
         // spdlog::info("spdlog: initialized.");
 
         // declare mission parameter
-        this->declare_parameter("power_on", true);
+        this->declare_parameter("power", true);
         // callback group
         service_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -113,10 +112,20 @@ public:
         m_messenger->unregister_udp();
         m_messenger->close();
     }
+    bool check_power()
+    {
+        if (this->get_parameter("power").as_bool() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 private:
     // flags
-    bool is_runnning;
     bool is_busy;
 
     //! TEMP STATE
@@ -142,7 +151,7 @@ private:
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
-        if (is_runnning)
+        if (check_power() == true)
         {
             // * read the command request
             command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
@@ -159,7 +168,7 @@ private:
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "Not running, request refused!");
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
             response->is_accepted = false;
         }
     }
@@ -204,7 +213,7 @@ private:
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Request> request,
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Response> response)
     {
-        if (is_runnning)
+        if (check_power() == true)
         {
             // * read the command request
 

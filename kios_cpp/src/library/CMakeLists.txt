@@ -34,15 +34,16 @@ target_include_directories(${MODULE_NAME}
 # Attention: target_link_libraries() should not apply any keyword
 # since no keyword is applied in ament_target_dependencies()
 target_link_libraries(${MODULE_NAME}
+    spdlog::spdlog
     Threads::Threads
     nlohmann_json::nlohmann_json
     websocketpp::websocketpp
 )
 
-ament_target_dependencies(${MODULE_NAME}
-    "rclcpp"
-    "rclcpp_action"
-    )
+# ament_target_dependencies(${MODULE_NAME}
+#     "rclcpp"
+#     "rclcpp_action"
+#     )
 #########################################################################
 
 
@@ -98,16 +99,18 @@ target_link_libraries(${MODULE_NAME}
 ######################################################### kios_utils library
 set(MODULE_NAME kios_utils)
 
-set(${MODULE_NAME}_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/kios_utils/kios_utils.cpp
-)
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/kios_utils/*.cpp")
 
-set(${MODULE_NAME}_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kios_utils/kios_utils.hpp
-)
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/kios_utils/*.hpp")
 
-# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/action/*.cpp")
-# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/action/*.hpp")
+# DISCARDED
+# set(${MODULE_NAME}_SRC
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/kios_utils/kios_utils.cpp
+# )
+
+# set(${MODULE_NAME}_HEADER_FILES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kios_utils/kios_utils.hpp
+# )
 
 add_library(${MODULE_NAME} STATIC
     ${${MODULE_NAME}_SRC}

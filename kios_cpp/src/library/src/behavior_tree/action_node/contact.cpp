@@ -33,23 +33,24 @@ namespace Insertion
             return false;
         }
         // return m_robot_state_ptr->is_contact_finished;
-    };
+    }
     /**
      * @brief temporarily just set action_name
      *
      */
     void Contact::set_action_context()
     {
-        m_node_context_ptr->parameter["skill"]["action_name"] = "contact";
+        m_node_context_ptr->parameter["skill"]["action_context"]["action_name"] = "contact";
         m_node_context_ptr->action_phase = ActionPhase::CONTACT;
-        m_node_context_ptr->parameter["skill"]["action_phase"] = ActionPhase::CONTACT;
+        m_node_context_ptr->action_name = "contact";
+        m_node_context_ptr->parameter["skill"]["action_context"]["action_phase"] = ActionPhase::CONTACT;
     }
     void Contact::node_context_initialize()
     {
         std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "contact";
         // todo add more command context here.
-    };
+    }
 
     BT::NodeStatus Contact::onStart()
     {

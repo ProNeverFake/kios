@@ -14,6 +14,7 @@
 #include "ws_client/ws_client.hpp"
 
 #include "kios_interface/srv/command_request.hpp"
+#include "kios_interface/srv/teach_object_service.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -28,40 +29,71 @@ public:
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
           udp_port(12346),
-          is_runnning(true),
           is_busy(false)
     {
+        // ! DISCARDED
+        // //*  initialize the spdlog for ws_client
+        // std::string verbosity = "trace";
+        // spdlog::level::level_enum info_level;
+        // if (verbosity == "trace")
+        // {
+        //     info_level = spdlog::level::trace;
+        // }
+        // else if (verbosity == "debug")
+        // {
+        //     info_level = spdlog::level::debug;
+        // }
+        // else if (verbosity == "info")
+        // {
+        //     info_level = spdlog::level::info;
+        // }
+        // else
+        // {
+        //     info_level = spdlog::level::info;
+        // }
+
+        // auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        // console_sink->set_level(info_level);
+        // console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
+
+        // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
+        // file_sink->set_level(spdlog::level::debug);
+
+        // auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+        // logger->set_level(info_level);
+        // spdlog::set_default_logger(logger);
+        // spdlog::info("spdlog: initialized.");
+
         // declare mission parameter
-        this->declare_parameter("power_on", true);
+        this->declare_parameter("power", true);
         // callback group
-        // timer_callback_group_ = this->create_callback_group(
-        //     rclcpp::CallbackGroupType::MutuallyExclusive);
         service_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
+            rclcpp::CallbackGroupType::MutuallyExclusive);
 
         // * initialize the websocket messenger
         m_messenger = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         m_messenger->special_connect();
-        // register the udp subscriber
-
         while (!m_messenger->wait_for_open_connection(3))
         {
             RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
         }
 
+        // udp register
         mios_register_udp();
-        // timer_ = this->create_wall_timer(
-        //     std::chrono::seconds(1),
-        //     std::bind(&Commander::timer_callback, this), timer_callback_group_);
-        // ! NOT VARIFIED
+        // object announcement
         m_messenger->send_grasped_object();
-        // subscription_ = this->create_subscription<std_msgs::msg::String>(
-        //     "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
-        // ! QoS not varified
-        service_ = this->create_service<kios_interface::srv::CommandRequest>(
+        // * initialize service
+        command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
             "command_request_service",
-            std::bind(&Commander::service_callback, this, _1, _2),
+            std::bind(&Commander::command_service_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            service_callback_group_);
+
+        // * CLI service
+        teach_object_service_ = this->create_service<kios_interface::srv::TeachObjectService>(
+            "teach_object_cli",
+            std::bind(&Commander::teach_object_service_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             service_callback_group_);
     }
@@ -80,10 +112,20 @@ public:
         m_messenger->unregister_udp();
         m_messenger->close();
     }
+    bool check_power()
+    {
+        if (this->get_parameter("power").as_bool() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 private:
     // flags
-    bool is_runnning;
     bool is_busy;
 
     //! TEMP STATE
@@ -91,13 +133,11 @@ private:
     kios::CommandRequest command_request_;
 
     // callback group
-    // rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr service_callback_group_;
-    rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
 
     // callbacks
-    rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr service_;
+    rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr command_service_;
+    rclcpp::Service<kios_interface::srv::TeachObjectService>::SharedPtr teach_object_service_;
 
     // ws_client rel
     std::shared_ptr<BTMessenger> m_messenger;
@@ -106,95 +146,49 @@ private:
     // udp subscriber ip
     std::string udp_ip;
     int udp_port;
-    // bool is_update;
 
-    void service_callback(
+    void command_service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
-        // * read the command request
-        command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
-        try
+        if (check_power() == true)
         {
-            command_request_.command_context = nlohmann::json::parse(request->command_context);
+            // * read the command request
+            command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
+            try
+            {
+                command_request_.command_context = nlohmann::json::parse(request->command_context);
+            }
+            catch (...)
+            {
+                std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << std::endl;
+            }
+            issue_command(command_request_);
+            response->is_accepted = true;
         }
-        catch (...)
+        else
         {
-            std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
+            response->is_accepted = false;
         }
-        issue_command(command_request_);
-        // ! TODO: return the websocket send and wait result!
-        response->is_accepted = true;
     }
-
-    // void timer_callback()
-    // {
-    //     RCLCPP_INFO(this->get_logger(), "timer hit.");
-    // }
-
-    /**
-     * @brief set the param "is_update" in node bt_udp_node as true
-     * TODO make a generic set param method
-     *
-     */
-    // void start_update_state()
-    // {
-    //     if (is_update == false)
-    //     {
-    //         auto parameter = rcl_interfaces::msg::Parameter();
-    //         auto request = std::make_shared<rcl_interfaces::srv::SetParametersAtomically::Request>();
-
-    //         parameter.name = "is_update";
-    //         parameter.value.type = 1;          //  bool = 1,    int = 2,        float = 3,     string = 4
-    //         parameter.value.bool_value = true; // .bool_value, .integer_value, .double_value, .string_value
-
-    //         request->parameters.push_back(parameter);
-
-    //         while (!m_is_update_client_ptr->wait_for_service(std::chrono::milliseconds(500)))
-    //         {
-    //             if (!rclcpp::ok())
-    //             {
-    //                 RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-    //                 return;
-    //             }
-    //             RCLCPP_INFO(this->get_logger(), "service is_update not available, waiting again...");
-    //         }
-    //         // !!!! CHECK
-    //         auto result_future = m_is_update_client_ptr->async_send_request(request);
-    //         std::future_status status = result_future.wait_for(
-    //             std::chrono::milliseconds(50));
-    //         if (status == std::future_status::ready)
-    //         {
-    //             auto result = result_future.get();
-    //         }
-    //         else
-    //         {
-    //             RCLCPP_INFO(this->get_logger(), "is update: response timed out!");
-    //         }
-    //         is_update = true;
-    //     }
-    //     else
-    //     {
-    //         // is update == true, do nothing
-    //     }
-    // }
 
     void issue_command(const kios::CommandRequest &command_request)
     {
-        // ! TODO
         switch (command_request.command_type)
         {
         case kios::CommandType::INITIALIZATION: {
-            // DO NOTHING
+            RCLCPP_INFO(this->get_logger(), "Issuing command: initialization...");
             break;
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
+            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
             stop_task();
             start_task(command_request.command_context);
             break;
         }
         default:
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED COMMANDTYPE!\n");
+            RCLCPP_ERROR(this->get_logger(), "ISSUING COMMAND: UNDEFINED COMMANDTYPE!");
             break;
         }
         // passing
@@ -208,6 +202,31 @@ private:
     void start_task(const nlohmann::json &skill_context)
     {
         m_messenger->start_task(skill_context);
+    }
+
+    void teach_object(const nlohmann::json &object_context)
+    {
+        m_messenger->send_and_wait("teach_object", object_context);
+    }
+
+    void teach_object_service_callback(
+        const std::shared_ptr<kios_interface::srv::TeachObjectService::Request> request,
+        const std::shared_ptr<kios_interface::srv::TeachObjectService::Response> response)
+    {
+        if (check_power() == true)
+        {
+            // * read the command request
+
+            std::string object_name = request->object_name;
+            nlohmann::json object_context = {{"object", object_name}};
+            teach_object(object_context);
+            response->is_success = true;
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "commander not running, request refused!");
+            response->is_success = false;
+        }
     }
 };
 

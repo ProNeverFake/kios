@@ -27,7 +27,7 @@ class StateReader(Node):
         self.is_running = False
 
         # declare parameters
-        self.declare_parameter('power_on', True)
+        self.declare_parameter('power', True)
 
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group

@@ -21,6 +21,7 @@ def generate_launch_description():
         launch_in_new_terminal('ros2 run kios_py state_reader'),
         launch_in_new_terminal('ros2 run kios_cpp messenger'),
         launch_in_new_terminal('ros2 run kios_cpp tree_node'),
-        launch_in_new_terminal('ros2 run kios_cpp tactician')
+        launch_in_new_terminal('ros2 run kios_cpp tactician'),
+        launch_in_new_terminal('ros2 run kios_py mongo_reader')
         # ... Add more nodes as needed
     ])

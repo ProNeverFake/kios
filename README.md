@@ -10,9 +10,19 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 
 ## NEWS
 
+**KNOWN BUGS:**
+- ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
+- ~~check: mios task context saving. (14082023)~~
+
 **DEVELOPER'S PLAN:**
+- [x] add service and client for mongoDB w/r
+- [ ] **ERGENT** enable mongoDB w/r
+- [ ] add node manipulator to control other nodes.
+- [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
+- [ ] move ActionContext to kios_utils.
+- [ ] add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -59,14 +69,20 @@ BB: Don't need to.
 ```
 git clone https://gitlab.com/kopino4-templates/readme-template
 ```
+6. enable global auto-fill
 
-6. There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
+```
+pip3 install argcomplete
+sudo activate-global-python-argcomplete3
+```
+
+> BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
 
 I'm sorry to inform you that the system is still not finished yet. Before finishing the system I have no time to provide any tutorial of this system. So LEARN BY YOURSELF, just like how you have learned to use mios.
 
-BB: GOOD LUCK.
+> BB: GOOD LUCK.
 
 ### Used technologies
 
@@ -76,9 +92,32 @@ BB: GOOD LUCK.
 
 ### Testing
 
-Blackbird: I'll just skip this part. Don't ask me why.
+Blackbird: I'll just skip this part. 
 
 ### Development Log
+
+- *16.08.2023:*
+  1. BUG of velocity limit violation fixed. (flag error in tactician)
+
+- *15.08.2023:*
+  1. BUG of Action Phase inconsistency fixed.
+  2. CLI teach_object test succeeded.
+
+- *14.08.2023:*
+  1. Realize mongo_reader in kios_py.
+  2. DEBUG: action_name is empty. check task module in mios.
+  3. Fix auto-fill error in CLI.
+  4. Add CLI service TeachObjectService in commander. Add CLI_node in kios_cli to enable service call.
+
+- *13.08.2023:*
+  1. Add kios_cli for inplementing command line interface. Add a test method "say".
+  2. Add mongoDB source file.
+
+- *10.08.2023:*
+  1. Context inconsistency with mios fixed. Now a single command execution along with mios is possible.
+  2. Bugs in tactician, commander and tree_node are fixed.
+  3. New launch file debug_launch.py added for debugging.
+  4. add new library kios_utils for containing common data structure.
 
 - *07.08.2023:*
   1. Change the project name into KIOS. The old name bt_mios_ros2 is discarded.

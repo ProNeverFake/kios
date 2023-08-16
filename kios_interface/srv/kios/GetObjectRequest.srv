@@ -1,0 +1,5 @@
+string[] object_list
+---
+bool is_success
+string error_message
+string object_data

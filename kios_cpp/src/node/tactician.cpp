@@ -19,64 +19,29 @@
 
 using std::placeholders::_1;
 
-enum class ActionPhase
-{
-    ERROR = -1,
-    INITIALIZATION = 0,
-    APPROACH = 1,
-    CONTACT = 2,
-    WIGGLE = 3
-};
-
-template <typename T>
-class ThreadSafeData
-{
-private:
-    T data_;
-    std::mutex mtx;
-
-public:
-    void write_data(T const &new_data)
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        data_ = new_data;
-    }
-
-    T read_data()
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        return data_;
-    }
-};
-
 class Tactician : public rclcpp::Node
 {
 public:
     Tactician()
         : Node("tactician"),
-          is_running(true),
           is_switch_action_phase(false),
           is_busy(false)
     {
         // declare mission parameter
-        this->declare_parameter("power_on", true);
+        this->declare_parameter("power", true);
+
         //* initialize the callback groups
         subscription_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
-        client_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
+        client_callback_group_ = timer_callback_group_;
 
+        // * initialize the objects
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(500),
+            std::chrono::seconds(1),
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
-        // TODO A PARAM CHECK TIMER
-        // param_check_timer_ = this->create_wall_timer(
-        //     std::chrono::milliseconds(50),
-        //     std::bind(&Tactician::parameter_check_timer_callback, this),
-        //     timer_callback_group_);
 
         // * initilize the client
         client_ = this->create_client<kios_interface::srv::CommandRequest>(
@@ -102,9 +67,20 @@ public:
             subscription_options);
     }
 
+    bool check_power()
+    {
+        if (this->get_parameter("power").as_bool() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 private:
     // flags
-    bool is_running;
     bool is_switch_action_phase;
     bool is_busy;
 
@@ -123,27 +99,35 @@ private:
 
     rclcpp::Client<kios_interface::srv::CommandRequest>::SharedPtr client_;
     rclcpp::TimerBase::SharedPtr timer_;
-    // rclcpp::TimerBase::SharedPtr param_check_timer_;
+
     rclcpp::Subscription<kios_interface::msg::TreeState>::SharedPtr tree_state_subscription_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
 
     void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
         task_state.tf_f_ext_k = msg->tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k);
+        RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k);
     }
 
     void tree_subscription_callback(const kios_interface::msg::TreeState::SharedPtr msg)
     {
         if (is_busy == false)
         {
+            RCLCPP_INFO(this->get_logger(), "tree_subscription hit.");
+
             kios::TreeState tree_state_temp_ = ts_tree_state_.read_data();
+            tree_state_temp_.action_name = msg->action_name;
             tree_state_temp_.action_phase = static_cast<kios::ActionPhase>(msg->action_phase);
             tree_state_temp_.is_running = msg->is_runnning;
+            // ! is running is not used here!!
 
+            // ! BBBUGMARK
+            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK NEW AP: %s", kios::action_phase_to_str(tree_state_temp_.action_phase).c_str());
+            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK OLD AP: %s", kios::action_phase_to_str(tree_state_temp_.last_action_phase).c_str());
             // if action phase switched
             if (tree_state_temp_.action_phase != tree_state_temp_.last_action_phase)
             {
+                RCLCPP_INFO(this->get_logger(), "tree_subscription: AP switch hit.");
                 // update the last action phase
                 tree_state_temp_.last_action_phase = tree_state_temp_.action_phase;
                 // flag to start a command request
@@ -151,6 +135,7 @@ private:
             }
             else
             {
+                RCLCPP_INFO(this->get_logger(), "tree_subscription: AP switch pass.");
                 // pass
             }
             // * update tree state in node
@@ -158,7 +143,7 @@ private:
         }
         else
         {
-            // pass
+            RCLCPP_INFO(this->get_logger(), "busy with handling action switch, tree state update and switch check skipped...");
         }
         // update tree state
     }
@@ -169,20 +154,21 @@ private:
 
         command_request_.command_type = kios::CommandType::STOP_OLD_START_NEW;
         // * handle the command context here
-        command_request_.command_context["skill"]["action_name"] = tree_state_temp_.action_name;
-        command_request_.command_context["skill"]["action_phase"] = tree_state_temp_.action_phase;
+        command_request_.command_context["skill"]["action_context"]["action_name"] = tree_state_temp_.action_name;
+        command_request_.command_context["skill"]["action_context"]["action_phase"] = tree_state_temp_.action_phase;
     }
 
     /**
      * @brief tick the tree and publish the context
      *
      */
-    int timer_callback()
+    void timer_callback()
     {
-        if (is_running)
+        if (check_power() == true)
         {
-            if (is_switch_action_phase)
+            if (is_switch_action_phase == true)
             {
+                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = TRUE");
                 is_busy = true;
                 // update context
                 update_command_request();
@@ -194,10 +180,10 @@ private:
                 {
                     if (!rclcpp::ok())
                     {
-                        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-                        return 0;
+                        RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+                        rclcpp::shutdown();
                     }
-                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+                    RCLCPP_INFO(this->get_logger(), "service not available, waiting again...");
                 }
 
                 auto result_future = client_->async_send_request(request);
@@ -208,28 +194,31 @@ private:
                     auto result = result_future.get();
                     if (result->is_accepted == true)
                     {
-                        RCLCPP_INFO(this->get_logger(), "Command accepted.\n");
+                        RCLCPP_INFO(this->get_logger(), "Command accepted.");
                     }
                     else
                     {
-                        RCLCPP_ERROR(this->get_logger(), "Command refused!\n");
+                        RCLCPP_ERROR(this->get_logger(), "Command refused!");
                     }
                 }
                 else
                 {
-                    RCLCPP_ERROR(this->get_logger(), "Service call timed out!\n");
+                    RCLCPP_ERROR(this->get_logger(), "Service call timed out!");
                 }
-
+                // ! BBDEBUG HOW CAN YOU FORGET TO RESET THE FLAG?!
+                // ! WHY USE ==??????
+                is_switch_action_phase = false;
                 is_busy = false;
             }
             else
             {
-                RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.\n");
+                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = FALSE");
+                // RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.");
             }
         }
         else
         {
-            RCLCPP_INFO(this->get_logger(), "Timer: not running.\n");
+            RCLCPP_ERROR(this->get_logger(), "Timer: not running.");
         }
     }
 };

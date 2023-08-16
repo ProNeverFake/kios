@@ -28,7 +28,8 @@ setup(
                 # 'bt_udp_node = kios_py.bt_udp_node:main',
                 # 'test_node_py = kios_py.test_node_py:main',
                 # 'bt_medium_node = kios_py.bt_medium_node:main',
-                'state_reader = kios_py.state_reader:main'
+                'state_reader = kios_py.state_reader:main',
+                'mongo_reader = kios_py.mongo_reader:main'
         ],
     },
 

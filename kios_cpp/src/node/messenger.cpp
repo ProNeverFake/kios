@@ -12,38 +12,13 @@
 #include "kios_interface/msg/mios_state.hpp"
 #include "kios_interface/msg/task_state.hpp"
 
+#include "kios_utils/kios_utils.hpp"
+
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 #include <chrono>
 #include <optional>
-
-struct TaskState
-{
-    std::vector<double> tf_f_ext_k;
-};
-
-// //! UNFINISHED
-template <typename T>
-class ThreadSafeData
-{
-private:
-    T data_;
-    std::mutex mtx;
-
-public:
-    void write_data(T const &new_data)
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        data_ = new_data;
-    }
-
-    T read_data()
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        return data_;
-    }
-};
 
 using std::placeholders::_1;
 
@@ -52,27 +27,31 @@ class Messenger : public rclcpp::Node
 public:
     Messenger()
         : Node("messenger"),
-          is_running(true),
           mios_state({0, 0, 0, 0, 0, 0})
 
     {
+        this->declare_parameter("power", true);
+
         //* initialize the callback groups
         subscription_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
         publisher_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
         timer_callback_group_ = publisher_callback_group_;
+
         //* initialize timer
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(500),
             std::bind(&Messenger::timer_callback, this),
             timer_callback_group_);
+
         //* initialize ros pub sub options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
         subscription_options.callback_group = subscription_callback_group_;
         rclcpp::PublisherOptions publisher_options;
         publisher_options.callback_group = publisher_callback_group_;
+
         //* initialize the pub sub callbacks
         subscription_ = this->create_subscription<kios_interface::msg::MiosState>(
             "mios_state_topic",
@@ -85,12 +64,23 @@ public:
             publisher_options);
     }
 
+    bool check_power()
+    {
+        if (this->get_parameter("power").as_bool() == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 private:
     //! TEMP_STATE
     std::vector<double> mios_state;
     // flag
-    bool is_running;
-    ThreadSafeData<TaskState> ts_task_state_;
+    kios::ThreadSafeData<kios::TaskState> ts_task_state_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
@@ -104,23 +94,36 @@ private:
 
     void subscription_callback(const kios_interface::msg::MiosState::SharedPtr msg)
     {
-        RCLCPP_INFO(this->get_logger(), "subscription hit.");
-        //// TEST
-        RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
-        // ! TEMP READ
-        TaskState task_state;
-        task_state.tf_f_ext_k = msg->tf_f_ext_k;
-        ts_task_state_.write_data(task_state);
-        // mios_state = msg->tf_f_ext_k;
+        if (check_power() == true)
+        {
+            RCLCPP_INFO(this->get_logger(), "subscription hit.");
+            //// TEST
+            RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
+            // ! TEMP READ
+            kios::TaskState task_state;
+            task_state.tf_f_ext_k = msg->tf_f_ext_k;
+            ts_task_state_.write_data(task_state);
+            // mios_state = msg->tf_f_ext_k;
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS ...");
+        }
     }
 
     void timer_callback()
     {
-        RCLCPP_INFO(this->get_logger(), "timer hit.\n");
-        auto message = kios_interface::msg::TaskState();
-        message.tf_f_ext_k = ts_task_state_.read_data().tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "Publishing: task_state\n");
-        publisher_->publish(message);
+        if (check_power() == true)
+        {
+            auto message = kios_interface::msg::TaskState();
+            message.tf_f_ext_k = ts_task_state_.read_data().tf_f_ext_k;
+            RCLCPP_INFO(this->get_logger(), "Publishing: task_state");
+            publisher_->publish(message);
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS ...");
+        }
     }
 };
 

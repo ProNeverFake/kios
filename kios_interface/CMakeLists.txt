@@ -25,6 +25,18 @@ endif()
 
 find_package(rosidl_default_generators REQUIRED)
 
+################################### kios_cli_srv
+set(MODULE_NAME kios_cli_srv)
+
+file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/srv/kios_cli/*.srv")
+
+set(${MODULE_NAME}_FILE_NAMES)
+
+foreach(file ${${MODULE_NAME}_FILES})
+    get_filename_component(file_name ${file} NAME)
+    list(APPEND ${MODULE_NAME}_FILE_NAMES "srv/kios_cli/${file_name}")
+endforeach()
+
 ################################### kios_srv
 set(MODULE_NAME kios_srv)
 
@@ -100,6 +112,7 @@ message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
 ################################ generate the interface
 rosidl_generate_interfaces(${PROJECT_NAME}
+      ${kios_cli_srv_FILE_NAMES}
       ${kios_srv_FILE_NAMES}      
       ${mios_srv_FILE_NAMES}
       ${action_FILE_NAMES}

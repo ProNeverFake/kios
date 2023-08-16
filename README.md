@@ -16,13 +16,12 @@ Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my
 
 **DEVELOPER'S PLAN:**
 - [x] add service and client for mongoDB w/r
-- [ ] **ERGENT** enable mongoDB w/r
 - [ ] add node manipulator to control other nodes.
-- [ ] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
+- [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
-- [ ] move ActionContext to kios_utils.
-- [ ] add meta node for kios node.
+- [ ] move ActionContext to ~~kios_utils~~ data_type.hpp
+- [ ] (postponed) add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -98,6 +97,8 @@ Blackbird: I'll just skip this part.
 
 - *16.08.2023:*
   1. BUG of velocity limit violation fixed. (flag error in tactician)
+  2. Add new CLI: turn_on and turn_off. Realized with ros2xxx.api
+  
 
 - *15.08.2023:*
   1. BUG of Action Phase inconsistency fixed.

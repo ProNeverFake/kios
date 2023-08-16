@@ -21,13 +21,10 @@ class StateReader(Node):
     mios_state_default = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     def __init__(self):
-        super().__init__('bt_state_reader')
-
-        # declare flag
-        self.is_running = False
+        super().__init__('state_reader')
 
         # declare parameters
-        self.declare_parameter('power', True)
+        self.declare_parameter('power', False)
 
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group
@@ -51,7 +48,7 @@ class StateReader(Node):
         self.udp_setup()
 
     def timer_callback(self):
-        if self.is_running:
+        if self.check_power():
             data, addr = self.udp_subscriber.recvfrom(1024)
             self.get_logger().info("Received message: %s" % data.decode())
             mios_state = json.loads(data.decode())
@@ -64,7 +61,7 @@ class StateReader(Node):
                   "sender time: ", mios_state["system_time"],
                   "receiver time: ", datetime.now())
         else:
-            self.get_logger().info('not runnning, timer pass ...')
+            self.get_logger().error('Power off, timer pass ...')
             pass
 
     def udp_setup(self):
@@ -72,7 +69,24 @@ class StateReader(Node):
         self.udp_subscriber = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_subscriber.bind((self.udp_ip, self.udp_port))
-        self.is_running = True
+        self.switch_power(turn_on=True)
+    
+    def check_power(self):
+        if self.has_parameter('power'):
+            self.get_logger().error('CHECK POWER')
+            return self.get_parameter('power').get_parameter_value().bool_value
+        else: 
+            self.get_logger().error('PARAM MISSING: POWER!')
+    
+    def switch_power(self, turn_on: bool):
+        power = rclpy.parameter.Parameter(
+            'power',
+            rclpy.Parameter.Type.BOOL,
+            turn_on
+        )
+        all_new_parameters = [power]
+        self.set_parameters(all_new_parameters)
+
 
 
 def main(args=None):

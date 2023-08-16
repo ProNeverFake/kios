@@ -48,6 +48,7 @@ class KiosCommand(CommandExtension):
         teach_object_parser.add_argument(
             'object_name', type=str, help='the name of the taught object')
         teach_object_parser.set_defaults(func=commands.teach_object)
+        
         # * update_object
         update_object_parser = subparsers.add_parser(
             'update_object', help='read the object in mongoDB and update those in tree_node')
@@ -55,6 +56,21 @@ class KiosCommand(CommandExtension):
         update_object_parser.add_argument(
             'object_name', type=str, help='the name of the taught object')
         update_object_parser.set_defaults(func=commands.update_object)
+        
+        # * turn_off
+        turn_off_parser = subparsers.add_parser(
+            'turn_off', help='turn off the power of the node')
+        turn_off_parser.add_argument(
+            'node_name', type=str, help='the name of the node to be turned off')
+        turn_off_parser.set_defaults(func=commands.turn_off)
+        
+        # * turn_on
+        turn_on_parser = subparsers.add_parser(
+            'turn_on', help='turn on the power of the node')
+        turn_on_parser.add_argument(
+            'node_name', type=str, help='the name of the node to be turned on')
+        turn_on_parser.set_defaults(func=commands.turn_on)
+
 
     def main(self, *, parser, args):
         if hasattr(args, 'func'):

@@ -25,7 +25,7 @@ namespace Insertion
     {
         // ! BUG
         return m_robot_state_ptr->is_approach_finished;
-    };
+    }
     /**
      * @brief temporarily just set action_name
      *
@@ -42,7 +42,7 @@ namespace Insertion
         std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "approach";
         // todo add more command context here.
-    };
+    }
 
     BT::NodeStatus Approach::onStart()
     {

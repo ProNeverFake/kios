@@ -161,7 +161,7 @@ private:
             }
             catch (...)
             {
-                std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << '\n';
+                std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << std::endl;
             }
             issue_command(command_request_);
             response->is_accepted = true;

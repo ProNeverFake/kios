@@ -136,19 +136,19 @@ private:
 
             // * tick the tree
             tick_result = m_tree_root->tick_once();
-            RCLCPP_INFO(this->get_logger(), "Tick tree once.\n");
+            RCLCPP_INFO(this->get_logger(), "Tick tree once.");
             // * check tick_result
             if (is_tree_running())
             {
                 // * go ahead
-                RCLCPP_INFO(this->get_logger(), "Tree state: RUNNING.\n");
+                RCLCPP_INFO(this->get_logger(), "Tree state: RUNNING.");
 
                 // * publish tree state
                 kios_interface::msg::TreeState msg;
                 msg.action_name = m_tree_root->get_context_ptr()->action_name;
                 msg.action_phase = static_cast<int32_t>(m_tree_root->get_context_ptr()->action_phase);
                 msg.is_runnning = true;
-                RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.\n", msg.action_name.c_str());
+                RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.", msg.action_name.c_str());
                 publisher_->publish(msg);
             }
             else
@@ -217,19 +217,19 @@ private:
         // if (check_power() == true)
         // {
         //     tick_result = m_tree_root->tick_once();
-        //     RCLCPP_INFO(this->get_logger(), "Tick tree once.\n");
+        //     RCLCPP_INFO(this->get_logger(), "Tick tree once.");
         //     // * check tick_result
         //     if (is_tree_running())
         //     {
         //         // * go ahead
-        //         RCLCPP_INFO(this->get_logger(), "Tree state: RUNNING.\n");
+        //         RCLCPP_INFO(this->get_logger(), "Tree state: RUNNING.");
 
         //         // * publish tree state
         //         kios_interface::msg::TreeState msg;
         //         msg.action_name = m_tree_root->get_context_ptr()->action_name;
         //         msg.action_phase = static_cast<int32_t>(m_tree_root->get_context_ptr()->action_phase);
         //         msg.is_runnning = true;
-        //         RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.\n", msg.action_name.c_str());
+        //         RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.", msg.action_name.c_str());
         //         publisher_->publish(msg);
         //     }
         //     else
@@ -265,7 +265,7 @@ private:
             return false;
         };
         default: {
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED BEHAVIOR!\n");
+            RCLCPP_ERROR(this->get_logger(), "UNDEFINED BEHAVIOR!");
             return false;
         }
         }

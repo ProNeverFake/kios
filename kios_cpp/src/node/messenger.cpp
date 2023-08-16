@@ -115,7 +115,6 @@ private:
     {
         if (check_power() == true)
         {
-            RCLCPP_INFO(this->get_logger(), "timer hit.\n");
             auto message = kios_interface::msg::TaskState();
             message.tf_f_ext_k = ts_task_state_.read_data().tf_f_ext_k;
             RCLCPP_INFO(this->get_logger(), "Publishing: task_state");

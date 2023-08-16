@@ -33,7 +33,7 @@ namespace Insertion
             return false;
         }
         // return m_robot_state_ptr->is_contact_finished;
-    };
+    }
     /**
      * @brief temporarily just set action_name
      *
@@ -50,7 +50,7 @@ namespace Insertion
         std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "contact";
         // todo add more command context here.
-    };
+    }
 
     BT::NodeStatus Contact::onStart()
     {

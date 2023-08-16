@@ -92,12 +92,15 @@ I'm sorry to inform you that the system is still not finished yet. Before finish
 
 ### Testing
 
-Blackbird: I'll just skip this part. Don't ask me why.
+Blackbird: I'll just skip this part. 
 
 ### Development Log
 
+- *16.08.2023:*
+  1. BUG of velocity limit violation fixed. (flag error in tactician)
+
 - *15.08.2023:*
-  1. BUG of velocity violation fixed (ActionPhase inconsistency).
+  1. BUG of Action Phase inconsistency fixed.
   2. CLI teach_object test succeeded.
 
 - *14.08.2023:*

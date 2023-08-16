@@ -7,6 +7,7 @@ add_executable(tree_node tree_node.cpp)
 
 target_link_libraries(tree_node
     ${PROJECT_NAME}::behavior_tree
+    ${PROJECT_NAME}::kios_utils
 )
 
 ament_target_dependencies(tree_node
@@ -43,6 +44,7 @@ add_executable(tactician tactician.cpp)
 target_link_libraries(tactician
     ${PROJECT_NAME}::behavior_tree
     nlohmann_json::nlohmann_json
+    ${PROJECT_NAME}::kios_utils
 )
 
 ament_target_dependencies(tactician

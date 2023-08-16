@@ -34,9 +34,8 @@ public:
         subscription_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
         timer_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::MutuallyExclusive);
-        client_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
+        client_callback_group_ = timer_callback_group_;
 
         // * initialize the objects
         timer_ = this->create_wall_timer(
@@ -120,10 +119,15 @@ private:
             tree_state_temp_.action_name = msg->action_name;
             tree_state_temp_.action_phase = static_cast<kios::ActionPhase>(msg->action_phase);
             tree_state_temp_.is_running = msg->is_runnning;
+            // ! is running is not used here!!
 
+            // ! BBBUGMARK
+            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK NEW AP: %s", kios::action_phase_to_str(tree_state_temp_.action_phase).c_str());
+            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK OLD AP: %s", kios::action_phase_to_str(tree_state_temp_.last_action_phase).c_str());
             // if action phase switched
             if (tree_state_temp_.action_phase != tree_state_temp_.last_action_phase)
             {
+                RCLCPP_INFO(this->get_logger(), "tree_subscription: AP switch hit.");
                 // update the last action phase
                 tree_state_temp_.last_action_phase = tree_state_temp_.action_phase;
                 // flag to start a command request
@@ -131,6 +135,7 @@ private:
             }
             else
             {
+                RCLCPP_INFO(this->get_logger(), "tree_subscription: AP switch pass.");
                 // pass
             }
             // * update tree state in node
@@ -138,7 +143,7 @@ private:
         }
         else
         {
-            // pass
+            RCLCPP_INFO(this->get_logger(), "busy with handling action switch, tree state update and switch check skipped...");
         }
         // update tree state
     }
@@ -163,6 +168,7 @@ private:
         {
             if (is_switch_action_phase == true)
             {
+                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = TRUE");
                 is_busy = true;
                 // update context
                 update_command_request();
@@ -174,10 +180,10 @@ private:
                 {
                     if (!rclcpp::ok())
                     {
-                        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+                        RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
                         rclcpp::shutdown();
                     }
-                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+                    RCLCPP_INFO(this->get_logger(), "service not available, waiting again...");
                 }
 
                 auto result_future = client_->async_send_request(request);
@@ -199,17 +205,20 @@ private:
                 {
                     RCLCPP_ERROR(this->get_logger(), "Service call timed out!");
                 }
-
+                // ! BBDEBUG HOW CAN YOU FORGET TO RESET THE FLAG?!
+                // ! WHY USE ==??????
+                is_switch_action_phase = false;
                 is_busy = false;
             }
             else
             {
-                RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.");
+                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = FALSE");
+                // RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.");
             }
         }
         else
         {
-            RCLCPP_INFO(this->get_logger(), "Timer: not running.\n");
+            RCLCPP_ERROR(this->get_logger(), "Timer: not running.");
         }
     }
 };

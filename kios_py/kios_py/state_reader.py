@@ -9,6 +9,8 @@ import time
 from datetime import datetime
 import json
 
+import queue
+
 from .resource.ws_client import *
 
 from kios_interface.msg import MiosState
@@ -44,6 +46,8 @@ class StateReader(Node):
             10,
             callback_group=publisher_callback_group
         )
+
+        self.msg_queue = queue.Queue()
 
         self.udp_setup()
 

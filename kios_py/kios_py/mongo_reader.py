@@ -33,7 +33,7 @@ class MongoReader(Node):
             2,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
-        
+
         # initialize get_object server
         server_callback_group = MutuallyExclusiveCallbackGroup()
         self.server_ = self.create_service(
@@ -43,11 +43,11 @@ class MongoReader(Node):
             callback_group=server_callback_group
         )
 
-
     def timer_callback(self):
         if self.is_running:
             self.get_logger().info('start')
-            result = self.mongo_client_.read("miosL", "environment", {"name": "housing"})
+            result = self.mongo_client_.read(
+                "miosL", "environment", {"name": "housing"})
             print(result[0]['O_T_OB'])
             self.get_logger().info('stop')
 
@@ -69,11 +69,12 @@ class MongoReader(Node):
                 object_result = {}
                 for object_name in object_list:
                     try:
-                        result = self.mongo_client_.read("miosL", "environment", {"name": object_name})[0]
+                        result = self.mongo_client_.read(
+                            "miosL", "environment", {"name": object_name})[0]
                         object_result[object_name] = result
                     except:
                         self.get_logger().error('UNKNOWN ERROR IN MONGO CLIENT READ() OF OBEJCT %s', object_name)
-                
+
                 if len(object_result) <= 0:
                     response.error_message = "read result == null"
                     return
@@ -85,7 +86,7 @@ class MongoReader(Node):
         else:
             self.get_logger().error('not runnning, server pass ...')
             response.error_message = "is_running == False"
-            return response 
+            return response
 
 
 def main(args=None):

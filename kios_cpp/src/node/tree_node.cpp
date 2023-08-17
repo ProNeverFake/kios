@@ -33,6 +33,7 @@ public:
         this->declare_parameter("is_update_object", false);
         this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
+
         //* initialize the callback groups
         subscription_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -45,9 +46,10 @@ public:
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(500),
+            std::chrono::milliseconds(10),
             std::bind(&TreeNode::timer_callback, this),
             timer_callback_group_);
+
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
@@ -84,8 +86,6 @@ public:
     }
 
 private:
-    // flags
-
     // object list
     std::vector<std::string> object_list_;
 
@@ -191,7 +191,7 @@ private:
 
     /**
      * @brief update the object with GetObjectRequest client
-     *
+     * ! UNFINISHED
      * @return true
      * @return false
      */

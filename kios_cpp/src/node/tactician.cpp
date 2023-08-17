@@ -39,7 +39,7 @@ public:
 
         // * initialize the objects
         timer_ = this->create_wall_timer(
-            std::chrono::seconds(1),
+            std::chrono::milliseconds(10),
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
 
@@ -122,8 +122,6 @@ private:
             // ! is running is not used here!!
 
             // ! BBBUGMARK
-            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK NEW AP: %s", kios::action_phase_to_str(tree_state_temp_.action_phase).c_str());
-            RCLCPP_INFO(this->get_logger(), "BBDEBUG CHECK OLD AP: %s", kios::action_phase_to_str(tree_state_temp_.last_action_phase).c_str());
             // if action phase switched
             if (tree_state_temp_.action_phase != tree_state_temp_.last_action_phase)
             {
@@ -168,7 +166,6 @@ private:
         {
             if (is_switch_action_phase == true)
             {
-                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = TRUE");
                 is_busy = true;
                 // update context
                 update_command_request();
@@ -205,15 +202,12 @@ private:
                 {
                     RCLCPP_ERROR(this->get_logger(), "Service call timed out!");
                 }
-                // ! BBDEBUG HOW CAN YOU FORGET TO RESET THE FLAG?!
-                // ! WHY USE ==??????
                 is_switch_action_phase = false;
                 is_busy = false;
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "FLAG CHECK: IS_SWITCH = FALSE");
-                // RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.");
+                RCLCPP_INFO(this->get_logger(), "Timer: continue the last action phase.");
             }
         }
         else

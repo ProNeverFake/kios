@@ -16,14 +16,14 @@ from .resource.ws_client import *
 from kios_interface.msg import MiosState
 
 
-class StateReader(Node):
+class MiosReader(Node):
 
     udp_subscriber = ''
     # robot state variable dictionary.
     mios_state_default = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     def __init__(self):
-        super().__init__('state_reader')
+        super().__init__('mios_reader')
 
         # declare parameters
         self.declare_parameter('power', False)
@@ -36,7 +36,7 @@ class StateReader(Node):
         self.udp_port = 12346
 
         self.timer = self.create_timer(
-            0.5,  # sec
+            0.01,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
 
@@ -47,7 +47,7 @@ class StateReader(Node):
             callback_group=publisher_callback_group
         )
 
-        self.msg_queue = queue.Queue()
+        # self.msg_queue = queue.Queue()
 
         self.udp_setup()
 
@@ -74,14 +74,14 @@ class StateReader(Node):
             socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_subscriber.bind((self.udp_ip, self.udp_port))
         self.switch_power(turn_on=True)
-    
+
     def check_power(self):
         if self.has_parameter('power'):
             self.get_logger().error('CHECK POWER')
             return self.get_parameter('power').get_parameter_value().bool_value
-        else: 
+        else:
             self.get_logger().error('PARAM MISSING: POWER!')
-    
+
     def switch_power(self, turn_on: bool):
         power = rclpy.parameter.Parameter(
             'power',
@@ -92,18 +92,17 @@ class StateReader(Node):
         self.set_parameters(all_new_parameters)
 
 
-
 def main(args=None):
     rclpy.init(args=args)
 
-    state_reader = StateReader()
+    mios_reader = MiosReader()
 
     executor = MultiThreadedExecutor()
-    executor.add_node(state_reader)
+    executor.add_node(mios_reader)
 
     executor.spin()
 
-    state_reader.destroy_node()
+    mios_reader.destroy_node()
     rclpy.shutdown()
 
 

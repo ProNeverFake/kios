@@ -1,4 +1,4 @@
-![KIOS LOGO](/LOGO.jpg "KIOS LOGO")
+![KIOS LOGO](/LOGO.jpg "KIOS LOGO"){width=40%, height=40%}
 
 # KIOS --- Knowledge-based Intelligent Operation System
 

@@ -1,6 +1,6 @@
-<p align="center">
-  <img src="/LOGO.jpg" width="30%">
-</p>
+<div align="center">
+  <img src="/LOGO.jpg" alt="LOGO" width="30%">
+</div>
 # KIOS --- Knowledge-based Intelligent Operation System
 
 This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle).

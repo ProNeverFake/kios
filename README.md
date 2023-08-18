@@ -1,3 +1,5 @@
+![KIOS LOGO](/LOGO.jpg "KIOS LOGO")
+
 # KIOS --- Knowledge-based Intelligent Operation System
 
 This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle).

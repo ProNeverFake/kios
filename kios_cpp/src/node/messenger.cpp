@@ -26,8 +26,7 @@ class Messenger : public rclcpp::Node
 {
 public:
     Messenger()
-        : Node("messenger"),
-          mios_state({0, 0, 0, 0, 0, 0})
+        : Node("messenger")
 
     {
         this->declare_parameter("power", true);
@@ -41,7 +40,7 @@ public:
 
         //* initialize timer
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(500),
+            std::chrono::milliseconds(10),
             std::bind(&Messenger::timer_callback, this),
             timer_callback_group_);
 
@@ -77,8 +76,6 @@ public:
     }
 
 private:
-    //! TEMP_STATE
-    std::vector<double> mios_state;
     // flag
     kios::ThreadSafeData<kios::TaskState> ts_task_state_;
 
@@ -97,13 +94,10 @@ private:
         if (check_power() == true)
         {
             RCLCPP_INFO(this->get_logger(), "subscription hit.");
-            //// TEST
-            RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
-            // ! TEMP READ
+            // RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
             kios::TaskState task_state;
             task_state.tf_f_ext_k = msg->tf_f_ext_k;
             ts_task_state_.write_data(task_state);
-            // mios_state = msg->tf_f_ext_k;
         }
         else
         {
@@ -130,7 +124,7 @@ private:
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    // register the nodes
+
     auto messenger = std::make_shared<Messenger>();
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(messenger);

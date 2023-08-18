@@ -5,6 +5,20 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+################################## conan setting
+# Download automatically, you can also just copy the conan.cmake file
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.16.1/conan.cmake"
+                  "${CMAKE_BINARY_DIR}/conan.cmake")
+endif()
+
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+
+conan_cmake_run(CONANFILE conanfile.txt  
+                BASIC_SETUP CMAKE_TARGETS
+                BUILD missing)
+
 
 # set CPP standard as 17 according to package behavior_tree library
 set(CMAKE_CXX_STANDARD 17)
@@ -35,6 +49,7 @@ find_package(websocketpp REQUIRED)
 find_package(Threads REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(Poco REQUIRED COMPONENTS Net)
 
 find_package(fmt REQUIRED)
 
@@ -56,6 +71,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
 
 # ########################## fetch libs
 # ! DISCARDED

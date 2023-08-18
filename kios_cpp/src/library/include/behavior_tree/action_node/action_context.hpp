@@ -9,36 +9,6 @@
 
 namespace Insertion
 {
-    // class ThreadSafeActionNodeContext
-    // {
-    //     void write_data_1()
-    //     {
-    //         std::lock_guard<std::mutex> lock(data_mutex);
-    //         for (int i = 0; i < 50; ++i)
-    //         { // thread 1 writes to the first half
-    //             data[i] = i;
-    //         }
-    //     }
-
-    //     void write_data_2()
-    //     {
-    //         std::lock_guard<std::mutex> lock(data_mutex);
-    //         for (int i = 50; i < 100; ++i)
-    //         { // thread 2 writes to the second half
-    //             data[i] = i;
-    //         }
-    //     }
-
-    //     void read_data()
-    //     {
-    //         std::lock_guard<std::mutex> lock(data_mutex);
-    //         for (int val : data)
-    //         {
-    //             std::cout << val << " ";
-    //         }
-    //         std::cout << std::endl;
-    //     }
-    // };
 
     enum class ActionPhase
     {
@@ -140,27 +110,12 @@ namespace Insertion
     };
     // ! TODO NOT THREAD SAFE
 
-    struct RobotState
+    struct RobotState // ! DISCARDED
     {
         std::vector<double> q;
         std::vector<double> F_ext;
         std::vector<double> TF_F_ext_K = {0, 0, 0, 0, 0, 0};
         bool is_approach_finished = false;
     };
-
-    // class ActionContext
-    // {
-    // public:
-    //     ActionContext(BT::Tree &behavior_tree);
-
-    //     BT::NodeStatus tick_once();
-    //     BT::NodeStatus get_tick_result(); // !
-    //     std::shared_ptr<ActionNodeContext> get_context_ptr();
-
-    // private:
-    //     ActionNodeContext m_tree_action_context;
-    // };
-
-    // ActionContext tree_root;
 
 } // namespace Insertion

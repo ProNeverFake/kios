@@ -4,6 +4,8 @@
 #include <chrono>
 #include <optional>
 #include <vector>
+#include <queue>
+#include <iostream>
 
 #include "nlohmann/json.hpp"
 
@@ -58,6 +60,62 @@ namespace kios
         {
             std::lock_guard<std::mutex> lock(mtx);
             return data_;
+        }
+    };
+
+    template <typename T>
+    class ThreadSafeQueue
+    {
+    private:
+        std::queue<T> queue;
+        std::mutex mtx;
+        std::condition_variable cv;
+
+    public:
+        void push(const T &value)
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            queue.push(value);
+        }
+
+        std::optional<T> pop()
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            if (queue.empty())
+            {
+                return std::nullopt;
+            }
+            else
+            {
+                T value = queue.front();
+                queue.pop();
+                return value;
+            }
+        }
+
+        void push_cv(const T &value)
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            queue.push(value);
+            cv.notify_one(); // Notify a waiting thread, if any
+        }
+
+        std::optional<T> pop_cv()
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            auto now = std::chrono::steady_clock::now();
+            if (cv.wait_until(lock, now + std::chrono::seconds(2), [this]() { return !queue.empty(); }))
+            {
+                std::cout << "message queue: Response caught." << std::endl;
+                T value = queue.front();
+                queue.pop();
+                return value;
+            }
+            else
+            {
+                std::cout << "message queue: Response timed out." << std::endl;
+                return std::nullopt;
+            }
         }
     };
 
@@ -149,4 +207,4 @@ namespace kios
               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
               {"F_ext_contact", {3.0, 2.0}}}}};
     };
-}
+} // namespace kios

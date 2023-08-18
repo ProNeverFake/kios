@@ -31,41 +31,9 @@ public:
           udp_port(12346),
           is_busy(false)
     {
-        // ! DISCARDED
-        // //*  initialize the spdlog for ws_client
-        // std::string verbosity = "trace";
-        // spdlog::level::level_enum info_level;
-        // if (verbosity == "trace")
-        // {
-        //     info_level = spdlog::level::trace;
-        // }
-        // else if (verbosity == "debug")
-        // {
-        //     info_level = spdlog::level::debug;
-        // }
-        // else if (verbosity == "info")
-        // {
-        //     info_level = spdlog::level::info;
-        // }
-        // else
-        // {
-        //     info_level = spdlog::level::info;
-        // }
-
-        // auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        // console_sink->set_level(info_level);
-        // console_sink->set_pattern("[kios][ws_client][%^%l%$] %v");
-
-        // auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
-        // file_sink->set_level(spdlog::level::debug);
-
-        // auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
-        // logger->set_level(info_level);
-        // spdlog::set_default_logger(logger);
-        // spdlog::info("spdlog: initialized.");
-
-        // declare mission parameter
+        // declare power parameter
         this->declare_parameter("power", true);
+
         // callback group
         service_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -81,8 +49,10 @@ public:
 
         // udp register
         mios_register_udp();
+
         // object announcement
         m_messenger->send_grasped_object();
+
         // * initialize service
         command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
             "command_request_service",
@@ -191,7 +161,6 @@ private:
             RCLCPP_ERROR(this->get_logger(), "ISSUING COMMAND: UNDEFINED COMMANDTYPE!");
             break;
         }
-        // passing
     };
 
     void stop_task()
@@ -216,7 +185,6 @@ private:
         if (check_power() == true)
         {
             // * read the command request
-
             std::string object_name = request->object_name;
             nlohmann::json object_context = {{"object", object_name}};
             teach_object(object_context);
@@ -233,7 +201,7 @@ private:
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    // register the nodes
+
     auto commander = std::make_shared<Commander>();
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(commander);

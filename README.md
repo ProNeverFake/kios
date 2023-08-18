@@ -10,18 +10,19 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 
 ## Intro
 
-Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my master thesis and maybe after finishing that I'll finally figure out what this system is really about.
+> Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my master thesis and maybe after finishing that I'll finally figure out what this system is really about.
 
 ## NEWS
 
 **KNOWN BUGS:**
+- time delay in mios_reader (to be verified).
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] **ERGENT** add thread queue to all nodes to guarantee 100% state change perception.
+- [ ] add a udp mechanism to realize skill state sharing between mios and kios.
+- [ ] ~~**ERGENT** add thread queue to all nodes to guarantee 100% state change perception.~~
 - [x] add service and client for mongoDB w/r
-- ~~[ ] add node manipulator to control other nodes.~~
 - [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
@@ -79,12 +80,15 @@ git clone https://gitlab.com/kopino4-templates/readme-template
 pip3 install argcomplete
 sudo activate-global-python-argcomplete3
 ```
+7. install conan 1.59.0 
+
+8. install mios (Please use branch "BBbranch").
 
 > BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
 
-I'm sorry to inform you that the system is still not finished yet. Before finishing the system I have no time to provide any tutorial of this system. So LEARN BY YOURSELF, just like how you have learned to use mios.
+This part is still under construction.
 
 > BB: GOOD LUCK.
 
@@ -99,6 +103,9 @@ I'm sorry to inform you that the system is still not finished yet. Before finish
 Blackbird: I'll just skip this part. 
 
 ### Development Log
+
+- *18.08.2023:*
+  1. Add Poco. Add new udp receiver in mios_reader.
 
 - *17.08.2023:*
   1. Add thread-safe data type.

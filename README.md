@@ -1,5 +1,6 @@
-![KIOS LOGO](/LOGO.jpg "KIOS LOGO"){width=40%}
-
+<p align="center">
+  <img src="/LOGO.jpg" width="30%">
+</p>
 # KIOS --- Knowledge-based Intelligent Operation System
 
 This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle).

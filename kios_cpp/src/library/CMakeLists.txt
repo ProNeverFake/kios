@@ -40,10 +40,6 @@ target_link_libraries(${MODULE_NAME}
     websocketpp::websocketpp
 )
 
-# ament_target_dependencies(${MODULE_NAME}
-#     "rclcpp"
-#     "rclcpp_action"
-#     )
 #########################################################################
 
 

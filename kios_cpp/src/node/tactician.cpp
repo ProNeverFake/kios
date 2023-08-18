@@ -106,7 +106,7 @@ private:
     void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
         task_state.tf_f_ext_k = msg->tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k);
+        RCLCPP_INFO(this->get_logger(), "task subscription listened: %s.", msg->tf_f_ext_k);
     }
 
     void tree_subscription_callback(const kios_interface::msg::TreeState::SharedPtr msg)

@@ -4,6 +4,8 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 from rclpy.qos import qos_profile_sensor_data
 
+import asyncio
+import websockets
 import socket
 import time
 from datetime import datetime
@@ -26,14 +28,22 @@ class MiosReader(Node):
         super().__init__('mios_reader')
 
         # declare parameters
-        self.declare_parameter('power', False)
+        self.declare_parameter('power', True)
 
-        timer_callback_group = ReentrantCallbackGroup()
+        skill_timer_group = MutuallyExclusiveCallbackGroup()
+
+        timer_callback_group = MutuallyExclusiveCallbackGroup()
         publisher_callback_group = timer_callback_group
 
         # udp settings
         self.udp_ip = "localhost"
         self.udp_port = 12346
+        self.skill_port = 8888
+
+        self.skill_timer = self.create_timer(
+            0.005,  # sec
+            self.skill_timer_callback,
+            callback_group=skill_timer_group)
 
         self.timer = self.create_timer(
             0.01,  # sec
@@ -68,11 +78,19 @@ class MiosReader(Node):
             self.get_logger().error('Power off, timer pass ...')
             pass
 
+    def skill_timer_callback(self):
+        pass
+
     def udp_setup(self):
         self.get_logger().info('udp setup hit.')
         self.udp_subscriber = socket.socket(
             socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_subscriber.bind((self.udp_ip, self.udp_port))
+
+        self.skill_rcv = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM)
+        self.skill_rcv.bind((self.udp_ip, self.skill_port))
+
         self.switch_power(turn_on=True)
 
     def check_power(self):

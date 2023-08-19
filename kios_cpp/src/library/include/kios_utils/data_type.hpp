@@ -11,6 +11,16 @@
 
 namespace kios
 {
+
+    enum class SkillPhase
+    {
+        ERROR = -1,
+        INITIALIZATION = 0,
+        START = 1,
+        SUCCESS = 2,
+        FINISH = 3
+    };
+
     enum class ActionPhase
     {
         ERROR = -1,

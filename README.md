@@ -92,11 +92,17 @@ This part is still under construction.
 
 > BB: GOOD LUCK.
 
-### Used technologies
+### System Structure
 
-- Behavior-tree.
-- Websocket communication.
-  ...
+<div align="center">
+  <img src="/system_structure.png" alt="system_structure" width="80%">
+</div>
+
+### Running Process
+
+<div align="center">
+  <img src="/process.png" alt="process" width="80%">
+</div>
 
 ### Testing
 

@@ -33,9 +33,10 @@ class CLINode(Node):
         future = self.client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         return future.result()
-    
+
     def find_node(self, node_name):
-        node_names = get_node_names(node = CLI_client, include_hidden_nodes=False)
+        node_names = get_node_names(
+            node=CLI_client, include_hidden_nodes=False)
         full_node_name = get_absolute_node_name(node_name)
         if full_node_name not in {n.full_name for n in node_names}:
             return False
@@ -64,9 +65,11 @@ class CLINode(Node):
         result = response.results[0]
         return result
 
+
 rclpy.init()
 # * Initialize the node
 CLI_client = CLINode()
+
 
 def say(args):
     if args.message:
@@ -95,14 +98,18 @@ def update_object(args):
 def modify_object(args):
     pass
 
+
 def turn_off(args):
     if args.node_name:
         if CLI_client.find_node(args.node_name):
-            CLI_client.get_logger().error(f'FAILED: Node {args.node_name} not found!')
+            CLI_client.get_logger().error(
+                f'FAILED: Node {args.node_name} not found!')
         else:
-            result = CLI_client.set_parameter(node_name=args.node_name, param_name="power", param_value="false")
+            result = CLI_client.set_parameter(
+                node_name=args.node_name, param_name="power", param_value="false")
             if result.successful:
-                CLI_client.get_logger().info(f'Successfully turned off {args.node_name}.')
+                CLI_client.get_logger().info(
+                    f'Successfully turned off {args.node_name}.')
             else:
                 msg = f'Failed when turning off {args.node_name}'
                 if result.reason:
@@ -112,14 +119,18 @@ def turn_off(args):
         CLI_client.get_logger().error("Usage: ros2 kios turn_off \"<node_name>\"")
     rclpy.shutdown()
 
+
 def turn_on(args):
     if args.node_name:
         if CLI_client.find_node(args.node_name):
-            CLI_client.get_logger().error(f'FAILED: Node {args.node_name} not found!')
+            CLI_client.get_logger().error(
+                f'FAILED: Node {args.node_name} not found!')
         else:
-            result = CLI_client.set_parameter(node_name=args.node_name, param_name="power", param_value="true")
+            result = CLI_client.set_parameter(
+                node_name=args.node_name, param_name="power", param_value="true")
             if result.successful:
-                CLI_client.get_logger().info(f'Successfully turned on {args.node_name}.')
+                CLI_client.get_logger().info(
+                    f'Successfully turned on {args.node_name}.')
             else:
                 msg = f'Failed when turning on {args.node_name}'
                 if result.reason:

@@ -86,6 +86,8 @@ public:
     }
 
 private:
+    // mios skill phase flag.
+
     // object list
     std::vector<std::string> object_list_;
 

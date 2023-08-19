@@ -20,13 +20,12 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 - ~~check: mios task context saving. (14082023)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] add a udp mechanism to realize skill state sharing between mios and kios.
-- [ ] ~~**ERGENT** add thread queue to all nodes to guarantee 100% state change perception.~~
+- [ ] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
 - [x] add service and client for mongoDB w/r
 - [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
 - [ ] ws_client enable request result bool return 
-- [ ] move ActionContext to ~~kios_utils~~ data_type.hpp
+- [x] move ActionContext to ~~kios_utils~~ data_type.hpp
 - [ ] (postponed) add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
@@ -39,6 +38,8 @@ SEE [DEVELOPMENT LOG](#development-log)
   * [Install](#install)
   * [Usage](#usage)
   * [Used Technologies](#used-technologies)
+  * [System Structure](#system-structure)
+  * [Running Process](#running-process)
   * [Testing](#testing)
   * [Development Log](#development-log)
 * [Contribute](#contribute)
@@ -52,7 +53,7 @@ kIOS, Short for "Knowledge-based Intelligent Operation System", is a robot skill
 
 ## Getting Started
 
-BB: Don't need to.
+BB: skip this part.
 
 ### Requirements
 
@@ -111,6 +112,11 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *19.08.2023:*
+  1. Move ws_client lib to kios_communication. add thread safe udp lib relying on Poco.
+  2. Add new enum TreeState for mios-kios state synchronization. The concept is elaborated in * [Running Process](#running-process)
+  3. Add udp socket in tree_node. Add more method for tree phase switch (UNFINISHED).
 
 - *18.08.2023:*
   1. Add Poco. Add new udp receiver in mios_reader.

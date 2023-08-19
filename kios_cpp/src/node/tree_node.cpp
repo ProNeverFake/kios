@@ -2,19 +2,18 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <optional>
 
 #include "rclcpp/rclcpp.hpp"
-
-// #include "rcl_interfaces/srv/set_parameters_atomically.hpp"
-// #include "rcl_interfaces/srv/get_parameters.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
 
 #include "behavior_tree/node_list.hpp"
+#include "kios_utils/kios_utils.hpp"
+#include "kios_communication/udp.hpp"
 
 #include "kios_interface/msg/tree_state.hpp"
 #include "kios_interface/msg/task_state.hpp"
 #include "kios_interface/msg/skill_context.hpp"
-
 #include "kios_interface/srv/get_object_request.hpp"
 
 using std::placeholders::_1;
@@ -29,7 +28,7 @@ public:
         object_list_.push_back("contact");
         object_list_.push_back("approach");
 
-        // declare mission parameter
+        //* declare mission parameter
         this->declare_parameter("is_update_object", false);
         this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
@@ -44,11 +43,6 @@ public:
 
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>();
-
-        timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(10),
-            std::bind(&TreeNode::timer_callback, this),
-            timer_callback_group_);
 
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
@@ -71,22 +65,30 @@ public:
             "get_object_service",
             rmw_qos_profile_services_default,
             client_callback_group_);
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(10),
+            std::bind(&TreeNode::timer_callback, this),
+            timer_callback_group_);
     }
 
     bool check_power()
     {
-        if (this->get_parameter("power").as_bool() == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this->get_parameter("power").as_bool();
+    }
+
+    void switch_power(bool turn_on)
+    {
+        std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("power", turn_on)};
+        this->set_parameters(all_new_parameters);
     }
 
 private:
-    // mios skill phase flag.
+    // * UDP socket
+    std::shared_ptr<kios::BTReceiver> udp_socket_;
+    bool isUdpReady;
+
+    // tree pause flag
+    kios::TreePhase tree_phase_;
 
     // object list
     std::vector<std::string> object_list_;
@@ -119,8 +121,9 @@ private:
      */
     void timer_callback()
     {
-        if (check_power() == true)
+        if (check_power())
         {
+            // * check the necessity of updating objects
             if (this->get_parameter("is_update_object").as_bool() == true)
             {
                 RCLCPP_INFO(this->get_logger(), "update the object...");
@@ -128,6 +131,22 @@ private:
                 {
                     // ! BBDEBUG SHUTDOWN
                     rclcpp::shutdown();
+                }
+            }
+            else
+            {
+                // DO NOTHING
+            }
+
+            // * get mios skill execution state
+            std::string message;
+            if (udp_socket_->get_message(message) == true)
+            {
+                if (!switch_tree_phase(message))
+                {
+                    RCLCPP_ERROR(this->get_logger(), "switch_tree_phase: TREE PHASE UNDEFINED!");
+                    // * turn off the tree node for debug.
+                    switch_tree_phase("ERROR");
                 }
             }
             else
@@ -154,9 +173,7 @@ private:
             }
             else
             {
-                // * stop
-                std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("power", false)};
-                this->set_parameters(all_new_parameters);
+                switch_power(false);
             }
         }
         else
@@ -171,7 +188,7 @@ private:
      * @return true
      * @return false
      */
-    bool is_tree_running()
+    bool is_tree_running() //! maybe discard in the future
     {
         switch (tick_result)
         {
@@ -190,6 +207,49 @@ private:
         }
         }
     }
+
+    /**
+     * @brief change the tree_phase_ for determining next move of the tree.
+     *
+     * @param phase
+     * @return true
+     * @return false if asked to switch to an undefined phase.
+     */
+    bool switch_tree_phase(const std::string &phase)
+    {
+        if (phase == "RESUME")
+        {
+            tree_phase_ = kios::TreePhase::RESUME;
+            return true;
+        }
+        if (phase == "PAUSE")
+        {
+            tree_phase_ = kios::TreePhase::PAUSE;
+            return true;
+        }
+        if (phase == "FAILURE")
+        {
+            tree_phase_ = kios::TreePhase::FAILURE;
+            return true;
+        }
+        if (phase == "IDLE")
+        {
+            tree_phase_ = kios::TreePhase::IDLE;
+            return true;
+        }
+        if (phase == "FINISH")
+        {
+            tree_phase_ = kios::TreePhase::FINISH;
+        }
+        if (phase == "ERROR")
+        {
+            tree_phase_ = kios::TreePhase::ERROR;
+        }
+        return false;
+    }
+
+    bool execute_tree();
+    // ! TODO
 
     /**
      * @brief update the object with GetObjectRequest client

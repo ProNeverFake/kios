@@ -10,7 +10,7 @@
 #include "rcl_interfaces/srv/get_parameters.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
 
-#include "ws_client/ws_client.hpp"
+#include "kios_communication/ws_client.hpp"
 
 using std::placeholders::_1;
 

@@ -1,17 +1,9 @@
 
-######################################################### ws_client library
-set(MODULE_NAME ws_client)
+######################################################### kios_communication library
+set(MODULE_NAME kios_communication)
 
-set(${MODULE_NAME}_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ws_client/ws_client.cpp
-)
-
-set(${MODULE_NAME}_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/ws_client/ws_client.hpp
-)
-
-# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/action/*.cpp")
-# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/action/*.hpp")
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/kios_communication/*.cpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/kios_communication/*.hpp")
 
 add_library(${MODULE_NAME} STATIC
     ${${MODULE_NAME}_SRC}
@@ -38,6 +30,7 @@ target_link_libraries(${MODULE_NAME}
     Threads::Threads
     nlohmann_json::nlohmann_json
     websocketpp::websocketpp
+    Poco::Net
 )
 
 #########################################################################

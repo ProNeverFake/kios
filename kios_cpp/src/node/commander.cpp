@@ -11,7 +11,7 @@
 
 #include "behavior_tree/node_list.hpp"
 
-#include "ws_client/ws_client.hpp"
+#include "kios_communication/ws_client.hpp"
 
 #include "kios_interface/srv/command_request.hpp"
 #include "kios_interface/srv/teach_object_service.hpp"

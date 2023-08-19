@@ -1,4 +1,4 @@
-#include "ws_client/ws_client.hpp"
+#include "kios_communication/ws_client.hpp"
 /***************** asynchronized response ***************/
 
 /******************* connection_metadata ****************/

@@ -100,13 +100,15 @@ This part is still under construction.
 
 ### Running Process
 
+The basic idea is to make the decision making part in kios and the skill execution part in mios in a chained loop. Mios and kios must be synchronized in skill execution phase, which means the start/success/failure phase in kios and mios must be handled in exactly the same time step of the system loop. In this way, the realtime cycle in mios skill execution is reserved and protected by being isolated from the communication part, and the realtime response in kios decision making mechanism is also guaranteed because of the non-stop perception feedback and the accessibility of mios.
+
 <div align="center">
   <img src="/process.png" alt="process" width="80%">
 </div>
 
 ### Testing
 
-Blackbird: I'll just skip this part. 
+Blackbird: I'll just skip this part for now. 
 
 ### Development Log
 

@@ -369,10 +369,9 @@ private:
         auto request = std::make_shared<kios_interface::srv::SwitchActionRequest::Request>();
         request->action_name = tree_state_.action_name;
         request->action_phase = static_cast<int32_t>(tree_state_.action_phase);
-        request->is_interrupted = true; // ! temp
-        while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(50)))
+        while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
         {
-            RCLCPP_ERROR(this->get_logger(), "service %s not available.", switch_action_client_->get_service_name());
+            RCLCPP_ERROR(this->get_logger(), "service switch_action_service not available.");
             return false;
         }
         auto result_future = switch_action_client_->async_send_request(request);
@@ -383,18 +382,18 @@ private:
             auto result = result_future.get();
             if (result->is_accepted == true)
             {
-                RCLCPP_INFO(this->get_logger(), "Service %s response: request accepted.", switch_action_client_->get_service_name());
+                RCLCPP_INFO(this->get_logger(), "switch_action request accepted.");
                 return true;
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "Service %s response: request refused!", switch_action_client_->get_service_name());
+                RCLCPP_ERROR(this->get_logger(), "switch_action request refused.");
                 return false;
             }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: service %s future is available but not ready.", switch_action_client_->get_service_name());
+            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: future is available but not ready.");
             return false;
         }
     }

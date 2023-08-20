@@ -3,18 +3,18 @@
 #include "behaviortree_cpp/behavior_tree.h"
 #include "behaviortree_cpp/bt_factory.h"
 
-#include "behavior_tree/action_node/action_context.hpp"
-
 #include <any>
 #include <unordered_map>
 #include <string>
 
 #include "spdlog/spdlog.h"
 
+#include "kios_utils/kios_utils.hpp"
+
 namespace Insertion
 {
 
-    // TODO a data storage class --- an interface for mongoDB
+    // ! DISCARD
     class MongoInterface
     {
     public:
@@ -41,18 +41,16 @@ namespace Insertion
             : BT::StatefulActionNode(name, config)
         {
         }
-        // choose an action depending on the current situation.
-        auto chose_action(); // todo
-        std::shared_ptr<ActionNodeContext> get_context_ptr();
+        static BT::PortsList providedPorts();
+        std::shared_ptr<kios::ActionPhaseContext> get_context_ptr();
         nlohmann::json get_action_parameter();
         void set_action_parameter(nlohmann::json parameter);
 
     private:
         virtual void action_parameter_initialize();
         virtual void node_context_initialize();
-        virtual bool is_success();       // here to set the check condition
-        MongoInterface m_data_interface; // data member
-        ActionNodeContext m_context;     // node and command context
+        virtual bool is_success();          // here to set the check condition
+        kios::ActionPhaseContext m_context; // node and command context
         nlohmann::json action_parameter;
     };
 

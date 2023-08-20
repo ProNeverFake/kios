@@ -2,19 +2,19 @@
 
 namespace Insertion
 {
-    Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr)
+    Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr)
         : MetaNode(name, config)
     {
         m_node_context_ptr = context_ptr;
         m_robot_state_ptr = state_ptr;
     }
 
-    BT::PortsList Contact::providedPorts()
-    {
-        // amount of milliseconds that we want to sleep
+    // BT::PortsList Contact::providedPorts()
+    // {
+    //     // amount of milliseconds that we want to sleep
 
-        return {BT::InputPort<std::vector<double>>("target_position")};
-    }
+    //     return {BT::InputPort<std::vector<double>>("target_position")};
+    // }
     /**
      * @brief Here to apply the success condition check.
      *
@@ -41,13 +41,13 @@ namespace Insertion
     void Contact::set_action_context()
     {
         m_node_context_ptr->parameter["skill"]["action_context"]["action_name"] = "contact";
-        m_node_context_ptr->action_phase = ActionPhase::CONTACT;
+        m_node_context_ptr->action_phase = kios::ActionPhase::CONTACT;
         m_node_context_ptr->action_name = "contact";
-        m_node_context_ptr->parameter["skill"]["action_context"]["action_phase"] = ActionPhase::CONTACT;
+        m_node_context_ptr->parameter["skill"]["action_context"]["action_phase"] = kios::ActionPhase::CONTACT;
     }
     void Contact::node_context_initialize()
     {
-        std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
+        std::shared_ptr<kios::ActionPhaseContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "contact";
         // todo add more command context here.
     }

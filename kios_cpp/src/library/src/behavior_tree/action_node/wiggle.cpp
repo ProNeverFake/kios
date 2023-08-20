@@ -2,19 +2,13 @@
 
 namespace Insertion
 {
-    Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr)
+    Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr)
         : MetaNode(name, config)
     {
         m_node_context_ptr = context_ptr;
         m_robot_state_ptr = state_ptr;
     }
 
-    BT::PortsList Wiggle::providedPorts()
-    {
-        // amount of milliseconds that we want to sleep
-
-        return {BT::InputPort<std::vector<double>>("target_position")};
-    }
     /**
      * @brief Here to apply the success condition check.
      *
@@ -33,12 +27,12 @@ namespace Insertion
     void Wiggle::set_action_context()
     {
         m_node_context_ptr->parameter["skill"]["action_name"] = "wiggle";
-        m_node_context_ptr->action_phase = ActionPhase::WIGGLE;
-        m_node_context_ptr->parameter["skill"]["action_phase"] = ActionPhase::WIGGLE;
+        m_node_context_ptr->action_phase = kios::ActionPhase::WIGGLE;
+        m_node_context_ptr->parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;
     }
     void Wiggle::node_context_initialize()
     {
-        std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
+        std::shared_ptr<kios::ActionPhaseContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "wiggle";
         // todo add more command context here.
     }

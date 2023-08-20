@@ -8,7 +8,7 @@ add_executable(tree_node tree_node.cpp)
 target_link_libraries(tree_node
     ${PROJECT_NAME}::behavior_tree
     ${PROJECT_NAME}::kios_utils
-    Poco::Net
+    ${PROJECT_NAME}::kios_communication
 )
 
 ament_target_dependencies(tree_node

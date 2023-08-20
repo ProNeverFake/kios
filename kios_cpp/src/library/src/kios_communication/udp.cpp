@@ -31,9 +31,16 @@ namespace kios
     BTReceiver::~BTReceiver()
     {
         stop_thread();
-        receiverThread.join(); // Handle thread joining properly based on your design
+        receiverThread.join();
     }
 
+    /**
+     * @brief thread safe pop method
+     *
+     * @param message
+     * @return true
+     * @return false
+     */
     bool BTReceiver::get_message(std::string &message)
     {
         std::unique_lock<std::mutex> lock(mtx);
@@ -46,6 +53,11 @@ namespace kios
         return false;
     }
 
+    /**
+     * @brief block to wait for the msg (wait for the cv.notify_once()).
+     *
+     * @param message
+     */
     void BTReceiver::wait_for_message(std::string &message)
     {
         std::unique_lock<std::mutex> lock(mtx);

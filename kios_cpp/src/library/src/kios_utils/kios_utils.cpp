@@ -34,4 +34,4 @@ namespace kios
         return "UNDEFINED ACTION PHASE";
     }
 
-}
+} // namespace kios

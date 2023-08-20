@@ -15,12 +15,14 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 ## NEWS
 
 **KNOWN BUGS:**
-- time delay in mios_reader (to be verified).
+- time delay in mios_reader (to be verified). (vielleicht wegen der unrechtzeitigen Nachrichtverhandlung.)
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
+- [ ] **THOUGHT** use thread safe stack for udp in mios_reader to solve the error.
+- [ ] **ERGENT** tree udp check mechanism and mios skill udp part.
+- [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
 - [x] add service and client for mongoDB w/r
 - [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
 - [ ] ws_client upgrade the log --> spdlog
@@ -113,20 +115,25 @@ Blackbird: I'll just skip this part for now.
 
 ### Development Log
 
+- *20.08.2023:*
+  1. Refactored and upgraded tactician and tree_node. 
+  2. Removed ActionContext in behavior_tree lib. All data types are now defined in kios_utils lib.
+  3. Changed the communication between tree_node and tactician. Now the action phase switch is detected in tree_node and tactician should be informed with SwitchActionRequest srv. TreeState msg (pub sub) is discarded (turn off) for now.
+
 - *19.08.2023:*
-  1. Move ws_client lib to kios_communication. add thread safe udp lib relying on Poco.
-  2. Add new enum TreeState for mios-kios state synchronization. The concept is elaborated in * [Running Process](#running-process)
-  3. Add udp socket in tree_node. Add more method for tree phase switch (UNFINISHED).
+  1. Moved ws_client lib to kios_communication. add thread safe udp lib relying on Poco.
+  2. Added new enum TreeState for mios-kios state synchronization. The concept is elaborated in * [Running Process](#running-process)
+  3. Added udp socket in tree_node. Add more method for tree phase switch (UNFINISHED).
 
 - *18.08.2023:*
-  1. Add Poco. Add new udp receiver in mios_reader.
+  1. Added Poco. Add new udp receiver in mios_reader.
 
 - *17.08.2023:*
-  1. Add thread-safe data type.
+  1. Added thread-safe data type.
 
 - *16.08.2023:*
   1. BUG of velocity limit violation fixed. (flag error in tactician)
-  2. Add new CLI: turn_on and turn_off. Realized with ros2xxx.api
+  2. Added new CLI: turn_on and turn_off. Realized with ros2xxx.api
   
 
 - *15.08.2023:*
@@ -134,24 +141,24 @@ Blackbird: I'll just skip this part for now.
   2. CLI teach_object test succeeded.
 
 - *14.08.2023:*
-  1. Realize mongo_reader in kios_py.
+  1. Realized mongo_reader in kios_py.
   2. DEBUG: action_name is empty. check task module in mios.
-  3. Fix auto-fill error in CLI.
-  4. Add CLI service TeachObjectService in commander. Add CLI_node in kios_cli to enable service call.
+  3. Fixed auto-fill error in CLI.
+  4. Added CLI service TeachObjectService in commander. Add CLI_node in kios_cli to enable service call.
 
 - *13.08.2023:*
-  1. Add kios_cli for inplementing command line interface. Add a test method "say".
-  2. Add mongoDB source file.
+  1. Added kios_cli for inplementing command line interface. Add a test method "say".
+  2. Added mongoDB source file.
 
 - *10.08.2023:*
   1. Context inconsistency with mios fixed. Now a single command execution along with mios is possible.
   2. Bugs in tactician, commander and tree_node are fixed.
   3. New launch file debug_launch.py added for debugging.
-  4. add new library kios_utils for containing common data structure.
+  4. Added new library kios_utils for containing common data structure.
 
 - *07.08.2023:*
-  1. Change the project name into KIOS. The old name bt_mios_ros2 is discarded.
-  2. Add README.md.
+  1. Changed the project name into KIOS. The old name bt_mios_ros2 is discarded.
+  2. Added README.md.
 
 ## Contribute
 

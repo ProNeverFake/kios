@@ -1,3 +1,4 @@
+#pragma once
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -61,7 +62,16 @@ namespace kios
         std::string action_name = "INI";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-        bool is_running = false;
+        bool isRunning = false;    // for pub sub
+        bool isInterrupted = true; // necessity of stopping old
+    };
+
+    struct RobotState // ! DISCARDED
+    {
+        std::vector<double> q;
+        std::vector<double> F_ext;
+        std::vector<double> TF_F_ext_K = {0, 0, 0, 0, 0, 0};
+        bool is_approach_finished = false;
     };
 
     /**
@@ -214,7 +224,7 @@ namespace kios
      * @brief the command request from tactician to commander with mp name and mp parameter
      *
      */
-    struct CommandRequest
+    struct CommandContext
     {
         CommandType command_type = CommandType::INITIALIZATION;
         nlohmann::json command_context = {

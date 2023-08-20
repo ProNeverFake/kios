@@ -43,9 +43,16 @@ namespace Insertion
     }
 
     // * MetaNode
-    std::shared_ptr<ActionNodeContext> MetaNode::get_context_ptr()
+    BT::PortsList MetaNode::providedPorts()
     {
-        return std::make_shared<ActionNodeContext>(m_context);
+        // amount of milliseconds that we want to sleep
+
+        return {BT::InputPort<std::vector<double>>("target_position")};
+    }
+
+    std::shared_ptr<kios::ActionPhaseContext> MetaNode::get_context_ptr()
+    {
+        return std::make_shared<kios::ActionPhaseContext>(m_context);
     }
 
     void MetaNode::node_context_initialize()
@@ -80,7 +87,7 @@ namespace Insertion
               {"time_max", 17},
               {"action_context",
                {{"action_name", "dummy_action"},
-                {"action_phase", ActionPhase::INITIALIZATION}}},
+                {"action_phase", kios::ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.1, 1}},
                 {"ddX_d", {0.5, 4}},

@@ -4,8 +4,8 @@ namespace Insertion
 {
     TreeRoot::TreeRoot()
     {
-        m_context_ptr = std::make_shared<ActionNodeContext>();
-        m_state_ptr = std::make_shared<RobotState>();
+        m_context_ptr = std::make_shared<kios::ActionPhaseContext>();
+        m_state_ptr = std::make_shared<kios::RobotState>();
         initialize_tree();
     }
     void TreeRoot::register_node()
@@ -24,11 +24,11 @@ namespace Insertion
         // TODO
         m_tree = m_factory.createTreeFromText(test_tree);
     }
-    std::shared_ptr<ActionNodeContext> TreeRoot::get_context_ptr()
+    std::shared_ptr<kios::ActionPhaseContext> TreeRoot::get_context_ptr()
     {
         return m_context_ptr;
     }
-    std::shared_ptr<RobotState> TreeRoot::get_state_ptr()
+    std::shared_ptr<kios::RobotState> TreeRoot::get_state_ptr()
     {
         return m_state_ptr;
     }
@@ -63,6 +63,6 @@ namespace Insertion
 
 } // namespace Insertion
 
-  ////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////

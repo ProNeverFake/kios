@@ -2,19 +2,13 @@
 
 namespace Insertion
 {
-    Approach::Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr)
+    Approach::Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr)
         : MetaNode(name, config)
     {
         m_node_context_ptr = context_ptr;
         m_robot_state_ptr = state_ptr;
     }
 
-    BT::PortsList Approach::providedPorts()
-    {
-        // amount of milliseconds that we want to sleep
-
-        return {BT::InputPort<std::vector<double>>("target_position")};
-    }
     /**
      * @brief Here to apply the success condition check.
      *
@@ -23,7 +17,7 @@ namespace Insertion
      */
     bool Approach::is_success()
     {
-        // ! BUG
+        // ! TODO
         return m_robot_state_ptr->is_approach_finished;
     }
     /**
@@ -34,12 +28,12 @@ namespace Insertion
     {
         m_node_context_ptr->parameter["skill"]["action_name"] = "approach";
         m_node_context_ptr->action_name = "approach";
-        m_node_context_ptr->action_phase = ActionPhase::APPROACH;
-        m_node_context_ptr->parameter["skill"]["action_phase"] = ActionPhase::APPROACH;
+        m_node_context_ptr->action_phase = kios::ActionPhase::APPROACH;
+        m_node_context_ptr->parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;
     }
     void Approach::node_context_initialize()
     {
-        std::shared_ptr<ActionNodeContext> context_ptr = get_context_ptr();
+        std::shared_ptr<kios::ActionPhaseContext> context_ptr = get_context_ptr();
         context_ptr->node_name = "approach";
         // todo add more command context here.
     }
@@ -89,7 +83,7 @@ namespace Insertion
               {"time_max", 17},
               {"action_context",
                {{"action_name", "dummy_action"},
-                {"action_phase", ActionPhase::INITIALIZATION}}},
+                {"action_phase", kios::ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.1, 1}},
                 {"ddX_d", {0.5, 4}},

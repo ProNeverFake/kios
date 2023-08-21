@@ -2,11 +2,11 @@
 
 namespace Insertion
 {
-    Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr)
-        : MetaNode(name, config)
+    Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+        : MetaNode(name, config, tree_state_ptr, task_state_ptr)
     {
-        m_node_context_ptr = context_ptr;
-        m_robot_state_ptr = state_ptr;
+        // initialize local context
+        node_context_initialize();
     }
 
     /**
@@ -17,51 +17,45 @@ namespace Insertion
      */
     bool Wiggle::is_success()
     {
-        // TODO
-        return false;
+        if (get_task_state_ptr()->isActionSuccess)
+        {
+            get_task_state_ptr()->isActionSuccess = false; //* success flag consumed
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
-    /**
-     * @brief temporarily just set action_name
-     *
-     */
-    void Wiggle::set_action_context()
+
+    void Wiggle::update_tree_state()
     {
-        m_node_context_ptr->parameter["skill"]["action_name"] = "wiggle";
-        m_node_context_ptr->action_phase = kios::ActionPhase::WIGGLE;
-        m_node_context_ptr->parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;
+        auto tree_state_ptr = get_tree_state_ptr();
+        auto node_context = get_node_context_ref();
+        tree_state_ptr->action_name = node_context.action_name;
+        tree_state_ptr->action_phase = node_context.action_phase;
     }
+
     void Wiggle::node_context_initialize()
     {
-        std::shared_ptr<kios::ActionPhaseContext> context_ptr = get_context_ptr();
-        context_ptr->node_name = "wiggle";
-        // todo add more command context here.
+        auto node_context = get_node_context_ref();
+        node_context.node_name = "wiggle";
+        node_context.action_phase = kios::ActionPhase::WIGGLE;
+        node_context.parameter["skill"]["action_name"] = "wiggle";
+        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;
     }
 
     BT::NodeStatus Wiggle::onStart()
     {
-        // getInput("target_position", target_position);
-        // * get the current state from data_pool class
-        // * check the state
         if (is_success())
         {
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
+            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
-        // if (msec <= 0)
-        // {
-        //     // no need to go into the RUNNING state
-        //     return BT::NodeStatus::SUCCESS;
-        // }
-        // else
-        // {
-        //     using namespace std::chrono;
-        //     // once the deadline is reached, we will return SUCCESS.
-        //     deadline_ = system_clock::now() + milliseconds(msec);
-        //     return BT::NodeStatus::RUNNING;
-        // }
     }
 
     /// method invoked by an action in the RUNNING state.
@@ -73,13 +67,14 @@ namespace Insertion
         }
         else
         {
+            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }
 
     void Wiggle::onHalted()
     {
-        // nothing to do here...
+        // * interrupted behavior. do nothing.
         std::cout << "Action stoped" << std::endl;
     }
 

@@ -9,7 +9,7 @@
 #include "rcl_interfaces/srv/get_parameters.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
 
-#include "behavior_tree/node_list.hpp"
+#include "behavior_tree/tree_root.hpp"
 
 #include "kios_communication/ws_client.hpp"
 
@@ -131,7 +131,9 @@ private:
             }
             catch (...)
             {
-                std::cerr << "SOMETHING WRONG WITH THE JSON PARSE!" << std::endl;
+                RCLCPP_ERROR_STREAM(this->get_logger(), "SOMETHING WRONG WITH THE JSON PARSE!");
+                response->is_accepted = false;
+                return;
             }
             issue_command(command_request_);
             response->is_accepted = true;
@@ -178,6 +180,12 @@ private:
         m_messenger->send_and_wait("teach_object", object_context);
     }
 
+    /**
+     * @brief teach object service callback. see teach_location in mios python module.
+     *
+     * @param request
+     * @param response
+     */
     void teach_object_service_callback(
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Request> request,
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Response> response)

@@ -6,7 +6,7 @@ namespace Insertion
     class Approach : public MetaNode
     {
     public:
-        Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr);
+        Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
 
         BT::NodeStatus onStart() override;
 
@@ -14,17 +14,13 @@ namespace Insertion
         BT::NodeStatus onRunning() override;
         // Method invoked when interrupted
         void onHalted() override;
+        void node_context_initialize() override; //
+        void update_tree_state() override;
 
     private:
-        void action_parameter_initialize() override;
-        std::shared_ptr<kios::ActionPhaseContext> m_node_context_ptr;
-        std::shared_ptr<kios::RobotState> m_robot_state_ptr;
-        void node_context_initialize();
-        bool is_success();
-        void set_action_context();
+        bool is_success() override;
+
         std::chrono::system_clock::time_point deadline_;
-        // node action param
-        nlohmann::json action_param;
     };
 
 } // namespace Insertion

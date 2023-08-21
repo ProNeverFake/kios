@@ -9,7 +9,7 @@
 
 #include "nlohmann/json.hpp"
 
-#include "behavior_tree/node_list.hpp"
+#include "behavior_tree/tree_root.hpp"
 
 #include "kios_interface/msg/task_state.hpp"
 #include "kios_interface/msg/skill_context.hpp"
@@ -123,9 +123,9 @@ private:
      */
     void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
-        std::lock_guard<std::mutex> guard(task_state_mtx_);
+        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
         task_state_.tf_f_ext_k = msg->tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "task subscription listened: %s.", msg->tf_f_ext_k);
+        RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k[2]);
     }
 
     /**
@@ -171,8 +171,8 @@ private:
     void generate_command_context()
     {
         // * lock task state (perception) and tree state
-        std::lock_guard<std::mutex> guard(task_state_mtx_);
-        std::lock_guard<std::mutex> guard(tree_state_mtx_);
+        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
+        std::lock_guard<std::mutex> tree_state_guard(tree_state_mtx_);
 
         /////////////////////////////////////////////
         // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT

@@ -54,6 +54,16 @@ namespace kios
     };
 
     /**
+     * @brief for commander request
+     *
+     */
+    struct CommandRequest
+    {
+        CommandType command_type;
+        nlohmann::json command_context;
+    };
+
+    /**
      * @brief the state of the behavior tree from tree node
      *
      */
@@ -62,16 +72,9 @@ namespace kios
         std::string action_name = "INI";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-        bool isRunning = false;    // for pub sub
-        bool isInterrupted = true; // necessity of stopping old
-    };
-
-    struct RobotState // ! DISCARDED
-    {
-        std::vector<double> q;
-        std::vector<double> F_ext;
-        std::vector<double> TF_F_ext_K = {0, 0, 0, 0, 0, 0};
-        bool is_approach_finished = false;
+        bool isRunning = false;      // ! for pub sub, discarded
+        bool isInterrupted = true;   // necessity of stopping old
+        bool isSwitchAction = false; // ! reserved flag. not used.
     };
 
     /**
@@ -81,6 +84,7 @@ namespace kios
     struct TaskState
     {
         std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
+        bool isActionSuccess = false;
     };
 
     /**
@@ -180,6 +184,7 @@ namespace kios
         std::string action_name = "INI";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         std::string command;
+        bool isActionSuccess = false;
         nlohmann::json parameter = {
             {"skill",
              {{"objects",

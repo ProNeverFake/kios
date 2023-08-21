@@ -14,22 +14,6 @@
 namespace Insertion
 {
 
-    // ! DISCARD
-    class MongoInterface
-    {
-    public:
-        MongoInterface();
-        void data_pool_register(std::vector<std::string> &reg_list);
-        std::any data_pool_lookup(const std::string &keyword) const;
-        void data_pool_update();
-        void data_pool_fetch();
-
-    private:
-        std::unordered_map<std::string, std::any> m_data_pool;
-        std::vector<std::string> m_entity_list = {
-            "target_position",
-            "reach_force"};
-    };
     /**
      * @brief a meta node class for insertion behavior tree node
      *
@@ -37,21 +21,37 @@ namespace Insertion
     class MetaNode : public BT::StatefulActionNode
     {
     public:
-        MetaNode(const std::string &name, const BT::NodeConfig &config)
-            : BT::StatefulActionNode(name, config)
+        MetaNode(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+            : BT::StatefulActionNode(name, config),
+              tree_state_ptr_(tree_state_ptr),
+              task_state_ptr_(task_state_ptr),
+              node_context_()
         {
         }
         static BT::PortsList providedPorts();
-        std::shared_ptr<kios::ActionPhaseContext> get_context_ptr();
-        nlohmann::json get_action_parameter();
-        void set_action_parameter(nlohmann::json parameter);
+
+        // shared context
+        std::shared_ptr<kios::TreeState> get_tree_state_ptr();
+        std::shared_ptr<kios::TaskState> get_task_state_ptr();
+
+        // local context
+        kios::ActionPhaseContext &get_node_context_ref();
+
+        // * update tree state with this node's context
+        virtual void update_tree_state() = 0;
+        // * node context initializer
+        virtual void node_context_initialize() = 0;
 
     private:
-        virtual void action_parameter_initialize();
-        virtual void node_context_initialize();
-        virtual bool is_success();          // here to set the check condition
-        kios::ActionPhaseContext m_context; // node and command context
-        nlohmann::json action_parameter;
+        //* shared objects among the entire tree
+        std::shared_ptr<kios::TreeState> tree_state_ptr_;
+        std::shared_ptr<kios::TaskState> task_state_ptr_;
+
+        // * default values as member variable of the node
+        kios::ActionPhaseContext node_context_; // default node context value
+
+        virtual bool is_success(); // here to set the check condition
+        bool is_switch_action();
     };
 
 } // namespace Insertion

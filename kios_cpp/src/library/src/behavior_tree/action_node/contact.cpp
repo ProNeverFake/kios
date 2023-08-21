@@ -2,19 +2,13 @@
 
 namespace Insertion
 {
-    Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::ActionPhaseContext> context_ptr, std::shared_ptr<kios::RobotState> state_ptr)
-        : MetaNode(name, config)
+    Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+        : MetaNode(name, config, tree_state_ptr, task_state_ptr)
     {
-        m_node_context_ptr = context_ptr;
-        m_robot_state_ptr = state_ptr;
+        // initialize local context
+        node_context_initialize();
     }
 
-    // BT::PortsList Contact::providedPorts()
-    // {
-    //     // amount of milliseconds that we want to sleep
-
-    //     return {BT::InputPort<std::vector<double>>("target_position")};
-    // }
     /**
      * @brief Here to apply the success condition check.
      *
@@ -23,45 +17,43 @@ namespace Insertion
      */
     bool Contact::is_success()
     {
-        // TODO
-        if (m_robot_state_ptr->TF_F_ext_K[2] > 5)
+        if (get_task_state_ptr()->isActionSuccess)
         {
+            get_task_state_ptr()->isActionSuccess = false; //* success flag consumed
             return true;
         }
         else
         {
             return false;
         }
-        // return m_robot_state_ptr->is_contact_finished;
     }
-    /**
-     * @brief temporarily just set action_name
-     *
-     */
-    void Contact::set_action_context()
+
+    void Contact::update_tree_state()
     {
-        m_node_context_ptr->parameter["skill"]["action_context"]["action_name"] = "contact";
-        m_node_context_ptr->action_phase = kios::ActionPhase::CONTACT;
-        m_node_context_ptr->action_name = "contact";
-        m_node_context_ptr->parameter["skill"]["action_context"]["action_phase"] = kios::ActionPhase::CONTACT;
+        auto tree_state_ptr = get_tree_state_ptr();
+        auto node_context = get_node_context_ref();
+        tree_state_ptr->action_name = node_context.action_name;
+        tree_state_ptr->action_phase = node_context.action_phase;
     }
+
     void Contact::node_context_initialize()
     {
-        std::shared_ptr<kios::ActionPhaseContext> context_ptr = get_context_ptr();
-        context_ptr->node_name = "contact";
-        // todo add more command context here.
+        auto node_context = get_node_context_ref();
+        node_context.node_name = "contact";
+        node_context.action_phase = kios::ActionPhase::CONTACT;
+        node_context.parameter["skill"]["action_name"] = "contact";
+        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CONTACT;
     }
 
     BT::NodeStatus Contact::onStart()
     {
-        // getInput("target_position", target_position);
         if (is_success())
         {
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            set_action_context();
+            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }
@@ -75,13 +67,14 @@ namespace Insertion
         }
         else
         {
+            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }
 
     void Contact::onHalted()
     {
-        // nothing to do here...
+        // * interrupted behavior. do nothing.
         std::cout << "Action stoped" << std::endl;
     }
 

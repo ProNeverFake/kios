@@ -313,7 +313,9 @@ bool BTMessenger::connect_o()
     }
     else
     {
-        std::cout << "Successfully connected to " << m_uri << std::endl;
+        spdlog::info("Successfully connected to", m_uri, ".");
+        // std::cout
+        //     << "Successfully connected to " << m_uri << std::endl;
         return true;
     }
 }

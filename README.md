@@ -18,6 +18,7 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 - time delay in mios_reader (to be verified). (vielleicht wegen der unrechtzeitigen Nachrichtverhandlung.)
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
+- **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
 
 **DEVELOPER'S PLAN:**
 - [ ] **THOUGHT** use thread safe stack for udp in mios_reader to solve the error.
@@ -115,10 +116,13 @@ Blackbird: I'll just skip this part for now.
 
 ### Development Log
 
-- *20.08.2023:*
-  1. Refactored and upgraded tactician and tree_node. 
-  2. Removed ActionContext in behavior_tree lib. All data types are now defined in kios_utils lib.
-  3. Changed the communication between tree_node and tactician. Now the action phase switch is detected in tree_node and tactician should be informed with SwitchActionRequest srv. TreeState msg (pub sub) is discarded (turn off) for now.
+- *22.08.2023:*
+  1. Updated the BBGeneralSkill. Imported kios_utils and kios_communication libs. Changed all data_types into kios_utils types.
+  2. Added thread-safe udp sender in kios_communication.
+  3. Added necessary tree phase switch parts in BBGeneralSkill.
+
+- *21.08.2023:*
+  1. Refactored all the tree node. Moved all basic methods into meta node. Removed all data types and linked the behavior_tree lib to kios_utils.
 
 - *20.08.2023:*
   1. Refactored and upgraded tactician and tree_node. 

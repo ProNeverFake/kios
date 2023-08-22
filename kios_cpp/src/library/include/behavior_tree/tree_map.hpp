@@ -26,7 +26,6 @@ namespace Insertion
     //                 </ReactiveSequence>
 
     //                 <Approach name="approach"/>
-
     //             </ReacitveSequence>
     //         </BehaviorTree>
 
@@ -36,7 +35,6 @@ namespace Insertion
     //                 <Push name="push_peg">
     //             </ReactiveSequence>
     //         </BehaviorTree>
-
     //     </root>
     //     )";
     static const char *test_tree = R"(

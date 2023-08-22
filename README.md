@@ -120,6 +120,11 @@ Blackbird: I'll just skip this part for now.
   2. Removed ActionContext in behavior_tree lib. All data types are now defined in kios_utils lib.
   3. Changed the communication between tree_node and tactician. Now the action phase switch is detected in tree_node and tactician should be informed with SwitchActionRequest srv. TreeState msg (pub sub) is discarded (turn off) for now.
 
+- *20.08.2023:*
+  1. Refactored and upgraded tactician and tree_node. 
+  2. Removed ActionContext in behavior_tree lib. All data types are now defined in kios_utils lib.
+  3. Changed the communication between tree_node and tactician. Now the action phase switch is detected in tree_node and tactician should be informed with SwitchActionRequest srv. TreeState msg (pub sub) is discarded (turn off) for now.
+
 - *19.08.2023:*
   1. Moved ws_client lib to kios_communication. add thread safe udp lib relying on Poco.
   2. Added new enum TreeState for mios-kios state synchronization. The concept is elaborated in * [Running Process](#running-process)

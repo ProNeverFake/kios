@@ -28,4 +28,6 @@ namespace kios
 
     std::string action_phase_to_str(ActionPhase action_phase);
 
+    std::string tree_phase_to_str(const TreePhase &tree_phase);
+
 } // namespace kios

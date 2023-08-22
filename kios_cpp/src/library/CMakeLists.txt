@@ -115,6 +115,12 @@ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
 
+target_link_libraries(${MODULE_NAME} 
+    PUBLIC
+        nlohmann_json::nlohmann_json
+        spdlog
+    )
+
 add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
 
 ######################################################################

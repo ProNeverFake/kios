@@ -73,4 +73,34 @@ namespace kios
         return "UNDEFINED ACTION PHASE";
     }
 
+    std::string tree_phase_to_str(const TreePhase &tree_phase)
+    {
+        switch (tree_phase)
+        {
+        case TreePhase::ERROR:
+            return "ERROR";
+
+        case TreePhase::IDLE:
+            return "IDLE";
+
+        case TreePhase::RESUME:
+            return "RESUME";
+
+        case TreePhase::PAUSE:
+            return "PAUSE";
+
+        case TreePhase::SUCCESS:
+            return "SUCCESS";
+
+        case TreePhase::FAILURE:
+            return "FAILURE";
+
+        case TreePhase::FINISH:
+            return "FINISH";
+
+        default:
+            return "UNKNOWN";
+        }
+    }
+
 } // namespace kios

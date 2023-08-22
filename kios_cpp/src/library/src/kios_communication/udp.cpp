@@ -20,7 +20,7 @@ namespace kios
         }
     }
 
-    BTReceiver::BTReceiver(std::string ip, int port)
+    BTReceiver::BTReceiver(std::string ip, int port, bool isThreading)
         : stopThread(false),
           socket_address_(ip, port),
           dg_socket_(socket_address_)
@@ -51,6 +51,95 @@ namespace kios
             return true;
         }
         return false;
+    }
+
+    /**
+     * @brief block to wait for the msg (wait for the cv.notify_once()).
+     *
+     * @param message
+     */
+    void BTReceiver::wait_for_message(std::string &message)
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this] { return !messageQueue.empty(); });
+        message = messageQueue.front();
+        messageQueue.pop();
+    }
+
+    void BTReceiver::stop_thread()
+    {
+        stopThread.store(true);
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    // * BTsender
+    void BTSender::send_message()
+    {
+        while (!stopThread.load())
+        {
+            try
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                if (!messageQueue.empty())
+                {
+                    std::string msg = messageQueue.front();
+                    dg_socket_.sendBytes(msg.data(), msg.size());
+                    messageQueue.pop();
+                }
+            }
+            catch (const std::exception &e)
+            {
+                // * if send error appears, stop the thread.
+                std::cerr << "BTsender: " << e.what() << std::endl;
+                stopThread.store(true);
+            }
+        }
+    }
+
+    BTSender::BTSender(std::string ip, int port, bool isThreading)
+        : stopThread(false),
+          socket_address_(ip, port),
+          dg_socket_(socket_address_)
+    {
+    }
+
+    bool BTSender::start()
+    {
+        try
+        {
+            senderThread = std::thread(&BTSender::send_message, this);
+        }
+        catch (...)
+        {
+            stop_thread();
+            return false;
+        }
+        return true;
+    }
+
+    bool BTSender::is_ready()
+    {
+        return stopThread.load();
+    }
+
+    BTSender::~BTSender()
+    {
+        stop_thread();
+        senderThread.join();
+    }
+
+    /**
+     * @brief thread safe push method
+     *
+     * @param message
+     * @return true
+     * @return false
+     */
+    void BTSender::push_message(std::string &&message)
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        messageQueue.push(message);
     }
 
     /**

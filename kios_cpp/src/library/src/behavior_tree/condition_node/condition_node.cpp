@@ -12,7 +12,7 @@ namespace Insertion
     }
     BT::NodeStatus HasObject::tick()
     {
-        if (has_object())
+        if (is_success())
         {
             return BT::NodeStatus::SUCCESS;
         }
@@ -22,7 +22,7 @@ namespace Insertion
         }
     }
 
-    bool HasObject::has_object()
+    bool HasObject::is_success()
     {
         // ! TODO
         return true;
@@ -38,7 +38,7 @@ namespace Insertion
 
     BT::NodeStatus AtPosition::tick()
     {
-        if (at_position())
+        if (is_success())
         {
             return BT::NodeStatus::SUCCESS;
         }
@@ -48,7 +48,7 @@ namespace Insertion
         }
     }
 
-    bool AtPosition::at_position()
+    bool AtPosition::is_success()
     {
         // ! TODO
         return false;

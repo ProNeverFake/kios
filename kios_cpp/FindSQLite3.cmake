@@ -99,9 +99,9 @@ endif()
 #############################################################################################
 
 
-set(SQLite_INCLUDE_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
-set(SQLite_INCLUDE_DIR "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
-set(SQLite_INCLUDES "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
+set(SQLite_INCLUDE_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
+set(SQLite_INCLUDE_DIR "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
+set(SQLite_INCLUDES "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
 set(SQLite_RES_DIRS )
 set(SQLite_DEFINITIONS )
 set(SQLite_LINKER_FLAGS_LIST
@@ -120,7 +120,7 @@ set(SQLite_SYSTEM_LIBS pthread dl m)
 set(SQLite_FRAMEWORK_DIRS )
 set(SQLite_FRAMEWORKS )
 set(SQLite_FRAMEWORKS_FOUND "") # Will be filled later
-set(SQLite_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/lib/cmake/conan-official-sqlite3-variables.cmake")
+set(SQLite_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/lib/cmake/conan-official-sqlite3-variables.cmake")
 
 conan_find_apple_frameworks(SQLite_FRAMEWORKS_FOUND "${SQLite_FRAMEWORKS}" "${SQLite_FRAMEWORK_DIRS}")
 
@@ -137,7 +137,7 @@ mark_as_advanced(SQLite_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to SQLite_LIBS and SQLite_LIBRARY_LIST
 set(SQLite_LIBRARY_LIST sqlite3)
-set(SQLite_LIB_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/lib")
+set(SQLite_LIB_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_SQLite_DEPENDENCIES "${SQLite_FRAMEWORKS_FOUND} ${SQLite_SYSTEM_LIBS} ")
@@ -172,10 +172,10 @@ set(CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH})
 
 ########### COMPONENT SQLite3 VARIABLES #############################################
 
-set(SQLite_SQLite3_INCLUDE_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
-set(SQLite_SQLite3_INCLUDE_DIR "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
-set(SQLite_SQLite3_INCLUDES "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/include")
-set(SQLite_SQLite3_LIB_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/lib")
+set(SQLite_SQLite3_INCLUDE_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
+set(SQLite_SQLite3_INCLUDE_DIR "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
+set(SQLite_SQLite3_INCLUDES "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/include")
+set(SQLite_SQLite3_LIB_DIRS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/lib")
 set(SQLite_SQLite3_RES_DIRS )
 set(SQLite_SQLite3_DEFINITIONS )
 set(SQLite_SQLite3_COMPILE_DEFINITIONS )
@@ -185,7 +185,7 @@ set(SQLite_SQLite3_LIBS sqlite3)
 set(SQLite_SQLite3_SYSTEM_LIBS pthread dl m)
 set(SQLite_SQLite3_FRAMEWORK_DIRS )
 set(SQLite_SQLite3_FRAMEWORKS )
-set(SQLite_SQLite3_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/6a03b0806bcf800472b17d5401d6ae7887a8a2b8/lib/cmake/conan-official-sqlite3-variables.cmake")
+set(SQLite_SQLite3_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/sqlite3/3.42.0/_/_/package/8fc930bdbf940331d9f322f454eac3dd06fd27e8/lib/cmake/conan-official-sqlite3-variables.cmake")
 set(SQLite_SQLite3_DEPENDENCIES )
 set(SQLite_SQLite3_LINKER_FLAGS_LIST
         "$<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,SHARED_LIBRARY>:>"

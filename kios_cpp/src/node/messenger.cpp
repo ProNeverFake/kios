@@ -11,6 +11,7 @@
 
 #include "kios_interface/msg/mios_state.hpp"
 #include "kios_interface/msg/task_state.hpp"
+#include "kios_interface/msg/sensor_state.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -31,12 +32,12 @@ public:
     {
         this->declare_parameter("power", true);
 
-        //* initialize the callback groups
-        subscription_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
-        publisher_callback_group_ = this->create_callback_group(
-            rclcpp::CallbackGroupType::Reentrant);
-        timer_callback_group_ = publisher_callback_group_;
+        // ! BBDEBUG ALL IN ONE SINGLE THREAD GROUP
+        // ! SHOULD WORK IN PRINCIPLE
+        timer_callback_group_ = this->create_callback_group(
+            rclcpp::CallbackGroupType::MutuallyExclusive);
+        subscription_callback_group_ = timer_callback_group_;
+        publisher_callback_group_ = timer_callback_group_;
 
         //* initialize timer
         timer_ = this->create_wall_timer(
@@ -52,12 +53,18 @@ public:
         publisher_options.callback_group = publisher_callback_group_;
 
         //* initialize the pub sub callbacks
-        subscription_ = this->create_subscription<kios_interface::msg::MiosState>(
+        mios_state_subscription_ = this->create_subscription<kios_interface::msg::MiosState>(
             "mios_state_topic",
             qos,
-            std::bind(&Messenger::subscription_callback, this, _1),
+            std::bind(&Messenger::mios_state_subscription_callback, this, _1),
             subscription_options);
-        publisher_ = this->create_publisher<kios_interface::msg::TaskState>(
+        sensor_state_subscription_ = this->create_subscription<kios_interface::msg::SensorState>(
+            "sensor_state_topic",
+            qos,
+            std::bind(&Messenger::sensor_state_subscription_callback, this, _1),
+            subscription_options);
+
+        task_state_publisher_ = this->create_publisher<kios_interface::msg::TaskState>(
             "task_state_topic",
             qos,
             publisher_options);
@@ -65,19 +72,12 @@ public:
 
     bool check_power()
     {
-        if (this->get_parameter("power").as_bool() == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this->get_parameter("power").as_bool();
     }
 
 private:
-    // flag
-    kios::ThreadSafeData<kios::TaskState> ts_task_state_;
+    kios_interface::msg::TaskState task_state_msg_;
+    kios::TaskState task_state_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
@@ -86,22 +86,32 @@ private:
 
     // callbacks
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<kios_interface::msg::TaskState>::SharedPtr publisher_;
-    rclcpp::Subscription<kios_interface::msg::MiosState>::SharedPtr subscription_;
+    rclcpp::Publisher<kios_interface::msg::TaskState>::SharedPtr task_state_publisher_;
+    rclcpp::Subscription<kios_interface::msg::MiosState>::SharedPtr mios_state_subscription_;
+    rclcpp::Subscription<kios_interface::msg::SensorState>::SharedPtr sensor_state_subscription_;
 
-    void subscription_callback(const kios_interface::msg::MiosState::SharedPtr msg)
+    void mios_state_subscription_callback(const kios_interface::msg::MiosState::SharedPtr msg)
     {
         if (check_power() == true)
         {
-            RCLCPP_INFO(this->get_logger(), "subscription hit.");
-            // RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
-            kios::TaskState task_state;
-            task_state.tf_f_ext_k = msg->tf_f_ext_k;
-            ts_task_state_.write_data(task_state);
+            RCLCPP_INFO(this->get_logger(), "MIOS SUB hit.");
+            task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS ...");
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, SUBSCRIPTION PASS ...");
+        }
+    }
+    void sensor_state_subscription_callback(const kios_interface::msg::SensorState::SharedPtr msg)
+    {
+        if (check_power() == true)
+        {
+            RCLCPP_INFO(this->get_logger(), "SENSOR SUB hit.");
+            task_state_msg_.test_data = std::move(msg->test_data);
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, SUBSCRIPTION PASS ...");
         }
     }
 
@@ -109,10 +119,8 @@ private:
     {
         if (check_power() == true)
         {
-            auto message = kios_interface::msg::TaskState();
-            message.tf_f_ext_k = ts_task_state_.read_data().tf_f_ext_k;
-            RCLCPP_INFO(this->get_logger(), "Publishing: task_state");
-            publisher_->publish(message);
+            RCLCPP_INFO(this->get_logger(), "Publishing task_state.");
+            task_state_publisher_->publish(task_state_msg_);
         }
         else
         {

@@ -120,6 +120,9 @@ Blackbird: I'll just skip this part for now.
 - *23.08.2023:*
   1. Added template class HyperMetaNode. Sorted up the behavior_tree dir and create new condition nodes.
   2. Added RunOnce method in template class.
+  3. Moved the udp of mios_reader into a new thread to run receive method. The new udp receiver in python is also thread safe.
+  4. Upgraded messenger. Now all the callbacks are in the same mutually exclusive callback group. This should make the R/W process in the publisher and subscriptions thread-safe.
+  5. Optimized subscription callbacks with moving assignment.
 
 - *22.08.2023:*
   1. Updated the BBGeneralSkill. Imported kios_utils and kios_communication libs. Changed all data_types into kios_utils types.

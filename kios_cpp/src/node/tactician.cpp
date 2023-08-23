@@ -124,8 +124,8 @@ private:
     void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
         std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        task_state_.tf_f_ext_k = msg->tf_f_ext_k;
         RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k[2]);
+        task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
     }
 
     /**

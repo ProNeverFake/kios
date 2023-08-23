@@ -80,9 +80,9 @@ find_package_handle_standard_args(MySQL REQUIRED_VARS
 mark_as_advanced(MySQL_FOUND MySQL_VERSION)
 
 
-set(MySQL_INCLUDE_DIRS "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/include")
-set(MySQL_INCLUDE_DIR "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/include")
-set(MySQL_INCLUDES "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/include")
+set(MySQL_INCLUDE_DIRS "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/include")
+set(MySQL_INCLUDE_DIR "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/include")
+set(MySQL_INCLUDES "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/include")
 set(MySQL_RES_DIRS )
 set(MySQL_DEFINITIONS )
 set(MySQL_LINKER_FLAGS_LIST
@@ -118,7 +118,7 @@ mark_as_advanced(MySQL_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to MySQL_LIBS and MySQL_LIBRARY_LIST
 set(MySQL_LIBRARY_LIST mysqlclient)
-set(MySQL_LIB_DIRS "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/lib")
+set(MySQL_LIB_DIRS "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_MySQL_DEPENDENCIES "${MySQL_FRAMEWORKS_FOUND} ${MySQL_SYSTEM_LIBS} OpenSSL::OpenSSL;ZLIB::ZLIB;zstd::zstd;lz4::lz4")
@@ -147,8 +147,8 @@ endforeach()
 set(MySQL_LIBRARIES_TARGETS "${MySQL_LIBRARIES_TARGETS};OpenSSL::OpenSSL;ZLIB::ZLIB;zstd::zstd;lz4::lz4")
 set(MySQL_LIBRARIES "${MySQL_LIBRARIES};OpenSSL::OpenSSL;ZLIB::ZLIB;zstd::zstd;lz4::lz4")
 
-set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/" ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/3c97b7b936291ce2de4c0b5df2a26830d69c3a8b/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/libmysqlclient/8.0.31/_/_/package/205d2942419054ef9d523bb0f9f8cf3ea0ff426d/" ${CMAKE_PREFIX_PATH})
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
     # Target approach

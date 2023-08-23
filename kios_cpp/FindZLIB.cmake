@@ -80,9 +80,9 @@ find_package_handle_standard_args(ZLIB REQUIRED_VARS
 mark_as_advanced(ZLIB_FOUND ZLIB_VERSION)
 
 
-set(ZLIB_INCLUDE_DIRS "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
-set(ZLIB_INCLUDE_DIR "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
-set(ZLIB_INCLUDES "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(ZLIB_INCLUDE_DIRS "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
+set(ZLIB_INCLUDE_DIR "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
+set(ZLIB_INCLUDES "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
 set(ZLIB_RES_DIRS )
 set(ZLIB_DEFINITIONS )
 set(ZLIB_LINKER_FLAGS_LIST
@@ -118,7 +118,7 @@ mark_as_advanced(ZLIB_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to ZLIB_LIBS and ZLIB_LIBRARY_LIST
 set(ZLIB_LIBRARY_LIST z)
-set(ZLIB_LIB_DIRS "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
+set(ZLIB_LIB_DIRS "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_ZLIB_DEPENDENCIES "${ZLIB_FRAMEWORKS_FOUND} ${ZLIB_SYSTEM_LIBS} ")
@@ -147,8 +147,8 @@ endforeach()
 set(ZLIB_LIBRARIES_TARGETS "${ZLIB_LIBRARIES_TARGETS};")
 set(ZLIB_LIBRARIES "${ZLIB_LIBRARIES};")
 
-set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/" ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/zlib/1.2.13/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/" ${CMAKE_PREFIX_PATH})
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
     # Target approach

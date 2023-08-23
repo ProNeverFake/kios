@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 #include <optional>
+#include <mutex>
+#include <thread>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
@@ -106,6 +108,9 @@ private:
     // flag
     bool isActionSuccess_;
 
+    // thread rel
+    std::mutex tree_mtx_;
+
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
     bool isUdpReady;
@@ -135,10 +140,25 @@ private:
         m_tree_root;
     BT::NodeStatus tick_result;
 
-    void subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg) const
+    /**
+     * @brief update the task_state. here the lock priority is lower than timer.
+     *
+     * @param msg
+     */
+    void subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
     {
-        m_tree_root->get_task_state_ptr()->tf_f_ext_k = msg->tf_f_ext_k;
-        RCLCPP_INFO(this->get_logger(), "subscription listened: %f.", msg->tf_f_ext_k[2]);
+        std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
+        if (lock.owns_lock())
+        {
+            // ! BBDEBUG maybe lock will fail for a long time.
+            // ! check the execution speed of the tree.
+            RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
+            m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
+        }
     }
 
     /**
@@ -171,6 +191,8 @@ private:
                 }
             }
 
+            // * lock tree first
+            std::lock_guard<std::mutex> lock(tree_mtx_);
             // * do tree cycle
             tree_cycle();
         }

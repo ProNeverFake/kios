@@ -80,9 +80,9 @@ find_package_handle_standard_args(EXPAT REQUIRED_VARS
 mark_as_advanced(EXPAT_FOUND EXPAT_VERSION)
 
 
-set(EXPAT_INCLUDE_DIRS "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/include")
-set(EXPAT_INCLUDE_DIR "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/include")
-set(EXPAT_INCLUDES "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/include")
+set(EXPAT_INCLUDE_DIRS "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/include")
+set(EXPAT_INCLUDE_DIR "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/include")
+set(EXPAT_INCLUDES "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/include")
 set(EXPAT_RES_DIRS )
 set(EXPAT_DEFINITIONS "-DXML_STATIC")
 set(EXPAT_LINKER_FLAGS_LIST
@@ -118,7 +118,7 @@ mark_as_advanced(EXPAT_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to EXPAT_LIBS and EXPAT_LIBRARY_LIST
 set(EXPAT_LIBRARY_LIST expat)
-set(EXPAT_LIB_DIRS "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/lib")
+set(EXPAT_LIB_DIRS "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_EXPAT_DEPENDENCIES "${EXPAT_FRAMEWORKS_FOUND} ${EXPAT_SYSTEM_LIBS} ")
@@ -147,8 +147,8 @@ endforeach()
 set(EXPAT_LIBRARIES_TARGETS "${EXPAT_LIBRARIES_TARGETS};")
 set(EXPAT_LIBRARIES "${EXPAT_LIBRARIES};")
 
-set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/" ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/c215f67ac7fc6a34d9d0fb90b0450016be569d86/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/expat/2.5.0/_/_/package/2bf99ee01cda593d5986afc64acf262ad576354f/" ${CMAKE_PREFIX_PATH})
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
     # Target approach

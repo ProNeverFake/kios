@@ -13,6 +13,8 @@
 #include "behavior_tree/action_node/contact.hpp"
 #include "behavior_tree/action_node/wiggle.hpp"
 
+#include "behavior_tree/condition_node/condition_node.hpp"
+
 // BB CODE
 namespace Insertion
 {

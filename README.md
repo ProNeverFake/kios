@@ -10,6 +10,23 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 
 ## Intro
 
+KIOS is developed as a full problem-level robot planning and learning framework based on ROS2. It integrates the high-level planning, which is realized by applying behavior tree mechanism, and the low-level action fine-tuning, which can be achieved by making use of the existing learning algorithms. The functionality of the system is highly decoupled and isolated in the corresponding ROS2 nodes, which composite a cycle like control loop that following the sensing-actuating mode.
+
+The project structure:
+- kios
+  - kios_cpp
+    - messenger
+    - tree_node
+    - tactician
+    - commander
+  - kios_py
+    - mios_reader
+    - mongo_reader
+  - kios_interface
+  - kios_cli
+
+THIS PART IS STILL UNDER CONSTRUCTION.
+
 > Blackbird: I'm too lazy to write anything here. In fact KIOS is developed for my master thesis and maybe after finishing that I'll finally figure out what this system is really about.
 
 ## NEWS

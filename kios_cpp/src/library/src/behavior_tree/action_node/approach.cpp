@@ -3,29 +3,10 @@
 namespace Insertion
 {
     Approach::Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : MetaNode(name, config, tree_state_ptr, task_state_ptr)
+        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
-    }
-
-    /**
-     * @brief Here to apply the success condition check.
-     *
-     * @return true
-     * @return false
-     */
-    bool Approach::is_success()
-    {
-        if (get_task_state_ptr()->isActionSuccess)
-        {
-            get_task_state_ptr()->isActionSuccess = false; //* success flag consumed
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 
     void Approach::update_tree_state()
@@ -43,6 +24,11 @@ namespace Insertion
         node_context.action_phase = kios::ActionPhase::APPROACH;
         node_context.parameter["skill"]["action_name"] = "approach";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;
+    }
+
+    bool Approach::is_success()
+    {
+        return consume_mios_success();
     }
 
     BT::NodeStatus Approach::onStart()
@@ -67,7 +53,6 @@ namespace Insertion
         }
         else
         {
-            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }

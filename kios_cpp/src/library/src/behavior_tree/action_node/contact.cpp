@@ -3,7 +3,7 @@
 namespace Insertion
 {
     Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : MetaNode(name, config, tree_state_ptr, task_state_ptr)
+        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -17,15 +17,7 @@ namespace Insertion
      */
     bool Contact::is_success()
     {
-        if (get_task_state_ptr()->isActionSuccess)
-        {
-            get_task_state_ptr()->isActionSuccess = false; //* success flag consumed
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return consume_mios_success();
     }
 
     void Contact::update_tree_state()

@@ -40,12 +40,20 @@ target_link_libraries(${MODULE_NAME}
 set(MODULE_NAME behavior_tree)
 
 
-file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/action_node/*.cpp")
+file(GLOB ${MODULE_NAME}_SRC 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/action_node/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/condition_node/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/meta_node/*.cpp")
+
 list(APPEND ${MODULE_NAME}_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/tree_root.cpp
 )
 
-file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/condition_node/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/meta_node/*.hpp")
+
 list(APPEND ${MODULE_NAME}_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/tree_root.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/tree_map.hpp
@@ -71,7 +79,6 @@ target_link_libraries(${MODULE_NAME}
         ${PROJECT_NAME}::kios_utils
         fmt::fmt
         spdlog
-    INTERFACE
         behaviortree_cpp
     )
 

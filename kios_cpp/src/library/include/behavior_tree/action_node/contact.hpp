@@ -1,9 +1,9 @@
-#include "behavior_tree/action_node/meta_node.hpp"
+#include "behavior_tree/meta_node/meta_node.hpp"
 
 namespace Insertion
 
 {
-    class Contact : public MetaNode
+    class Contact : public HyperMetaNode<BT::StatefulActionNode>
     {
     public:
         Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
@@ -18,8 +18,7 @@ namespace Insertion
         void update_tree_state() override;
 
     private:
-        bool is_success() override;
-
+        bool is_success();
         std::chrono::system_clock::time_point deadline_;
     };
 

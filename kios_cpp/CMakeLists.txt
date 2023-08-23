@@ -21,10 +21,19 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-conan_cmake_run(CONANFILE conanfile.txt  
-                BASIC_SETUP CMAKE_TARGETS
-                BUILD missing)
+find_program(CONAN_EXECUTABLE conan)
+if (NOT CONAN_EXECUTABLE)
+    message(FATAL_ERROR "Conan executable not found!")
+endif()
 
+execute_process(COMMAND ${CONAN_EXECUTABLE} install . --build=missing
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                RESULT_VARIABLE CONAN_INSTALL_RESULT)
+if (NOT CONAN_INSTALL_RESULT EQUAL "0")
+    message(FATAL_ERROR "Conan install failed!")
+endif()
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
 # set CPP standard as 17 according to package behavior_tree library
 set(CMAKE_CXX_STANDARD 17)

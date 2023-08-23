@@ -19,14 +19,15 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
 - **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
+- **[FATAL]** segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) 
 
 **DEVELOPER'S PLAN:**
-- [ ] **THOUGHT** use thread safe stack for udp in mios_reader to solve the error.
-- [ ] **ERGENT** tree udp check mechanism and mios skill udp part.
+- [ ] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
+- [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
 - [x] add service and client for mongoDB w/r
 - [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
-- [ ] ws_client upgrade the log --> spdlog
+- [ ] ~~**DISCARDED**ws_client upgrade the log --> spdlog ~~
 - [ ] ws_client enable request result bool return 
 - [x] move ActionContext to ~~kios_utils~~ data_type.hpp
 - [ ] (postponed) add meta node for kios node.
@@ -115,6 +116,10 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *23.08.2023:*
+  1. Added template class HyperMetaNode. Sorted up the behavior_tree dir and create new condition nodes.
+  2. Added RunOnce method in template class.
 
 - *22.08.2023:*
   1. Updated the BBGeneralSkill. Imported kios_utils and kios_communication libs. Changed all data_types into kios_utils types.

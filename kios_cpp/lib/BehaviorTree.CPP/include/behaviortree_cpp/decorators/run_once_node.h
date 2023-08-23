@@ -15,8 +15,8 @@
 
 #include "behaviortree_cpp/decorator_node.h"
 
-
-namespace BT {
+namespace BT
+{
 
 /**
  * @brief The RunOnceNode is used when you want to execute the child
@@ -31,23 +31,22 @@ namespace BT {
  */
 class RunOnceNode : public DecoratorNode
 {
-  public:
+public:
   RunOnceNode(const std::string& name, const NodeConfig& config) :
-            DecoratorNode(name, config)
+    DecoratorNode(name, config)
   {
     setRegistrationID("RunOnce");
   }
 
   static PortsList providedPorts()
   {
-    return {InputPort<bool>(
-        "then_skip", true,
-        "If true, skip after the first execution, "
-        "otherwise return the same NodeStatus returned once bu the child.")};
+    return {InputPort<bool>("then_skip", true,
+                            "If true, skip after the first execution, "
+                            "otherwise return the same NodeStatus returned once bu the "
+                            "child.")};
   }
 
-  private:
-
+private:
   virtual BT::NodeStatus tick() override;
 
   bool already_ticked_ = false;
@@ -59,7 +58,7 @@ class RunOnceNode : public DecoratorNode
 inline NodeStatus RunOnceNode::tick()
 {
   bool skip = true;
-  if(auto const res = getInput<bool>("then_skip"))
+  if (auto const res = getInput<bool>("then_skip"))
   {
     skip = res.value();
   }
@@ -72,7 +71,8 @@ inline NodeStatus RunOnceNode::tick()
   setStatus(NodeStatus::RUNNING);
   const NodeStatus status = child_node_->executeTick();
 
-  if(isStatusCompleted(status)) {
+  if (isStatusCompleted(status))
+  {
     already_ticked_ = true;
     returned_status_ = status;
     resetChild();

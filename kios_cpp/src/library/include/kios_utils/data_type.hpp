@@ -189,7 +189,7 @@ namespace kios
             {"skill",
              {{"objects",
                {{"Container", "housing"},
-                {"Approach", "app1"},
+                {"Approach", "approach"},
                 {"Insertable", "ring"}}},
               {"time_max", 17},
               {"action_context",

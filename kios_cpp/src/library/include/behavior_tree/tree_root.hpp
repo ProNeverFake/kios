@@ -6,7 +6,7 @@
 
 #include "spdlog/spdlog.h"
 
-#include "behavior_tree/action_node/meta_node.hpp"
+#include "behavior_tree/meta_node/meta_node.hpp"
 #include "behavior_tree/tree_map.hpp"
 
 #include "behavior_tree/action_node/approach.hpp"

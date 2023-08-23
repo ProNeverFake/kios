@@ -41,7 +41,7 @@ namespace Insertion
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Fallback name="root_sequence">
-                    <Contact name="contact"/>
+                    <Approach name="approach"/>
                 </Fallback>
             </BehaviorTree>
         </root>

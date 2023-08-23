@@ -142,20 +142,7 @@ namespace kios
         messageQueue.push(message);
     }
 
-    /**
-     * @brief block to wait for the msg (wait for the cv.notify_once()).
-     *
-     * @param message
-     */
-    void BTReceiver::wait_for_message(std::string &message)
-    {
-        std::unique_lock<std::mutex> lock(mtx);
-        cv.wait(lock, [this] { return !messageQueue.empty(); });
-        message = messageQueue.front();
-        messageQueue.pop();
-    }
-
-    void BTReceiver::stop_thread()
+    void BTSender::stop_thread()
     {
         stopThread.store(true);
     }

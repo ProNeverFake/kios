@@ -1,4 +1,4 @@
-#include "behavior_tree/action_node/meta_node.hpp"
+#include "behavior_tree/meta_node/meta_node.hpp"
 
 namespace Insertion
 {

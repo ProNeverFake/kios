@@ -69,7 +69,8 @@ namespace kios
      */
     struct TreeState
     {
-        std::string action_name = "INI";
+        std::string action_name = "Initialization";
+        std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
         bool isRunning = false;      // ! for pub sub, discarded
@@ -180,8 +181,8 @@ namespace kios
      */
     struct ActionPhaseContext
     {
-        std::string node_name = "INI";
-        std::string action_name = "INI";
+        std::string node_name = "Initialization";
+        std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         std::string command;
         bool isActionSuccess = false;
@@ -193,7 +194,7 @@ namespace kios
                 {"Insertable", "ring"}}},
               {"time_max", 17},
               {"action_context",
-               {{"action_name", "INI"},
+               {{"action_name", "initialization"},
                 {"action_phase", ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.05, 0.05}},

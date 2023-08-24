@@ -80,9 +80,9 @@ find_package_handle_standard_args(BZip2 REQUIRED_VARS
 mark_as_advanced(BZip2_FOUND BZip2_VERSION)
 
 
-set(BZip2_INCLUDE_DIRS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/include")
-set(BZip2_INCLUDE_DIR "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/include")
-set(BZip2_INCLUDES "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/include")
+set(BZip2_INCLUDE_DIRS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/include")
+set(BZip2_INCLUDE_DIR "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/include")
+set(BZip2_INCLUDES "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/include")
 set(BZip2_RES_DIRS )
 set(BZip2_DEFINITIONS )
 set(BZip2_LINKER_FLAGS_LIST
@@ -101,7 +101,7 @@ set(BZip2_SYSTEM_LIBS )
 set(BZip2_FRAMEWORK_DIRS )
 set(BZip2_FRAMEWORKS )
 set(BZip2_FRAMEWORKS_FOUND "") # Will be filled later
-set(BZip2_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/lib/cmake/conan-official-bzip2-variables.cmake")
+set(BZip2_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/lib/cmake/conan-official-bzip2-variables.cmake")
 
 conan_find_apple_frameworks(BZip2_FRAMEWORKS_FOUND "${BZip2_FRAMEWORKS}" "${BZip2_FRAMEWORK_DIRS}")
 
@@ -118,7 +118,7 @@ mark_as_advanced(BZip2_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to BZip2_LIBS and BZip2_LIBRARY_LIST
 set(BZip2_LIBRARY_LIST bz2)
-set(BZip2_LIB_DIRS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/lib")
+set(BZip2_LIB_DIRS "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_BZip2_DEPENDENCIES "${BZip2_FRAMEWORKS_FOUND} ${BZip2_SYSTEM_LIBS} ")
@@ -147,8 +147,8 @@ endforeach()
 set(BZip2_LIBRARIES_TARGETS "${BZip2_LIBRARIES_TARGETS};")
 set(BZip2_LIBRARIES "${BZip2_LIBRARIES};")
 
-set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/" ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/c32092bf4d4bb47cf962af898e02823f499b017e/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/bzip2/1.0.8/_/_/package/da606cf731e334010b0bf6e85a2a6f891b9f36b0/" ${CMAKE_PREFIX_PATH})
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
     # Target approach

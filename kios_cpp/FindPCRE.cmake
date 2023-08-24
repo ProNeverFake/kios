@@ -99,9 +99,9 @@ endif()
 #############################################################################################
 
 
-set(PCRE_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
+set(PCRE_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
 set(PCRE_RES_DIRS )
 set(PCRE_DEFINITIONS "-DPCRE_STATIC=1")
 set(PCRE_LINKER_FLAGS_LIST
@@ -137,7 +137,7 @@ mark_as_advanced(PCRE_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to PCRE_LIBS and PCRE_LIBRARY_LIST
 set(PCRE_LIBRARY_LIST pcreposix pcre pcre16 pcre32)
-set(PCRE_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/lib")
+set(PCRE_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_PCRE_DEPENDENCIES "${PCRE_FRAMEWORKS_FOUND} ${PCRE_SYSTEM_LIBS} BZip2::BZip2;ZLIB::ZLIB")
@@ -172,10 +172,10 @@ set(CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH})
 
 ########### COMPONENT libpcre32 VARIABLES #############################################
 
-set(PCRE_libpcre32_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre32_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre32_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre32_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/lib")
+set(PCRE_libpcre32_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre32_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre32_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre32_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/lib")
 set(PCRE_libpcre32_RES_DIRS )
 set(PCRE_libpcre32_DEFINITIONS "-DPCRE_STATIC=1")
 set(PCRE_libpcre32_COMPILE_DEFINITIONS "PCRE_STATIC=1")
@@ -195,10 +195,10 @@ set(PCRE_libpcre32_LINKER_FLAGS_LIST
 
 ########### COMPONENT libpcre16 VARIABLES #############################################
 
-set(PCRE_libpcre16_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre16_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre16_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre16_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/lib")
+set(PCRE_libpcre16_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre16_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre16_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre16_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/lib")
 set(PCRE_libpcre16_RES_DIRS )
 set(PCRE_libpcre16_DEFINITIONS "-DPCRE_STATIC=1")
 set(PCRE_libpcre16_COMPILE_DEFINITIONS "PCRE_STATIC=1")
@@ -218,10 +218,10 @@ set(PCRE_libpcre16_LINKER_FLAGS_LIST
 
 ########### COMPONENT libpcre VARIABLES #############################################
 
-set(PCRE_libpcre_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcre_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/lib")
+set(PCRE_libpcre_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcre_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/lib")
 set(PCRE_libpcre_RES_DIRS )
 set(PCRE_libpcre_DEFINITIONS "-DPCRE_STATIC=1")
 set(PCRE_libpcre_COMPILE_DEFINITIONS "PCRE_STATIC=1")
@@ -241,10 +241,10 @@ set(PCRE_libpcre_LINKER_FLAGS_LIST
 
 ########### COMPONENT libpcreposix VARIABLES #############################################
 
-set(PCRE_libpcreposix_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcreposix_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcreposix_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/include")
-set(PCRE_libpcreposix_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/f755979807ccde50238e44be7e9e64fe34847ffe/lib")
+set(PCRE_libpcreposix_INCLUDE_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcreposix_INCLUDE_DIR "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcreposix_INCLUDES "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/include")
+set(PCRE_libpcreposix_LIB_DIRS "/home/blackbird/.conan/data/pcre/8.45/_/_/package/87087120c448298530c012e627c1a0b8f062586d/lib")
 set(PCRE_libpcreposix_RES_DIRS )
 set(PCRE_libpcreposix_DEFINITIONS )
 set(PCRE_libpcreposix_COMPILE_DEFINITIONS )

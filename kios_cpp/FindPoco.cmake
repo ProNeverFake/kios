@@ -99,9 +99,9 @@ endif()
 #############################################################################################
 
 
-set(Poco_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
+set(Poco_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
 set(Poco_RES_DIRS )
 set(Poco_DEFINITIONS "-DPOCO_STATIC=ON"
 			"-DPOCO_UNBUNDLED")
@@ -139,7 +139,7 @@ mark_as_advanced(Poco_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to Poco_LIBS and Poco_LIBRARY_LIST
 set(Poco_LIBRARY_LIST PocoDataMySQL PocoDataPostgreSQL PocoDataSQLite PocoEncodings PocoJWT PocoMongoDB PocoNetSSL PocoCrypto PocoRedis PocoNet PocoZip PocoUtil PocoJSON PocoXML PocoActiveRecord PocoData PocoFoundation)
-set(Poco_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_Poco_DEPENDENCIES "${Poco_FRAMEWORKS_FOUND} ${Poco_SYSTEM_LIBS} MySQL::MySQL;PostgreSQL::PostgreSQL;SQLite::SQLite;OpenSSL::OpenSSL;EXPAT::EXPAT;PCRE::PCRE;ZLIB::ZLIB")
@@ -174,10 +174,10 @@ set(CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH})
 
 ########### COMPONENT Foundation VARIABLES #############################################
 
-set(Poco_Foundation_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Foundation_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Foundation_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Foundation_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Foundation_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Foundation_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Foundation_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Foundation_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Foundation_RES_DIRS )
 set(Poco_Foundation_DEFINITIONS "-DPOCO_STATIC=ON"
 			"-DPOCO_UNBUNDLED")
@@ -199,10 +199,10 @@ set(Poco_Foundation_LINKER_FLAGS_LIST
 
 ########### COMPONENT Data VARIABLES #############################################
 
-set(Poco_Data_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Data_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Data_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Data_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Data_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Data_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Data_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Data_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Data_RES_DIRS )
 set(Poco_Data_DEFINITIONS )
 set(Poco_Data_COMPILE_DEFINITIONS )
@@ -222,10 +222,10 @@ set(Poco_Data_LINKER_FLAGS_LIST
 
 ########### COMPONENT ActiveRecord VARIABLES #############################################
 
-set(Poco_ActiveRecord_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_ActiveRecord_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_ActiveRecord_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_ActiveRecord_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_ActiveRecord_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_ActiveRecord_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_ActiveRecord_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_ActiveRecord_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_ActiveRecord_RES_DIRS )
 set(Poco_ActiveRecord_DEFINITIONS )
 set(Poco_ActiveRecord_COMPILE_DEFINITIONS )
@@ -245,10 +245,10 @@ set(Poco_ActiveRecord_LINKER_FLAGS_LIST
 
 ########### COMPONENT XML VARIABLES #############################################
 
-set(Poco_XML_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_XML_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_XML_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_XML_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_XML_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_XML_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_XML_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_XML_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_XML_RES_DIRS )
 set(Poco_XML_DEFINITIONS )
 set(Poco_XML_COMPILE_DEFINITIONS )
@@ -268,10 +268,10 @@ set(Poco_XML_LINKER_FLAGS_LIST
 
 ########### COMPONENT JSON VARIABLES #############################################
 
-set(Poco_JSON_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JSON_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JSON_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JSON_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_JSON_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JSON_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JSON_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JSON_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_JSON_RES_DIRS )
 set(Poco_JSON_DEFINITIONS )
 set(Poco_JSON_COMPILE_DEFINITIONS )
@@ -291,10 +291,10 @@ set(Poco_JSON_LINKER_FLAGS_LIST
 
 ########### COMPONENT Util VARIABLES #############################################
 
-set(Poco_Util_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Util_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Util_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Util_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Util_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Util_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Util_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Util_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Util_RES_DIRS )
 set(Poco_Util_DEFINITIONS )
 set(Poco_Util_COMPILE_DEFINITIONS )
@@ -314,10 +314,10 @@ set(Poco_Util_LINKER_FLAGS_LIST
 
 ########### COMPONENT Zip VARIABLES #############################################
 
-set(Poco_Zip_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Zip_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Zip_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Zip_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Zip_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Zip_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Zip_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Zip_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Zip_RES_DIRS )
 set(Poco_Zip_DEFINITIONS )
 set(Poco_Zip_COMPILE_DEFINITIONS )
@@ -337,10 +337,10 @@ set(Poco_Zip_LINKER_FLAGS_LIST
 
 ########### COMPONENT Net VARIABLES #############################################
 
-set(Poco_Net_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Net_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Net_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Net_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Net_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Net_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Net_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Net_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Net_RES_DIRS )
 set(Poco_Net_DEFINITIONS )
 set(Poco_Net_COMPILE_DEFINITIONS )
@@ -360,10 +360,10 @@ set(Poco_Net_LINKER_FLAGS_LIST
 
 ########### COMPONENT Redis VARIABLES #############################################
 
-set(Poco_Redis_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Redis_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Redis_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Redis_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Redis_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Redis_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Redis_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Redis_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Redis_RES_DIRS )
 set(Poco_Redis_DEFINITIONS )
 set(Poco_Redis_COMPILE_DEFINITIONS )
@@ -383,10 +383,10 @@ set(Poco_Redis_LINKER_FLAGS_LIST
 
 ########### COMPONENT Crypto VARIABLES #############################################
 
-set(Poco_Crypto_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Crypto_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Crypto_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Crypto_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Crypto_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Crypto_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Crypto_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Crypto_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Crypto_RES_DIRS )
 set(Poco_Crypto_DEFINITIONS )
 set(Poco_Crypto_COMPILE_DEFINITIONS )
@@ -406,10 +406,10 @@ set(Poco_Crypto_LINKER_FLAGS_LIST
 
 ########### COMPONENT NetSSL VARIABLES #############################################
 
-set(Poco_NetSSL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_NetSSL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_NetSSL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_NetSSL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_NetSSL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_NetSSL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_NetSSL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_NetSSL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_NetSSL_RES_DIRS )
 set(Poco_NetSSL_DEFINITIONS )
 set(Poco_NetSSL_COMPILE_DEFINITIONS )
@@ -429,10 +429,10 @@ set(Poco_NetSSL_LINKER_FLAGS_LIST
 
 ########### COMPONENT MongoDB VARIABLES #############################################
 
-set(Poco_MongoDB_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_MongoDB_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_MongoDB_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_MongoDB_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_MongoDB_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_MongoDB_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_MongoDB_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_MongoDB_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_MongoDB_RES_DIRS )
 set(Poco_MongoDB_DEFINITIONS )
 set(Poco_MongoDB_COMPILE_DEFINITIONS )
@@ -452,10 +452,10 @@ set(Poco_MongoDB_LINKER_FLAGS_LIST
 
 ########### COMPONENT JWT VARIABLES #############################################
 
-set(Poco_JWT_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JWT_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JWT_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_JWT_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_JWT_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JWT_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JWT_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_JWT_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_JWT_RES_DIRS )
 set(Poco_JWT_DEFINITIONS )
 set(Poco_JWT_COMPILE_DEFINITIONS )
@@ -475,10 +475,10 @@ set(Poco_JWT_LINKER_FLAGS_LIST
 
 ########### COMPONENT Encodings VARIABLES #############################################
 
-set(Poco_Encodings_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Encodings_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Encodings_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_Encodings_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_Encodings_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Encodings_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Encodings_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_Encodings_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_Encodings_RES_DIRS )
 set(Poco_Encodings_DEFINITIONS )
 set(Poco_Encodings_COMPILE_DEFINITIONS )
@@ -498,10 +498,10 @@ set(Poco_Encodings_LINKER_FLAGS_LIST
 
 ########### COMPONENT DataSQLite VARIABLES #############################################
 
-set(Poco_DataSQLite_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataSQLite_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataSQLite_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataSQLite_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_DataSQLite_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataSQLite_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataSQLite_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataSQLite_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_DataSQLite_RES_DIRS )
 set(Poco_DataSQLite_DEFINITIONS )
 set(Poco_DataSQLite_COMPILE_DEFINITIONS )
@@ -521,10 +521,10 @@ set(Poco_DataSQLite_LINKER_FLAGS_LIST
 
 ########### COMPONENT DataPostgreSQL VARIABLES #############################################
 
-set(Poco_DataPostgreSQL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataPostgreSQL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataPostgreSQL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataPostgreSQL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_DataPostgreSQL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataPostgreSQL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataPostgreSQL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataPostgreSQL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_DataPostgreSQL_RES_DIRS )
 set(Poco_DataPostgreSQL_DEFINITIONS )
 set(Poco_DataPostgreSQL_COMPILE_DEFINITIONS )
@@ -544,10 +544,10 @@ set(Poco_DataPostgreSQL_LINKER_FLAGS_LIST
 
 ########### COMPONENT DataMySQL VARIABLES #############################################
 
-set(Poco_DataMySQL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataMySQL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataMySQL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/include")
-set(Poco_DataMySQL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/68684f3caf2a75d1ab629579551ce1eeeddefe1b/lib")
+set(Poco_DataMySQL_INCLUDE_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataMySQL_INCLUDE_DIR "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataMySQL_INCLUDES "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/include")
+set(Poco_DataMySQL_LIB_DIRS "/home/blackbird/.conan/data/poco/1.11.0/_/_/package/6857f37625f8dc329d15d5676e3b7a0d4ac23caa/lib")
 set(Poco_DataMySQL_RES_DIRS )
 set(Poco_DataMySQL_DEFINITIONS )
 set(Poco_DataMySQL_COMPILE_DEFINITIONS )

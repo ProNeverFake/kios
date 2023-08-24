@@ -99,9 +99,9 @@ endif()
 #############################################################################################
 
 
-set(PostgreSQL_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
+set(PostgreSQL_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
 set(PostgreSQL_RES_DIRS )
 set(PostgreSQL_DEFINITIONS )
 set(PostgreSQL_LINKER_FLAGS_LIST
@@ -137,7 +137,7 @@ mark_as_advanced(PostgreSQL_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to PostgreSQL_LIBS and PostgreSQL_LIBRARY_LIST
 set(PostgreSQL_LIBRARY_LIST pq pgcommon pgcommon_shlib pgport pgport_shlib)
-set(PostgreSQL_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
+set(PostgreSQL_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_PostgreSQL_DEPENDENCIES "${PostgreSQL_FRAMEWORKS_FOUND} ${PostgreSQL_SYSTEM_LIBS} ")
@@ -172,10 +172,10 @@ set(CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH})
 
 ########### COMPONENT pgport VARIABLES #############################################
 
-set(PostgreSQL_pgport_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgport_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgport_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgport_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
+set(PostgreSQL_pgport_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgport_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgport_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgport_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
 set(PostgreSQL_pgport_RES_DIRS )
 set(PostgreSQL_pgport_DEFINITIONS )
 set(PostgreSQL_pgport_COMPILE_DEFINITIONS )
@@ -195,10 +195,10 @@ set(PostgreSQL_pgport_LINKER_FLAGS_LIST
 
 ########### COMPONENT pgcommon VARIABLES #############################################
 
-set(PostgreSQL_pgcommon_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgcommon_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgcommon_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pgcommon_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
+set(PostgreSQL_pgcommon_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgcommon_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgcommon_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pgcommon_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
 set(PostgreSQL_pgcommon_RES_DIRS )
 set(PostgreSQL_pgcommon_DEFINITIONS )
 set(PostgreSQL_pgcommon_COMPILE_DEFINITIONS )
@@ -218,10 +218,10 @@ set(PostgreSQL_pgcommon_LINKER_FLAGS_LIST
 
 ########### COMPONENT pq VARIABLES #############################################
 
-set(PostgreSQL_pq_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pq_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pq_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(PostgreSQL_pq_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
+set(PostgreSQL_pq_INCLUDE_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pq_INCLUDE_DIR "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pq_INCLUDES "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(PostgreSQL_pq_LIB_DIRS "/home/blackbird/.conan/data/libpq/14.7/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
 set(PostgreSQL_pq_RES_DIRS )
 set(PostgreSQL_pq_DEFINITIONS )
 set(PostgreSQL_pq_COMPILE_DEFINITIONS )

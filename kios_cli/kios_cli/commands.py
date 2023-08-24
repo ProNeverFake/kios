@@ -15,6 +15,12 @@ from ros2param.api import get_parameter_value
 from ros2node.api import get_node_names
 from ros2node.api import get_absolute_node_name
 
+import launch
+from launch import LaunchDescription
+from launch.actions import OpaqueFunction
+
+import subprocess
+
 
 class CLINode(Node):
 
@@ -139,3 +145,29 @@ def turn_on(args):
     else:
         CLI_client.get_logger().error("Usage: ros2 kios turn_on \"<node_name>\"")
     rclpy.shutdown()
+
+
+def launch_in_new_terminal(cmd):
+    """
+    Helper function to spawn a new terminal and run a command.
+    Adjust for your specific terminal if not using gnome-terminal.
+    """
+    def fn(context):
+        subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', cmd])
+        return []
+
+    return OpaqueFunction(function=fn)
+
+
+def launch_node(args):
+    # ! BUG
+    if args.node_name and args.pkg_name:
+
+        command = 'ros2 run ' + args.pkg_name + args.node_name
+
+        return LaunchDescription([
+            launch_in_new_terminal(command),
+        ])
+    else:
+        CLI_client.get_logger().error("Usage: ros2 kios launch \"<pkg_name>\" \"<node_name>\"")
+        rclpy.shutdown()

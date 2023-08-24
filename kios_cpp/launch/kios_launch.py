@@ -83,6 +83,14 @@ def generate_launch_description():
     #         ]
     #     )
 
+
+    mongo_reader = Node(
+        package='kios_py',
+        namespace='',
+        executable='mongo_reader',
+        name='mongo_reader'
+    )
+
     mios_reader = Node(
         package='kios_py',
         namespace='',
@@ -129,6 +137,7 @@ def generate_launch_description():
         # turtlesim_node_with_parameters,
         # forward_turtlesim_commands_to_second_turtlesim_node,
         mios_reader,
+        mongo_reader,
         messenger,
         tree_node,
         tactician,

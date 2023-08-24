@@ -26,11 +26,13 @@ target_include_directories(${MODULE_NAME}
 # Attention: target_link_libraries() should not apply any keyword
 # since no keyword is applied in ament_target_dependencies()
 target_link_libraries(${MODULE_NAME}
-    spdlog::spdlog
-    Threads::Threads
-    nlohmann_json::nlohmann_json
-    websocketpp::websocketpp
-    Poco::Net
+    PUBLIC
+        spdlog::spdlog
+        Threads::Threads
+        nlohmann_json::nlohmann_json
+        websocketpp::websocketpp
+        ${Boost_LIBRARIES}
+        # Poco::Net
 )
 
 #########################################################################

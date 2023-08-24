@@ -23,8 +23,7 @@ class MiosReader(Node):
 
     udp_subscriber = ''
     # robot state variable dictionary.
-    mios_state_default = json.load("")
-    mios_state_default["TF_F_ext_K"] = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    mios_state_default = {"TF_F_ext_K" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
 
     def __init__(self):
         super().__init__('mios_reader')
@@ -35,13 +34,13 @@ class MiosReader(Node):
         # * new udp receiver!
         self.udp_receiver_ = UDPReceiver()
         self.time_out_count_ = 0
-        self.udpOn = True
+        self.udpOn = False
 
         timer_callback_group = ReentrantCallbackGroup()
         publisher_callback_group = timer_callback_group
 
         self.timer = self.create_timer(
-            0.01,  # sec
+            1,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
 
@@ -70,6 +69,10 @@ class MiosReader(Node):
                 self.get_logger().info("Received message: %s" % udp_msg.decode())
                 mios_state = json.loads(udp_msg.decode())
                 pub_msg = self.update_mios_state_message(pub_msg, mios_state)
+                # check time
+                # self.get_logger().info(f'CHECK: '+ mios_state)
+                print('mios time: ', mios_state["system_time"])
+                print('kios time: ', datetime.now())
             else:
                 self.time_out_count_ = self.time_out_count_ + 1
                 if self.time_out_count_ >= 10:
@@ -77,11 +80,8 @@ class MiosReader(Node):
                     self.switch_power(turn_on=False)
                 pub_msg = self.update_mios_state_message(
                     pub_msg, self.mios_state_default)
-
             # publish msg
             self.publisher.publish(pub_msg)
-            self.get_logger().info(f'time check: mios time: ', mios_state["system_time"],
-                                   'kios time: ', datetime.now())
         else:
             if self.udpOn == True:
                 self.udp_receiver_.stop()

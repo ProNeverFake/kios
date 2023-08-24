@@ -12,6 +12,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 ################################## conan setting
+
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+message("CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}\n")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+message("CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}\n")
+
+
 # Download automatically, you can also just copy the conan.cmake file
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
     message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
@@ -21,19 +29,31 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-find_program(CONAN_EXECUTABLE conan)
-if (NOT CONAN_EXECUTABLE)
-    message(FATAL_ERROR "Conan executable not found!")
+# Check if Conan is installed
+find_program(CONAN conan)
+if (NOT CONAN)
+    message(FATAL_ERROR "Conan package manager not found!")
 endif()
 
-execute_process(COMMAND ${CONAN_EXECUTABLE} install . --build=missing
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                RESULT_VARIABLE CONAN_INSTALL_RESULT)
-if (NOT CONAN_INSTALL_RESULT EQUAL "0")
-    message(FATAL_ERROR "Conan install failed!")
+# Create a Conan build directory
+set(CONAN_BUILD_DIR ${CMAKE_BINARY_DIR}/conan_build)
+file(MAKE_DIRECTORY ${CONAN_BUILD_DIR})
+
+# Run Conan install to fetch dependencies
+execute_process(
+    COMMAND ${CONAN} install ${CMAKE_SOURCE_DIR} --build=missing -s build_type=${CMAKE_BUILD_TYPE}
+    WORKING_DIRECTORY ${CONAN_BUILD_DIR}
+    RESULT_VARIABLE CONAN_INSTALL_RESULT
+)
+if (NOT ${CONAN_INSTALL_RESULT} EQUAL 0)
+    message(FATAL_ERROR "Conan dependency installation failed!")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+# Include the generated CMake files by Conan
+include(${CONAN_BUILD_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+
+
 
 # set CPP standard as 17 according to package behavior_tree library
 set(CMAKE_CXX_STANDARD 17)
@@ -65,6 +85,7 @@ find_package(Threads REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(Poco REQUIRED COMPONENTS Net)
+find_package(Boost REQUIRED COMPONENTS system thread)
 
 find_package(fmt REQUIRED)
 
@@ -86,6 +107,8 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+include_directories(${Boost_INCLUDE_DIRS})
 
 # ########################## fetch libs
 # ! DISCARDED

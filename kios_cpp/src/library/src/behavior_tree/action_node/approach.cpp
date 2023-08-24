@@ -11,19 +11,22 @@ namespace Insertion
 
     void Approach::update_tree_state()
     {
-        auto tree_state_ptr = get_tree_state_ptr();
-        auto node_context = get_node_context_ref();
-        tree_state_ptr->action_name = node_context.action_name;
-        tree_state_ptr->action_phase = node_context.action_phase;
+        std::cout << "APPROACH UPDATE TREE STATE" << std::endl;
+        get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
+        get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
     }
 
     void Approach::node_context_initialize()
     {
-        auto node_context = get_node_context_ref();
+        std::cout << "node_context_initialize" << std::endl;
+        auto &node_context = get_node_context_ref();
+        std::cout << "old: " << node_context.node_name << std::endl;
         node_context.node_name = "approach";
         node_context.action_phase = kios::ActionPhase::APPROACH;
         node_context.parameter["skill"]["action_name"] = "approach";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;
+
+        std::cout << "new: " << node_context.node_name << std::endl;
     }
 
     bool Approach::is_success()
@@ -53,6 +56,7 @@ namespace Insertion
         }
         else
         {
+            update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }

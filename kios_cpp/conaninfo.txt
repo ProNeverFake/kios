@@ -3,7 +3,7 @@
     build_type=Release
     compiler=gcc
     compiler.libcxx=libstdc++
-    compiler.version=11
+    compiler.version=9
     os=Linux
 
 [requires]
@@ -18,22 +18,22 @@
     build_type=Release
     compiler=gcc
     compiler.libcxx=libstdc++
-    compiler.version=11
+    compiler.version=9
     os=Linux
     os_build=Linux
 
 [full_requires]
-    bzip2/1.0.8:c32092bf4d4bb47cf962af898e02823f499b017e
-    expat/2.5.0:2bf99ee01cda593d5986afc64acf262ad576354f
-    libmysqlclient/8.0.31:205d2942419054ef9d523bb0f9f8cf3ea0ff426d
-    libpq/14.7:dfbe50feef7f3c6223a476cd5aeadb687084a646
-    lz4/1.9.4:dfbe50feef7f3c6223a476cd5aeadb687084a646
-    openssl/3.1.2:304480252b01879c8641f79a653b593b8f26cf9f
-    pcre/8.45:f755979807ccde50238e44be7e9e64fe34847ffe
-    poco/1.11.0:68684f3caf2a75d1ab629579551ce1eeeddefe1b
-    sqlite3/3.42.0:8fc930bdbf940331d9f322f454eac3dd06fd27e8
-    zlib/1.2.13:dfbe50feef7f3c6223a476cd5aeadb687084a646
-    zstd/1.5.5:1e8f95ed1a9a9ef594f731500716088f6eb8bee6
+    bzip2/1.0.8:da606cf731e334010b0bf6e85a2a6f891b9f36b0
+    expat/2.5.0:c215f67ac7fc6a34d9d0fb90b0450016be569d86
+    libmysqlclient/8.0.31:3c97b7b936291ce2de4c0b5df2a26830d69c3a8b
+    libpq/14.7:6af9cc7cb931c5ad942174fd7838eb655717c709
+    lz4/1.9.4:6af9cc7cb931c5ad942174fd7838eb655717c709
+    openssl/3.1.2:3b92fb92d86b5880d7fcd3124cd3e37e04f7e25f
+    pcre/8.45:87087120c448298530c012e627c1a0b8f062586d
+    poco/1.11.0:6857f37625f8dc329d15d5676e3b7a0d4ac23caa
+    sqlite3/3.42.0:6a03b0806bcf800472b17d5401d6ae7887a8a2b8
+    zlib/1.2.13:6af9cc7cb931c5ad942174fd7838eb655717c709
+    zstd/1.5.5:a1fcff3227a663d62f35b4eedde78f4ce0fcd438
 
 [full_options]
     bzip2:build_executable=True

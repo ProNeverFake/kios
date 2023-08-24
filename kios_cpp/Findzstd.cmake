@@ -99,9 +99,9 @@ endif()
 #############################################################################################
 
 
-set(zstd_INCLUDE_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
-set(zstd_INCLUDE_DIR "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
-set(zstd_INCLUDES "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
+set(zstd_INCLUDE_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
+set(zstd_INCLUDE_DIR "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
+set(zstd_INCLUDES "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
 set(zstd_RES_DIRS )
 set(zstd_DEFINITIONS )
 set(zstd_LINKER_FLAGS_LIST
@@ -137,7 +137,7 @@ mark_as_advanced(zstd_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to zstd_LIBS and zstd_LIBRARY_LIST
 set(zstd_LIBRARY_LIST zstd)
-set(zstd_LIB_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/lib")
+set(zstd_LIB_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_zstd_DEPENDENCIES "${zstd_FRAMEWORKS_FOUND} ${zstd_SYSTEM_LIBS} ")
@@ -172,10 +172,10 @@ set(CMAKE_PREFIX_PATH  ${CMAKE_PREFIX_PATH})
 
 ########### COMPONENT libzstd_static VARIABLES #############################################
 
-set(zstd_libzstd_static_INCLUDE_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
-set(zstd_libzstd_static_INCLUDE_DIR "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
-set(zstd_libzstd_static_INCLUDES "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/include")
-set(zstd_libzstd_static_LIB_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/1e8f95ed1a9a9ef594f731500716088f6eb8bee6/lib")
+set(zstd_libzstd_static_INCLUDE_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
+set(zstd_libzstd_static_INCLUDE_DIR "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
+set(zstd_libzstd_static_INCLUDES "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/include")
+set(zstd_libzstd_static_LIB_DIRS "/home/blackbird/.conan/data/zstd/1.5.5/_/_/package/a1fcff3227a663d62f35b4eedde78f4ce0fcd438/lib")
 set(zstd_libzstd_static_RES_DIRS )
 set(zstd_libzstd_static_DEFINITIONS )
 set(zstd_libzstd_static_COMPILE_DEFINITIONS )

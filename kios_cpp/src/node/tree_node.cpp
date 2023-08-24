@@ -11,7 +11,7 @@
 
 #include "behavior_tree/tree_root.hpp"
 #include "kios_utils/kios_utils.hpp"
-#include "kios_communication/udp.hpp"
+#include "kios_communication/boost_udp.hpp"
 
 #include "kios_interface/msg/tree_state.hpp"
 #include "kios_interface/msg/task_state.hpp"
@@ -26,9 +26,8 @@ class TreeNode : public rclcpp::Node
 public:
     TreeNode()
         : Node("tree_node"),
-          tree_state_ptr_(),
-          task_state_ptr_(),
-          tree_phase_(),
+          tree_state_ptr_(std::make_shared<kios::TreeState>()),
+          task_state_ptr_(std::make_shared<kios::TaskState>()),
           isActionSuccess_(false)
     {
         // initialize object list
@@ -80,9 +79,14 @@ public:
             rmw_qos_profile_services_default,
             client_callback_group_);
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(10),
+            std::chrono::milliseconds(1000),
             std::bind(&TreeNode::timer_callback, this),
             timer_callback_group_);
+
+        udp_socket_ = std::make_shared<kios::BTReceiver>("127.0.0.1", 8888);
+
+        // ! FOR TEST
+        tree_phase_ = kios::TreePhase::RESUME;
     }
 
     bool check_power()
@@ -203,27 +207,6 @@ private:
     }
 
     /**
-     * @brief publisher inline method. currently off.
-     * ! OUT OF DATE
-     */
-    void publish_tree_state()
-    {
-        if (this->get_parameter("pub_power").as_bool() == true)
-        {
-            kios_interface::msg::TreeState msg;
-            msg.action_name = tree_state_ptr_->action_name;
-            msg.action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
-            msg.is_runnning = true;
-            RCLCPP_INFO(this->get_logger(), "Tree action node name: %s.", msg.action_name.c_str());
-            publisher_->publish(msg);
-        }
-        else
-        {
-            // publisher off, do nothing.
-        }
-    }
-
-    /**
      * @brief check the tree state. set the tree phase if tree is not running.
      *
      * @return true tree still running
@@ -307,7 +290,7 @@ private:
             break;
         }
         case kios::TreePhase::RESUME: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: RESUME.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: RESUME.");
             // * normal phase. execute the tree.isActionSuccess_ = true;
             execute_tree();
             break;
@@ -357,26 +340,29 @@ private:
      * @brief tree's execution method, called when RESUME
      *
      */
-    inline void execute_tree()
+    void execute_tree()
     {
         // *update the isMiosSuccess flag in context.
         task_state_ptr_->isActionSuccess = isActionSuccess_;
 
         // *tick the tree first
-        tick_result = m_tree_root->tick_once();
         RCLCPP_INFO(this->get_logger(), "execute_tree: tick once.");
+        tick_result = m_tree_root->tick_once();
+
         // *check result
         if (is_tree_running())
         {
-            // * publish the tree state
-            publish_tree_state(); // ! currently off
             // * tree is running. update action phase and check.
+
+            RCLCPP_INFO_STREAM(this->get_logger(), "CURRENT ACTION: " << tree_state_ptr_->action_name);
+            RCLCPP_ERROR_STREAM(this->get_logger(), "SWITCH DETECT: CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
 
             if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
             {
                 // * action switch
                 RCLCPP_INFO(this->get_logger(), "execute_tre: AP switch hit.");
                 // update the last action phase
+                tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
                 switch_tree_phase("PAUSE");
                 // * call service

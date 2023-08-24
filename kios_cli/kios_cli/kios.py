@@ -71,6 +71,14 @@ class KiosCommand(CommandExtension):
             'node_name', type=str, help='the name of the node to be turned on')
         turn_on_parser.set_defaults(func=commands.turn_on)
 
+        launch_parser = subparsers.add_parser(
+            'launch', help='launch the node in a new terminal')
+        launch_parser.add_argument(
+            'pkg_name', type=str, help='the name of the pkg to be launched')
+        launch_parser.add_argument(
+            'node_name', type=str, help='the name of the node to be launched')
+        launch_parser.set_defaults(func=commands.launch_node)
+
 
     def main(self, *, parser, args):
         if hasattr(args, 'func'):

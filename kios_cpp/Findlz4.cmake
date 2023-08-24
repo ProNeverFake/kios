@@ -80,9 +80,9 @@ find_package_handle_standard_args(lz4 REQUIRED_VARS
 mark_as_advanced(lz4_FOUND lz4_VERSION)
 
 
-set(lz4_INCLUDE_DIRS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(lz4_INCLUDE_DIR "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
-set(lz4_INCLUDES "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/include")
+set(lz4_INCLUDE_DIRS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(lz4_INCLUDE_DIR "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
+set(lz4_INCLUDES "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/include")
 set(lz4_RES_DIRS )
 set(lz4_DEFINITIONS )
 set(lz4_LINKER_FLAGS_LIST
@@ -101,7 +101,7 @@ set(lz4_SYSTEM_LIBS )
 set(lz4_FRAMEWORK_DIRS )
 set(lz4_FRAMEWORKS )
 set(lz4_FRAMEWORKS_FOUND "") # Will be filled later
-set(lz4_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib/cmake/conan-official-lz4-targets.cmake")
+set(lz4_BUILD_MODULES_PATHS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib/cmake/conan-official-lz4-targets.cmake")
 
 conan_find_apple_frameworks(lz4_FRAMEWORKS_FOUND "${lz4_FRAMEWORKS}" "${lz4_FRAMEWORK_DIRS}")
 
@@ -118,7 +118,7 @@ mark_as_advanced(lz4_INCLUDE_DIRS
 
 # Find the real .lib/.a and add them to lz4_LIBS and lz4_LIBRARY_LIST
 set(lz4_LIBRARY_LIST lz4)
-set(lz4_LIB_DIRS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/lib")
+set(lz4_LIB_DIRS "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/lib")
 
 # Gather all the libraries that should be linked to the targets (do not touch existing variables):
 set(_lz4_DEPENDENCIES "${lz4_FRAMEWORKS_FOUND} ${lz4_SYSTEM_LIBS} ")
@@ -147,8 +147,8 @@ endforeach()
 set(lz4_LIBRARIES_TARGETS "${lz4_LIBRARIES_TARGETS};")
 set(lz4_LIBRARIES "${lz4_LIBRARIES};")
 
-set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/" ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/dfbe50feef7f3c6223a476cd5aeadb687084a646/" ${CMAKE_PREFIX_PATH})
+set(CMAKE_MODULE_PATH "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/home/blackbird/.conan/data/lz4/1.9.4/_/_/package/6af9cc7cb931c5ad942174fd7838eb655717c709/" ${CMAKE_PREFIX_PATH})
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.0")
     # Target approach

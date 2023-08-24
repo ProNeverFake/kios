@@ -3,9 +3,9 @@
 namespace Insertion
 {
     TreeRoot::TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+        : tree_state_ptr_(tree_state_ptr),
+          task_state_ptr_(task_state_ptr)
     {
-        tree_state_ptr_ = tree_state_ptr;
-        task_state_ptr_ = task_state_ptr;
         initialize_tree();
     }
 
@@ -20,7 +20,6 @@ namespace Insertion
         factory_.registerNodeType<AtPosition>("AtPosition", tree_state_ptr_, task_state_ptr_);
         // factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
         // factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
-        // factory.registerNodeType<Reach>("Reach");
         // * generate tree
         tree_ = factory_.createTreeFromText(test_tree);
     }

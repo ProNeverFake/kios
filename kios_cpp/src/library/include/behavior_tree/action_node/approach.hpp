@@ -9,9 +9,9 @@ namespace Insertion
         Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
 
         BT::NodeStatus onStart() override;
-
         /// method invoked by an action in the RUNNING state.
         BT::NodeStatus onRunning() override;
+
         // Method invoked when interrupted
         void onHalted() override;
         void node_context_initialize() override; //

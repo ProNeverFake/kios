@@ -4,6 +4,7 @@
 #include <string>
 #include <atomic>
 #include <mutex>
+#include <iostream>
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -29,8 +30,12 @@ public:
     Tactician()
         : Node("tactician"),
           isSwitchAction(false),
-          isBusy(false)
+          isBusy(false),
+          command_context_(),
+          tree_state_(),
+          task_state_()
     {
+        std::cout << "start initialization" << std::endl;
         // declare mission parameter
         this->declare_parameter("power", true);
 
@@ -68,6 +73,14 @@ public:
             qos,
             std::bind(&Tactician::task_subscription_callback, this, _1),
             subscription_options);
+
+        // ! BBDEBUG NO TIMER?!
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(1000),
+            std::bind(&Tactician::timer_callback, this),
+            timer_callback_group_);
+
+        std::cout << "finish initialization" << std::endl;
     }
 
     bool check_power()
@@ -102,7 +115,6 @@ private:
     kios::TaskState task_state_;
     kios::TreeState tree_state_;
 
-    kios::ActionPhaseContext action_phase_context_;
     kios::CommandContext command_context_;
 
     // callback group
@@ -147,10 +159,12 @@ private:
             }
             else
             {
+                RCLCPP_ERROR(this->get_logger(), "SWITCH ACTION HIT!");
+
                 // * update tree state
-                std::lock_guard<std::mutex> guard(tree_state_mtx_);
-                tree_state_.action_name = request->action_name;
-                tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
+                std::lock_guard<std::mutex> lock(tree_state_mtx_);
+                tree_state_.action_name = std::move(request->action_name);
+                tree_state_.action_phase = std::move(static_cast<kios::ActionPhase>(request->action_phase));
                 // * set flag for timer
                 isSwitchAction.store(true);
             }
@@ -253,12 +267,12 @@ private:
                 }
                 else
                 {
-                    RCLCPP_DEBUG(this->get_logger(), "Timer: Node is busy now.");
+                    RCLCPP_INFO(this->get_logger(), "Timer: Node is busy now.");
                 }
             }
             else
             {
-                RCLCPP_DEBUG(this->get_logger(), "Timer: Continue the last action phase.");
+                RCLCPP_INFO(this->get_logger(), "Timer: Continue the last action phase.");
             }
         }
         else

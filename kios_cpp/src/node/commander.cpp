@@ -29,7 +29,7 @@ public:
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"),
           udp_port(12346),
-          is_busy(false)
+          isBusy(false)
     {
         // declare power parameter
         this->declare_parameter("power", true);
@@ -39,10 +39,10 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
 
         // * initialize the websocket messenger
-        m_messenger = std::make_shared<BTMessenger>(ws_url);
+        messenger_ = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
-        m_messenger->special_connect();
-        while (!m_messenger->wait_for_open_connection(3))
+        messenger_->special_connect();
+        while (!messenger_->wait_for_open_connection(3))
         {
             RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
         }
@@ -51,7 +51,7 @@ public:
         mios_register_udp();
 
         // object announcement
-        m_messenger->send_grasped_object();
+        messenger_->send_grasped_object();
 
         // * initialize service
         command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
@@ -71,16 +71,16 @@ public:
     // connection rel
     void mios_register_udp()
     {
-        m_messenger->register_udp(udp_port);
+        messenger_->register_udp(udp_port);
     }
     void mios_unregister_udp()
     {
-        m_messenger->unregister_udp();
+        messenger_->unregister_udp();
     }
     void shut_down_connection()
     {
-        m_messenger->unregister_udp();
-        m_messenger->close();
+        messenger_->unregister_udp();
+        messenger_->close();
     }
     bool check_power()
     {
@@ -96,7 +96,7 @@ public:
 
 private:
     // flags
-    bool is_busy;
+    bool isBusy;
 
     //! TEMP STATE
     kios::ActionPhaseContext action_phase_context_;
@@ -110,7 +110,7 @@ private:
     rclcpp::Service<kios_interface::srv::TeachObjectService>::SharedPtr teach_object_service_;
 
     // ws_client rel
-    std::shared_ptr<BTMessenger> m_messenger;
+    std::shared_ptr<BTMessenger> messenger_;
     std::string ws_url;
 
     // udp subscriber ip
@@ -167,17 +167,17 @@ private:
 
     void stop_task()
     {
-        m_messenger->stop_task();
+        messenger_->stop_task();
     }
 
     void start_task(const nlohmann::json &skill_context)
     {
-        m_messenger->start_task(skill_context);
+        messenger_->start_task(skill_context);
     }
 
     void teach_object(const nlohmann::json &object_context)
     {
-        m_messenger->send_and_wait("teach_object", object_context);
+        messenger_->send_and_wait("teach_object", object_context);
     }
 
     /**

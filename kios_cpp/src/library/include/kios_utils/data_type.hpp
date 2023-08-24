@@ -241,7 +241,7 @@ namespace kios
                 {"Insertable", "ring"}}},
               {"time_max", 17},
               {"action_context",
-               {{"action_name", "INI"},
+               {{"action_name", "Initialization"},
                 {"action_phase", ActionPhase::INITIALIZATION}}},
               {"p0",
                {{"dX_d", {0.05, 0.05}},

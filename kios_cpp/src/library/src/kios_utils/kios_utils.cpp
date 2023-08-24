@@ -103,4 +103,51 @@ namespace kios
         }
     }
 
+    /**
+     * @brief method to switch tree state.
+     *
+     * @param phase
+     * @return true
+     * @return false if asked to switch to an undefined phase.
+     */
+    bool switch_tree_phase(const std::string &phase, TreePhase &tree_phase)
+    {
+        if (phase == "RESUME")
+        {
+            tree_phase = kios::TreePhase::RESUME;
+            return true;
+        }
+        if (phase == "PAUSE")
+        {
+            tree_phase = kios::TreePhase::PAUSE;
+            return true;
+        }
+        if (phase == "FAILURE")
+        {
+            tree_phase = kios::TreePhase::FAILURE;
+            return true;
+        }
+        if (phase == "SUCCESS")
+        {
+            tree_phase = kios::TreePhase::SUCCESS;
+            return true;
+        }
+        if (phase == "IDLE")
+        {
+            tree_phase = kios::TreePhase::IDLE;
+            return true;
+        }
+        if (phase == "FINISH")
+        {
+            tree_phase = kios::TreePhase::FINISH;
+            return true;
+        }
+        if (phase == "ERROR")
+        {
+            tree_phase = kios::TreePhase::ERROR;
+            return true;
+        }
+        return false;
+    }
+
 } // namespace kios

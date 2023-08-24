@@ -13,7 +13,6 @@
 #include "behavior_tree/tree_root.hpp"
 
 #include "kios_interface/msg/task_state.hpp"
-#include "kios_interface/msg/skill_context.hpp"
 #include "kios_interface/msg/tree_state.hpp"
 
 #include "kios_interface/srv/command_request.hpp"
@@ -74,7 +73,6 @@ public:
             std::bind(&Tactician::task_subscription_callback, this, _1),
             subscription_options);
 
-        // ! BBDEBUG NO TIMER?!
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(1000),
             std::bind(&Tactician::timer_callback, this),
@@ -133,10 +131,11 @@ private:
      *
      * @param msg
      */
-    void task_subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
+    void task_subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
         std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k[2]);
+        RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k[2]);
         task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
     }
 

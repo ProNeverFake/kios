@@ -30,4 +30,13 @@ namespace kios
 
     std::string tree_phase_to_str(const TreePhase &tree_phase);
 
+    /**
+     * @brief method to switch tree state.
+     *
+     * @param phase
+     * @return true
+     * @return false if asked to switch to an undefined phase.
+     */
+    bool switch_tree_phase(const std::string &phase, TreePhase &tree_phase);
+
 } // namespace kios

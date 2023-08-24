@@ -32,21 +32,17 @@ THIS PART IS STILL UNDER CONSTRUCTION.
 ## NEWS
 
 **KNOWN BUGS:**
-- time delay in mios_reader (to be verified). (vielleicht wegen der unrechtzeitigen Nachrichtverhandlung.)
+- ~~time delay in mios_reader (to be verified). (vielleicht wegen der unrechtzeitigen Nachrichtverhandlung.)~~
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
 - **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
-- **[FATAL]** segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) 
+- ~~**[FATAL]** segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) ~~
 
 **DEVELOPER'S PLAN:**
-- [ ] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
+- [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [x] add service and client for mongoDB w/r
-- [x] **ERGENT** refactor the teach/modify_object method in ws_client and node manipulator
-- [ ] ~~**DISCARDED**ws_client upgrade the log --> spdlog ~~
 - [ ] ws_client enable request result bool return 
-- [x] move ActionContext to ~~kios_utils~~ data_type.hpp
 - [ ] (postponed) add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
@@ -133,6 +129,11 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *24.08.2023:*
+  1. Refactored Poco udp with boost.asio.
+  2. Fixed the segmentation fault bug in tactician. ---“啊？”
+  3. Added SwitchTreePhase Server. Now nodes can invoke tree phase switch out of the tree_node.
 
 - *23.08.2023:*
   1. Added template class HyperMetaNode. Sorted up the behavior_tree dir and create new condition nodes.

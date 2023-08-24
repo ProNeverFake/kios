@@ -41,7 +41,7 @@ public:
 
         //* initialize timer
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(5000),
             std::bind(&Messenger::timer_callback, this),
             timer_callback_group_);
 
@@ -77,7 +77,6 @@ public:
 
 private:
     kios_interface::msg::TaskState task_state_msg_;
-    kios::TaskState task_state_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
@@ -90,7 +89,7 @@ private:
     rclcpp::Subscription<kios_interface::msg::MiosState>::SharedPtr mios_state_subscription_;
     rclcpp::Subscription<kios_interface::msg::SensorState>::SharedPtr sensor_state_subscription_;
 
-    void mios_state_subscription_callback(const kios_interface::msg::MiosState::SharedPtr msg)
+    void mios_state_subscription_callback(kios_interface::msg::MiosState::SharedPtr msg)
     {
         if (check_power() == true)
         {
@@ -102,7 +101,7 @@ private:
             RCLCPP_ERROR(this->get_logger(), "POWER OFF, SUBSCRIPTION PASS ...");
         }
     }
-    void sensor_state_subscription_callback(const kios_interface::msg::SensorState::SharedPtr msg)
+    void sensor_state_subscription_callback(kios_interface::msg::SensorState::SharedPtr msg)
     {
         if (check_power() == true)
         {

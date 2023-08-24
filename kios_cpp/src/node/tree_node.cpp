@@ -18,8 +18,10 @@
 #include "kios_interface/msg/skill_context.hpp"
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
+#include "kios_interface/srv/switch_tree_phase_request.hpp"
 
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 class TreeNode : public rclcpp::Node
 {
@@ -57,6 +59,7 @@ public:
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
         subscription_options.callback_group = subscription_callback_group_;
+        // ! DISCARDED
         rclcpp::PublisherOptions publisher_options;
         publisher_options.callback_group = publisher_callback_group_;
 
@@ -66,6 +69,7 @@ public:
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
+        // ! DISCARDED
         publisher_ = this->create_publisher<kios_interface::msg::TreeState>(
             "tree_state_topic",
             qos,
@@ -78,6 +82,12 @@ public:
             "switch_action_service",
             rmw_qos_profile_services_default,
             client_callback_group_);
+        switch_tree_phase_server_ = this->create_service<kios_interface::srv::SwitchTreePhaseRequest>(
+            "switch_tree_phase_service",
+            std::bind(&TreeNode::switch_tree_phase_server_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            client_callback_group_);
+
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(1000),
             std::bind(&TreeNode::timer_callback, this),
@@ -114,6 +124,7 @@ private:
 
     // thread rel
     std::mutex tree_mtx_;
+    std::mutex tree_phase_mtx_;
 
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
@@ -138,6 +149,7 @@ private:
     rclcpp::Publisher<kios_interface::msg::TreeState>::SharedPtr publisher_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
+    rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot>
@@ -149,7 +161,7 @@ private:
      *
      * @param msg
      */
-    void subscription_callback(const kios_interface::msg::TaskState::SharedPtr msg)
+    void subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
         std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
         if (lock.owns_lock())
@@ -165,6 +177,33 @@ private:
         }
     }
 
+    void switch_tree_phase_server_callback(
+        const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Request> request,
+        const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Response> response)
+    {
+        if (check_power() == true)
+        {
+            std::string tree_phase_str = kios::tree_phase_to_str(static_cast<kios::TreePhase>(request->tree_phase));
+            RCLCPP_INFO_STREAM(
+                this->get_logger(),
+                "Switch tree phase to " << tree_phase_str
+                                        << " on the request from node " << request->client_name
+                                        << " for reason: " << request->reason);
+            {
+                std::lock_guard<std::mutex> lock(tree_phase_mtx_);
+                tree_phase_ = static_cast<kios::TreePhase>(request->tree_phase);
+            }
+            response->is_accepted = true;
+        }
+        else
+        {
+            RCLCPP_ERROR_STREAM(
+                this->get_logger(),
+                "POWER OFF, request from " << request->client_name << " refused!");
+            response->is_accepted = false;
+        }
+    }
+
     /**
      * @brief THE MAINLINE OF THE NODE.
      *
@@ -173,6 +212,8 @@ private:
     {
         if (check_power())
         {
+            // * lock tree phase first
+            std::lock_guard<std::mutex> lock(tree_phase_mtx_);
             // * check the necessity of updating objects
             if (this->get_parameter("is_update_object").as_bool() == true)
             {
@@ -241,6 +282,7 @@ private:
      * @return true
      * @return false if asked to switch to an undefined phase.
      */
+    // ! test the one in kios_utils
     bool switch_tree_phase(const std::string &phase)
     {
         if (phase == "RESUME")
@@ -271,14 +313,21 @@ private:
         if (phase == "FINISH")
         {
             tree_phase_ = kios::TreePhase::FINISH;
+            return true;
         }
         if (phase == "ERROR")
         {
             tree_phase_ = kios::TreePhase::ERROR;
+            return true;
         }
         return false;
     }
 
+    /**
+     * @brief inline method for tree life cycle. execute the corresponsing method according to the
+     * current tree phase.
+     *
+     */
     inline void tree_cycle()
     {
         switch (tree_phase_)
@@ -291,7 +340,7 @@ private:
         }
         case kios::TreePhase::RESUME: {
             RCLCPP_INFO(this->get_logger(), "tree_cycle: RESUME.");
-            // * normal phase. execute the tree.isActionSuccess_ = true;
+            // * normal phase.
             execute_tree();
             break;
         }
@@ -337,7 +386,7 @@ private:
     }
 
     /**
-     * @brief tree's execution method, called when RESUME
+     * @brief tree's execution method, called when RESUME and SUCCESS
      *
      */
     void execute_tree()
@@ -374,7 +423,7 @@ private:
         }
         else
         {
-            // switch tree phase already called in is_tree_running
+            // tree phase switch is already handled in is_tree_running(). here pass...
         }
     }
 

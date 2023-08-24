@@ -1,1 +1,1 @@
-float64[] test_data
+float64[] test_data [0, 0, 0, 0, 0, 0]

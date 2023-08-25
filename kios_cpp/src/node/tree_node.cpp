@@ -403,13 +403,14 @@ private:
         {
             // * tree is running. update action phase and check.
 
-            RCLCPP_INFO_STREAM(this->get_logger(), "CURRENT ACTION: " << tree_state_ptr_->action_name);
-            RCLCPP_ERROR_STREAM(this->get_logger(), "SWITCH DETECT: CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
+            RCLCPP_ERROR_STREAM(
+                this->get_logger(),
+                "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
 
             if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
             {
                 // * action switch
-                RCLCPP_INFO(this->get_logger(), "execute_tre: AP switch hit.");
+                RCLCPP_INFO(this->get_logger(), "execute_tree: AP switch hit.");
                 // update the last action phase
                 tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;

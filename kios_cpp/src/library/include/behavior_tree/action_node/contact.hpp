@@ -16,9 +16,9 @@ namespace Insertion
         void onHalted() override;
         void node_context_initialize() override; //
         void update_tree_state() override;
+        bool is_success() override;
 
     private:
-        bool is_success();
         std::chrono::system_clock::time_point deadline_;
     };
 

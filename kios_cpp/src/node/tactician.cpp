@@ -74,7 +74,7 @@ public:
             subscription_options);
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(100),
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
 
@@ -135,7 +135,27 @@ private:
     {
         std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
         RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f.", msg->tf_f_ext_k[2]);
+        if (msg->tf_f_ext_k.empty())
+        {
+            RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
+        }
+        // std::stringstream ss;
+
+        // for (size_t i = 0; i < msg->tf_f_ext_k.size(); ++i)
+        // {
+        //     ss << msg->tf_f_ext_k[i];
+        //     if (i != msg->tf_f_ext_k.size() - 1)
+        //     { // if not the last element
+        //         ss << ", ";
+        //     }
+        // }
+        // std::string str = ss.str();
+        // std::cout << str << std::endl;
+        // std::cout << "PRINT TEST: " << msg->tf_f_ext_k << std::endl;
+        // double test_number = msg->tf_f_ext_k[2];
+        // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
+        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", test_number);
+
         task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
     }
 
@@ -202,23 +222,26 @@ private:
     /**
      * @brief inline function for send the command request to commander
      *
+     * @param ready_deadline max time to wait until server is ready
+     * @param response_deadline max time to wait until response is ready
      * @return true
-     * @return false if error happened or request refused
+     * @return false
      */
-    bool send_command_request()
+    bool send_command_request(int ready_deadline = 50, int response_deadline = 50)
     {
         auto request = std::make_shared<kios_interface::srv::CommandRequest::Request>();
         request->command_type = static_cast<int32_t>(command_context_.command_type);
         request->command_context = command_context_.command_context.dump();
+
         // client send request
-        while (!command_client_->wait_for_service(std::chrono::milliseconds(50)))
+        while (!command_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
-            RCLCPP_ERROR_STREAM(this->get_logger(), "Service " << command_client_->get_service_name() << " not available!");
+            RCLCPP_ERROR_STREAM(this->get_logger(), "Service " << command_client_->get_service_name() << " is not available after waiting for " << ready_deadline << " miliseconds!");
             return false;
         }
         auto result_future = command_client_->async_send_request(request);
         std::future_status status = result_future.wait_until(
-            std::chrono::steady_clock::now() + std::chrono::milliseconds(50));
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();
@@ -235,7 +258,7 @@ private:
         }
         else
         {
-            RCLCPP_ERROR_STREAM(this->get_logger(), "UNKNOWN ERROR: Service " << command_client_->get_service_name() << " is available but not ready.");
+            RCLCPP_ERROR_STREAM(this->get_logger(), "UNKNOWN ERROR: Service " << command_client_->get_service_name() << " is available but response is not ready after waiting for " << response_deadline << "miliseconds!");
             return false;
         }
     }
@@ -255,7 +278,7 @@ private:
                     // * set busy
                     isBusy.store(true);
                     generate_command_context();
-                    if (!send_command_request())
+                    if (!send_command_request(1000, 1000))
                     {
                         //* error in command request service. turn off for debug.
                         switch_power(false);

@@ -40,9 +40,10 @@ namespace Insertion
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
-                <Fallback name="root_sequence">
+                <ReactiveSequence name="root_sequence">
                     <Approach name="approach"/>
-                </Fallback>
+                    <Contact name="contact"/>
+                </ReactiveSequence>
             </BehaviorTree>
         </root>
         )";

@@ -41,7 +41,7 @@ public:
 
         //* initialize timer
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(5000),
+            std::chrono::milliseconds(100),
             std::bind(&Messenger::timer_callback, this),
             timer_callback_group_);
 

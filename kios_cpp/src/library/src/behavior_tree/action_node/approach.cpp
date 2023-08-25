@@ -14,19 +14,19 @@ namespace Insertion
         std::cout << "APPROACH UPDATE TREE STATE" << std::endl;
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
+        std::cout << "UPDATED VALUE: " << get_tree_state_ptr()->action_name << std::endl;
     }
 
     void Approach::node_context_initialize()
     {
         std::cout << "node_context_initialize" << std::endl;
         auto &node_context = get_node_context_ref();
-        std::cout << "old: " << node_context.node_name << std::endl;
-        node_context.node_name = "approach";
+        node_context.node_name = "APPROACH";
+        node_context.action_name = "approach";
         node_context.action_phase = kios::ActionPhase::APPROACH;
         node_context.parameter["skill"]["action_name"] = "approach";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;
-
-        std::cout << "new: " << node_context.node_name << std::endl;
+        std::cout << "NEW: " << node_context.node_name << std::endl;
     }
 
     bool Approach::is_success()
@@ -36,8 +36,13 @@ namespace Insertion
 
     BT::NodeStatus Approach::onStart()
     {
+        if (has_succeeded_once())
+        {
+            return BT::NodeStatus::SUCCESS;
+        }
         if (is_success())
         {
+            mark_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -52,6 +57,7 @@ namespace Insertion
     {
         if (is_success())
         {
+            mark_success();
             return BT::NodeStatus::SUCCESS;
         }
         else

@@ -93,6 +93,16 @@ namespace Insertion
             return node_context_;
         }
 
+        void mark_success()
+        {
+            hasSucceededOnce = true;
+        }
+
+        bool has_succeeded_once()
+        {
+            return hasSucceededOnce;
+        }
+
         // ! MUST OVERRIDE
         // * update tree state with this node's context
         virtual void update_tree_state() = 0;
@@ -122,11 +132,6 @@ namespace Insertion
         }
 
         // virtual bool is_switch_action();
-
-        bool has_succeeded()
-        {
-            return hasSucceededOnce;
-        }
 
         // ! CANNOT OVERRIDE FINAL OVERRIDE
         // BT::NodeStatus tick() override;

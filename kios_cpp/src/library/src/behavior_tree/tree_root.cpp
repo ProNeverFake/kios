@@ -18,7 +18,7 @@ namespace Insertion
         factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<HasObject>("HasObject", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<AtPosition>("AtPosition", tree_state_ptr_, task_state_ptr_);
-        // factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
+        factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
         // factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
         // * generate tree
         tree_ = factory_.createTreeFromText(test_tree);

@@ -40,7 +40,7 @@ class MiosReader(Node):
         publisher_callback_group = timer_callback_group
 
         self.timer = self.create_timer(
-            1,  # sec
+            0.1,  # sec
             self.timer_callback,
             callback_group=timer_callback_group)
 
@@ -71,12 +71,13 @@ class MiosReader(Node):
                 pub_msg = self.update_mios_state_message(pub_msg, mios_state)
                 # check time
                 # self.get_logger().info(f'CHECK: '+ mios_state)
-                print('mios time: ', mios_state["system_time"])
-                print('kios time: ', datetime.now())
+                # print('mios time: ', mios_state["system_time"])
+                # print('kios time: ', datetime.now())
             else:
                 self.time_out_count_ = self.time_out_count_ + 1
+                self.get_logger().error("UDP TIME OUT TRIGGERED ONCE")
                 if self.time_out_count_ >= 10:
-                    self.get_logger().error("UDP TIME OUT TRIGGERED. POWER OFF!")
+                    self.get_logger().error("UDP TIME OUT FOR TOO LONG! POWER OFF!")
                     self.switch_power(turn_on=False)
                 pub_msg = self.update_mios_state_message(
                     pub_msg, self.mios_state_default)

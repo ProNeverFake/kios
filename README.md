@@ -32,11 +32,13 @@ THIS PART IS STILL UNDER CONSTRUCTION.
 ## NEWS
 
 **KNOWN BUGS:**
+- MIOS must be launched again after finishing the last tree execution. Otherwise there will be a local error (limit exceeded and context incomplete).
+- RCLCPP_INFO macro cannot print element of std::vector (segmentation fault).
 - ~~time delay in mios_reader (to be verified). (vielleicht wegen der unrechtzeitigen Nachrichtverhandlung.)~~
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~
 - ~~check: mios task context saving. (14082023)~~
 - **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
-- ~~**[FATAL]** segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) ~~
+- ~~ segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) ~~
 
 **DEVELOPER'S PLAN:**
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.

@@ -213,7 +213,7 @@ private:
         if (check_power())
         {
             // * lock tree phase first
-            std::lock_guard<std::mutex> lock(tree_phase_mtx_);
+            std::lock_guard<std::mutex> lock_tree_phase(tree_phase_mtx_);
             // * check the necessity of updating objects
             if (this->get_parameter("is_update_object").as_bool() == true)
             {
@@ -237,7 +237,7 @@ private:
             }
 
             // * lock tree first
-            std::lock_guard<std::mutex> lock(tree_mtx_);
+            std::lock_guard<std::mutex> lock_tree(tree_mtx_);
             // * do tree cycle
             tree_cycle();
         }

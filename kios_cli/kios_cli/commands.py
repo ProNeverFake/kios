@@ -2,7 +2,7 @@ from rcl_interfaces.srv import SetParameters
 from rclpy.parameter import Parameter
 import rclpy
 from rclpy.node import Node
-import json
+import os
 from time import sleep
 
 from kios_interface.srv import TeachObjectService
@@ -147,6 +147,14 @@ def turn_on(args):
     rclpy.shutdown()
 
 
+def get_workspace_path():
+    ament_paths = os.environ.get('AMENT_PREFIX_PATH', '').split(':')
+    if ament_paths:
+        # Take the last path as the most recently sourced workspace
+        return ament_paths[-1]
+    return None
+
+
 def launch_in_new_terminal(cmd):
     """
     Helper function to spawn a new terminal and run a command.
@@ -163,11 +171,12 @@ def launch_node(args):
     # ! BUG
     if args.node_name and args.pkg_name:
 
-        command = 'ros2 run ' + args.pkg_name + args.node_name
+        command = 'ros2 run ' + args.pkg_name + ' ' + args.node_name
 
         return LaunchDescription([
             launch_in_new_terminal(command),
         ])
     else:
-        CLI_client.get_logger().error("Usage: ros2 kios launch \"<pkg_name>\" \"<node_name>\"")
+        CLI_client.get_logger().error(
+            "Usage: ros2 kios launch \"<pkg_name>\" \"<node_name>\"")
         rclpy.shutdown()

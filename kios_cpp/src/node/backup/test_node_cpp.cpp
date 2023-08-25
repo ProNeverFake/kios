@@ -12,7 +12,7 @@
 #include "rcl_interfaces/msg/parameter.hpp"
 
 #include "behavior_tree/node_list.hpp"
-#include "ws_client/ws_client.hpp"
+#include "kios_communication/ws_client.hpp"
 
 #include "kios_interface/srv/request_state.hpp"
 

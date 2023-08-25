@@ -1,30 +1,42 @@
-#include "behavior_tree/action_node/meta_node.hpp"
+#include "behavior_tree/meta_node/meta_node.hpp"
 
 namespace Insertion
 
-// TODO: design meta one-time point
 {
-    class Contact : public MetaNode
+    // class Contact : public HyperMetaNode<BT::StatefulActionNode>
+    // {
+    // public:
+    //     Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+
+    //     BT::NodeStatus onStart() override;
+
+    //     /// method invoked by an action in the RUNNING state.
+    //     BT::NodeStatus onRunning() override;
+    //     // Method invoked when interrupted
+    //     void onHalted() override;
+    //     void node_context_initialize() override; //
+    //     void update_tree_state() override;
+    //     bool is_success() override;
+
+    // private:
+    //     std::chrono::system_clock::time_point deadline_;
+    // };
+
+    /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+
+    class Contact : public HyperMetaNode<BT::SyncActionNode>
     {
     public:
-        Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr);
+        Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
 
-        static BT::PortsList providedPorts();
+        BT::NodeStatus tick() override;
 
-        BT::NodeStatus onStart() override;
-
-        /// method invoked by an action in the RUNNING state.
-        BT::NodeStatus onRunning() override;
-        // Method invoked when interrupted
-        void onHalted() override;
+        void node_context_initialize() override; //
+        void update_tree_state() override;
+        bool is_success() override;
 
     private:
-        int number;
-        std::shared_ptr<ActionNodeContext> m_node_context_ptr;
-        std::shared_ptr<RobotState> m_robot_state_ptr;
-        void node_context_initialize();
-        bool is_success();
-        void set_action_context();
         std::chrono::system_clock::time_point deadline_;
     };
 

@@ -1,4 +1,4 @@
-#include "ws_client/ws_client.hpp"
+#include "kios_communication/ws_client.hpp"
 /***************** asynchronized response ***************/
 
 /******************* connection_metadata ****************/
@@ -313,7 +313,9 @@ bool BTMessenger::connect_o()
     }
     else
     {
-        std::cout << "Successfully connected to " << m_uri << std::endl;
+        spdlog::info("Successfully connected to", m_uri, ".");
+        // std::cout
+        //     << "Successfully connected to " << m_uri << std::endl;
         return true;
     }
 }

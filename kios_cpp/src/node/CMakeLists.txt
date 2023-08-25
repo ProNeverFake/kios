@@ -8,6 +8,7 @@ add_executable(tree_node tree_node.cpp)
 target_link_libraries(tree_node
     ${PROJECT_NAME}::behavior_tree
     ${PROJECT_NAME}::kios_utils
+    ${PROJECT_NAME}::kios_communication
 )
 
 ament_target_dependencies(tree_node
@@ -26,7 +27,7 @@ endif()
 add_executable(commander commander.cpp)
 
 target_link_libraries(commander
-    ${PROJECT_NAME}::ws_client
+    ${PROJECT_NAME}::kios_communication
     ${PROJECT_NAME}::behavior_tree
     ${PROJECT_NAME}::kios_utils
 )

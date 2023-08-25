@@ -4,6 +4,7 @@ from launch.actions import OpaqueFunction
 
 import subprocess
 
+
 def launch_in_new_terminal(cmd):
     """
     Helper function to spawn a new terminal and run a command.
@@ -15,13 +16,13 @@ def launch_in_new_terminal(cmd):
 
     return OpaqueFunction(function=fn)
 
+
 def generate_launch_description():
     return LaunchDescription([
         launch_in_new_terminal('ros2 run kios_cpp commander'),
-        launch_in_new_terminal('ros2 run kios_py state_reader'),
+        launch_in_new_terminal('ros2 run kios_py mongo_reader'),
+        launch_in_new_terminal('ros2 run kios_py mios_reader'),
         launch_in_new_terminal('ros2 run kios_cpp messenger'),
-        launch_in_new_terminal('ros2 run kios_cpp tree_node'),
         launch_in_new_terminal('ros2 run kios_cpp tactician'),
-        launch_in_new_terminal('ros2 run kios_py mongo_reader')
-        # ... Add more nodes as needed
+        launch_in_new_terminal('ros2 run kios_cpp tree_node'),
     ])

@@ -1,17 +1,9 @@
 
-######################################################### ws_client library
-set(MODULE_NAME ws_client)
+######################################################### kios_communication library
+set(MODULE_NAME kios_communication)
 
-set(${MODULE_NAME}_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ws_client/ws_client.cpp
-)
-
-set(${MODULE_NAME}_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/ws_client/ws_client.hpp
-)
-
-# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/action/*.cpp")
-# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/action/*.hpp")
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/kios_communication/*.cpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/kios_communication/*.hpp")
 
 add_library(${MODULE_NAME} STATIC
     ${${MODULE_NAME}_SRC}
@@ -34,10 +26,13 @@ target_include_directories(${MODULE_NAME}
 # Attention: target_link_libraries() should not apply any keyword
 # since no keyword is applied in ament_target_dependencies()
 target_link_libraries(${MODULE_NAME}
-    spdlog::spdlog
-    Threads::Threads
-    nlohmann_json::nlohmann_json
-    websocketpp::websocketpp
+    PUBLIC
+        spdlog::spdlog
+        Threads::Threads
+        nlohmann_json::nlohmann_json
+        websocketpp::websocketpp
+        ${Boost_LIBRARIES}
+        # Poco::Net
 )
 
 #########################################################################
@@ -47,14 +42,22 @@ target_link_libraries(${MODULE_NAME}
 set(MODULE_NAME behavior_tree)
 
 
-file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/action_node/*.cpp")
+file(GLOB ${MODULE_NAME}_SRC 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/action_node/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/condition_node/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/meta_node/*.cpp")
+
 list(APPEND ${MODULE_NAME}_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/node_list.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/behavior_tree/tree_root.cpp
 )
 
-file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/action_node/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/condition_node/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/meta_node/*.hpp")
+
 list(APPEND ${MODULE_NAME}_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/node_list.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/tree_root.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/behavior_tree/tree_map.hpp
 )
 
@@ -75,9 +78,9 @@ target_include_directories(${MODULE_NAME}
 
 target_link_libraries(${MODULE_NAME} 
     PUBLIC
+        ${PROJECT_NAME}::kios_utils
         fmt::fmt
         spdlog
-    INTERFACE
         behaviortree_cpp
     )
 
@@ -120,6 +123,12 @@ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
+
+target_link_libraries(${MODULE_NAME} 
+    PUBLIC
+        nlohmann_json::nlohmann_json
+        spdlog
+    )
 
 add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
 

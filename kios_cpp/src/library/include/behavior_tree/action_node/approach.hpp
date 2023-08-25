@@ -1,32 +1,64 @@
-#include "behavior_tree/action_node/meta_node.hpp"
+#include "behavior_tree/meta_node/meta_node.hpp"
 
 namespace Insertion
 
 {
-    class Approach : public MetaNode
+    // class Approach : public HyperMetaNode<BT::StatefulActionNode>
+    // {
+    // public:
+    //     Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+
+    //     BT::NodeStatus onStart() override;
+    //     /// method invoked by an action in the RUNNING state.
+    //     BT::NodeStatus onRunning() override;
+
+    //     // Method invoked when interrupted
+    //     void onHalted() override;
+    //     void node_context_initialize() override; //
+    //     void update_tree_state() override;
+
+    //     bool is_success() override;
+
+    // private:
+    //     std::chrono::system_clock::time_point deadline_;
+    // };
+
+    // class Approach : public HyperMetaNode<BT::StatefulActionNode>
+    // {
+    // public:
+    //     Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+
+    //     BT::NodeStatus onStart() override;
+
+    //     /// method invoked by an action in the RUNNING state.
+    //     BT::NodeStatus onRunning() override;
+    //     // Method invoked when interrupted
+    //     void onHalted() override;
+    //     void node_context_initialize() override; //
+    //     void update_tree_state() override;
+
+    //     bool consume_mios_success() override;
+
+    // private:
+    //     std::chrono::system_clock::time_point deadline_;
+    // };
+
+    ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
+    class Approach : public HyperMetaNode<BT::SyncActionNode>
     {
     public:
-        Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<ActionNodeContext> context_ptr, std::shared_ptr<RobotState> state_ptr);
+        Approach(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
 
-        static BT::PortsList providedPorts();
+        BT::NodeStatus tick() override;
 
-        BT::NodeStatus onStart() override;
+        void node_context_initialize() override; //
+        void update_tree_state() override;
 
-        /// method invoked by an action in the RUNNING state.
-        BT::NodeStatus onRunning() override;
-        // Method invoked when interrupted
-        void onHalted() override;
+        bool is_success() override;
 
     private:
-        void action_parameter_initialize() override; // TODO in contact and wiggle
-        std::shared_ptr<ActionNodeContext> m_node_context_ptr;
-        std::shared_ptr<RobotState> m_robot_state_ptr;
-        void node_context_initialize();
-        bool is_success();
-        void set_action_context();
         std::chrono::system_clock::time_point deadline_;
-        // node action param
-        nlohmann::json action_param;
     };
 
 } // namespace Insertion

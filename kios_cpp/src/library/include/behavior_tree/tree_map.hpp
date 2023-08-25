@@ -26,7 +26,6 @@ namespace Insertion
     //                 </ReactiveSequence>
 
     //                 <Approach name="approach"/>
-
     //             </ReacitveSequence>
     //         </BehaviorTree>
 
@@ -36,15 +35,15 @@ namespace Insertion
     //                 <Push name="push_peg">
     //             </ReactiveSequence>
     //         </BehaviorTree>
-
     //     </root>
     //     )";
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
-                <Fallback name="root_sequence">
+                <ReactiveSequence name="root_sequence">
+                    <Approach name="approach"/>
                     <Contact name="contact"/>
-                </Fallback>
+                </ReactiveSequence>
             </BehaviorTree>
         </root>
         )";

@@ -139,7 +139,7 @@ def generate_launch_description():
         mios_reader,
         mongo_reader,
         messenger,
-        tree_node,
+        # tree_node,
         tactician,
         commander,
     ])

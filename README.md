@@ -40,6 +40,19 @@ THIS PART IS STILL UNDER CONSTRUCTION.
 - **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
 - ~~ segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) ~~
 
+```bash
+[INFO] [1692982718.593064864] [tree_node]: execute_tree: tick once.
+CHECK TASK STATE CONTENT
+0, 0, 0, 0, 0, 0
+BEFORE CHECK CONTACT SUCCESS
+CONTACT NOT SUCCESS
+APPROACH UPDATE TREE STATE
+UPDATED VALUE: contact
+terminate called after throwing an instance of 'BT::LogicError'
+  what():  [ReactiveSequence]: only a single child can return RUNNING
+
+```
+
 **DEVELOPER'S PLAN:**
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.

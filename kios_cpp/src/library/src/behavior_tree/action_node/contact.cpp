@@ -17,7 +17,20 @@ namespace Insertion
      */
     bool Contact::is_success()
     {
-        // return consume_mios_success();
+        std::cerr << "CHECK TASK STATE CONTENT" << std::endl;
+        std::stringstream ss;
+        for (size_t i = 0; i < get_task_state_ptr()->tf_f_ext_k.size(); ++i)
+        {
+            ss << get_task_state_ptr()->tf_f_ext_k[i];
+            if (i != get_task_state_ptr()->tf_f_ext_k.size() - 1)
+            { // if not the last element
+                ss << ", ";
+            }
+        }
+        std::string str = ss.str();
+        std::cout << str << std::endl;
+
+        std::cerr << "BEFORE CHECK CONTACT SUCCESS" << std::endl;
         if (get_task_state_ptr()->tf_f_ext_k[2] > 7)
         {
             std::cout << "CONTACT SUCCESS" << std::endl;

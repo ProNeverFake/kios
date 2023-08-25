@@ -38,11 +38,11 @@ namespace Insertion
     {
         if (has_succeeded_once())
         {
+            std::cout << "APPROACH HAS ONCE SUCCEEDED" << std::endl;
             return BT::NodeStatus::SUCCESS;
         }
         if (is_success())
         {
-            mark_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -57,7 +57,6 @@ namespace Insertion
     {
         if (is_success())
         {
-            mark_success();
             return BT::NodeStatus::SUCCESS;
         }
         else

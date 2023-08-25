@@ -120,6 +120,7 @@ namespace Insertion
         {
             if (task_state_ptr_->isActionSuccess)
             {
+                mark_success();
                 // * mios succeeded. consume it and return true
                 task_state_ptr_->isActionSuccess = false;
                 return true;

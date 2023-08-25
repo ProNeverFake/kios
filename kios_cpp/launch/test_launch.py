@@ -11,6 +11,18 @@ import subprocess
 #     """
 #     def fn(context):
 #         subprocess.Popen(['gnome-terminal', '--', 'bash',
+#                          '-c'])
+#         return []
+
+#     return OpaqueFunction(function=fn)
+
+# def launch_in_new_terminal(cmd, log_file):
+#     """
+#     Helper function to spawn a new terminal and run a command.
+#     Adjust for your specific terminal if not using gnome-terminal.
+#     """
+#     def fn(context):
+#         subprocess.Popen(['gnome-terminal', '--', 'bash',
 #                          '-c', f'{cmd} > {log_file} 2>&1'])
 #         return []
 

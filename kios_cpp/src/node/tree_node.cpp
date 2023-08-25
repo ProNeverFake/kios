@@ -416,7 +416,7 @@ private:
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
                 switch_tree_phase("PAUSE");
                 // * call service
-                if (!send_switch_action_request())
+                if (!send_switch_action_request(1000, 1000))
                 {
                     switch_tree_phase("ERROR");
                 }
@@ -434,21 +434,21 @@ private:
      * @return true
      * @return false if send failed
      */
-    bool send_switch_action_request()
+    bool send_switch_action_request(int ready_deadline = 50, int response_deadline = 50)
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::SwitchActionRequest::Request>();
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->is_interrupted = true; // ! temp
-        while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(50)))
+        while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             RCLCPP_ERROR(this->get_logger(), "service %s not available.", switch_action_client_->get_service_name());
             return false;
         }
         auto result_future = switch_action_client_->async_send_request(request);
         std::future_status status = result_future.wait_until(
-            std::chrono::steady_clock::now() + std::chrono::milliseconds(50));
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();

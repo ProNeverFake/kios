@@ -68,6 +68,8 @@ public:
             "task_state_topic",
             qos,
             publisher_options);
+
+        rclcpp::sleep_for(std::chrono::seconds(3));
     }
 
     bool check_power()

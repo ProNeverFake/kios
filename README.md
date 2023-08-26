@@ -39,6 +39,7 @@ THIS PART IS STILL UNDER CONSTRUCTION.
 - ~~check: mios task context saving. (14082023)~~
 - **[FATAL]** mios cannot build at personal laptop (ubuntu 22.04). 
 - ~~ segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0) ~~
+- The reactive sequence should not be used with more than one async action node. (error msg see below)
 
 ```bash
 [INFO] [1692982718.593064864] [tree_node]: execute_tree: tick once.
@@ -50,14 +51,13 @@ APPROACH UPDATE TREE STATE
 UPDATED VALUE: contact
 terminate called after throwing an instance of 'BT::LogicError'
   what():  [ReactiveSequence]: only a single child can return RUNNING
-
 ```
 
 **DEVELOPER'S PLAN:**
+- [ ] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [ ] ws_client enable request result bool return 
 - [ ] (postponed) add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
@@ -144,6 +144,10 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *26.08.2023:*
+  1. BehaviorTree.CPP library changed. In reactivesequence, the error of multiple nodes return running is disabled now.
+  2. Validated the sequence action execution. The execution flow of kios is validated.
 
 - *24.08.2023:*
   1. Refactored Poco udp with boost.asio.

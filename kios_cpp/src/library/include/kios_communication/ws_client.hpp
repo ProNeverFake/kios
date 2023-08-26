@@ -18,6 +18,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <typeinfo>
 
 #include <condition_variable>
 #include <mutex>
@@ -50,13 +51,13 @@ public:
     {
         std::unique_lock<std::mutex> lock(mtx);
         auto now = std::chrono::steady_clock::now();
-        if (cv.wait_until(lock, now + std::chrono::milliseconds(wait_deadline)), [this]() { return !queue.empty(); }))
-            {
-                std::cout << "message queue: Response caught." << std::endl;
-                T value = queue.front();
-                queue.pop();
-                return value;
-            }
+        if (cv.wait_until(lock, now + std::chrono::milliseconds(wait_deadline), [this]() { return !queue.empty(); }))
+        {
+            std::cout << "message queue: Response caught." << std::endl;
+            T value = queue.front();
+            queue.pop();
+            return value;
+        }
         else
         {
             std::cout << "message queue: Response timed out." << std::endl;

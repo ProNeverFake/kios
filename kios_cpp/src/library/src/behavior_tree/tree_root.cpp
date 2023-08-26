@@ -23,6 +23,41 @@ namespace Insertion
         // * generate tree
         tree_ = factory_.createTreeFromText(test_tree);
     }
+
+    // ! TODO TRY
+    // void TreeRoot::construct_tree()
+    // {
+    //     BT::NodeConfiguration config;
+    //     // Create nodes
+    //     auto root_node = std::make_shared<BT::SequenceNode>("root");
+    //     auto reactive_seq = std::make_shared<BT::ReactiveSequence>("reactive_seq");
+    //     auto approach_node = std::make_shared<Approach>("approach", config, tree_state_ptr_, task_state_ptr_);
+    //     auto contact_node = std::make_shared<Contact>("contact", config, tree_state_ptr_, task_state_ptr_);
+
+    //     reactive_seq->EnableException(false);
+    //     // Set parent-child relationships
+    //     root_node->addChild(reactive_seq.get());
+    //     reactive_seq->addChild(approach_node.get());
+    //     reactive_seq->addChild(contact_node.get());
+
+    //     // Store nodes in a container to manage their lifetime
+    //     std::vector<std::shared_ptr<BT::TreeNode>> nodes;
+    //     nodes.push_back(std::move(root_node));
+    //     nodes.push_back(std::move(reactive_seq));
+    //     nodes.push_back(std::move(approach_node));
+    //     nodes.push_back(std::move(contact_node));
+
+    //     // Create a tree from the root node
+    //     BT::Tree tree(root_node.get());
+
+    //     // Tick the tree as needed
+    //     while (some_condition)
+    //     {
+    //         tree.tickRoot();
+    //         // Add your logic here
+    //     }
+    // }
+
     std::shared_ptr<kios::TreeState> TreeRoot::get_tree_state_ptr()
     {
         return tree_state_ptr_;

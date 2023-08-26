@@ -79,6 +79,8 @@ public:
             timer_callback_group_);
 
         std::cout << "finish initialization" << std::endl;
+
+        rclcpp::sleep_for(std::chrono::seconds(3));
     }
 
     bool check_power()

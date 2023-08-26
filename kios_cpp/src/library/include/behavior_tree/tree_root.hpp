@@ -23,6 +23,7 @@ namespace Insertion
     public:
         TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
         void initialize_tree();
+        void construct_tree();
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();

@@ -97,6 +97,8 @@ public:
 
         // ! FOR TEST
         tree_phase_ = kios::TreePhase::RESUME;
+
+        rclcpp::sleep_for(std::chrono::seconds(4));
     }
 
     bool check_power()

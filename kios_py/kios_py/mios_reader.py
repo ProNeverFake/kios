@@ -51,6 +51,8 @@ class MiosReader(Node):
             callback_group=publisher_callback_group
         )
 
+        time.sleep(2)
+
     def __del__(self):
         self.udp_receiver_.stop()
 

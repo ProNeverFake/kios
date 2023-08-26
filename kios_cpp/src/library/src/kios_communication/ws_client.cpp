@@ -543,7 +543,7 @@ void BTMessenger::start_task(nlohmann::json skill_context)
     nlohmann::json call_context =
         {{"task", "GenericTask"},
          {"parameters", task_context},
-         {"queue", false}};
+         {"queue", true}};
     if (is_connected())
     {
         send_and_wait("start_task", call_context);
@@ -586,7 +586,13 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
+
             std::cout << "Call method " << method << "get response if_success: " << result["result"]["result"] << std::endl;
+            // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["result"].dump());
+            std::cout << "The type of result is " << typeid(result["result"]["result"]).name() << std::endl;
+            std::cout << "Call method " << method << "get response error message: " << result["result"]["error"] << std::endl;
+            // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
+
             // TODO handle the result.
         }
         catch (nlohmann::json::parse_error &e)
@@ -624,7 +630,10 @@ bool BTMessenger::send_and_check(const std::string &method, nlohmann::json paylo
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
-            spdlog::info("Call method ", method, "get response if_success: ", result["result"]["result"]);
+            spdlog::info("Call method ", method, " get response if_success: {}", result["result"]["result"].dump());
+            spdlog::info("The type of result is {}", typeid(result["result"]["result"]).name());
+
+            spdlog::info("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
 
             // ! TODO handle the result.
         }

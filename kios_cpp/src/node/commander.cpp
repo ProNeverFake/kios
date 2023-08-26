@@ -155,7 +155,10 @@ private:
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
-            stop_task();
+            // stop_task();
+            ////////////////////////////////
+            // !!!!! TEST remove stop_task
+            ////////////////////////////////
             start_task(command_request.command_context);
             break;
         }

@@ -180,6 +180,12 @@ private:
         messenger_->send_and_wait("teach_object", object_context);
     }
 
+    // ! TODO
+    void get_object(const nlohmann::json &object_context)
+    {
+        messenger_->send_and_wait("get_object", object_context);
+    }
+
     /**
      * @brief teach object service callback. see teach_location in mios python module.
      *

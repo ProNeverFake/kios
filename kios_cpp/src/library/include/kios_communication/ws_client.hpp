@@ -45,34 +45,30 @@ public:
         queue.push(value);
         cv.notify_one(); // Notify a waiting thread, if any
     }
-    // T pop()
-    // {
-    //     std::unique_lock<std::mutex> lock(mtx);
-    //     auto now = std::chrono::steady_clock::now();
-    //     if (cv.wait_until(lock, now + std::chrono::seconds(2), [this]() { return !queue.empty(); }))
-    //     {
-    //         std::cout << "message queue: Response caught." << std::endl;
-    //         T value = queue.front();
-    //         queue.pop();
-    //         return value;
-    //     }
-    // }
-    std::optional<T> pop()
+
+    std::optional<T> pop(int wait_deadline = 1000)
     {
         std::unique_lock<std::mutex> lock(mtx);
         auto now = std::chrono::steady_clock::now();
-        if (cv.wait_until(lock, now + std::chrono::seconds(2), [this]() { return !queue.empty(); }))
-        {
-            std::cout << "message queue: Response caught." << std::endl;
-            T value = queue.front();
-            queue.pop();
-            return value;
-        }
+        if (cv.wait_until(lock, now + std::chrono::milliseconds(wait_deadline)), [this]() { return !queue.empty(); }))
+            {
+                std::cout << "message queue: Response caught." << std::endl;
+                T value = queue.front();
+                queue.pop();
+                return value;
+            }
         else
         {
             std::cout << "message queue: Response timed out." << std::endl;
             return std::nullopt;
         }
+    }
+
+    void reset()
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        std::queue<T> empty_queue;
+        queue.swap(empty_queue);
     }
 };
 
@@ -169,6 +165,8 @@ public:
     void message_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr msg);
 
     ThreadSafeQueue<std::string> &get_message_queue();
+
+    void reset_message_queue();
 };
 
 class BTMessenger
@@ -180,6 +178,7 @@ public:
     bool connect_o();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void send_and_wait(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
+    bool send_and_check(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 1000, bool silent = false);
     void close();
     bool is_connected();
     // call mios methods

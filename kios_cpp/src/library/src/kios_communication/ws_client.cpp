@@ -213,6 +213,11 @@ ThreadSafeQueue<std::string> &websocket_endpoint::get_message_queue()
     return message_queue_;
 }
 
+void websocket_endpoint::reset_message_queue()
+{
+    message_queue_.reset();
+}
+
 connection_metadata::ptr websocket_endpoint::get_metadata(int id)
 {
     auto metadata_it = m_connection_list.find(id);
@@ -581,7 +586,6 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
-            // !!! TODO return the result bool value
             std::cout << "Call method " << method << "get response if_success: " << result["result"]["result"] << std::endl;
             // TODO handle the result.
         }
@@ -598,8 +602,48 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
     {
         std::cerr << "Response timed out, waiting skipped." << std::endl;
     }
+}
 
-    // TODO
+/**
+ * @brief "call_method" and check result.
+ * @param method
+ * @param payload
+ * @param timeout
+ * @param silent
+ */
+bool BTMessenger::send_and_check(const std::string &method, nlohmann::json payload, int timeout, bool silent)
+{
+    m_ws_endpoint.get_message_queue().reset();
+    send(method, payload);
+
+    auto response_opt = m_ws_endpoint.get_message_queue().pop();
+
+    if (response_opt.has_value())
+    {
+        try
+        {
+            nlohmann::json result = nlohmann::json::parse(response_opt.value());
+            // The parsing succeeded, the data is JSON.
+            spdlog::info("Call method ", method, "get response if_success: ", result["result"]["result"]);
+
+            // ! TODO handle the result.
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            spdlog::error("JSON parsing failed: ", e.what());
+            return false;
+        }
+        catch (...)
+        {
+            spdlog::error("SEND_AND_WAIT: UNDEFINED ERROR!");
+            return false;
+        }
+    }
+    else
+    {
+        spdlog::error("Response timed out, waiting skipped.");
+        return false;
+    }
 }
 
 [[maybe_unused]] void BTMessenger::set_message_handler(std::function<void(const std::string &)> handler)

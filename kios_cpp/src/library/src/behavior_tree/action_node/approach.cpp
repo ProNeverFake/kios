@@ -47,6 +47,7 @@ namespace Insertion
         }
         else
         {
+            std::cout << "APPROACH GO RUNNNING" << std::endl;
             update_tree_state();
             return BT::NodeStatus::RUNNING;
         }

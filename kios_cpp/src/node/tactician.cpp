@@ -154,7 +154,7 @@ private:
         // std::cout << "PRINT TEST: " << msg->tf_f_ext_k << std::endl;
         // double test_number = msg->tf_f_ext_k[2];
         // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
-        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", test_number);
+        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", msg->tf_f_ext_k[2]);
 
         task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
     }

@@ -130,7 +130,6 @@ private:
 
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
-    bool isUdpReady;
 
     // tree rel
     kios::TreePhase tree_phase_;
@@ -180,10 +179,6 @@ private:
             {
                 RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
             }
-        }
-        else
-        {
-            // pass
         }
     }
 

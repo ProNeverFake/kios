@@ -183,8 +183,10 @@ public:
     void close();
     bool is_connected();
     // call mios methods
-    void start_task(nlohmann::json payload = nlohmann::json());
-    void stop_task();
+    void start_task_command(nlohmann::json payload = nlohmann::json());
+    void stop_task_command();
+    bool stop_task_request();
+    bool start_task_request(nlohmann::json skill_context);
     void unregister_udp();
     void register_udp(int &port);
     void set_message_handler(std::function<void(const std::string &)> handler);

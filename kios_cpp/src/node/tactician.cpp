@@ -135,30 +135,37 @@ private:
      */
     void task_subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-        if (msg->tf_f_ext_k.empty())
+        if (check_power())
         {
-            RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
+            std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
+            RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+            if (msg->tf_f_ext_k.empty())
+            {
+                RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
+            }
+            // std::stringstream ss;
+
+            // for (size_t i = 0; i < msg->tf_f_ext_k.size(); ++i)
+            // {
+            //     ss << msg->tf_f_ext_k[i];
+            //     if (i != msg->tf_f_ext_k.size() - 1)
+            //     { // if not the last element
+            //         ss << ", ";
+            //     }
+            // }
+            // std::string str = ss.str();
+            // std::cout << str << std::endl;
+            // std::cout << "PRINT TEST: " << msg->tf_f_ext_k << std::endl;
+            // double test_number = msg->tf_f_ext_k[2];
+            // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
+            // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", msg->tf_f_ext_k[2]);
+
+            task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
         }
-        // std::stringstream ss;
-
-        // for (size_t i = 0; i < msg->tf_f_ext_k.size(); ++i)
-        // {
-        //     ss << msg->tf_f_ext_k[i];
-        //     if (i != msg->tf_f_ext_k.size() - 1)
-        //     { // if not the last element
-        //         ss << ", ";
-        //     }
-        // }
-        // std::string str = ss.str();
-        // std::cout << str << std::endl;
-        // std::cout << "PRINT TEST: " << msg->tf_f_ext_k << std::endl;
-        // double test_number = msg->tf_f_ext_k[2];
-        // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
-        // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", msg->tf_f_ext_k[2]);
-
-        task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+        else
+        {
+            // pass;
+        }
     }
 
     /**
@@ -185,7 +192,8 @@ private:
                 // * update tree state
                 std::lock_guard<std::mutex> lock(tree_state_mtx_);
                 tree_state_.action_name = std::move(request->action_name);
-                tree_state_.action_phase = std::move(static_cast<kios::ActionPhase>(request->action_phase));
+                tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
+                tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
                 // * set flag for timer
                 isSwitchAction.store(true);
             }
@@ -205,10 +213,6 @@ private:
      */
     void generate_command_context()
     {
-        // * lock task state (perception) and tree state
-        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        std::lock_guard<std::mutex> tree_state_guard(tree_state_mtx_);
-
         /////////////////////////////////////////////
         // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT
         // * now just copy.
@@ -265,6 +269,88 @@ private:
         }
     }
 
+    void handle_request()
+    {
+        RCLCPP_ERROR(this->get_logger(), "HANDLE REQUEST");
+
+        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
+        // std::lock_guard<std::mutex> tree_state_guard(tree_state_mtx_);
+        // handle the request according to tree phase;
+        switch (tree_state_.tree_phase)
+        {
+        case kios::TreePhase::PAUSE: {
+            RCLCPP_ERROR(this->get_logger(), "TREE PHASE: PAUSE");
+
+            // * tree is waiting for tactician to generate parameter and request for command.
+            generate_command_context();
+            if (!send_command_request(1000, 1000))
+            {
+                //* error in command request service.
+                // * invoke error in tree
+
+                // * turn off for check
+                switch_power(false);
+            }
+            break;
+        }
+        case kios::TreePhase::ERROR: {
+            // * error in tree. stop and check.
+            switch_power(false);
+            break;
+        }
+        case kios::TreePhase::FAILURE: {
+            // * this won't arrive at tactician in principle. but just stop.
+            switch_power(false);
+            break;
+        }
+        case kios::TreePhase::FINISH: {
+            RCLCPP_ERROR(this->get_logger(), "TREE PHASE: FINISH");
+
+            // * the tree is finished. send stop old task command and stop
+            command_context_.command_type = kios::CommandType::STOP_OLD_TASK;
+
+            if (!send_command_request(1000, 1000))
+            {
+                //* error in command request service.
+                // * invoke error in tree
+
+                // * turn off for check
+                switch_power(false);
+            }
+            switch_power(false);
+            break;
+        }
+        case kios::TreePhase::IDLE: {
+            RCLCPP_ERROR(this->get_logger(), "TREE PHASE: IDLE");
+
+            // * this won't arrive at tactician in principle. there must be an error somewhere.
+
+            break;
+        }
+        case kios::TreePhase::SUCCESS: {
+            RCLCPP_ERROR(this->get_logger(), "TREE PHASE: SUCCESS");
+
+            // * mios success ---> tree success ---> tree start new action ---> tree pause and send switch action phase request
+            // * ............ ---> ............ ---> BT return success and FINISH ---> tree send switch action phase request with FINISH
+            // * so this won't arrive at tactician in principle.
+
+            break;
+        }
+        case kios::TreePhase::RESUME: {
+            RCLCPP_ERROR(this->get_logger(), "TREE PHASE: RESUME");
+
+            // * this won't ....
+            break;
+        }
+
+        default: {
+            RCLCPP_ERROR(this->get_logger(), "HANDLING UNDEFINED TREEPHASE!");
+            switch_power(false);
+            break;
+        }
+        }
+    }
+
     /**
      * @brief timer callback. handle the switch action request and send the command request to commander.
      *
@@ -279,12 +365,23 @@ private:
                 {
                     // * set busy
                     isBusy.store(true);
-                    generate_command_context();
-                    if (!send_command_request(1000, 1000))
-                    {
-                        //* error in command request service. turn off for debug.
-                        switch_power(false);
-                    }
+
+                    handle_request();
+                    // if (!send_command_request(1000, 1000))
+                    // {
+                    //     //* error in command request service.
+                    //     // * invoke error in tree
+
+                    //     // * turn off for check
+                    //     switch_power(false);
+                    // }
+                    // // * turn off if finished
+                    // std::lock_guard<std::mutex> tree_state_lock(tree_state_mtx_);
+                    // if (tree_state_.tree_phase == kios::TreePhase::FINISH)
+                    // {
+                    //     RCLCPP_INFO(this->get_logger(), "Timer: Mission succeeded.");
+                    //     switch_power(false);
+                    // }
                     // * command_request finished. reset flags.
                     isSwitchAction.store(false);
                     isBusy.store(false);

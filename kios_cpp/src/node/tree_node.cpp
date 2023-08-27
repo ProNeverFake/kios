@@ -65,7 +65,7 @@ public:
 
         // * initialize the callbacks
         subscription_ = this->create_subscription<kios_interface::msg::TaskState>(
-            "mios_state_topic",
+            "task_state_topic",
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
@@ -89,7 +89,7 @@ public:
             client_callback_group_);
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(100),
             std::bind(&TreeNode::timer_callback, this),
             timer_callback_group_);
 
@@ -165,17 +165,25 @@ private:
      */
     void subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
-        if (lock.owns_lock())
+        if (check_power() == true)
         {
-            // ! BBDEBUG maybe lock will fail for a long time.
-            // ! check the execution speed of the tree.
-            RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
-            m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
+            if (lock.owns_lock())
+            {
+                // ! BBDEBUG maybe lock will fail for a long time.
+                // ! check the execution speed of the tree.
+                std::cout << "subscription listened: " << msg->tf_f_ext_k[2] << std::endl;
+                // RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
+                m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
+            }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
+            // pass
         }
     }
 
@@ -240,6 +248,8 @@ private:
 
             // * lock tree first
             std::lock_guard<std::mutex> lock_tree(tree_mtx_);
+            // * update tree phase in tree state
+            tree_state_ptr_->tree_phase = tree_phase_;
             // * do tree cycle
             tree_cycle();
         }
@@ -373,8 +383,18 @@ private:
         }
         case kios::TreePhase::FINISH: {
             RCLCPP_ERROR(this->get_logger(), "tree_cycle: FINISH.");
-            // * all tasks in tree finished. turn off for check.
-            switch_power(false);
+            // * all tasks in tree finished. first send request to finish all actions at mios side.
+            tree_state_ptr_->action_name = "finish";
+            tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;
+            if (send_switch_action_request(1000, 1000))
+            {
+                switch_power(false);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "tree_cycle at FINISH: failed when sending stop request.");
+                switch_tree_phase("ERROR");
+            }
             break;
         }
 
@@ -417,6 +437,7 @@ private:
                 tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
                 switch_tree_phase("PAUSE");
+                tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))
                 {
@@ -442,6 +463,7 @@ private:
         auto request = std::make_shared<kios_interface::srv::SwitchActionRequest::Request>();
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
+        request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
         request->is_interrupted = true; // ! temp
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {

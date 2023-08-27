@@ -468,7 +468,15 @@ bool BTMessenger::wait_for_open_connection(int deadline)
 bool BTMessenger::is_connected()
 {
     std::cout << "is_connected() check connect id: " << connection_id << std::endl;
-    return m_ws_endpoint.is_open(connection_id);
+    if (m_ws_endpoint.is_open(connection_id))
+    {
+        return true;
+    }
+    else
+    {
+        spdlog::error("CONNECTION IS DOWN.");
+        return false;
+    }
 }
 
 /**
@@ -519,11 +527,11 @@ void BTMessenger::unregister_udp()
     }
 }
 /**
- * @brief start a task with "general skill" added.
+ * @brief start a task with "general skill" added. do not handle the response.
  *
  * @param skill_context
  */
-void BTMessenger::start_task(nlohmann::json skill_context)
+void BTMessenger::start_task_command(nlohmann::json skill_context)
 {
     // TODO
     std::vector<std::string> skill_names;
@@ -551,10 +559,10 @@ void BTMessenger::start_task(nlohmann::json skill_context)
 }
 
 /**
- * @brief stop the current task.
+ * @brief stop the current task. do not handle the response
  *
  */
-void BTMessenger::stop_task()
+void BTMessenger::stop_task_command()
 {
     nlohmann::json payload =
         {{"raise_exception", false},
@@ -568,8 +576,65 @@ void BTMessenger::stop_task()
 }
 
 /**
+ * @brief stop the current task. return the response
+ *
+ */
+bool BTMessenger::stop_task_request()
+{
+    nlohmann::json payload =
+        {{"raise_exception", false},
+         {"recover", false},
+         {"empty_queue", false}};
+    if (is_connected())
+    {
+        // send("stop_task", payload);
+        return send_and_check("stop_task", payload);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
+ * @brief start a task with "general skill" added. do not handle the response.
+ *
+ * @param skill_context
+ */
+bool BTMessenger::start_task_request(nlohmann::json skill_context)
+{
+    // TODO
+    std::vector<std::string> skill_names;
+    std::vector<std::string> skill_types;
+    std::unordered_map<std::string, nlohmann::json> skill_contexts;
+
+    skill_names.push_back("insertion");
+    skill_types.push_back("BBGeneralSkill");
+    skill_contexts["insertion"] = skill_context;
+
+    nlohmann::json task_context =
+        {{"parameters",
+          {{"skill_names", skill_names},
+           {"skill_types", skill_types},
+           {"as_queue", false}}},
+         {"skills", skill_contexts}};
+    nlohmann::json call_context =
+        {{"task", "GenericTask"},
+         {"parameters", task_context},
+         {"queue", true}};
+    if (is_connected())
+    {
+        return send_and_check("start_task", call_context);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
  * @brief "call_method" and wait for result.
- * TODO enable result check
+ * do not handle the response.
  * @param method
  * @param payload
  * @param timeout
@@ -589,6 +654,24 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
 
             std::cout << "Call method " << method << "get response if_success: " << result["result"]["result"] << std::endl;
             // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["result"].dump());
+            // * bool cast test
+            // try
+            // {
+            //     bool success = result["result"]["result"];
+            //     if (success == true)
+            //     {
+            //         std::cout << "The result is true." << std::endl;
+            //     }
+            //     else if (success == false)
+            //     {
+            //         std::cout << "The result is false." << std::endl;
+            //     }
+            // }
+            // catch (const std::exception &e)
+            // {
+            //     std::cerr << e.what() << '\n';
+            // }
+
             std::cout << "The type of result is " << typeid(result["result"]["result"]).name() << std::endl;
             std::cout << "Call method " << method << "get response error message: " << result["result"]["error"] << std::endl;
             // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
@@ -631,11 +714,15 @@ bool BTMessenger::send_and_check(const std::string &method, nlohmann::json paylo
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
             // The parsing succeeded, the data is JSON.
             spdlog::info("Call method ", method, " get response if_success: {}", result["result"]["result"].dump());
-            spdlog::info("The type of result is {}", typeid(result["result"]["result"]).name());
-
-            spdlog::info("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
-
-            // ! TODO handle the result.
+            if (static_cast<bool>(result["result"]["result"]) == true)
+            {
+                return true;
+            }
+            else if (static_cast<bool>(result["result"]["result"]) == false)
+            {
+                spdlog::error("Error message: {}", result["result"]["error"].dump());
+                return false;
+            }
         }
         catch (nlohmann::json::parse_error &e)
         {

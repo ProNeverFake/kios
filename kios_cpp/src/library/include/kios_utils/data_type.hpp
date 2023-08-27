@@ -33,6 +33,7 @@ namespace kios
      */
     enum class ActionPhase
     {
+        FINISH = 999,
         ERROR = -1,
         INITIALIZATION = 0,
         APPROACH = 1,
@@ -73,6 +74,7 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
+        TreePhase tree_phase = TreePhase::IDLE;
         bool isRunning = false;      // ! for pub sub, discarded
         bool isInterrupted = true;   // necessity of stopping old
         bool isSwitchAction = false; // ! reserved flag. not used.
@@ -244,8 +246,8 @@ namespace kios
                {{"action_name", "Initialization"},
                 {"action_phase", ActionPhase::INITIALIZATION}}},
               {"p0",
-               {{"dX_d", {0.1, 1}},
-                {"ddX_d", {0.5, 4}},
+               {{"dX_d", {0.1, 0.5}},
+                {"ddX_d", {0.5, 2}},
                 {"DeltaX", {0, 0, 0, 0, 0, 0}},
                 {"K_x", {1500, 1500, 1500, 600, 600, 600}}}},
               {"p1",
@@ -253,9 +255,9 @@ namespace kios
                 {"ddX_d", {0.5, 1}},
                 {"K_x", {500, 500, 500, 600, 600, 600}}}},
               {"p2",
-               {{"search_a", {5, 5, 1, 5, 5, 40}},
+               {{"search_a", {5, 5, 1, 5, 5, 0}},
                 {"search_f", {5, 3, 0.5, 0.5, 0.5, 1}},
-                {"search_phi", {3.14159 * 2 / 3, 3.1415926 / 3, 0, 3.141592 / 2, 0, 0}},
+                {"search_phi", {3.14159 * 2 / 3, 3.14159 / 3, 0, 3.141592 / 2, 0, 0}},
                 {"K_x", {500, 500, 500, 800, 800, 800}},
                 {"f_push", {0, 0, 7, 0, 0, 0}},
                 {"dX_d", {0.1, 2}},

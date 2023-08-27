@@ -155,11 +155,23 @@ private:
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
-            // stop_task();
+            if (stop_task_request() == true)
+            {
+                start_task_request(command_request.command_context);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "Issuing command: BAD NEWS FROM RESPONSE!");
+            }
             ////////////////////////////////
             // !!!!! TEST remove stop_task
             ////////////////////////////////
-            start_task(command_request.command_context);
+            // start_task_command(command_request.command_context);
+            break;
+        }
+        case kios::CommandType::STOP_OLD_TASK: {
+            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old command...");
+            stop_task_command();
             break;
         }
         default:
@@ -168,14 +180,24 @@ private:
         }
     };
 
-    void stop_task()
+    bool stop_task_request()
     {
-        messenger_->stop_task();
+        return messenger_->stop_task_request();
     }
 
-    void start_task(const nlohmann::json &skill_context)
+    bool start_task_request(const nlohmann::json &skill_context)
     {
-        messenger_->start_task(skill_context);
+        return messenger_->start_task_request(skill_context);
+    }
+
+    void stop_task_command()
+    {
+        messenger_->stop_task_command();
+    }
+
+    void start_task_command(const nlohmann::json &skill_context)
+    {
+        messenger_->start_task_command(skill_context);
     }
 
     void teach_object(const nlohmann::json &object_context)

@@ -130,7 +130,6 @@ private:
 
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
-    bool isUdpReady;
 
     // tree rel
     kios::TreePhase tree_phase_;
@@ -170,7 +169,7 @@ private:
         {
             // ! BBDEBUG maybe lock will fail for a long time.
             // ! check the execution speed of the tree.
-            RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
+            // RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
             m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
         }
         else

@@ -583,7 +583,10 @@ private:
                     RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
                     return false;
                 }
-                // ! TODO handle the object_data
+                // ! TODO assemble the object dictionary
+                //////////////////////////////////////////////////////////////////////////////
+
+                ///////////////////////////////////////////////////////////////////////////////
             }
             else
             {

@@ -146,10 +146,11 @@ Blackbird: I'll just skip this part for now.
 
 ### Development Log
 
-- *26.08.2023:*
+- *28.08.2023:*
   1. Added mongo_reader cpp node. The old python node is discarded from now.
   2. Added mongo_client lib and object master class. Merged Object and Parameters from mios.
   3. Successfully read the objects from mongoDB.
+  4. Fixed conan dependency management problem. Now the mongocxx and eigen can be sourced from conan.
 
 - *27.08.2023:*
   1. Added send_and_check method to ws_client. Now commander can handle the response from mios.

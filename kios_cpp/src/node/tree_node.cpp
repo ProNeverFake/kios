@@ -19,6 +19,7 @@
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/switch_tree_phase_request.hpp"
+#include "kios_interface/srv/get_object_request.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -137,7 +138,10 @@ private:
     std::shared_ptr<kios::TaskState> task_state_ptr_;
 
     // object list
-    std::vector<std::string> object_list_;
+    std::vector<std::string> object_list_; // ! DISCARDED
+
+    // object dictionary
+    std::shared_ptr<std::unordered_map<std::string, kios::Object>> object_dictionary_ptr_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr client_callback_group_;
@@ -148,17 +152,14 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
     rclcpp::Publisher<kios_interface::msg::TreeState>::SharedPtr publisher_;
-    rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
+    rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot>
         m_tree_root;
     BT::NodeStatus tick_result;
-
-    // object dictionary
-    std::shared_ptr<std::unordered_map<std::string, kios::Object>> object_dictionary_ptr_;
 
     /**
      * @brief update the task_state. here the lock priority is lower than timer.
@@ -492,29 +493,81 @@ private:
         }
     }
 
+    //  ! DISCARDED. THIS IS FOR MONGO READER IN PYTHON
+    // bool update_object()
+    // {
+    //     // * send request to update the object
+    //     auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
+    //     request->object_list = object_list_;
+    //     while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
+    //     {
+    //         if (!rclcpp::ok())
+    //         {
+    //             RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+    //             rclcpp::shutdown();
+    //         }
+    //         RCLCPP_INFO(this->get_logger(), "service get_object_service not available, waiting ...");
+    //     }
+    //     auto result_future = get_object_client_->async_send_request(request);
+    //     std::future_status status = result_future.wait_until(
+    //         std::chrono::steady_clock::now() + std::chrono::seconds(1));
+    //     if (status == std::future_status::ready)
+    //     {
+    //         auto result = result_future.get();
+    //         if (result->is_accepted == true)
+    //         {
+    //             RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
+    //             try
+    //             {
+    //                 nlohmann::json object_data = nlohmann::json::parse(result->object_data);
+    //             }
+    //             catch (...)
+    //             {
+    //                 RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
+    //                 return false;
+    //             }
+    //             // ! TODO handle the object_data
+    //         }
+    //         else
+    //         {
+    //             RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
+    //             return false;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
+    //         return false;
+    //     }
+
+    //     // * reset the flag in node param
+    //     std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
+    //     this->set_parameters(all_new_parameters);
+    //     return true;
+    // }
+
     /**
      * @brief update the object with GetObjectRequest client
-     * ! UNFINISHED
      * @return true
      * @return false
      */
-    bool update_object()
+    bool update_object(int ready_deadline = 100, int response_deadline = 1000)
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
         request->object_list = object_list_;
-        while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
+        while (!get_object_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             if (!rclcpp::ok())
             {
                 RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-                rclcpp::shutdown();
+                switch_power(false);
             }
             RCLCPP_INFO(this->get_logger(), "service get_object_service not available, waiting ...");
         }
         auto result_future = get_object_client_->async_send_request(request);
         std::future_status status = result_future.wait_until(
-            std::chrono::steady_clock::now() + std::chrono::seconds(1));
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();

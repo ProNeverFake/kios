@@ -107,7 +107,7 @@ private:
     rclcpp::Service<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_serer_;
     rclcpp::TimerBase::SharedPtr test_timer_;
 
-    unsigned int mongo_port;
+    unsigned int mongo_port; // not used now
 
     bool update_object_dictionary()
     {

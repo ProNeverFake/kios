@@ -157,6 +157,9 @@ private:
         m_tree_root;
     BT::NodeStatus tick_result;
 
+    // object dictionary
+    std::shared_ptr<std::unordered_map<std::string, kios::Object>> object_dictionary_ptr_;
+
     /**
      * @brief update the task_state. here the lock priority is lower than timer.
      *
@@ -515,7 +518,7 @@ private:
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();
-            if (result->is_success == true)
+            if (result->is_accepted == true)
             {
                 RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
                 try

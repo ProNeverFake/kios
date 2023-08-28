@@ -6,6 +6,8 @@
 #include "nlohmann/json.hpp"
 
 #include "kios_utils/data_type.hpp"
+#include "kios_utils/object.hpp"
+#include "kios_utils/parameters.hpp"
 
 namespace kios
 {

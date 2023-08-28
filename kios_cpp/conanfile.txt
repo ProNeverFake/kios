@@ -1,6 +1,8 @@
 [requires]
+eigen/3.4.0
+mongo-cxx-driver/3.6.6
 poco/1.11.0
 
 [generators]
 cmake_find_package
-cmake
+

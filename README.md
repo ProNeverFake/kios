@@ -54,7 +54,8 @@ terminate called after throwing an instance of 'BT::LogicError'
 ```
 
 **DEVELOPER'S PLAN:**
-- [ ] **TOP** ws_client enable request result bool return (otherwise large lag.)
+- [x] **ERGENT** enable at position check in tree node.
+- [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
@@ -144,6 +145,16 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *26.08.2023:*
+  1. Added mongo_reader cpp node. The old python node is discarded from now.
+  2. Added mongo_client lib and object master class. Merged Object and Parameters from mios.
+  3. Successfully read the objects from mongoDB.
+
+- *27.08.2023:*
+  1. Added send_and_check method to ws_client. Now commander can handle the response from mios.
+  2. Added request handling method in commander. Now commander is enabled to stop mios skill execution when a success is invoked on kios side. 
+  3. Added tree phase to switch action request and tree state. Now tactician can conduct tree phase check and stay in the same phase with tree node.
 
 - *26.08.2023:*
   1. BehaviorTree.CPP library changed. In reactivesequence, the error of multiple nodes return running is disabled now.

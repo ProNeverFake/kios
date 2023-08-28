@@ -55,6 +55,10 @@ if(ENABLE_CONAN)
     conan_basic_setup(TARGETS)
 endif()
 
+## NOW CONAN IS SET BY conan.cmake
+include(cmake/Conan.cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+
 
 # set CPP standard as 17 according to package behavior_tree library
 set(CMAKE_CXX_STANDARD 17)
@@ -87,6 +91,13 @@ find_package(spdlog REQUIRED)
 find_package(std_srvs REQUIRED)
 # find_package(Poco REQUIRED COMPONENTS Net)
 find_package(Boost REQUIRED COMPONENTS system thread)
+
+find_package(mongocxx REQUIRED)
+
+# find_package(libbsoncxx REQUIRED)
+
+
+find_package(Eigen3 REQUIRED)
 
 find_package(fmt REQUIRED)
 

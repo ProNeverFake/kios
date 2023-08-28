@@ -58,7 +58,7 @@ class MongoReader(Node):
     def server_callback(self, request, response):
         response.object_data = ""
         response.error_message = ""
-        response.is_success = False
+        response.is_accepted = False
         if self.is_running:
             object_list = request.object_list
             if len(object_list) <= 0:
@@ -79,7 +79,7 @@ class MongoReader(Node):
                     response.error_message = "read result == null"
                     return
 
-                response.is_success = True
+                response.is_accepted = True
                 response.object_data = json.dumps(object_result)
                 return response
 

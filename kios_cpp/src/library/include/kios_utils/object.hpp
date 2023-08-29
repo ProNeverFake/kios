@@ -3,6 +3,8 @@
 #include "nlohmann/json.hpp"
 #include "Eigen/Core"
 
+#include <optional>
+
 namespace kios
 {
 

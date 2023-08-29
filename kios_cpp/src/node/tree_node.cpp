@@ -31,14 +31,14 @@ public:
         : Node("tree_node"),
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
-          isActionSuccess_(false)
+          isActionSuccess_(false),
+          hasUpdatedObjects_(false)
     {
         // initialize object list
         object_list_.push_back("contact");
         object_list_.push_back("approach");
 
         //* declare mission parameter
-        this->declare_parameter("is_update_object", false);
         this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
         this->declare_parameter("pub_power", true);
@@ -124,6 +124,7 @@ public:
 private:
     // flag
     bool isActionSuccess_;
+    bool hasUpdatedObjects_;
 
     // thread rel
     std::mutex tree_mtx_;
@@ -224,13 +225,14 @@ private:
             // * lock tree phase first
             std::lock_guard<std::mutex> lock_tree_phase(tree_phase_mtx_);
             // * check the necessity of updating objects
-            if (this->get_parameter("is_update_object").as_bool() == true)
+            if (hasUpdatedObjects_ == false)
             {
                 RCLCPP_INFO(this->get_logger(), "update the object...");
-                if (update_object() == false)
+                if (update_object(1000, 1000) == false)
                 {
                     switch_tree_phase("ERROR");
                 }
+                hasUpdatedObjects_ = true;
             }
 
             // * get mios skill execution state
@@ -493,59 +495,6 @@ private:
         }
     }
 
-    //  ! DISCARDED. THIS IS FOR MONGO READER IN PYTHON
-    // bool update_object()
-    // {
-    //     // * send request to update the object
-    //     auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
-    //     request->object_list = object_list_;
-    //     while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
-    //     {
-    //         if (!rclcpp::ok())
-    //         {
-    //             RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-    //             rclcpp::shutdown();
-    //         }
-    //         RCLCPP_INFO(this->get_logger(), "service get_object_service not available, waiting ...");
-    //     }
-    //     auto result_future = get_object_client_->async_send_request(request);
-    //     std::future_status status = result_future.wait_until(
-    //         std::chrono::steady_clock::now() + std::chrono::seconds(1));
-    //     if (status == std::future_status::ready)
-    //     {
-    //         auto result = result_future.get();
-    //         if (result->is_accepted == true)
-    //         {
-    //             RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
-    //             try
-    //             {
-    //                 nlohmann::json object_data = nlohmann::json::parse(result->object_data);
-    //             }
-    //             catch (...)
-    //             {
-    //                 RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
-    //                 return false;
-    //             }
-    //             // ! TODO handle the object_data
-    //         }
-    //         else
-    //         {
-    //             RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
-    //             return false;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
-    //         return false;
-    //     }
-
-    //     // * reset the flag in node param
-    //     std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
-    //     this->set_parameters(all_new_parameters);
-    //     return true;
-    // }
-
     /**
      * @brief update the object with GetObjectRequest client
      * @return true
@@ -574,19 +523,22 @@ private:
             if (result->is_accepted == true)
             {
                 RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
+                std::unordered_map<std::string, kios::Object> object_dict_;
                 try
                 {
-                    nlohmann::json object_data = nlohmann::json::parse(result->object_data);
+                    for (int i = 0; i < result->object_name.size(); i++)
+                    {
+                        auto p = std::make_pair(result->object_name[i], kios::Object::from_json(nlohmann::json::parse(result->object_data[i])));
+                        object_dict_.insert(p);
+                    }
+                    // * update the object dictionary in task state
+                    task_state_ptr_->object_dictionary.swap(object_dict_);
                 }
                 catch (...)
                 {
                     RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
                     return false;
                 }
-                // ! TODO assemble the object dictionary
-                //////////////////////////////////////////////////////////////////////////////
-
-                ///////////////////////////////////////////////////////////////////////////////
             }
             else
             {
@@ -599,11 +551,6 @@ private:
             RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
             return false;
         }
-
-        // * reset the flag in node param
-        std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
-        this->set_parameters(all_new_parameters);
-        return true;
     }
 };
 

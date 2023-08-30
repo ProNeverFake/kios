@@ -2,18 +2,20 @@
 ######################################################### mirmi_utils library
 set(MODULE_NAME mirmi_utils)
 
-# file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/kios_communication/*.cpp")
-# file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/mirmi_utils/*.hpp")
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/mirmi_utils/*.cpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/mirmi_utils/*.hpp")
 
-add_library(${MODULE_NAME} INTERFACE
-    # ${${MODULE_NAME}_SRC}
-    # ${${MODULE_NAME}_HEADER_FILES}
+add_library(${MODULE_NAME} STATIC
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
     )
 
 add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
 
 target_include_directories(${MODULE_NAME}
-    INTERFACE
+    PRIVATE
+        src
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     )
@@ -22,7 +24,7 @@ target_include_directories(${MODULE_NAME}
 # Attention: target_link_libraries() should not apply any keyword
 # since no keyword is applied in ament_target_dependencies()
 target_link_libraries(${MODULE_NAME}
-    INTERFACE
+    PUBLIC
         spdlog::spdlog
         nlohmann_json::nlohmann_json
         Eigen3::Eigen

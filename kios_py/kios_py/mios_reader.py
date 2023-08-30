@@ -23,7 +23,8 @@ class MiosReader(Node):
 
     udp_subscriber = ''
     # robot state variable dictionary.
-    mios_state_default = {"TF_F_ext_K" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
+    mios_state_default = {"TF_F_ext_K" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                          "T_T_EE" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
 
     def __init__(self):
         super().__init__('mios_reader')
@@ -67,6 +68,7 @@ class MiosReader(Node):
             pub_msg = MiosState()
             udp_msg = self.udp_receiver_.get_last_message()
             if udp_msg:
+                # * msg received, publish new.
                 self.time_out_count_ = 0
                 self.get_logger().info("Received message: %s" % udp_msg.decode())
                 mios_state = json.loads(udp_msg.decode())
@@ -75,24 +77,26 @@ class MiosReader(Node):
                 # self.get_logger().info(f'CHECK: '+ mios_state)
                 # print('mios time: ', mios_state["system_time"])
                 # print('kios time: ', datetime.now())
+                self.publisher.publish(pub_msg)
             else:
+                # * no message, count timeout
                 self.time_out_count_ = self.time_out_count_ + 1
                 self.get_logger().error("UDP TIME OUT TRIGGERED ONCE")
                 if self.time_out_count_ >= 10:
                     self.get_logger().error("UDP TIME OUT FOR TOO LONG! POWER OFF!")
                     self.switch_power(turn_on=False)
-                pub_msg = self.update_mios_state_message(
-                    pub_msg, self.mios_state_default)
+                # pub_msg = self.update_mios_state_message(
+                #     pub_msg, self.mios_state_default)
             # publish msg
-            self.publisher.publish(pub_msg)
+            
         else:
+            # * set the udp with the same state as the node.
             if self.udpOn == True:
                 self.udp_receiver_.stop()
                 self.udpOn = False
             else:
                 pass
             self.get_logger().error('Power off, timer pass ...')
-            pass
 
     def check_power(self):
         if self.has_parameter('power'):
@@ -114,6 +118,7 @@ class MiosReader(Node):
     # method to update the msg to publish
     def update_mios_state_message(self, msg: MiosState,  mios_state: str):
         msg.tf_f_ext_k = mios_state["TF_F_ext_K"]
+        msg.t_t_ee = mios_state["T_T_EE"]
         return msg
 
 

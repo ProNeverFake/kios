@@ -88,6 +88,8 @@ namespace kios
     struct TaskState
     {
         std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
+        std::vector<double> t_t_ee = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
         bool isActionSuccess = false;
 
         std::unordered_map<std::string, Object> object_dictionary;

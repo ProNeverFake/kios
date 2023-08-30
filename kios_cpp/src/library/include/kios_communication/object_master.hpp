@@ -1,14 +1,3 @@
-/**
- * @file lt_memory.hpp
- * @author your name (you@domain.com)
- * @brief long time memory.
- * * store and read data from mongo DB for long time utilization.
- * @version 0.1
- * @date 2023-06-11
- *
- * @copyright Copyright (c) 2023
- *
- */
 #pragma once
 
 #include "kios_communication/mongodb_client.hpp"
@@ -41,7 +30,7 @@ namespace kios
 
         unsigned m_database_port;
 
-        std::shared_ptr<std::unordered_map<std::string, Object>> get_object_dictionary();
+        std::unordered_map<std::string, Object> get_object_dictionary();
 
     private:
         bool make_database_consistent();
@@ -49,7 +38,7 @@ namespace kios
 
         MongodbClient m_mongodb_client;
 
-        std::shared_ptr<std::unordered_map<std::string, Object>> object_dictionary_ptr_;
+        std::unordered_map<std::string, Object> object_dictionary_;
     };
 
 } // namespace kios

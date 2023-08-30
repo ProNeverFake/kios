@@ -502,13 +502,13 @@ void BTMessenger::close()
     m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
 }
 
-void BTMessenger::register_udp(int &port)
+void BTMessenger::register_udp(int &port, nlohmann::json &sub_list)
 {
     udp_port = port;
     nlohmann::json payload;
     payload["ip"] = udp_ip;
     payload["port"] = udp_port;
-    payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K", "system_time"};
+    payload["subscribe"] = sub_list;
     if (is_connected())
     {
         // !! DEBUG

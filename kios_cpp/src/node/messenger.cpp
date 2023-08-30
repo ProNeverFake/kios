@@ -97,6 +97,7 @@ private:
         {
             RCLCPP_INFO(this->get_logger(), "MIOS SUB hit.");
             task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            task_state_msg_.t_t_ee = std::move(msg->t_t_ee);
         }
         else
         {

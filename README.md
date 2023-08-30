@@ -54,7 +54,7 @@ terminate called after throwing an instance of 'BT::LogicError'
 ```
 
 **DEVELOPER'S PLAN:**
-- [x] **ERGENT** enable at position check in tree node.
+- [ ] **ERGENT** enable at position check in tree node.
 - [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
@@ -145,6 +145,9 @@ The basic idea is to make the decision making part in kios and the skill executi
 Blackbird: I'll just skip this part for now. 
 
 ### Development Log
+
+- *29.08.2023:*
+  1. Changed the msg TaskState into nested msg type with MiosState and SensorState.
 
 - *28.08.2023:*
   1. Added mongo_reader cpp node. The old python node is discarded from now.

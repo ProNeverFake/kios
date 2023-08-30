@@ -169,16 +169,20 @@ private:
      */
     void subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        if (check_power() == true)
+        // ! TEST
+        // if (check_power() == true)
         {
             std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
             if (lock.owns_lock())
             {
                 // ! BBDEBUG maybe lock will fail for a long time.
                 // ! check the execution speed of the tree.
-                std::cout << "subscription listened: " << msg->tf_f_ext_k[2] << std::endl;
+                // std::cout << "subscription listened: " << msg->tf_f_ext_k[2] << std::endl;
                 // RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
+                std::cout << "subscription listened: " << msg->t_t_ee[15] << std::endl;
+
                 m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
+                task_state_ptr_->t_t_ee = std::move(msg->t_t_ee);
             }
             else
             {
@@ -232,7 +236,19 @@ private:
                 {
                     switch_tree_phase("ERROR");
                 }
-                hasUpdatedObjects_ = true;
+                else
+                {
+                    hasUpdatedObjects_ = true;
+                }
+                // // ! TEST
+                // /////////////////////////////////////
+                // std::cout << "TEST" << std::endl;
+                // for (auto &entity : task_state_ptr_->object_dictionary)
+                // {
+                //     std::cout << entity.first << std::endl;
+                //     std::cout << entity.second.O_T_OB << std::endl;
+                // }
+                // //////////////////////////////////////
             }
 
             // * get mios skill execution state
@@ -511,8 +527,11 @@ private:
             {
                 RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
                 switch_power(false);
+                return false;
             }
-            RCLCPP_INFO(this->get_logger(), "service get_object_service not available, waiting ...");
+            RCLCPP_ERROR(this->get_logger(), "service get_object_service is timeout for getting ready!");
+            switch_power(false);
+            return false;
         }
         auto result_future = get_object_client_->async_send_request(request);
         std::future_status status = result_future.wait_until(
@@ -526,13 +545,17 @@ private:
                 std::unordered_map<std::string, kios::Object> object_dict_;
                 try
                 {
+                    // std::cout << "READ START" << std::endl;
                     for (int i = 0; i < result->object_name.size(); i++)
                     {
                         auto p = std::make_pair(result->object_name[i], kios::Object::from_json(nlohmann::json::parse(result->object_data[i])));
-                        object_dict_.insert(p);
+                        object_dict_.emplace(p);
                     }
+                    // std::cout << "SWAP" << std::endl;
                     // * update the object dictionary in task state
                     task_state_ptr_->object_dictionary.swap(object_dict_);
+                    // std::cout << "READ FINISH" << std::endl;
+                    return true;
                 }
                 catch (...)
                 {

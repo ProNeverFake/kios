@@ -162,24 +162,37 @@ namespace kios
 
     bool ObjectMaster::load_environment()
     {
-        spdlog::trace("ObjectMaster::load_environment");
-        std::set<nlohmann::json> docs;
-        object_dictionary_ptr_->emplace(std::make_pair("NullObject", Object("NullObject")));
-        object_dictionary_ptr_->emplace(std::make_pair("NoneObject", Object("NoneObject")));
-        if (!m_mongodb_client.read_documents("environment", docs))
+        try
         {
-            return false;
+            spdlog::trace("ObjectMaster::load_environment");
+            std::set<nlohmann::json> docs;
+            // object_dictionary_.emplace(std::make_pair("NullObject", Object("NullObject")));
+            // object_dictionary_.emplace(std::make_pair("NoneObject", Object("NoneObject")));
+            if (!m_mongodb_client.read_documents("environment", docs))
+            {
+                return false;
+            }
+
+            for (const auto &d : docs)
+            {
+                object_dictionary_.emplace(std::make_pair(d["name"], Object::from_json(d)));
+            }
+            return true;
         }
-        for (const auto &d : docs)
+        catch (const std::exception &e)
         {
-            object_dictionary_ptr_->emplace(std::make_pair(d["name"], Object::from_json(d)));
+            std::cerr << e.what() << '\n';
         }
-        return true;
     }
 
-    std::shared_ptr<std::unordered_map<std::string, Object>> ObjectMaster::get_object_dictionary()
+    /**
+     * @brief get copy
+     *
+     * @return std::unordered_map<std::string, Object>
+     */
+    std::unordered_map<std::string, Object> ObjectMaster::get_object_dictionary()
     {
-        return object_dictionary_ptr_;
+        return object_dictionary_;
     }
 
     bool ObjectMaster::upload_environment_element(const Object &element)
@@ -203,7 +216,7 @@ namespace kios
         //    if(!m_mongodb_client.write_document("safety","parameters",m_st_memory->read_parameters()->safety.to_json(),true)){
         //        return false;
         //    }
-        for (const auto &env : *object_dictionary_ptr_)
+        for (const auto &env : object_dictionary_)
         {
             spdlog::debug("Updating object: " + env.first);
             if (!m_mongodb_client.write_document(env.first, "environment", env.second.to_json(), true))

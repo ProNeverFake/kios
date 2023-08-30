@@ -188,7 +188,7 @@ public:
     bool stop_task_request();
     bool start_task_request(nlohmann::json skill_context);
     void unregister_udp();
-    void register_udp(int &port);
+    void register_udp(int &port, nlohmann::json &sub_list);
     void set_message_handler(std::function<void(const std::string &)> handler);
     void send_grasped_object();
     bool wait_for_open_connection(int deadline);

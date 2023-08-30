@@ -27,9 +27,10 @@ public:
     Commander()
         : Node("commander"),
           ws_url("ws://localhost:12000/mios/core"),
-          udp_ip("127.0.0.1"),
-          udp_port(12346),
-          isBusy(false)
+          udp_ip("127.0.0.1"), // not used
+          udp_port_(12346),
+          isBusy(false),
+          subscription_list_{"tau_ext", "q", "TF_F_ext_K", "system_time", "T_T_EE"}
     {
         // declare power parameter
         this->declare_parameter("power", true);
@@ -48,7 +49,7 @@ public:
         }
 
         // udp register
-        mios_register_udp();
+        mios_register_udp(udp_port_, subscription_list_);
 
         // object announcement
         messenger_->send_grasped_object();
@@ -69,9 +70,9 @@ public:
     }
 
     // connection rel
-    void mios_register_udp()
+    void mios_register_udp(int &udp_port, nlohmann::json sub_list)
     {
-        messenger_->register_udp(udp_port);
+        messenger_->register_udp(udp_port, sub_list);
     }
     void mios_unregister_udp()
     {
@@ -114,8 +115,10 @@ private:
     std::string ws_url;
 
     // udp subscriber ip
-    std::string udp_ip;
-    int udp_port;
+    std::string udp_ip; // not used
+    int udp_port_;
+    nlohmann::json subscription_list_;
+    // std::vector<std::string> subscription_list;
 
     void command_service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,

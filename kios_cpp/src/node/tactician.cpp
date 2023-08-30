@@ -139,10 +139,10 @@ private:
         {
             std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
             RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-            if (msg->tf_f_ext_k.empty())
-            {
-                RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
-            }
+            // if (msg->tf_f_ext_k.empty())
+            // {
+            //     RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
+            // }
             // std::stringstream ss;
 
             // for (size_t i = 0; i < msg->tf_f_ext_k.size(); ++i)
@@ -160,7 +160,8 @@ private:
             // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
             // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", msg->tf_f_ext_k[2]);
 
-            task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            // task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            task_state_.from_ros2_msg(*msg);
         }
         else
         {

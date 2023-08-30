@@ -27,47 +27,47 @@ def launch_in_new_terminal(cmd, log_file):
 
 def generate_launch_description():
 
-    # mongo_reader = Node(
-    #     package='kios_cpp',
-    #     namespace='',
-    #     executable='mongo_reader',
-    #     name='mongo_reader'
-    # )
+    mongo_reader = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='mongo_reader',
+        name='mongo_reader'
+    )
 
-    # mios_reader = Node(
-    #     package='kios_py',
-    #     namespace='',
-    #     executable='mios_reader',
-    #     name='mios_reader'
-    # )
+    mios_reader = Node(
+        package='kios_py',
+        namespace='',
+        executable='mios_reader',
+        name='mios_reader'
+    )
 
-    # messenger = Node(
-    #     package='kios_cpp',
-    #     namespace='',
-    #     executable='messenger',
-    #     name='messenger'
-    # )
+    messenger = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='messenger',
+        name='messenger'
+    )
 
-    # tree_node = Node(
-    #     package='kios_cpp',
-    #     namespace='',
-    #     executable='tree_node',
-    #     name='tree_node'
-    # )
+    tree_node = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='tree_node',
+        name='tree_node'
+    )
 
-    # tactician = Node(
-    #     package='kios_cpp',
-    #     namespace='',
-    #     executable='tactician',
-    #     name='tactician'
-    # )
+    tactician = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='tactician',
+        name='tactician'
+    )
 
-    # commander = Node(
-    #     package='kios_cpp',
-    #     namespace='',
-    #     executable='commander',
-    #     name='commander'
-    # )
+    commander = Node(
+        package='kios_cpp',
+        namespace='',
+        executable='commander',
+        name='commander'
+    )
 
     return LaunchDescription([
         # background_r_launch_arg,
@@ -79,17 +79,17 @@ def generate_launch_description():
         # turtlesim_node,
         # turtlesim_node_with_parameters,
         # forward_turtlesim_commands_to_second_turtlesim_node,
-        # mios_reader,
-        # mongo_reader,
-        # messenger,
+        mios_reader,
+        mongo_reader,
+        messenger,
         # tree_node,
         # tactician,
-        # commander,
-        launch_in_new_terminal('ros2 run kios_cpp commander', 'commander.log'),
-        launch_in_new_terminal('ros2 run kios_cpp mongo_reader', 'mongo_reader.log'),
-        launch_in_new_terminal('ros2 run kios_py mios_reader', 'mios_reader.log'),
-        launch_in_new_terminal('ros2 run kios_cpp messenger', 'messenger.log'),
-        # launch_in_new_terminal('ros2 run kios_cpp tactician', 'tactician.log'),
+        commander,
+        # launch_in_new_terminal('ros2 run kios_cpp commander', 'commander.log'),
+        # launch_in_new_terminal('ros2 run kios_cpp mongo_reader', 'mongo_reader.log'),
+        # launch_in_new_terminal('ros2 run kios_py mios_reader', 'mios_reader.log'),
+        # launch_in_new_terminal('ros2 run kios_cpp messenger', 'messenger.log'),
+        launch_in_new_terminal('ros2 run kios_cpp tactician', 'tactician.log'),
         launch_in_new_terminal('ros2 run kios_cpp tree_node', 'tree_node.log'),
     ])
 

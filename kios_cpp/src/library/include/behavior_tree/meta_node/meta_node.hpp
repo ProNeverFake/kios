@@ -11,6 +11,8 @@
 
 #include "kios_utils/kios_utils.hpp"
 
+#include "mirmi_utils/math.hpp"
+
 namespace Insertion
 {
 
@@ -148,5 +150,36 @@ namespace Insertion
         // * default values as member variable of the node
         kios::ActionPhaseContext node_context_; // default node context value
     };
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // // * META CONDITION NODE
+    // class HasObject : public HyperMetaNode<BT::ConditionNode>
+    // {
+    // public:
+    //     HasObject(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+    //     BT::NodeStatus tick() override;
+    //     bool is_success() override;
+
+    //     // empty override
+    //     void update_tree_state() override{};
+    //     void node_context_initialize() override{};
+
+    // private:
+    // };
+
+    // class AtPosition : public HyperMetaNode<BT::ConditionNode>
+    // {
+    // public:
+    //     AtPosition(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+    //     BT::NodeStatus tick() override;
+    //     bool is_success() override;
+
+    //     // empty override
+    //     void update_tree_state() override{};
+    //     void node_context_initialize() override{};
+
+    // private:
+    // };
 
 } // namespace Insertion

@@ -175,14 +175,13 @@ private:
             std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
             if (lock.owns_lock())
             {
-                // ! BBDEBUG maybe lock will fail for a long time.
-                // ! check the execution speed of the tree.
                 // std::cout << "subscription listened: " << msg->tf_f_ext_k[2] << std::endl;
                 // RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
-                std::cout << "subscription listened: " << msg->t_t_ee[15] << std::endl;
+                // std::cout << "subscription listened: " << msg->mios_state.t_t_ee[15] << std::endl;
+                task_state_ptr_->from_ros2_msg(*msg);
 
-                m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
-                task_state_ptr_->t_t_ee = std::move(msg->t_t_ee);
+                // m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
+                // task_state_ptr_->t_t_ee = std::move(msg->t_t_ee);
             }
             else
             {
@@ -240,15 +239,21 @@ private:
                 {
                     hasUpdatedObjects_ = true;
                 }
-                // // ! TEST
-                // /////////////////////////////////////
-                // std::cout << "TEST" << std::endl;
-                // for (auto &entity : task_state_ptr_->object_dictionary)
-                // {
-                //     std::cout << entity.first << std::endl;
-                //     std::cout << entity.second.O_T_OB << std::endl;
-                // }
-                // //////////////////////////////////////
+                // ! TEST
+                /////////////////////////////////////
+                std::cout << "TEST" << std::endl;
+                for (auto &entity : task_state_ptr_->object_dictionary)
+                {
+                    std::cout << entity.first << std::endl;
+                    std::cout << entity.second.O_T_OB << std::endl;
+                }
+
+                auto &dict = task_state_ptr_->object_dictionary;
+                if (dict.find("contact") == dict.end())
+                {
+                    std::cerr << "NOT CONTACT IN THE DICTIONARY!" << std::endl;
+                }
+                //////////////////////////////////////
             }
 
             // * get mios skill execution state
@@ -284,20 +289,41 @@ private:
      */
     bool is_tree_running()
     {
+        // ! CHANGE
+        // * check tree state first for detect possibly invoked error in tree node.
+        if (tree_state_ptr_->tree_phase == kios::TreePhase::ERROR)
+        {
+            RCLCPP_FATAL(this->get_logger(), "DETECT INVOKED INNER ERROR FROM TREE NODE!");
+            switch_power(false);
+            return false;
+        }
+
+        // * check tick_result
         switch (tick_result)
         {
         case BT::NodeStatus::RUNNING: {
             return true;
+            break;
         };
         case BT::NodeStatus::SUCCESS: {
-            RCLCPP_INFO(this->get_logger(), "MISSION SUCCEEDS.");
+            RCLCPP_INFO(this->get_logger(), "IS_TREE_RUNNING: MISSION SUCCEEDS.");
             std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", true)};
             this->set_parameters(all_new_parameters);
             switch_tree_phase("FINISH");
             return false;
+            break;
         };
+        case BT::NodeStatus::FAILURE: {
+            RCLCPP_ERROR(this->get_logger(), "IS_TREE_RUNNING: TREE IN FAILURE STATUS, MISSION FAILS.");
+            // ? currently this ros param is not used. set it for completion.
+            std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", false)};
+            this->set_parameters(all_new_parameters);
+            switch_tree_phase("FAILURE");
+            return false;
+            break;
+        }
         default: {
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED BEHAVIOR!");
+            RCLCPP_ERROR(this->get_logger(), "IS_TREE_RUNNNING: HANDLER FOR RETURNED BT::NODESTATUS IS NOT DEFINED!");
             switch_tree_phase("ERROR");
             return false;
         }

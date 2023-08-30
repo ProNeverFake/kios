@@ -12,20 +12,21 @@ namespace Insertion
     void TreeRoot::initialize_tree()
     {
         // * register nodes
-        // static GripperInterface grip_singleton;
-        // factory.registerSimpleCondition("CheckBattery", std::bind(CheckBattery));
-        // factory.registerSimpleAction("OpenGripper", std::bind(&GripperInterface::open, &grip_singleton));
+        // * condition nodes
+        factory_.registerNodeType<HasObject>("HasObjectApproch", "approach", tree_state_ptr_, task_state_ptr_);
+        factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
+        factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
+        factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
+        // * action nodes
         factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<HasObject>("HasObject", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<AtPosition>("AtPosition", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
-        // factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
+
         // * generate tree
         tree_ = factory_.createTreeFromText(test_tree);
     }
 
-    // ! TODO TRY
+    // ! TODO TRY TO GENERATE TREE FROM C++ CODE
     // void TreeRoot::construct_tree()
     // {
     //     BT::NodeConfiguration config;

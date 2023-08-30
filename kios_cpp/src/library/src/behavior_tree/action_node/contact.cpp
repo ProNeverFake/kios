@@ -20,21 +20,20 @@ namespace Insertion
         std::cout << "CONTACT IS_SUCCESS?" << std::endl;
 
         // std::cerr << "CHECK TASK STATE CONTENT" << std::endl;
-
-        std::stringstream ss;
-        for (size_t i = 0; i < get_task_state_ptr()->tf_f_ext_k.size(); ++i)
-        {
-            ss << get_task_state_ptr()->tf_f_ext_k[i];
-            if (i != get_task_state_ptr()->tf_f_ext_k.size() - 1)
-            { // if not the last element
-                ss << ", ";
-            }
-        }
-        std::string str = ss.str();
-        std::cout << str << std::endl;
+        // std::stringstream ss;
+        // for (size_t i = 0; i < get_task_state_ptr()->tf_f_ext_k.size(); ++i)
+        // {
+        //     ss << get_task_state_ptr()->tf_f_ext_k[i];
+        //     if (i != get_task_state_ptr()->tf_f_ext_k.size() - 1)
+        //     { // if not the last element
+        //         ss << ", ";
+        //     }
+        // }
+        // std::string str = ss.str();
+        // std::cout << str << std::endl;
 
         // std::cerr << "BEFORE CHECK CONTACT SUCCESS" << std::endl;
-        if (get_task_state_ptr()->tf_f_ext_k[2] > 7)
+        if (get_task_state_ptr()->mios_state.tf_f_ext_k[2] > 7)
         {
             // std::cout << "CONTACT SUCCESS" << std::endl;
             mark_success();
@@ -70,7 +69,7 @@ namespace Insertion
         if (has_succeeded_once())
         {
             std::cout << "CONTACT HAS ONCE SUCCEEDED" << std::endl;
-            return BT::NodeStatus::SKIPPED;
+            return BT::NodeStatus::SUCCESS;
         }
         if (is_success())
         {
@@ -90,12 +89,12 @@ namespace Insertion
     /// method invoked by an action in the RUNNING state.
     BT::NodeStatus Contact::onRunning()
     {
-        std::cout << "CONTACT ON RUNNING" << std::endl;
-        if (has_succeeded_once())
-        {
-            std::cout << "CONTACT HAS ONCE SUCCEEDED == true" << std::endl;
-            return BT::NodeStatus::SKIPPED;
-        }
+        // std::cout << "CONTACT ON RUNNING" << std::endl;
+        // if (has_succeeded_once())
+        // {
+        //     std::cout << "CONTACT HAS ONCE SUCCEEDED == true" << std::endl;
+        //     return BT::NodeStatus::SKIPPED;
+        // }
         if (is_success())
         {
             std::cout << "CONTACT SUCCESS" << std::endl;

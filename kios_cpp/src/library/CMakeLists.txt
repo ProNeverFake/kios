@@ -124,6 +124,7 @@ target_link_libraries(${MODULE_NAME}
         fmt::fmt
         spdlog
         behaviortree_cpp
+        ${PROJECT_NAME}::mirmi_utils
     )
 
 ########## copy the xml tree file into the corresponding dir
@@ -159,19 +160,22 @@ add_library(${MODULE_NAME} STATIC
     )
 
 target_include_directories(${MODULE_NAME}
-PRIVATE
-    src
-PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-)
+        PRIVATE
+            src
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
 
 target_link_libraries(${MODULE_NAME} 
-    PUBLIC
         nlohmann_json::nlohmann_json
         spdlog
         Eigen3::Eigen
         ${PROJECT_NAME}::mirmi_utils
+    )
+ament_target_dependencies(${MODULE_NAME}
+        rclcpp
+        kios_interface
     )
 
 add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})

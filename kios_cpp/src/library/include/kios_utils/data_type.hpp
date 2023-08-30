@@ -11,6 +11,12 @@
 #include "nlohmann/json.hpp"
 #include "kios_utils/object.hpp"
 
+#include "kios_interface/msg/task_state.hpp"
+#include "kios_interface/msg/mios_state.hpp"
+#include "kios_interface/msg/sensor_state.hpp"
+
+#include "mirmi_utils/math.hpp"
+
 namespace kios
 {
     /**
@@ -34,7 +40,7 @@ namespace kios
      */
     enum class ActionPhase
     {
-        FINISH = 999,
+        FINISH = 999, // ! DISCARDED
         ERROR = -1,
         INITIALIZATION = 0,
         APPROACH = 1,
@@ -81,17 +87,68 @@ namespace kios
         bool isSwitchAction = false; // ! reserved flag. not used.
     };
 
+    struct MiosState
+    {
+        std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
+        std::vector<double> t_t_ee = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Eigen::Matrix<double, 4, 4> t_t_ee_matrix;
+
+        void from_ros2_msg(const kios_interface::msg::MiosState &msg)
+        {
+            tf_f_ext_k = std::move(msg.tf_f_ext_k);
+            if (msg.t_t_ee.size() != 16)
+            {
+                std::cerr << "Invalid data size!" << std::endl;
+            }
+            else
+            {
+                // * Here move
+                t_t_ee = std::move(msg.t_t_ee);
+                // * Here copy
+                t_t_ee_matrix = Eigen::Map<Eigen::Matrix<double, 4, 4>>(t_t_ee.data());
+                // std::cout << t_t_ee_matrix << std::endl;
+            }
+        }
+    };
+
+    struct SensorState
+    {
+        std::vector<double> test_data = {0, 0, 0, 0, 0, 0};
+
+        void from_ros2_msg(const kios_interface::msg::SensorState &msg)
+        {
+            test_data = std::move(msg.test_data);
+        }
+    };
+
     /**
      * @brief the perception of the robot in current task
      *
      */
     struct TaskState
     {
+        // * from messenger
+        MiosState mios_state;
+        SensorState sensor_state;
+
+        void from_ros2_msg(const kios_interface::msg::TaskState &msg)
+        {
+            mios_state.from_ros2_msg(msg.mios_state);
+            sensor_state.from_ros2_msg(msg.sensor_state);
+            // ! distance TEST
+            // double translation_distance = mirmi_utils::get_linear_distance(mios_state.t_t_ee_matrix, object_dictionary.at("approach").O_T_OB);
+            // std::cout << "T: " << translation_distance << std::endl;
+            // double rotation_distance = mirmi_utils::get_angular_distance(mios_state.t_t_ee_matrix, object_dictionary.at("approach").O_T_OB);
+            // std::cout << "R: " << rotation_distance << std::endl;
+        }
+
         std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
         std::vector<double> t_t_ee = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+        // * from skill udp
         bool isActionSuccess = false;
 
+        // * from mongo_reader
         std::unordered_map<std::string, Object> object_dictionary;
     };
 
@@ -264,7 +321,7 @@ namespace kios
                 {"search_f", {5, 3, 0.5, 0.5, 0.5, 1}},
                 {"search_phi", {3.14159 * 2 / 3, 3.14159 / 3, 0, 3.141592 / 2, 0, 0}},
                 {"K_x", {500, 500, 500, 800, 800, 800}},
-                {"f_push", {0, 0, 7, 0, 0, 0}},
+                {"f_push", {0, 0, 5, 0, 0, 0}},
                 {"dX_d", {0.1, 2}},
                 {"ddX_d", {0.5, 2}}}},
               {"p3",

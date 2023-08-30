@@ -40,7 +40,7 @@ namespace Insertion
         if (has_succeeded_once())
         {
             std::cout << "APPROACH HAS ONCE SUCCEEDED" << std::endl;
-            return BT::NodeStatus::SKIPPED;
+            return BT::NodeStatus::SUCCESS;
         }
         if (is_success())
         {
@@ -60,12 +60,6 @@ namespace Insertion
     /// method invoked by an action in the RUNNING state.
     BT::NodeStatus Approach::onRunning()
     {
-        std::cout << "APPROACH ON RUNNING" << std::endl;
-        if (has_succeeded_once())
-        {
-            std::cout << "APPROACH HAS ONCE SUCCEEDED == true" << std::endl;
-            return BT::NodeStatus::SKIPPED;
-        }
         if (is_success())
         {
             std::cout << "APPROACH SUCCESS" << std::endl;

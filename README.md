@@ -54,6 +54,7 @@ terminate called after throwing an instance of 'BT::LogicError'
 ```
 
 **DEVELOPER'S PLAN:**
+- [ ] Add reset method to all nodes to enable retry.
 - [ ] **ERGENT** enable at position check in tree node.
 - [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.

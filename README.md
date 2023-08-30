@@ -119,6 +119,8 @@ sudo activate-global-python-argcomplete3
 
 8. install mios (Please use branch "BBbranch").
 
+9. install spdlog.
+
 > BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
@@ -147,8 +149,14 @@ Blackbird: I'll just skip this part for now.
 
 ### Development Log
 
+- *30.08.2023:*
+  1. 
+  2.
+  3. 
+
 - *29.08.2023:*
   1. Changed the msg TaskState into nested msg type with MiosState and SensorState.
+  2. Restored all code in branch dump. reset branch BBbranch for debug.
 
 - *28.08.2023:*
   1. Added mongo_reader cpp node. The old python node is discarded from now.

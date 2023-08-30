@@ -32,16 +32,16 @@ public:
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
           isActionSuccess_(false),
-          hasUpdatedObjects_(false)
+          hasUpdatedObjects_(false),
+          object_list_()
     {
         // initialize object list
         object_list_.push_back("contact");
         object_list_.push_back("approach");
 
         //* declare mission parameter
-        this->declare_parameter("is_mission_success", false);
+        // this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
-        this->declare_parameter("pub_power", true);
         this->declare_parameter("client_power", true);
 
         //* initialize the callback groups
@@ -49,9 +49,8 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
         subscription_callback_group_ = timer_callback_group_;
 
-        publisher_callback_group_ = this->create_callback_group(
+        client_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
-        client_callback_group_ = publisher_callback_group_;
 
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
@@ -60,9 +59,6 @@ public:
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
         subscription_options.callback_group = subscription_callback_group_;
-        // ! DISCARDED
-        rclcpp::PublisherOptions publisher_options;
-        publisher_options.callback_group = publisher_callback_group_;
 
         // * initialize the callbacks
         subscription_ = this->create_subscription<kios_interface::msg::TaskState>(
@@ -70,11 +66,7 @@ public:
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
-        // ! DISCARDED
-        publisher_ = this->create_publisher<kios_interface::msg::TreeState>(
-            "tree_state_topic",
-            qos,
-            publisher_options);
+
         get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
             "get_object_service",
             rmw_qos_profile_services_default,
@@ -96,7 +88,7 @@ public:
 
         udp_socket_ = std::make_shared<kios::BTReceiver>("127.0.0.1", 8888);
 
-        // ! FOR TEST
+        // * set tree phase to resume to let tree tick
         tree_phase_ = kios::TreePhase::RESUME;
 
         rclcpp::sleep_for(std::chrono::seconds(4));
@@ -126,7 +118,7 @@ private:
     bool isActionSuccess_;
     bool hasUpdatedObjects_;
 
-    // thread rel
+    // thread data rel
     std::mutex tree_mtx_;
     std::mutex tree_phase_mtx_;
 
@@ -139,7 +131,7 @@ private:
     std::shared_ptr<kios::TaskState> task_state_ptr_;
 
     // object list
-    std::vector<std::string> object_list_; // ! DISCARDED
+    std::vector<std::string> object_list_; // reserved for the future. maybe use this for object check to judge if a task is possible.
 
     // object dictionary
     std::shared_ptr<std::unordered_map<std::string, kios::Object>> object_dictionary_ptr_;
@@ -148,18 +140,15 @@ private:
     rclcpp::CallbackGroup::SharedPtr client_callback_group_;
     rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
-    rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
-    rclcpp::Publisher<kios_interface::msg::TreeState>::SharedPtr publisher_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
-    std::shared_ptr<Insertion::TreeRoot>
-        m_tree_root;
+    std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
 
     /**
@@ -169,19 +158,13 @@ private:
      */
     void subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        // ! TEST
-        // if (check_power() == true)
+        if (check_power() == true)
         {
             std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
             if (lock.owns_lock())
             {
-                // std::cout << "subscription listened: " << msg->tf_f_ext_k[2] << std::endl;
-                // RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
-                // std::cout << "subscription listened: " << msg->mios_state.t_t_ee[15] << std::endl;
+                // * update task state
                 task_state_ptr_->from_ros2_msg(*msg);
-
-                // m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
-                // task_state_ptr_->t_t_ee = std::move(msg->t_t_ee);
             }
             else
             {
@@ -190,6 +173,12 @@ private:
         }
     }
 
+    /**
+     * @brief handle the switch tree phase request.
+     * ! TODO TEST
+     * @param request
+     * @param response
+     */
     void switch_tree_phase_server_callback(
         const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Response> response)
@@ -239,20 +228,20 @@ private:
                 {
                     hasUpdatedObjects_ = true;
                 }
-                // ! TEST
-                /////////////////////////////////////
-                std::cout << "TEST" << std::endl;
-                for (auto &entity : task_state_ptr_->object_dictionary)
-                {
-                    std::cout << entity.first << std::endl;
-                    std::cout << entity.second.O_T_OB << std::endl;
-                }
+                // // ! TEST
+                // /////////////////////////////////////
+                // std::cout << "TEST" << std::endl;
+                // for (auto &entity : task_state_ptr_->object_dictionary)
+                // {
+                //     std::cout << entity.first << std::endl;
+                //     std::cout << entity.second.O_T_OB << std::endl;
+                // }
 
-                auto &dict = task_state_ptr_->object_dictionary;
-                if (dict.find("contact") == dict.end())
-                {
-                    std::cerr << "NOT CONTACT IN THE DICTIONARY!" << std::endl;
-                }
+                // auto &dict = task_state_ptr_->object_dictionary;
+                // if (dict.find("contact") == dict.end())
+                // {
+                //     std::cerr << "NOT CONTACT IN THE DICTIONARY!" << std::endl;
+                // }
                 //////////////////////////////////////
             }
 
@@ -307,17 +296,18 @@ private:
         };
         case BT::NodeStatus::SUCCESS: {
             RCLCPP_INFO(this->get_logger(), "IS_TREE_RUNNING: MISSION SUCCEEDS.");
-            std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", true)};
-            this->set_parameters(all_new_parameters);
+            // // ? currently this ros param is not used. set it for completion.
+            // std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", true)};
+            // this->set_parameters(all_new_parameters);
             switch_tree_phase("FINISH");
             return false;
             break;
         };
         case BT::NodeStatus::FAILURE: {
             RCLCPP_ERROR(this->get_logger(), "IS_TREE_RUNNING: TREE IN FAILURE STATUS, MISSION FAILS.");
-            // ? currently this ros param is not used. set it for completion.
-            std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", false)};
-            this->set_parameters(all_new_parameters);
+            // // ? currently this ros param is not used. set it for completion.
+            // std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", false)};
+            // this->set_parameters(all_new_parameters);
             switch_tree_phase("FAILURE");
             return false;
             break;
@@ -546,6 +536,7 @@ private:
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
+        // now the object_list is not in use.
         request->object_list = object_list_;
         while (!get_object_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {

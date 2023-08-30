@@ -54,7 +54,7 @@ public:
             rmw_qos_profile_services_default,
             client_callback_group_);
 
-        //*
+        // * initialize switch action server
         switch_action_server_ = this->create_service<kios_interface::srv::SwitchActionRequest>(
             "switch_action_service",
             std::bind(&Tactician::switch_action_server_callback, this, _1, _2),
@@ -109,7 +109,7 @@ private:
 
     // flags
     std::atomic_bool isSwitchAction;
-    std::atomic_bool isBusy; // this is necessary because of the timer callback group setting
+    std::atomic_bool isBusy; // necessary because of the timer callback group setting
 
     // state of tree and task
     kios::TaskState task_state_;
@@ -139,28 +139,7 @@ private:
         {
             std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
             RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-            // if (msg->tf_f_ext_k.empty())
-            // {
-            //     RCLCPP_ERROR(this->get_logger(), "WHY IS THE MSG EMPTY???");
-            // }
-            // std::stringstream ss;
-
-            // for (size_t i = 0; i < msg->tf_f_ext_k.size(); ++i)
-            // {
-            //     ss << msg->tf_f_ext_k[i];
-            //     if (i != msg->tf_f_ext_k.size() - 1)
-            //     { // if not the last element
-            //         ss << ", ";
-            //     }
-            // }
-            // std::string str = ss.str();
-            // std::cout << str << std::endl;
-            // std::cout << "PRINT TEST: " << msg->tf_f_ext_k << std::endl;
-            // double test_number = msg->tf_f_ext_k[2];
-            // RCLCPP_INFO_STREAM(this->get_logger(), "task subscription listened: " << test_number);
-            // RCLCPP_INFO(this->get_logger(), "task subscription listened: %f", msg->tf_f_ext_k[2]);
-
-            // task_state_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            // * update task state
             task_state_.from_ros2_msg(*msg);
         }
         else

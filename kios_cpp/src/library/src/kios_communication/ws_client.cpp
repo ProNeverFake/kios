@@ -295,7 +295,7 @@ BTMessenger::BTMessenger(const std::string &uri)
     auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
     file_sink->set_level(spdlog::level::debug);
 
-    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("kios", {console_sink, file_sink}));
     logger->set_level(info_level);
     spdlog::set_default_logger(logger);
     spdlog::info("spdlog: initialized.");
@@ -326,7 +326,7 @@ bool BTMessenger::connect_o()
 }
 /**
  * @brief connect method with future obj
- *
+ * ! Discarded
  * @return true
  * @return false
  */
@@ -345,7 +345,8 @@ bool BTMessenger::connect()
         break;
     };
     case std::future_status::ready: {
-        std::cout << "websocket connection request: affirmative." << std::endl;
+        // std::cout << "websocket connection request: affirmative." << std::endl;
+        spdlog::info("websocket connection request: affirmative.");
         connection_id = connection_future.get();
         std::cout << "connection id: " << connection_id << std::endl;
         if (connection_id < 0)
@@ -389,7 +390,8 @@ bool BTMessenger::connect()
     }
     }
 }
-// !
+
+// ! now this is in use.
 bool BTMessenger::special_connect()
 {
     std::future<int> connection_future = std::async(std::launch::async, &websocket_endpoint::special_connect, &m_ws_endpoint, m_uri);
@@ -405,7 +407,9 @@ bool BTMessenger::special_connect()
         break;
     };
     case std::future_status::ready: {
-        std::cout << "websocket connection request: affirmative." << std::endl;
+        // std::cout << "websocket connection request: affirmative." << std::endl;
+        spdlog::info("websocket connection request: affirmative.");
+
         connection_id = connection_future.get();
         std::cout << "connection id: " << connection_id << std::endl;
         if (connection_id < 0)
@@ -467,6 +471,7 @@ bool BTMessenger::wait_for_open_connection(int deadline)
 
 bool BTMessenger::is_connected()
 {
+    spdlog::trace("is_connected");
     std::cout << "is_connected() check connect id: " << connection_id << std::endl;
     if (m_ws_endpoint.is_open(connection_id))
     {
@@ -511,8 +516,15 @@ void BTMessenger::register_udp(int &port, nlohmann::json &sub_list)
     payload["subscribe"] = sub_list;
     if (is_connected())
     {
-        // !! DEBUG
-        send_and_wait("subscribe_telemetry", payload);
+        if (send_and_check("subscribe_telemetry", payload))
+        {
+            spdlog::info("Successfully registered the udp receiver!");
+        }
+        else
+        {
+            spdlog::error("Failed when registering the udp receiver!");
+        }
+        // send_and_wait("subscribe_telemetry", payload);
     }
 }
 

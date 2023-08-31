@@ -98,26 +98,43 @@ BB: skip this part.
 ### Install
 
 1. Install ROS2 humble (or foxy).
-2. Install BehaviorTree.CPP.
+
+Currently the system is only verified on Ubuntu 20.04 LTS with Ros2 Foxy. In Ubuntu 22.04 environment the mongocxx (installed by conanfile.txt and is a common dependency for mios and kios) may have problem finding the system dependencies. 
+
+2. ~~Install BehaviorTree.CPP.~~
 
 - **update:** Now you don't need to do that. It is now a built-in library.
 
 3. Install websocketpp apt package.
+
+```bash
+sudo apt-get install libwebsocketpp-dev
+```
+
 4. Install nlohmann apt package.
+
 5. clone the project and build.
 
-```
+```bash
 git clone https://gitlab.com/kopino4-templates/readme-template
 ```
-6. enable global auto-fill
 
-```
+6. enable global auto-fill (skip this if you do not use CLI of kios)
+
+```bash
 pip3 install argcomplete
 sudo activate-global-python-argcomplete3
 ```
-7. install conan 1.59.0 
+
+7. install conan 1.59.0 (please do not use conan 2)
+
+```bash
+pip3 install conan==1.59.0
+```
 
 8. install mios (Please use branch "BBbranch").
+
+Please follow the installing instruction of mios and install all the dependencies needed.
 
 9. install spdlog.
 
@@ -150,9 +167,10 @@ Blackbird: I'll just skip this part for now.
 ### Development Log
 
 - *30.08.2023:*
-  1. 
-  2.
-  3. 
+  1. The bug in mongo_reader is fixed. Now tree_node can fetch the object dictionary by sending GetObjectRequest service call to mongo reader.
+  2. Add MiosState and SensorState in data types. Added updating methods to them and TaskState. Now update methods can be invoked by passing corresponding msg.  
+  3. Completed the condition nodes HasObject and AtPosition. Enabled object check and distance check. Now these condition nodes are strongly related to user-specified actions according to provided action name.
+  4. Tested the Fallback and Sequence of BT with current condition and action nodes. Now the TaxInsertion skill in mios can be perfectly reproduced by kios.
 
 - *29.08.2023:*
   1. Changed the msg TaskState into nested msg type with MiosState and SensorState.

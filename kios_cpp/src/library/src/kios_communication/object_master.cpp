@@ -181,7 +181,7 @@ namespace kios
         }
         catch (const std::exception &e)
         {
-            std::cerr << e.what() << '\n';
+            spdlog::error("{}", e.what());
         }
     }
 

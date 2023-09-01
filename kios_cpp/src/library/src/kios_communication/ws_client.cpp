@@ -45,24 +45,24 @@ void connection_metadata::on_close(client *c, websocketpp::connection_hdl hdl)
     m_server = s.str();
 }
 
-// On message print out the payload
+/**
+ * @brief the default on_message method
+ *
+ * @param hdl
+ * @param msg
+ */
 void connection_metadata::on_message(websocketpp::connection_hdl hdl, client::message_ptr msg)
 {
-    std::cout << "Received message: " << msg->get_payload() << std::endl;
+    spdlog::info("Received message: {}", msg->get_payload());
 
-    // Here we're assuming the payload is a JSON string, so we'll parse it
     try
     {
         nlohmann::json result = nlohmann::json::parse(msg->get_payload());
         // The parsing succeeded, the data is JSON.
-        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
-        // Here you can handle the incomingJson object accordingly.
     }
     catch (nlohmann::json::parse_error &e)
     {
-        // If we are here, the data is not JSON.
         spdlog::error("JSON parsing failed: ", e.what());
-        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
     }
     // ! ERROR
     // Do something with the payload_json object here.
@@ -78,10 +78,11 @@ bool websocket_endpoint::is_open(int connection_id)
     auto connection = m_endpoint.get_con_from_hdl(m_connection_list[connection_id]->get_hdl(), error_code);
     if (error_code)
     {
-        std::cout << "is_open error: " << error_code.message() << std::endl;
+        spdlog::error("is_open error: {}", error_code.message());
         return false;
     }
-    std::cout << "is_open(): result = " << connection->get_state() << std::endl;
+    // ! CHECK
+    spdlog::info("is_open(): result = {}", connection->get_state());
     return connection->get_state() == websocketpp::session::state::open;
 }
 
@@ -95,7 +96,7 @@ int websocket_endpoint::connect(std::string const &uri)
 
     if (ec)
     {
-        std::cout << "Connect initialization error: " << ec.message() << std::endl;
+        spdlog::error("Connect initialization error: {}", ec.message());
         return -1;
     }
 
@@ -144,7 +145,7 @@ int websocket_endpoint::special_connect(std::string const &uri)
 
     if (ec)
     {
-        std::cout << "Connect initialization error: " << ec.message() << std::endl;
+        spdlog::error("Connect initialization error: {}", ec.message());
         return -1;
     }
 
@@ -185,7 +186,7 @@ int websocket_endpoint::special_connect(std::string const &uri)
 void websocket_endpoint::message_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr msg)
 {
     message_queue_.push(msg->get_payload());
-    std::cout << "message_handler: message received!" << std::endl;
+    spdlog::info("message_handler: message received!");
 }
 
 void websocket_endpoint::send(int id, const std::string &message)
@@ -199,12 +200,12 @@ void websocket_endpoint::send(int id, const std::string &message)
 
         if (ec)
         {
-            std::cout << "> Error sending message: " << ec.message() << std::endl;
+            spdlog::error("> Error sending message: {}", ec.message());
         }
     }
     else
     {
-        std::cout << "> No connection found with id " << id << std::endl;
+        spdlog::error("> No connection found with id {}", id);
     }
 }
 
@@ -223,7 +224,7 @@ connection_metadata::ptr websocket_endpoint::get_metadata(int id)
     auto metadata_it = m_connection_list.find(id);
     if (metadata_it == m_connection_list.end())
     {
-        std::cout << "> No connection found with id " << id << std::endl;
+        spdlog::warn("> No connection found with id {}", id);
         return nullptr;
     }
     else
@@ -240,14 +241,14 @@ void websocket_endpoint::close(int id, websocketpp::close::status::value code, s
     con_list::iterator metadata_it = m_connection_list.find(id);
     if (metadata_it == m_connection_list.end())
     {
-        std::cout << "Invalid connection id" << std::endl;
+        spdlog::error("Invalid connection id.");
         return;
     }
 
     m_endpoint.close(metadata_it->second->get_hdl(), code, reason, ec);
     if (ec)
     {
-        std::cout << "Error closing connection: " << ec.message() << std::endl;
+        spdlog::error("Error closing connection: {}", ec.message());
         return;
     }
 
@@ -315,13 +316,12 @@ bool BTMessenger::connect_o()
     std::this_thread::sleep_for(std::chrono::seconds(3));
     if (connection_id < 0)
     {
-        std::cout << "Failed to connect to " << m_uri << std::endl;
+        spdlog::error("Failed to connect to {}", m_uri);
         return false;
     }
     else
     {
-        spdlog::info("Successfully connected to", m_uri, ".");
-
+        spdlog::info("Successfully connected to {}.", m_uri);
         return true;
     }
 }
@@ -339,7 +339,7 @@ bool BTMessenger::connect()
     switch (connection_future.wait_for(std::chrono::seconds(5)))
     {
     case std::future_status::deferred: {
-        std::cout << "websocket connection: deferred." << std::endl;
+        spdlog::info("websocket connection: deferred.");
         break;
     };
     case std::future_status::timeout: {
@@ -349,7 +349,6 @@ bool BTMessenger::connect()
     case std::future_status::ready: {
         spdlog::info("websocket connection request: affirmative.");
         connection_id = connection_future.get();
-        // std::cout << "connection id: " << connection_id << std::endl;
         if (connection_id < 0)
         {
             spdlog::error("Connecting result: failed to connect to {}", m_uri);
@@ -366,26 +365,27 @@ bool BTMessenger::connect()
                         nlohmann::json result = nlohmann::json::parse(msg);
                         // The parsing succeeded, the data is JSON.
 
-                        std::cout << "the result is : " << result["result"] << std::endl;
+                        // ! CHECK
+                        spdlog::info("the result is : {}", result["result"].dump());
                         // Here you can handle the incomingJson object accordingly.
                     }
                     catch (nlohmann::json::parse_error &e)
                     {
                         // If we are here, the data is not JSON.
-                        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+                        spdlog::error("JSON parsing failed: {}", e.what());
                     }
                 });
             }
             catch (...)
             {
-                std::cout << "something happened... PLS CHECK CONNECT()" << std::endl;
+                spdlog::warn("something happened... PLS CHECK CONNECT()");
             }
             return true;
         }
         break;
     };
     default: {
-        std::cout << "UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() " << m_uri << std::endl;
+        spdlog::error("UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() {}", m_uri);
         return false;
     }
     }
@@ -407,11 +407,10 @@ bool BTMessenger::special_connect()
         break;
     };
     case std::future_status::ready: {
-        // std::cout << "websocket connection request: affirmative." << std::endl;
         spdlog::info("websocket connection request: affirmative.");
 
         connection_id = connection_future.get();
-        std::cout << "connection id: " << connection_id << std::endl;
+        spdlog::info("connection id: {}", connection_id);
         if (connection_id < 0)
         {
             spdlog::error("Connecting result: failed to connect to {}", m_uri);
@@ -660,46 +659,26 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
         try
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
-            // The parsing succeeded, the data is JSON.
 
             spdlog::info("Call method {} get response if_success: {}", method, result["result"]["result"].dump());
-            // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["result"].dump());
-            // * bool cast test
-            // try
-            // {
-            //     bool success = result["result"]["result"];
-            //     if (success == true)
-            //     {
-            //         std::cout << "The result is true." << std::endl;
-            //     }
-            //     else if (success == false)
-            //     {
-            //         std::cout << "The result is false." << std::endl;
-            //     }
-            // }
-            // catch (const std::exception &e)
-            // {
-            //     std::cerr << e.what() << '\n';
-            // }
 
-            std::cout << "The type of result is " << typeid(result["result"]["result"]).name() << std::endl;
-            std::cout << "Call method " << method << "get response error message: " << result["result"]["error"] << std::endl;
-            // spdlog::info("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
+            // ! CHECK
+            spdlog::error("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
 
             // TODO handle the result.
         }
         catch (nlohmann::json::parse_error &e)
         {
-            std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+            spdlog::error("JSON parsing failed: {}", e.what());
         }
         catch (...)
         {
-            std::cerr << "SEND_AND_WAIT: UNDEFINED ERROR!" << std::endl;
+            spdlog::error("SEND_AND_WAIT: UNDEFINED ERROR!");
         }
     }
     else
     {
-        std::cerr << "Response timed out, waiting skipped." << std::endl;
+        spdlog::error("Response timed out, waiting skipped.");
     }
 }
 

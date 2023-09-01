@@ -28,9 +28,9 @@ namespace Insertion
 
         auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         console_sink->set_level(info_level);
-        console_sink->set_pattern("[kios][behavior_tree][%^%l%$] %v");
+        console_sink->set_pattern("[kios][tree_root][%^%l%$] %v");
 
-        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_behavior_tree.txt", true);
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_tree_root.txt", true);
         file_sink->set_level(spdlog::level::debug);
 
         auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("kios", {console_sink, file_sink}));

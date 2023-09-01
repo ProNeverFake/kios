@@ -11,9 +11,14 @@
 #include "behavior_tree/meta_node/meta_node.hpp"
 #include "behavior_tree/tree_map.hpp"
 
+// for demo
 #include "behavior_tree/action_node/approach.hpp"
 #include "behavior_tree/action_node/contact.hpp"
 #include "behavior_tree/action_node/wiggle.hpp"
+
+// general action nodes
+#include "behavior_tree/action_node/cartesian_move.hpp"
+#include "behavior_tree/action_node/joint_move.hpp"
 
 #include "behavior_tree/condition_node/condition_node.hpp"
 
@@ -31,13 +36,13 @@ namespace Insertion
         BT::NodeStatus get_tick_result();
         std::shared_ptr<kios::TreeState> get_tree_state_ptr();
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
-        bool is_switch_action(); // ! discarded
-        void update_state();     // ! discarded
 
     private:
-        std::string current_action_name_ = "dummy_action";
+        // * BT rel
         BT::BehaviorTreeFactory factory_;
         BT::Tree tree_;
+
+        // * state rel
         std::shared_ptr<kios::TreeState> tree_state_ptr_;
         std::shared_ptr<kios::TaskState> task_state_ptr_;
     };

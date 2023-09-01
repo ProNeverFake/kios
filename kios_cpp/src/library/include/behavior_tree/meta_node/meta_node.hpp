@@ -70,7 +70,8 @@ namespace Insertion
               tree_state_ptr_(tree_state_ptr),
               task_state_ptr_(task_state_ptr),
               node_context_(),
-              hasSucceededOnce(false)
+              hasSucceededOnce(false),
+
         {
         }
         static BT::PortsList providedPorts()
@@ -106,14 +107,16 @@ namespace Insertion
         }
 
         // ! MUST OVERRIDE
+        /////////////////////////////////////////////////////////////////
         // * update tree state with this node's context
         virtual void update_tree_state() = 0;
         // * node context initializer
         virtual void node_context_initialize() = 0;
         virtual bool is_success() = 0;
-
+        /////////////////////////////////////////////////////////////////
         /**
          * @brief if mios have returned SUCCESS (in task state), consume it and return true. else return false.
+         * Used by actions that detect success condition on mios's side.
          *
          * @return true
          * @return false
@@ -136,12 +139,12 @@ namespace Insertion
 
         // virtual bool is_switch_action();
 
-        // ! CANNOT OVERRIDE FINAL OVERRIDE
+        // ! CANNOT OVERRIDE THIS: FINAL OVERRIDE IN STATEFULACTION!
         // BT::NodeStatus tick() override;
 
     private:
         //* only run once flag
-        bool hasSucceededOnce;
+        bool hasSucceededOnce; // ! this will be DISCARDED after the integration of RunOnceNode
 
         //* shared objects among the entire tree
         std::shared_ptr<kios::TreeState> tree_state_ptr_;

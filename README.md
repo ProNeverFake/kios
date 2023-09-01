@@ -21,11 +21,12 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - ~~RCLCPP_INFO macro cannot print element of std::vector(segmentation fault).~~(Not solved yet. This bug is found in ros2 foxy.)
 - ~~time delay in mios_reader (to be verified).~~(Solved by FILO message queue).
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~(Inconsistency in ActionPhase enumerator of kios/mios)
-- ~~**[FATAL]** mios cannot build at personal laptop (ubuntu 22.04).~~
+- ~~mios cannot build at personal laptop (ubuntu 22.04).~~
 - ~~segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0)~~(the reason is that )
 - ~~The reactive sequence should not be used with more than one async action node. (error msg see below)~~
 
 **DEVELOPER'S PLAN:**
+- [ ] Enable parameter check according to the action phase in the command.
 - [ ] **TOP** Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
 - [ ] Add reset method to all nodes to enable retry.
 - [x] **ERGENT** enable at position check in tree node.
@@ -33,7 +34,7 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [ ] (postponed) add meta node for kios node.
+- [x] (postponed) add meta node for kios node.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -60,7 +61,7 @@ KIOS, short for "Knowledge-based Intelligent Operation System", is a robot skill
 
 ## Getting Started
 
-> BB: skip this part.
+> BB: No I know in fact you don't want to get started.
 
 ### Requirements
 
@@ -147,8 +148,9 @@ The project structure:
     - srv
   - kios_cli
 
-> BB: THIS PART IS STILL UNDER CONSTRUCTION.
-
+/////////////////////////////////////////////
+//////////   UNDER CONSTRUCTION  ////////////
+/////////////////////////////////////////////
 
 ### Running Process
 
@@ -160,9 +162,18 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Testing
 
-Blackbird: I'll just skip this part for now. 
+> BB: This part is skipped for now. 
 
 ### Development Log
+
+- *01.09.2023:*
+  1. Added CartesianMove and JointMove into ActionPhase. Added corresponding motion primitives and action nodes. Completed the ActionContext and CommandContext. 
+  > (BB: THIS PART IS NOT TESTED YET.)
+  2. Updated all the print lines in ws_client and tree_node into spdlog format.
+  3. Updated Json command format. Approach, Contact and Wiggle are now demo ActionPhases. More general action phases should be added in the future.
+
+  **WARNNING** BE AWARED THAT YOU FORGET SOMETHING IN ACTIONCONTEXT AND SKILLPARAMETER!!!! 
+
 
 - *30.08.2023:*
   1. The bug in mongo_reader is fixed. Now tree_node can fetch the object dictionary by sending GetObjectRequest service call to mongo reader.

@@ -50,16 +50,21 @@ namespace Insertion
         factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
-        // * action nodes
+        // * demo action nodes
         factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
         factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
+
+        // * general action nodes
+        factory_.registerNodeType<CartesianMove>("CartesianMove", tree_state_ptr_, task_state_ptr_);
+        factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
 
         // * generate tree
         tree_ = factory_.createTreeFromText(test_tree);
     }
 
-    // ! TODO TRY TO GENERATE TREE FROM C++ CODE
+    // ! DISCARDED
+    // ! HERE TRY TO GENERATE TREE FROM C++ CODE BUT NOW XML GENERATOR IS PREDERED
     // void TreeRoot::construct_tree()
     // {
     //     BT::NodeConfiguration config;
@@ -120,24 +125,6 @@ namespace Insertion
     BT::NodeStatus TreeRoot::tick_while_running()
     {
         return tree_.tickWhileRunning();
-    }
-
-    bool TreeRoot::is_switch_action()
-    {
-        if (current_action_name_ != get_tree_state_ptr()->action_name)
-        {
-            current_action_name_ = get_tree_state_ptr()->action_name;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    void TreeRoot::update_state()
-    {
-        // ! TODO
     }
 
 } // namespace Insertion

@@ -11,14 +11,14 @@ namespace Insertion
 
     void Approach::update_tree_state()
     {
-        std::cout << "APPROACH UPDATE TREE STATE" << std::endl;
+        spdlog::trace("Approach::update_tree_state()");
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
     }
 
     void Approach::node_context_initialize()
     {
-        std::cout << "APPROACH INITIALIZE" << std::endl;
+        spdlog::trace("Approach::node_context_initialize()");
         auto &node_context = get_node_context_ref();
         node_context.node_name = "APPROACH";
         node_context.action_name = "approach";
@@ -29,28 +29,28 @@ namespace Insertion
 
     bool Approach::is_success()
     {
-        std::cout << "APPROACH IS_SUCCESS?" << std::endl;
-
+        spdlog::trace("Approach::is_success()");
         return consume_mios_success();
     }
 
     BT::NodeStatus Approach::onStart()
     {
-        std::cout << "APPROACH ON START" << std::endl;
+        spdlog::trace("Approach::onStart()");
+
         if (has_succeeded_once())
         {
-            std::cout << "APPROACH HAS ONCE SUCCEEDED" << std::endl;
+            spdlog::debug("APPROACH HAS ONCE SUCCEEDED");
             return BT::NodeStatus::SUCCESS;
         }
         if (is_success())
         {
-            std::cout << "APPROACH ALREADY SUCCESS" << std::endl;
+            spdlog::debug("APPROACH ALREADY SUCCEEDED");
 
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            std::cout << "APPROACH GO RUNNING" << std::endl;
+            spdlog::debug("APPROACH GO RUNNING");
 
             update_tree_state();
             return BT::NodeStatus::RUNNING;
@@ -62,13 +62,14 @@ namespace Insertion
     {
         if (is_success())
         {
-            std::cout << "APPROACH SUCCESS" << std::endl;
+            spdlog::debug("APPROACH SUCCEEDS");
 
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            std::cout << "APPROACH RUNNING" << std::endl;
+            spdlog::debug("APPROACH RUNNING");
+
             update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
@@ -77,7 +78,7 @@ namespace Insertion
     void Approach::onHalted()
     {
         // * interrupted behavior. do nothing.
-        std::cout << "APPROACH ON HALTED" << std::endl;
+        spdlog::trace("Approach::onHalted()");
     }
 
     /////////////////////////////////////////////////////////////

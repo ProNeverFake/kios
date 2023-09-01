@@ -318,7 +318,7 @@ namespace kios
 
     /**
      * @brief the command request from tactician to commander with mp name and mp parameter
-     *
+     * ! CHECK
      */
     struct CommandContext
     {
@@ -378,12 +378,13 @@ namespace kios
                   }},
                  {"joint_move",
                   {
+                      // ! MARK the skill parameter is inconsist with the json here !
+                      // ! Also check the parameter entity name!!
                       {"speed", 0.5},
                       {"acceleration", 1},
                       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
                   }},
              }},
-            // ! TODO add move to pose and move to joint pose
             {"control", {{"control_mode", 0}}},
             {"user",
              {

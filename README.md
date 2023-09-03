@@ -22,10 +22,10 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - ~~time delay in mios_reader (to be verified).~~(Solved by FILO message queue).
 - ~~velocity limits are always violated with node Contact in the tree. (10082023)~~(Inconsistency in ActionPhase enumerator of kios/mios)
 - ~~mios cannot build at personal laptop (ubuntu 22.04).~~
-- ~~segmentation fault in core: unique ptr in franka --- Poco. (currently built with conan poco 1.11.0)~~(the reason is that )
 - ~~The reactive sequence should not be used with more than one async action node. (error msg see below)~~
 
 **DEVELOPER'S PLAN:**
+- [ ] Mios object grounding is not necessary for kios usage. remove this part in the future.
 - [ ] Enable parameter check according to the action phase in the command.
 - [ ] **TOP** Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
 - [ ] Add reset method to all nodes to enable retry.
@@ -34,7 +34,10 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [x] (postponed) add meta node for kios node.
+- [x] (POSTPONED) add meta node for kios node.
+
+**THOUGHT**
+- [ ] Create a dummy object in action context, command context and mongoDB.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -118,9 +121,9 @@ pip3 install conan==1.59.0
 
 ### Usage
 
-This part is still under construction.
+Ok so this part is the instruction of kios.
 
-> BB: GOOD LUCK.
+> BB: THE INSTRUCTION IS STILL UNDER CONSTRUCTION. GOOD LUCK.
 
 ### System Structure
 

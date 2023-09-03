@@ -70,11 +70,9 @@ target_link_libraries(${MODULE_NAME}
         nlohmann_json::nlohmann_json
         websocketpp::websocketpp
         ${Boost_LIBRARIES}
-        # ${LIBMONGOCXX_LIBRARIES} 
-        # ${LIBBSONCXX_LIBRARIES}
         mongo::mongocxx_static
         ${PROJECT_NAME}::kios_utils
-        # Poco::Net
+
 )
 
 #########################################################################

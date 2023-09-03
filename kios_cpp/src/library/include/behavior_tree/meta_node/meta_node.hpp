@@ -70,7 +70,7 @@ namespace Insertion
               tree_state_ptr_(tree_state_ptr),
               task_state_ptr_(task_state_ptr),
               node_context_(),
-              hasSucceededOnce(false),
+              hasSucceededOnce(false)
 
         {
         }

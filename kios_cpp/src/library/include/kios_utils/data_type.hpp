@@ -252,10 +252,12 @@ namespace kios
              {
                  {
                      "objects",
-                     {{"Container", "housing"},
-                      {"Approach", "approach"},
-                      {"Insertable", "ring"},
-                      {"skill_object", "null"}},
+                     {
+                         {"Container", "housing"},
+                         {"Approach", "approach"},
+                         {"Insertable", "ring"},
+                         //   {"skill_object", "null"}
+                     },
                  },
                  {"time_max", 30},
                  {"action_context",
@@ -293,19 +295,19 @@ namespace kios
                       {"f_push", 7},
                       {"K_x", {500, 500, 0, 800, 800, 800}},
                   }},
-                 {"cartesian_move",
-                  {
-                      {"dX_d", {0.05, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"joint_move",
-                  {
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
+                 //  {"cartesian_move",
+                 //   {
+                 //       {"dX_d", {0.05, 0.05}},
+                 //       {"ddX_d", {0.05, 0.05}},
+                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                 //   }},
+                 //  {"joint_move",
+                 //   {
+                 //       {"speed", 0.5},
+                 //       {"acceleration", 1},
+                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                 //   }},
              }},
             // ! TODO add move to pose and move to joint pose
             {"control", {{"control_mode", 0}}},
@@ -331,7 +333,7 @@ namespace kios
                       {"Container", "housing"},
                       {"Approach", "approach"},
                       {"Insertable", "ring"},
-                      {"skill_object", "null"},
+                      //   {"skill_object", "null"},
                   }},
                  {"time_max", 30},
                  {"action_context",
@@ -341,14 +343,14 @@ namespace kios
                   }},
                  {"approach",
                   {
-                      {"dX_d", {0.05, 0.05}},
+                      {"dX_d", {0.1, 0.15}},
                       {"ddX_d", {0.05, 0.05}},
                       {"DeltaX", {0, 0, 0, 0, 0, 0}},
                       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
                   }},
                  {"contact",
                   {
-                      {"dX_d", {0.03, 0.05}},
+                      {"dX_d", {0.05, 0.15}},
                       {"ddX_d", {0.05, 0.05}},
                       {"K_x", {500, 500, 500, 600, 600, 600}},
                   }},
@@ -369,21 +371,21 @@ namespace kios
                       {"f_push", 7},
                       {"K_x", {500, 500, 0, 800, 800, 800}},
                   }},
-                 {"cartesian_move",
-                  {
-                      {"dX_d", {0.05, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"joint_move",
-                  {
-                      // ! MARK the skill parameter is inconsist with the json here !
-                      // ! Also check the parameter entity name!!
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
+                 //  {"cartesian_move",
+                 //   {
+                 //       {"dX_d", {0.05, 0.05}},
+                 //       {"ddX_d", {0.05, 0.05}},
+                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                 //   }},
+                 //  {"joint_move",
+                 //   {
+                 //       // ! MARK the skill parameter is inconsist with the json here !
+                 //       // ! Also check the parameter entity name!!
+                 //       {"speed", 0.5},
+                 //       {"acceleration", 1},
+                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                 //   }},
              }},
             {"control", {{"control_mode", 0}}},
             {"user",

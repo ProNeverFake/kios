@@ -9,6 +9,13 @@
 #include <iostream>
 
 #include "nlohmann/json.hpp"
+#include "kios_utils/object.hpp"
+
+#include "kios_interface/msg/task_state.hpp"
+#include "kios_interface/msg/mios_state.hpp"
+#include "kios_interface/msg/sensor_state.hpp"
+
+#include "mirmi_utils/math.hpp"
 
 namespace kios
 {
@@ -33,11 +40,17 @@ namespace kios
      */
     enum class ActionPhase
     {
+        FINISH = 999, // ! DISCARDED
+
         ERROR = -1,
         INITIALIZATION = 0,
         APPROACH = 1,
         CONTACT = 2,
-        WIGGLE = 3
+        WIGGLE = 3,
+
+        // * abstracted action phases from here
+        CARTESIAN_MOVE = 11,
+        JOINT_MOVE = 12
     };
 
     /**
@@ -73,9 +86,44 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
+        TreePhase tree_phase = TreePhase::IDLE;
         bool isRunning = false;      // ! for pub sub, discarded
         bool isInterrupted = true;   // necessity of stopping old
         bool isSwitchAction = false; // ! reserved flag. not used.
+    };
+
+    struct MiosState
+    {
+        std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
+        std::vector<double> t_t_ee = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Eigen::Matrix<double, 4, 4> t_t_ee_matrix;
+
+        void from_ros2_msg(const kios_interface::msg::MiosState &msg)
+        {
+            tf_f_ext_k = std::move(msg.tf_f_ext_k);
+            if (msg.t_t_ee.size() != 16)
+            {
+                std::cerr << "Invalid data size!" << std::endl;
+            }
+            else
+            {
+                // * Here move
+                t_t_ee = std::move(msg.t_t_ee);
+                // * Here copy
+                t_t_ee_matrix = Eigen::Map<Eigen::Matrix<double, 4, 4>>(t_t_ee.data());
+                // std::cout << t_t_ee_matrix << std::endl;
+            }
+        }
+    };
+
+    struct SensorState
+    {
+        std::vector<double> test_data = {0, 0, 0, 0, 0, 0};
+
+        void from_ros2_msg(const kios_interface::msg::SensorState &msg)
+        {
+            test_data = std::move(msg.test_data);
+        }
     };
 
     /**
@@ -84,8 +132,21 @@ namespace kios
      */
     struct TaskState
     {
-        std::vector<double> tf_f_ext_k = {0, 0, 0, 0, 0, 0};
+        // * from messenger
+        MiosState mios_state;
+        SensorState sensor_state;
+
+        void from_ros2_msg(const kios_interface::msg::TaskState &msg)
+        {
+            mios_state.from_ros2_msg(msg.mios_state);
+            sensor_state.from_ros2_msg(msg.sensor_state);
+        }
+
+        // * from skill udp
         bool isActionSuccess = false;
+
+        // * from mongo_reader
+        std::unordered_map<std::string, Object> object_dictionary;
     };
 
     /**
@@ -188,88 +249,150 @@ namespace kios
         bool isActionSuccess = false;
         nlohmann::json parameter = {
             {"skill",
-             {{"objects",
-               {{"Container", "housing"},
-                {"Approach", "approach"},
-                {"Insertable", "ring"}}},
-              {"time_max", 30},
-              {"action_context",
-               {{"action_name", "initialization"},
-                {"action_phase", ActionPhase::INITIALIZATION}}},
-              {"p0",
-               {{"dX_d", {0.05, 0.05}},
-                {"ddX_d", {0.05, 0.05}},
-                {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                {"K_x", {1500, 1500, 1500, 600, 600, 600}}}},
-              {"p1",
-               {{"dX_d", {0.03, 0.05}},
-                {"ddX_d", {0.05, 0.05}},
-                {"K_x", {500, 500, 500, 600, 600, 600}}}},
-              {"p2",
-               {{"search_a", {10, 10, 0, 2, 2, 0}},
-                {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
-                {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
-                {"K_x", {500, 500, 500, 800, 800, 800}},
-                {"f_push", {0, 0, 7, 0, 0, 0}},
-                {"dX_d", {0.02, 0.05}},
-                {"ddX_d", {0.05, 0.02}}}},
-              {"p3",
-               {{"dX_d", {0.02, 0.05}},
-                {"ddX_d", {0.05, 0.02}},
-                {"f_push", 7},
-                {"K_x", {500, 500, 0, 800, 800, 800}}}}}},
-            {"control",
-             {{"control_mode", 0}}},
+             {
+                 {
+                     "objects",
+                     {
+                         {"Container", "housing"},
+                         {"Approach", "approach"},
+                         {"Insertable", "ring"},
+                         //   {"skill_object", "null"}
+                     },
+                 },
+                 {"time_max", 30},
+                 {"action_context",
+                  {
+                      {"action_name", "initialization"},
+                      {"action_phase", ActionPhase::INITIALIZATION},
+                  }},
+                 {"approach",
+                  {
+                      {"dX_d", {0.05, 0.05}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                  }},
+                 {"contact",
+                  {
+                      {"dX_d", {0.03, 0.05}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"K_x", {500, 500, 500, 600, 600, 600}},
+                  }},
+                 {"wiggle",
+                  {
+                      {"search_a", {10, 10, 0, 2, 2, 0}},
+                      {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
+                      {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
+                      {"K_x", {500, 500, 500, 800, 800, 800}},
+                      {"f_push", {0, 0, 7, 0, 0, 0}},
+                      {"dX_d", {0.02, 0.05}},
+                      {"ddX_d", {0.05, 0.02}},
+                  }},
+                 {"insertion",
+                  {
+                      {"dX_d", {0.02, 0.05}},
+                      {"ddX_d", {0.05, 0.02}},
+                      {"f_push", 7},
+                      {"K_x", {500, 500, 0, 800, 800, 800}},
+                  }},
+                 //  {"cartesian_move",
+                 //   {
+                 //       {"dX_d", {0.05, 0.05}},
+                 //       {"ddX_d", {0.05, 0.05}},
+                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                 //   }},
+                 //  {"joint_move",
+                 //   {
+                 //       {"speed", 0.5},
+                 //       {"acceleration", 1},
+                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                 //   }},
+             }},
+            // ! TODO add move to pose and move to joint pose
+            {"control", {{"control_mode", 0}}},
             {"user",
              {{"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
-              {"F_ext_contact", {3.0, 2.0}}}}};
+              {"F_ext_contact",
+               {3.0, 2.0}}}}};
     };
 
     /**
      * @brief the command request from tactician to commander with mp name and mp parameter
-     *
+     * ! CHECK
      */
     struct CommandContext
     {
         CommandType command_type = CommandType::INITIALIZATION;
         nlohmann::json command_context = {
             {"skill",
-             {{"objects",
-               {{"Container", "contact"},
-                {"Approach", "approach"},
-                {"Insertable", "ring"}}},
-              {"time_max", 30},
-              {"action_context",
-               {{"action_name", "Initialization"},
-                {"action_phase", ActionPhase::INITIALIZATION}}},
-              {"p0",
-               {{"dX_d", {0.05, 0.05}},
-                {"ddX_d", {0.05, 0.05}},
-                {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                {"K_x", {1500, 1500, 1500, 600, 600, 600}}}},
-              {"p1",
-               {{"dX_d", {0.03, 0.1}},
-                {"ddX_d", {0.5, 1}},
-                {"K_x", {500, 500, 500, 600, 600, 600}}}},
-              {"p2",
-               {{"search_a", {5, 5, 1, 5, 5, 40}},
-                {"search_f", {5, 3, 0.5, 0.5, 0.5, 1}},
-                {"search_phi", {3.14159 * 2 / 3, 3.1415926 / 3, 0, 3.141592 / 2, 0, 0}},
-                {"K_x", {500, 500, 500, 800, 800, 800}},
-                {"f_push", {0, 0, 7, 0, 0, 0}},
-                {"dX_d", {0.05, 0.05}},
-                {"ddX_d", {0.05, 0.05}}}},
-              {"p3",
-               {{"dX_d", {0.05, 0.05}},
-                {"ddX_d", {0.05, 0.05}},
-                {"f_push", 7},
-                {"K_x", {500, 500, 0, 800, 800, 800}}}}}},
-            {"control",
-             {{"control_mode", 0}}},
+             {
+                 {"objects",
+                  {
+                      {"Container", "housing"},
+                      {"Approach", "approach"},
+                      {"Insertable", "ring"},
+                      //   {"skill_object", "null"},
+                  }},
+                 {"time_max", 30},
+                 {"action_context",
+                  {
+                      {"action_name", "initialization"},
+                      {"action_phase", ActionPhase::INITIALIZATION},
+                  }},
+                 {"approach",
+                  {
+                      {"dX_d", {0.1, 0.15}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                  }},
+                 {"contact",
+                  {
+                      {"dX_d", {0.05, 0.15}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"K_x", {500, 500, 500, 600, 600, 600}},
+                  }},
+                 {"wiggle",
+                  {
+                      {"search_a", {10, 10, 0, 2, 2, 0}},
+                      {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
+                      {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
+                      {"K_x", {500, 500, 500, 800, 800, 800}},
+                      {"f_push", {0, 0, 7, 0, 0, 0}},
+                      {"dX_d", {0.02, 0.05}},
+                      {"ddX_d", {0.05, 0.02}},
+                  }},
+                 {"insertion",
+                  {
+                      {"dX_d", {0.02, 0.05}},
+                      {"ddX_d", {0.05, 0.02}},
+                      {"f_push", 7},
+                      {"K_x", {500, 500, 0, 800, 800, 800}},
+                  }},
+                 //  {"cartesian_move",
+                 //   {
+                 //       {"dX_d", {0.05, 0.05}},
+                 //       {"ddX_d", {0.05, 0.05}},
+                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                 //   }},
+                 //  {"joint_move",
+                 //   {
+                 //       // ! MARK the skill parameter is inconsist with the json here !
+                 //       // ! Also check the parameter entity name!!
+                 //       {"speed", 0.5},
+                 //       {"acceleration", 1},
+                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                 //   }},
+             }},
+            {"control", {{"control_mode", 0}}},
             {"user",
-             {{"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
-              {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
-              {"F_ext_contact", {3.0, 2.0}}}}};
+             {
+                 {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                 {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                 {"F_ext_contact", {3.0, 2.0}},
+             }}};
     };
 } // namespace kios

@@ -4,14 +4,21 @@
 #include <string>
 #include <memory>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include "behavior_tree/meta_node/meta_node.hpp"
 #include "behavior_tree/tree_map.hpp"
 
+// for demo
 #include "behavior_tree/action_node/approach.hpp"
 #include "behavior_tree/action_node/contact.hpp"
 #include "behavior_tree/action_node/wiggle.hpp"
+
+// general action nodes
+#include "behavior_tree/action_node/cartesian_move.hpp"
+#include "behavior_tree/action_node/joint_move.hpp"
 
 #include "behavior_tree/condition_node/condition_node.hpp"
 
@@ -22,21 +29,28 @@ namespace Insertion
     {
     public:
         TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
-        void initialize_tree();
+        bool initialize_tree();
+        bool construct_tree(const std::string &tree_string);
+        bool register_nodes();
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();
         std::shared_ptr<kios::TreeState> get_tree_state_ptr();
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
-        bool is_switch_action(); // ! discarded
-        void update_state();     // ! discarded
 
     private:
-        std::string current_action_name_ = "dummy_action";
+        // flag
+        bool hasRegisteredNodes;
+
+        // * BT rel
         BT::BehaviorTreeFactory factory_;
         BT::Tree tree_;
+
+        // * state rel
         std::shared_ptr<kios::TreeState> tree_state_ptr_;
         std::shared_ptr<kios::TaskState> task_state_ptr_;
+
+        void set_log();
     };
 
 } // namespace Insertion

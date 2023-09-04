@@ -11,9 +11,8 @@ from .resource.mongodb_client import MongoDBClient
 from kios_interface.srv import GetObjectRequest
 
 
-class MongoReader(Node):
+class Planner(Node):
 
-    udp_subscriber = ''
 
     def __init__(self):
         super().__init__('mongo_reader')
@@ -24,8 +23,6 @@ class MongoReader(Node):
         # declare parameters
         self.declare_parameter('power', True)
 
-        # intialize mongoDB client
-        self.mongo_client_ = MongoDBClient(port=27017)
 
         # initialize timer
         timer_callback_group = ReentrantCallbackGroup()
@@ -35,6 +32,7 @@ class MongoReader(Node):
             callback_group=timer_callback_group)
 
         # initialize get_object server
+        # ! should be a client
         server_callback_group = MutuallyExclusiveCallbackGroup()
         self.server_ = self.create_service(
             GetObjectRequest,
@@ -92,14 +90,14 @@ class MongoReader(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    mongo_reader = MongoReader()
+    planner = Planner()
 
     executor = MultiThreadedExecutor()
-    executor.add_node(mongo_reader)
+    executor.add_node(planner)
 
     executor.spin()
 
-    mongo_reader.destroy_node()
+    planner.destroy_node()
     rclpy.shutdown()
 
 

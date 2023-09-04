@@ -1,4 +1,39 @@
 
+######################################################### mirmi_utils library
+set(MODULE_NAME mirmi_utils)
+
+file(GLOB ${MODULE_NAME}_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/mirmi_utils/*.cpp")
+file(GLOB ${MODULE_NAME}_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/mirmi_utils/*.hpp")
+
+add_library(${MODULE_NAME} STATIC
+    ${${MODULE_NAME}_SRC}
+    ${${MODULE_NAME}_HEADER_FILES}
+    )
+
+add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
+
+target_include_directories(${MODULE_NAME}
+    PRIVATE
+        src
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
+
+
+# Attention: target_link_libraries() should not apply any keyword
+# since no keyword is applied in ament_target_dependencies()
+target_link_libraries(${MODULE_NAME}
+    PUBLIC
+        spdlog::spdlog
+        nlohmann_json::nlohmann_json
+        Eigen3::Eigen
+)
+
+#########################################################################
+
+
+
 ######################################################### kios_communication library
 set(MODULE_NAME kios_communication)
 
@@ -18,10 +53,13 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 target_include_directories(${MODULE_NAME}
     PRIVATE
         src
+        # ${LIBMONGOCXX_INCLUDE_DIRS} 
+        # ${LIBBSONCXX_INCLUDE_DIRS}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
     )
+
 
 # Attention: target_link_libraries() should not apply any keyword
 # since no keyword is applied in ament_target_dependencies()
@@ -32,7 +70,9 @@ target_link_libraries(${MODULE_NAME}
         nlohmann_json::nlohmann_json
         websocketpp::websocketpp
         ${Boost_LIBRARIES}
-        # Poco::Net
+        mongo::mongocxx_static
+        ${PROJECT_NAME}::kios_utils
+
 )
 
 #########################################################################
@@ -82,6 +122,7 @@ target_link_libraries(${MODULE_NAME}
         fmt::fmt
         spdlog
         behaviortree_cpp
+        ${PROJECT_NAME}::mirmi_utils
     )
 
 ########## copy the xml tree file into the corresponding dir
@@ -117,25 +158,24 @@ add_library(${MODULE_NAME} STATIC
     )
 
 target_include_directories(${MODULE_NAME}
-PRIVATE
-    src
-PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-)
+        PRIVATE
+            src
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    )
 
 target_link_libraries(${MODULE_NAME} 
-    PUBLIC
         nlohmann_json::nlohmann_json
         spdlog
+        Eigen3::Eigen
+        ${PROJECT_NAME}::mirmi_utils
+    )
+ament_target_dependencies(${MODULE_NAME}
+        rclcpp
+        kios_interface
     )
 
 add_library(${PROJECT_NAME}::${MODULE_NAME} ALIAS ${MODULE_NAME})
 
 ######################################################################
-
-# install(TARGETS
-#     # mios_node
-#     bt_node
-#     DESTINATION lib/${PROJECT_NAME}
-#     )

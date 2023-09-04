@@ -32,8 +32,6 @@ public:
     {
         this->declare_parameter("power", true);
 
-        // ! BBDEBUG ALL IN ONE SINGLE THREAD GROUP
-        // ! SHOULD WORK IN PRINCIPLE
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
         subscription_callback_group_ = timer_callback_group_;
@@ -68,6 +66,8 @@ public:
             "task_state_topic",
             qos,
             publisher_options);
+
+        rclcpp::sleep_for(std::chrono::seconds(3));
     }
 
     bool check_power()
@@ -94,7 +94,9 @@ private:
         if (check_power() == true)
         {
             RCLCPP_INFO(this->get_logger(), "MIOS SUB hit.");
-            task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            // task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
+            // task_state_msg_.t_t_ee = std::move(msg->t_t_ee);
+            task_state_msg_.mios_state = std::move(*msg);
         }
         else
         {
@@ -106,7 +108,8 @@ private:
         if (check_power() == true)
         {
             RCLCPP_INFO(this->get_logger(), "SENSOR SUB hit.");
-            task_state_msg_.test_data = std::move(msg->test_data);
+            // task_state_msg_.test_data = std::move(msg->test_data);
+            task_state_msg_.sensor_state = std::move(*msg);
         }
         else
         {

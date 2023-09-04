@@ -1,3 +1,5 @@
+# ActionPhase
+int32 FINISH=999
 int32 ERROR=-1
 int32 INITIALIZATION=0
 int32 APPROACH=1
@@ -6,6 +8,8 @@ int32 WIGGLE=3
 
 string action_name
 int32 action_phase
+# defined enum class in data_type.hpp
+int32 tree_phase
 bool is_interrupted
 ---
 bool is_accepted

@@ -45,24 +45,24 @@ void connection_metadata::on_close(client *c, websocketpp::connection_hdl hdl)
     m_server = s.str();
 }
 
-// On message print out the payload
+/**
+ * @brief the default on_message method
+ *
+ * @param hdl
+ * @param msg
+ */
 void connection_metadata::on_message(websocketpp::connection_hdl hdl, client::message_ptr msg)
 {
-    std::cout << "Received message: " << msg->get_payload() << std::endl;
+    spdlog::info("Received message: {}", msg->get_payload());
 
-    // Here we're assuming the payload is a JSON string, so we'll parse it
     try
     {
         nlohmann::json result = nlohmann::json::parse(msg->get_payload());
         // The parsing succeeded, the data is JSON.
-        std::cout << "parsing succeeded. result: " << result["result"] << std::endl;
-        // Here you can handle the incomingJson object accordingly.
     }
     catch (nlohmann::json::parse_error &e)
     {
-        // If we are here, the data is not JSON.
         spdlog::error("JSON parsing failed: ", e.what());
-        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
     }
     // ! ERROR
     // Do something with the payload_json object here.
@@ -78,10 +78,11 @@ bool websocket_endpoint::is_open(int connection_id)
     auto connection = m_endpoint.get_con_from_hdl(m_connection_list[connection_id]->get_hdl(), error_code);
     if (error_code)
     {
-        std::cout << "is_open error: " << error_code.message() << std::endl;
+        spdlog::error("is_open error: {}", error_code.message());
         return false;
     }
-    std::cout << "is_open(): result = " << connection->get_state() << std::endl;
+    // ! CHECK
+    spdlog::info("is_open(): result = {}", connection->get_state());
     return connection->get_state() == websocketpp::session::state::open;
 }
 
@@ -95,7 +96,7 @@ int websocket_endpoint::connect(std::string const &uri)
 
     if (ec)
     {
-        std::cout << "Connect initialization error: " << ec.message() << std::endl;
+        spdlog::error("Connect initialization error: {}", ec.message());
         return -1;
     }
 
@@ -144,7 +145,7 @@ int websocket_endpoint::special_connect(std::string const &uri)
 
     if (ec)
     {
-        std::cout << "Connect initialization error: " << ec.message() << std::endl;
+        spdlog::error("Connect initialization error: {}", ec.message());
         return -1;
     }
 
@@ -185,7 +186,7 @@ int websocket_endpoint::special_connect(std::string const &uri)
 void websocket_endpoint::message_handler_callback(websocketpp::connection_hdl hdl, client::message_ptr msg)
 {
     message_queue_.push(msg->get_payload());
-    std::cout << "message_handler: message received!" << std::endl;
+    spdlog::info("message_handler: message received!");
 }
 
 void websocket_endpoint::send(int id, const std::string &message)
@@ -199,12 +200,12 @@ void websocket_endpoint::send(int id, const std::string &message)
 
         if (ec)
         {
-            std::cout << "> Error sending message: " << ec.message() << std::endl;
+            spdlog::error("> Error sending message: {}", ec.message());
         }
     }
     else
     {
-        std::cout << "> No connection found with id " << id << std::endl;
+        spdlog::error("> No connection found with id {}", id);
     }
 }
 
@@ -213,12 +214,17 @@ ThreadSafeQueue<std::string> &websocket_endpoint::get_message_queue()
     return message_queue_;
 }
 
+void websocket_endpoint::reset_message_queue()
+{
+    message_queue_.reset();
+}
+
 connection_metadata::ptr websocket_endpoint::get_metadata(int id)
 {
     auto metadata_it = m_connection_list.find(id);
     if (metadata_it == m_connection_list.end())
     {
-        std::cout << "> No connection found with id " << id << std::endl;
+        spdlog::warn("> No connection found with id {}", id);
         return nullptr;
     }
     else
@@ -235,14 +241,14 @@ void websocket_endpoint::close(int id, websocketpp::close::status::value code, s
     con_list::iterator metadata_it = m_connection_list.find(id);
     if (metadata_it == m_connection_list.end())
     {
-        std::cout << "Invalid connection id" << std::endl;
+        spdlog::error("Invalid connection id.");
         return;
     }
 
     m_endpoint.close(metadata_it->second->get_hdl(), code, reason, ec);
     if (ec)
     {
-        std::cout << "Error closing connection: " << ec.message() << std::endl;
+        spdlog::error("Error closing connection: {}", ec.message());
         return;
     }
 
@@ -261,6 +267,7 @@ void websocket_endpoint::set_message_handler(std::function<void(const std::strin
 BTMessenger::BTMessenger(const std::string &uri)
     : m_uri(uri), connection_id(-1)
 {
+    // * for register udp receiver in mios
     udp_ip = "127.0.0.1";
     udp_port = 12346;
     //*  initialize the spdlog for ws_client
@@ -290,14 +297,15 @@ BTMessenger::BTMessenger(const std::string &uri)
     auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/kios_ws_client.txt", true);
     file_sink->set_level(spdlog::level::debug);
 
-    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("mios", {console_sink, file_sink}));
+    auto logger = std::shared_ptr<spdlog::logger>(new spdlog::logger("kios", {console_sink, file_sink}));
     logger->set_level(info_level);
     spdlog::set_default_logger(logger);
     spdlog::info("spdlog: initialized.");
 }
+
 /**
  * @brief the original raw connect method
- *
+ * ! Discarded
  * @return true
  * @return false
  */
@@ -308,20 +316,19 @@ bool BTMessenger::connect_o()
     std::this_thread::sleep_for(std::chrono::seconds(3));
     if (connection_id < 0)
     {
-        std::cout << "Failed to connect to " << m_uri << std::endl;
+        spdlog::error("Failed to connect to {}", m_uri);
         return false;
     }
     else
     {
-        spdlog::info("Successfully connected to", m_uri, ".");
-        // std::cout
-        //     << "Successfully connected to " << m_uri << std::endl;
+        spdlog::info("Successfully connected to {}.", m_uri);
         return true;
     }
 }
+
 /**
  * @brief connect method with future obj
- *
+ * ! Discarded
  * @return true
  * @return false
  */
@@ -332,26 +339,24 @@ bool BTMessenger::connect()
     switch (connection_future.wait_for(std::chrono::seconds(5)))
     {
     case std::future_status::deferred: {
-        std::cout << "websocket connection: deferred." << std::endl;
+        spdlog::info("websocket connection: deferred.");
         break;
     };
     case std::future_status::timeout: {
-        std::cout << "websocket connection attempt: timed out!" << std::endl;
+        spdlog::error("websocket connection attempt: timed out!");
         break;
     };
     case std::future_status::ready: {
-        std::cout << "websocket connection request: affirmative." << std::endl;
+        spdlog::info("websocket connection request: affirmative.");
         connection_id = connection_future.get();
-        std::cout << "connection id: " << connection_id << std::endl;
         if (connection_id < 0)
         {
-            std::cout << "Connecting result: failed to connect to " << m_uri << std::endl;
+            spdlog::error("Connecting result: failed to connect to {}", m_uri);
             return false;
         }
         else
         {
-            std::cout << "Connecting result: Successfully connected to " << m_uri << std::endl;
-
+            spdlog::info("Connecting result: Successfully connected to {}", m_uri);
             try
             {
                 set_message_handler([](const std::string &msg) {
@@ -359,58 +364,62 @@ bool BTMessenger::connect()
                     {
                         nlohmann::json result = nlohmann::json::parse(msg);
                         // The parsing succeeded, the data is JSON.
-                        std::cout << "set_message_handler run..." << std::endl;
-                        std::cout << "the result is : " << result["result"] << std::endl;
+
+                        // ! CHECK
+                        spdlog::info("the result is : {}", result["result"].dump());
                         // Here you can handle the incomingJson object accordingly.
                     }
                     catch (nlohmann::json::parse_error &e)
                     {
                         // If we are here, the data is not JSON.
-                        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+                        spdlog::error("JSON parsing failed: {}", e.what());
                     }
                 });
             }
             catch (...)
             {
-                std::cout << "something happened... PLS CHECK CONNECT()" << std::endl;
+                spdlog::warn("something happened... PLS CHECK CONNECT()");
             }
             return true;
         }
         break;
     };
     default: {
-        std::cout << "UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() " << m_uri << std::endl;
+        spdlog::error("UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() {}", m_uri);
         return false;
     }
     }
 }
-// !
+
+// * now this is in use.
 bool BTMessenger::special_connect()
 {
+    spdlog::trace("BTMessenger::special_connect()");
     std::future<int> connection_future = std::async(std::launch::async, &websocket_endpoint::special_connect, &m_ws_endpoint, m_uri);
 
     switch (connection_future.wait_for(std::chrono::seconds(5)))
     {
     case std::future_status::deferred: {
-        std::cout << "websocket connection: deferred." << std::endl;
+        spdlog::error("websocket connection: deferred.");
         break;
     };
     case std::future_status::timeout: {
-        std::cout << "websocket connection attempt: timed out!" << std::endl;
+        spdlog::error("websocket connection attempt: timed out!");
         break;
     };
     case std::future_status::ready: {
-        std::cout << "websocket connection request: affirmative." << std::endl;
+        spdlog::info("websocket connection request: affirmative.");
+
         connection_id = connection_future.get();
-        std::cout << "connection id: " << connection_id << std::endl;
+        spdlog::info("connection id: {}", connection_id);
         if (connection_id < 0)
         {
-            std::cout << "Connecting result: failed to connect to " << m_uri << std::endl;
+            spdlog::error("Connecting result: failed to connect to {}", m_uri);
             return false;
         }
         else
         {
-            std::cout << "Connecting result: Successfully connected to " << m_uri << std::endl;
+            spdlog::info("Connecting result: Successfully connected to {}", m_uri);
 
             try
             {
@@ -419,27 +428,25 @@ bool BTMessenger::special_connect()
                     {
                         nlohmann::json result = nlohmann::json::parse(msg);
                         // The parsing succeeded, the data is JSON.
-                        std::cout << "set_message_handler run..." << std::endl;
-                        std::cout << "the result is : " << result["result"] << std::endl;
-                        // Here you can handle the incomingJson object accordingly.
+                        spdlog::info("setting message handler...");
+                        spdlog::info("the result is : {}", result["result"]);
                     }
                     catch (nlohmann::json::parse_error &e)
                     {
-                        // If we are here, the data is not JSON.
-                        std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+                        spdlog::error("JSON parsing failed: {}", e.what());
                     }
                 });
             }
             catch (...)
             {
-                std::cout << "something happened... PLS CHECK CONNECT()" << std::endl;
+                spdlog::error("something happened... PLS CHECK CONNECT()");
             }
             return true;
         }
         break;
     };
     default: {
-        std::cout << "UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() " << m_uri << std::endl;
+        spdlog::error("UNKNOWN ERROR PLS CHECK BTMESSENGER::CONNECT() {}", m_uri);
         return false;
     }
     }
@@ -451,19 +458,28 @@ bool BTMessenger::wait_for_open_connection(int deadline)
     {
         if (is_connected())
         {
-            std::cout << "wait for open connection: success." << std::endl;
+            spdlog::info("wait for open connection: success.");
             return true;
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    std::cout << "wait for open connection: timeout." << std::endl;
+    spdlog::error("wait for open connection: timeout.");
     return false;
 }
 
 bool BTMessenger::is_connected()
 {
-    std::cout << "is_connected() check connect id: " << connection_id << std::endl;
-    return m_ws_endpoint.is_open(connection_id);
+    spdlog::trace("is_connected");
+    spdlog::info("is_connected() check connect id: {}", connection_id);
+    if (m_ws_endpoint.is_open(connection_id))
+    {
+        return true;
+    }
+    else
+    {
+        spdlog::error("CONNECTION IS DOWN.");
+        return false;
+    }
 }
 
 /**
@@ -489,17 +505,24 @@ void BTMessenger::close()
     m_ws_endpoint.close(connection_id, websocketpp::close::status::going_away, "");
 }
 
-void BTMessenger::register_udp(int &port)
+void BTMessenger::register_udp(int &port, nlohmann::json &sub_list)
 {
     udp_port = port;
     nlohmann::json payload;
     payload["ip"] = udp_ip;
     payload["port"] = udp_port;
-    payload["subscribe"] = {"tau_ext", "q", "TF_F_ext_K", "system_time"};
+    payload["subscribe"] = sub_list;
     if (is_connected())
     {
-        // !! DEBUG
-        send_and_wait("subscribe_telemetry", payload);
+        if (send_and_check("subscribe_telemetry", payload))
+        {
+            spdlog::info("Successfully registered the udp receiver!");
+        }
+        else
+        {
+            spdlog::error("Failed when registering the udp receiver!");
+        }
+        // send_and_wait("subscribe_telemetry", payload);
     }
 }
 
@@ -514,11 +537,11 @@ void BTMessenger::unregister_udp()
     }
 }
 /**
- * @brief start a task with "general skill" added.
+ * @brief start a task with "general skill" added. do not handle the response.
  *
  * @param skill_context
  */
-void BTMessenger::start_task(nlohmann::json skill_context)
+void BTMessenger::start_task_command(nlohmann::json skill_context)
 {
     // TODO
     std::vector<std::string> skill_names;
@@ -538,7 +561,7 @@ void BTMessenger::start_task(nlohmann::json skill_context)
     nlohmann::json call_context =
         {{"task", "GenericTask"},
          {"parameters", task_context},
-         {"queue", false}};
+         {"queue", true}};
     if (is_connected())
     {
         send_and_wait("start_task", call_context);
@@ -546,10 +569,10 @@ void BTMessenger::start_task(nlohmann::json skill_context)
 }
 
 /**
- * @brief stop the current task.
+ * @brief stop the current task. do not handle the response
  *
  */
-void BTMessenger::stop_task()
+void BTMessenger::stop_task_command()
 {
     nlohmann::json payload =
         {{"raise_exception", false},
@@ -563,8 +586,65 @@ void BTMessenger::stop_task()
 }
 
 /**
+ * @brief stop the current task. return the response
+ *
+ */
+bool BTMessenger::stop_task_request()
+{
+    nlohmann::json payload =
+        {{"raise_exception", false},
+         {"recover", false},
+         {"empty_queue", false}};
+    if (is_connected())
+    {
+        // send("stop_task", payload);
+        return send_and_check("stop_task", payload);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
+ * @brief start a task with "general skill" added. do not handle the response.
+ *
+ * @param skill_context
+ */
+bool BTMessenger::start_task_request(nlohmann::json skill_context)
+{
+    // TODO
+    std::vector<std::string> skill_names;
+    std::vector<std::string> skill_types;
+    std::unordered_map<std::string, nlohmann::json> skill_contexts;
+
+    skill_names.push_back("insertion");
+    skill_types.push_back("BBGeneralSkill");
+    skill_contexts["insertion"] = skill_context;
+
+    nlohmann::json task_context =
+        {{"parameters",
+          {{"skill_names", skill_names},
+           {"skill_types", skill_types},
+           {"as_queue", false}}},
+         {"skills", skill_contexts}};
+    nlohmann::json call_context =
+        {{"task", "GenericTask"},
+         {"parameters", task_context},
+         {"queue", true}};
+    if (is_connected())
+    {
+        return send_and_check("start_task", call_context);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
  * @brief "call_method" and wait for result.
- * TODO enable result check
+ * do not handle the response.
  * @param method
  * @param payload
  * @param timeout
@@ -580,26 +660,71 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
         try
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
-            // The parsing succeeded, the data is JSON.
-            // !!! TODO return the result bool value
-            std::cout << "Call method " << method << "get response if_success: " << result["result"]["result"] << std::endl;
-            // TODO handle the result.
+
+            spdlog::info("Call method {} get response if_success: {}", method, result["result"]["result"].dump());
         }
         catch (nlohmann::json::parse_error &e)
         {
-            std::cerr << "JSON parsing failed: " << e.what() << std::endl;
+            spdlog::error("JSON parsing failed: {}", e.what());
         }
         catch (...)
         {
-            std::cerr << "SEND_AND_WAIT: UNDEFINED ERROR!" << std::endl;
+            spdlog::error("SEND_AND_WAIT: UNDEFINED ERROR!");
         }
     }
     else
     {
-        std::cerr << "Response timed out, waiting skipped." << std::endl;
+        spdlog::error("Response timed out, waiting skipped.");
     }
+}
 
-    // TODO
+/**
+ * @brief "call_method" and check result.
+ * @param method
+ * @param payload
+ * @param timeout
+ * @param silent
+ */
+bool BTMessenger::send_and_check(const std::string &method, nlohmann::json payload, int timeout, bool silent)
+{
+    m_ws_endpoint.get_message_queue().reset();
+    send(method, payload);
+
+    auto response_opt = m_ws_endpoint.get_message_queue().pop();
+
+    if (response_opt.has_value())
+    {
+        try
+        {
+            nlohmann::json result = nlohmann::json::parse(response_opt.value());
+            // The parsing succeeded, the data is JSON.
+            spdlog::info("Call method ", method, " get response if_success: {}", result["result"]["result"].dump());
+            if (static_cast<bool>(result["result"]["result"]) == true)
+            {
+                return true;
+            }
+            else if (static_cast<bool>(result["result"]["result"]) == false)
+            {
+                spdlog::error("Error message: {}", result["result"]["error"].dump());
+                return false;
+            }
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            spdlog::error("JSON parsing failed: ", e.what());
+            return false;
+        }
+        catch (...)
+        {
+            spdlog::error("SEND_AND_WAIT: UNDEFINED ERROR!");
+            return false;
+        }
+    }
+    else
+    {
+        spdlog::error("Response timed out, waiting skipped.");
+        return false;
+    }
 }
 
 [[maybe_unused]] void BTMessenger::set_message_handler(std::function<void(const std::string &)> handler)

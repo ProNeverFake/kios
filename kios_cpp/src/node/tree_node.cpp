@@ -19,6 +19,7 @@
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/switch_tree_phase_request.hpp"
+#include "kios_interface/srv/get_object_request.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -30,17 +31,17 @@ public:
         : Node("tree_node"),
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
-          isActionSuccess_(false)
+          isActionSuccess_(false),
+          hasUpdatedObjects_(false),
+          object_list_()
     {
         // initialize object list
         object_list_.push_back("contact");
         object_list_.push_back("approach");
 
         //* declare mission parameter
-        this->declare_parameter("is_update_object", false);
-        this->declare_parameter("is_mission_success", false);
+        // this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
-        this->declare_parameter("pub_power", true);
         this->declare_parameter("client_power", true);
 
         //* initialize the callback groups
@@ -48,32 +49,27 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
         subscription_callback_group_ = timer_callback_group_;
 
-        publisher_callback_group_ = this->create_callback_group(
+        client_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::Reentrant);
-        client_callback_group_ = publisher_callback_group_;
 
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
+
+        // ! for TEST initialize the tree
+        m_tree_root->initialize_tree();
 
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
         subscription_options.callback_group = subscription_callback_group_;
-        // ! DISCARDED
-        rclcpp::PublisherOptions publisher_options;
-        publisher_options.callback_group = publisher_callback_group_;
 
         // * initialize the callbacks
         subscription_ = this->create_subscription<kios_interface::msg::TaskState>(
-            "mios_state_topic",
+            "task_state_topic",
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
-        // ! DISCARDED
-        publisher_ = this->create_publisher<kios_interface::msg::TreeState>(
-            "tree_state_topic",
-            qos,
-            publisher_options);
+
         get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
             "get_object_service",
             rmw_qos_profile_services_default,
@@ -89,14 +85,16 @@ public:
             client_callback_group_);
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(1000),
+            std::chrono::milliseconds(100),
             std::bind(&TreeNode::timer_callback, this),
             timer_callback_group_);
 
         udp_socket_ = std::make_shared<kios::BTReceiver>("127.0.0.1", 8888);
 
-        // ! FOR TEST
+        // * set tree phase to resume to let tree tick
         tree_phase_ = kios::TreePhase::RESUME;
+
+        rclcpp::sleep_for(std::chrono::seconds(4));
     }
 
     bool check_power()
@@ -121,14 +119,14 @@ public:
 private:
     // flag
     bool isActionSuccess_;
+    bool hasUpdatedObjects_;
 
-    // thread rel
+    // thread data rel
     std::mutex tree_mtx_;
     std::mutex tree_phase_mtx_;
 
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
-    bool isUdpReady;
 
     // tree rel
     kios::TreePhase tree_phase_;
@@ -136,24 +134,24 @@ private:
     std::shared_ptr<kios::TaskState> task_state_ptr_;
 
     // object list
-    std::vector<std::string> object_list_;
+    std::vector<std::string> object_list_; // reserved for the future. maybe use this for object check to judge if a task is possible.
+
+    // object dictionary
+    std::shared_ptr<std::unordered_map<std::string, kios::Object>> object_dictionary_ptr_;
 
     // callback group
     rclcpp::CallbackGroup::SharedPtr client_callback_group_;
     rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
     rclcpp::CallbackGroup::SharedPtr subscription_callback_group_;
-    rclcpp::CallbackGroup::SharedPtr publisher_callback_group_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
-    rclcpp::Publisher<kios_interface::msg::TreeState>::SharedPtr publisher_;
-    rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
+    rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
-    std::shared_ptr<Insertion::TreeRoot>
-        m_tree_root;
+    std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
 
     /**
@@ -163,20 +161,27 @@ private:
      */
     void subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
-        if (lock.owns_lock())
+        if (check_power() == true)
         {
-            // ! BBDEBUG maybe lock will fail for a long time.
-            // ! check the execution speed of the tree.
-            RCLCPP_INFO_STREAM(this->get_logger(), "subscription listened: " << msg->tf_f_ext_k[2]);
-            m_tree_root->get_task_state_ptr()->tf_f_ext_k = std::move(msg->tf_f_ext_k);
-        }
-        else
-        {
-            RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
+            std::unique_lock<std::mutex> lock(tree_mtx_, std::try_to_lock);
+            if (lock.owns_lock())
+            {
+                // * update task state
+                task_state_ptr_->from_ros2_msg(*msg);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "SUBSCRIPTION: LOCK FAILED. PASS.");
+            }
         }
     }
 
+    /**
+     * @brief handle the switch tree phase request.
+     * ! TODO TEST
+     * @param request
+     * @param response
+     */
     void switch_tree_phase_server_callback(
         const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::SwitchTreePhaseRequest::Response> response)
@@ -215,13 +220,32 @@ private:
             // * lock tree phase first
             std::lock_guard<std::mutex> lock_tree_phase(tree_phase_mtx_);
             // * check the necessity of updating objects
-            if (this->get_parameter("is_update_object").as_bool() == true)
+            if (hasUpdatedObjects_ == false)
             {
                 RCLCPP_INFO(this->get_logger(), "update the object...");
-                if (update_object() == false)
+                if (update_object(1000, 1000) == false)
                 {
                     switch_tree_phase("ERROR");
                 }
+                else
+                {
+                    hasUpdatedObjects_ = true;
+                }
+                // // ! TEST
+                // /////////////////////////////////////
+                // std::cout << "TEST" << std::endl;
+                // for (auto &entity : task_state_ptr_->object_dictionary)
+                // {
+                //     std::cout << entity.first << std::endl;
+                //     std::cout << entity.second.O_T_OB << std::endl;
+                // }
+
+                // auto &dict = task_state_ptr_->object_dictionary;
+                // if (dict.find("contact") == dict.end())
+                // {
+                //     std::cerr << "NOT CONTACT IN THE DICTIONARY!" << std::endl;
+                // }
+                //////////////////////////////////////
             }
 
             // * get mios skill execution state
@@ -238,6 +262,8 @@ private:
 
             // * lock tree first
             std::lock_guard<std::mutex> lock_tree(tree_mtx_);
+            // * update tree phase in tree state
+            tree_state_ptr_->tree_phase = tree_phase_;
             // * do tree cycle
             tree_cycle();
         }
@@ -255,20 +281,42 @@ private:
      */
     bool is_tree_running()
     {
+        // ! CHANGE
+        // * check tree state first for detect possibly invoked error in tree node.
+        if (tree_state_ptr_->tree_phase == kios::TreePhase::ERROR)
+        {
+            RCLCPP_FATAL(this->get_logger(), "DETECT INVOKED INNER ERROR FROM TREE NODE!");
+            switch_power(false);
+            return false;
+        }
+
+        // * check tick_result
         switch (tick_result)
         {
         case BT::NodeStatus::RUNNING: {
             return true;
+            break;
         };
         case BT::NodeStatus::SUCCESS: {
-            RCLCPP_INFO(this->get_logger(), "MISSION SUCCEEDS.");
-            std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", true)};
-            this->set_parameters(all_new_parameters);
+            RCLCPP_INFO(this->get_logger(), "IS_TREE_RUNNING: MISSION SUCCEEDS.");
+            // // ? currently this ros param is not used. set it for completion.
+            // std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", true)};
+            // this->set_parameters(all_new_parameters);
             switch_tree_phase("FINISH");
             return false;
+            break;
         };
+        case BT::NodeStatus::FAILURE: {
+            RCLCPP_ERROR(this->get_logger(), "IS_TREE_RUNNING: TREE IN FAILURE STATUS, MISSION FAILS.");
+            // // ? currently this ros param is not used. set it for completion.
+            // std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_mission_success", false)};
+            // this->set_parameters(all_new_parameters);
+            switch_tree_phase("FAILURE");
+            return false;
+            break;
+        }
         default: {
-            RCLCPP_ERROR(this->get_logger(), "UNDEFINED BEHAVIOR!");
+            RCLCPP_ERROR(this->get_logger(), "IS_TREE_RUNNNING: HANDLER FOR RETURNED BT::NODESTATUS IS NOT DEFINED!");
             switch_tree_phase("ERROR");
             return false;
         }
@@ -371,8 +419,18 @@ private:
         }
         case kios::TreePhase::FINISH: {
             RCLCPP_ERROR(this->get_logger(), "tree_cycle: FINISH.");
-            // * all tasks in tree finished. turn off for check.
-            switch_power(false);
+            // * all tasks in tree finished. first send request to finish all actions at mios side.
+            tree_state_ptr_->action_name = "finish";
+            tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;
+            if (send_switch_action_request(1000, 1000))
+            {
+                switch_power(false);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "tree_cycle at FINISH: failed when sending stop request.");
+                switch_tree_phase("ERROR");
+            }
             break;
         }
 
@@ -415,6 +473,7 @@ private:
                 tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
                 switch_tree_phase("PAUSE");
+                tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))
                 {
@@ -440,6 +499,7 @@ private:
         auto request = std::make_shared<kios_interface::srv::SwitchActionRequest::Request>();
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
+        request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
         request->is_interrupted = true; // ! temp
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
@@ -472,43 +532,56 @@ private:
 
     /**
      * @brief update the object with GetObjectRequest client
-     * ! UNFINISHED
      * @return true
      * @return false
      */
-    bool update_object()
+    bool update_object(int ready_deadline = 100, int response_deadline = 1000)
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
+        // now the object_list is not in use.
         request->object_list = object_list_;
-        while (!get_object_client_->wait_for_service(std::chrono::milliseconds(50)))
+        while (!get_object_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             if (!rclcpp::ok())
             {
                 RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-                rclcpp::shutdown();
+                switch_power(false);
+                return false;
             }
-            RCLCPP_INFO(this->get_logger(), "service get_object_service not available, waiting ...");
+            RCLCPP_ERROR(this->get_logger(), "service get_object_service is timeout for getting ready!");
+            switch_power(false);
+            return false;
         }
         auto result_future = get_object_client_->async_send_request(request);
         std::future_status status = result_future.wait_until(
-            std::chrono::steady_clock::now() + std::chrono::seconds(1));
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
         if (status == std::future_status::ready)
         {
             auto result = result_future.get();
-            if (result->is_success == true)
+            if (result->is_accepted == true)
             {
                 RCLCPP_INFO(this->get_logger(), "get_object_service: Service call succeeded.");
+                std::unordered_map<std::string, kios::Object> object_dict_;
                 try
                 {
-                    nlohmann::json object_data = nlohmann::json::parse(result->object_data);
+                    // std::cout << "READ START" << std::endl;
+                    for (int i = 0; i < result->object_name.size(); i++)
+                    {
+                        auto p = std::make_pair(result->object_name[i], kios::Object::from_json(nlohmann::json::parse(result->object_data[i])));
+                        object_dict_.emplace(p);
+                    }
+                    // std::cout << "SWAP" << std::endl;
+                    // * update the object dictionary in task state
+                    task_state_ptr_->object_dictionary.swap(object_dict_);
+                    // std::cout << "READ FINISH" << std::endl;
+                    return true;
                 }
                 catch (...)
                 {
                     RCLCPP_FATAL(this->get_logger(), "get_object_service: ERROR IN JSON FILE PARSING!");
                     return false;
                 }
-                // ! TODO handle the object_data
             }
             else
             {
@@ -521,11 +594,6 @@ private:
             RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
             return false;
         }
-
-        // * reset the flag in node param
-        std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("is_update_object", false)};
-        this->set_parameters(all_new_parameters);
-        return true;
     }
 };
 

@@ -68,14 +68,29 @@ ament_target_dependencies(messenger
   kios_interface
 )
 
+######################################################### messenger
+
+add_executable(mongo_reader mongo_reader.cpp)
+
+target_link_libraries(mongo_reader
+    ${PROJECT_NAME}::behavior_tree
+    nlohmann_json::nlohmann_json
+    ${PROJECT_NAME}::kios_utils
+    ${PROJECT_NAME}::kios_communication
+)
+
+ament_target_dependencies(mongo_reader
+  rclcpp
+  kios_interface
+)
 
 
 install(TARGETS
-    # robot_state_subscription
     commander
     messenger
     tactician
     tree_node
+    mongo_reader
 
     DESTINATION lib/${PROJECT_NAME}
     )

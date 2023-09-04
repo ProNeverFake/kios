@@ -15,7 +15,8 @@
 namespace BT
 {
 
-bool ReactiveSequence::throw_if_multiple_running = true;
+// ! BBLAB: MULTIPLE NODES IN RUNNING ENABLED
+bool ReactiveSequence::throw_if_multiple_running = false;
 
 void ReactiveSequence::EnableException(bool enable)
 {
@@ -44,11 +45,11 @@ NodeStatus ReactiveSequence::tick()
         {
           haltChild(i);
         }
-        if(running_child_ == -1)
+        if (running_child_ == -1)
         {
           running_child_ = int(index);
         }
-        else if(throw_if_multiple_running && running_child_ != int(index))
+        else if (throw_if_multiple_running && running_child_ != int(index))
         {
           throw LogicError("[ReactiveSequence]: only a single child can return RUNNING");
         }
@@ -60,9 +61,10 @@ NodeStatus ReactiveSequence::tick()
         return NodeStatus::FAILURE;
       }
       // do nothing if SUCCESS
-      case NodeStatus::SUCCESS: break;
+      case NodeStatus::SUCCESS:
+        break;
 
-      case NodeStatus::SKIPPED:{
+      case NodeStatus::SKIPPED: {
         // to allow it to be skipped again, we must reset the node
         haltChild(index);
       }

@@ -150,4 +150,10 @@ namespace kios
         return false;
     }
 
+    bool compare_homogeneous_matrix(const Eigen::Matrix<double, 4, 4> &T_1, const Eigen::Matrix<double, 4, 4> &T_2, double angular_threshold, double translation_threshold)
+    {
+        double angular_distance = mirmi_utils::get_angular_distance(T_1, T_2);
+        double translation_distance = mirmi_utils::get_linear_distance(T_1, T_2);
+    }
+
 } // namespace kios

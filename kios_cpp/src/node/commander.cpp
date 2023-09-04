@@ -27,9 +27,10 @@ public:
     Commander()
         : Node("commander"),
           ws_url("ws://localhost:12000/mios/core"),
-          udp_ip("127.0.0.1"),
-          udp_port(12346),
-          isBusy(false)
+          udp_ip("127.0.0.1"), // not used
+          udp_port_(12346),
+          isBusy(false),
+          subscription_list_{"tau_ext", "q", "TF_F_ext_K", "system_time", "T_T_EE"}
     {
         // declare power parameter
         this->declare_parameter("power", true);
@@ -44,11 +45,16 @@ public:
         messenger_->special_connect();
         while (!messenger_->wait_for_open_connection(3))
         {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_WARN(this->get_logger(), "USER SHUTDOWN DETECTED.");
+                std::exit(EXIT_FAILURE); // exit immediately.
+            }
             RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
         }
 
         // udp register
-        mios_register_udp();
+        mios_register_udp(udp_port_, subscription_list_);
 
         // object announcement
         messenger_->send_grasped_object();
@@ -69,9 +75,9 @@ public:
     }
 
     // connection rel
-    void mios_register_udp()
+    void mios_register_udp(int &udp_port, nlohmann::json sub_list)
     {
-        messenger_->register_udp(udp_port);
+        messenger_->register_udp(udp_port, sub_list);
     }
     void mios_unregister_udp()
     {
@@ -114,8 +120,10 @@ private:
     std::string ws_url;
 
     // udp subscriber ip
-    std::string udp_ip;
-    int udp_port;
+    std::string udp_ip; // not used
+    int udp_port_;
+    nlohmann::json subscription_list_;
+    // std::vector<std::string> subscription_list;
 
     void command_service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
@@ -155,8 +163,23 @@ private:
         }
         case kios::CommandType::STOP_OLD_START_NEW: {
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
-            stop_task();
-            start_task(command_request.command_context);
+            if (stop_task_request() == true)
+            {
+                start_task_request(command_request.command_context);
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "Issuing command: BAD NEWS FROM RESPONSE!");
+            }
+            ////////////////////////////////
+            // !!!!! TEST remove stop_task
+            ////////////////////////////////
+            // start_task_command(command_request.command_context);
+            break;
+        }
+        case kios::CommandType::STOP_OLD_TASK: {
+            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old command...");
+            stop_task_command();
             break;
         }
         default:
@@ -165,19 +188,35 @@ private:
         }
     };
 
-    void stop_task()
+    bool stop_task_request()
     {
-        messenger_->stop_task();
+        return messenger_->stop_task_request();
     }
 
-    void start_task(const nlohmann::json &skill_context)
+    bool start_task_request(const nlohmann::json &skill_context)
     {
-        messenger_->start_task(skill_context);
+        return messenger_->start_task_request(skill_context);
+    }
+
+    void stop_task_command()
+    {
+        messenger_->stop_task_command();
+    }
+
+    void start_task_command(const nlohmann::json &skill_context)
+    {
+        messenger_->start_task_command(skill_context);
     }
 
     void teach_object(const nlohmann::json &object_context)
     {
         messenger_->send_and_wait("teach_object", object_context);
+    }
+
+    // ! TODO
+    void get_object(const nlohmann::json &object_context)
+    {
+        messenger_->send_and_wait("get_object", object_context);
     }
 
     /**

@@ -37,13 +37,33 @@ namespace Insertion
     //         </BehaviorTree>
     //     </root>
     //     )";
+
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Approach name="approach"/>
+    //                 <Contact name="contact"/>
+    //                 <Wiggle name="wiggle"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
-                <ReactiveSequence name="root_sequence">
-                    <Approach name="approach"/>
-                    <Contact name="contact"/>
-                </ReactiveSequence>
+                <Sequence name="root_sequence">
+                    <Fallback name="approach_fallback">
+                        <AtPositionApproch name="at_position_approach"/>
+                        <Approach name="approach"/>
+                    </Fallback>
+                    <Sequence name="approach_sequence">
+                        <HasObjectContact name="has_object_contact"/>
+                        <Contact name="contact"/>
+                    </Sequence>
+                    <Wiggle name="wiggle"/>
+                </Sequence>
             </BehaviorTree>
         </root>
         )";

@@ -45,6 +45,11 @@ public:
         messenger_->special_connect();
         while (!messenger_->wait_for_open_connection(3))
         {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_WARN(this->get_logger(), "USER SHUTDOWN DETECTED.");
+                std::exit(EXIT_FAILURE); // exit immediately.
+            }
             RCLCPP_INFO(this->get_logger(), "websocket connection not ready. Waiting for an open connection.");
         }
 

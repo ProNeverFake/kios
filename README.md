@@ -153,42 +153,80 @@ The project structure:
 
 The functions of the nodes are explained explicitly below.
 
-**mios_reader**
+---
+
+##### **mios_reader**
 
 The node **mios_reader** publishes the realtime sensing data from mios.
 
 - Written in python.
 - Has a udp receiver member object which receives the packages from the telemetry udp sender in mios.
 - The entities sent by mios telemetry is registered in node **commander**.
-- Publish the sensing data to topic `mios_state_topic` with msg `MiosState`.
+- Publish the sensing data to topic `mios_state_topic` with msg `MiosState.msg`.
 - Has a user-defined package loss tolerance. Power off if it is exceeded (timeout).
 
 For developer:
 
 - The messages(data) are transfered "as they are". They should be restored to the original format at the endpoint that use them. 
 
-**sensor_reader**
+---
+
+##### **sensor_reader**
 
 The node **sensor_reader** publishes the realtime sensing data from the sensors.
 
 - Not implemented yet since there is no sensor deployed on my robot.
-- Publish the data to topic `sensor_state_topic` with msg `SensorState`.
+- Publish the data to topic `sensor_state_topic` with msg `SensorState.msg`.
 
-**messenger**
+---
 
-The node **messenger** receives all the sensing data and assemble them with a nested msg, then publish it.
+##### **messenger**
 
-- Subscibe the topicmsg `mios_state_topic` and `sensor_state_topic`.
-- Publish to topic `task_state_topic` with msg `TaskState`, which is a msg type nested with `MiosState` and `SensorState`.
+The node **messenger** subscribes all the sensing data topics and assemble them with a nested msg, then publish it.
+
+- Subscibe the topic `mios_state_topic` and `sensor_state_topic`.
+- Publish to topic `task_state_topic` with msg `TaskState.msg`, which is a msg type nested with `MiosState.msg` and `SensorState.msg`.
 
 For developer:
 
 - The subscribers and publishers are put in a MutuallyExclusiveCallbackGroup and the node is executed by a single-thread executor. This, though may affect the efficiency, can avoid possible data race. Deploy mutex instead if you need higher transfer frequency.
 
+---
+
+##### **tree_node**
+
+The node **tree_node** manages the life cycle of the behavior tree. It subscribes the robot state, determines the next action and asks the node **tactician** for constructing the action.
+
+- Subscribe the topic `task_state_topic`.
+- Request action switch by service `switch_action_service` with `SwitchAcitionRequest.srv`.
+- Determine the next action by "ticking" the `tree_root`.
+- Synchronize the tree phase by receiving state feedback from mios with a udp receiver member object.
+
+...
+
+---
+
+##### **tactician**
+
+The node **tactician** construct the action with the corresponding context. It receives the switch action request from the node **tree_node** and generate the action context, then asks the node **commander** to send the command.
+
+- Provide the service `switch_action_service` with `SwitchAcitionRequest.srv`.
+- Determine the action parameter in `generate_command_context()`.
+
+---
+
+##### **commander**
+
+The node **commander** manages the websocket connection with mios Port. It receives the command request from the node **tactician** and send it to mios websocket server.
+
+- Provide the service `command_request_service` with `CommandRequest.srv`.
+- Can `send`, `send_and_wait`, `send_and_check`.
 
 
 /////////////////////////////////////////////
+
 //////////   UNDER CONSTRUCTION  ////////////
+
 /////////////////////////////////////////////
 
 ### Running Process
@@ -207,7 +245,8 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 - *04.09.2023*
   1. Added node elaborations.
-  2. Sorted out the tree generation code in tree_root.cpp.
+  2. Sorted out the tree generation code in tree_root.cpp. 
+  3. Fixed the Bug in commander. Now the program can exit with SIGTERM.
 
 - *03.09.2023*
   1. Fixed the bug in action node switching in the tree. (undefined behavior without bool return.)

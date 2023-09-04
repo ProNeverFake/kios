@@ -53,14 +53,15 @@ public:
         auto now = std::chrono::steady_clock::now();
         if (cv.wait_until(lock, now + std::chrono::milliseconds(wait_deadline), [this]() { return !queue.empty(); }))
         {
-            std::cout << "message queue: Response caught." << std::endl;
+            spdlog::info("message queue: Response caught.");
+
             T value = queue.front();
             queue.pop();
             return value;
         }
         else
         {
-            std::cout << "message queue: Response timed out." << std::endl;
+            spdlog::warn("message queue: Response timed out.");
             return std::nullopt;
         }
     }

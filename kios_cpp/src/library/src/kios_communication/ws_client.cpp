@@ -394,6 +394,7 @@ bool BTMessenger::connect()
 // * now this is in use.
 bool BTMessenger::special_connect()
 {
+    spdlog::trace("BTMessenger::special_connect()");
     std::future<int> connection_future = std::async(std::launch::async, &websocket_endpoint::special_connect, &m_ws_endpoint, m_uri);
 
     switch (connection_future.wait_for(std::chrono::seconds(5)))
@@ -661,11 +662,6 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
 
             spdlog::info("Call method {} get response if_success: {}", method, result["result"]["result"].dump());
-
-            // ! CHECK
-            spdlog::error("Call method ", method, " get response error message: {}", result["result"]["error"].dump());
-
-            // TODO handle the result.
         }
         catch (nlohmann::json::parse_error &e)
         {

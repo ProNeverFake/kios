@@ -231,6 +231,11 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 
 - Provide the service `get_object_service` with `GetObjectRequest.srv`.
 
+---
+
+##### **planner** (NOT IMPLEMENTED YET)
+
+The node **planner** (should) make plans for robot tasks. It makes the plan the tasks, generates the xml in string format for generating behavior tree, and asks for node **tree_node** to implements the tree.
 
 /////////////////////////////////////////////
 
@@ -248,7 +253,7 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Testing
 
-> BB: This part is skipped for now. 
+> BB: I'm now testing... Please be patient... 
 
 ### Development Log
 

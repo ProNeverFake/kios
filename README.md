@@ -201,6 +201,7 @@ The node **tree_node** manages the life cycle of the behavior tree. It subscribe
 - Request action switch by service `switch_action_service` with `SwitchAcitionRequest.srv`.
 - Determine the next action by "ticking" the `tree_root`.
 - Synchronize the tree phase by receiving state feedback from mios with a udp receiver member object.
+- Update the object list with service `get_object_service` with `GetObjectRequest.srv`.
 
 ...
 
@@ -221,6 +222,14 @@ The node **commander** manages the websocket connection with mios Port. It recei
 
 - Provide the service `command_request_service` with `CommandRequest.srv`.
 - Can `send`, `send_and_wait`, `send_and_check`.
+
+---
+
+##### **mongo_reader**
+
+The node **mongo_reader** manages the communication between kios and mongoDB. It reads the objects set in mongoDB with mongoDB client.
+
+- Provide the service `get_object_service` with `GetObjectRequest.srv`.
 
 
 /////////////////////////////////////////////

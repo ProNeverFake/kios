@@ -4,7 +4,15 @@ namespace Insertion
 {
     TreeRoot::TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
         : tree_state_ptr_(tree_state_ptr),
-          task_state_ptr_(task_state_ptr)
+          task_state_ptr_(task_state_ptr),
+          hasRegisteredNodes(false)
+    {
+        set_log();
+        // * run tree initialization method
+        // initialize_tree(); // ! MOVED TO TREE_NODE
+    }
+
+    void TreeRoot::set_log()
     {
         // * set spdlog
         std::string verbosity = "trace";
@@ -37,30 +45,87 @@ namespace Insertion
         logger->set_level(info_level);
         spdlog::set_default_logger(logger);
         spdlog::info("spdlog: initialized.");
-
-        // * run tree initialization method
-        initialize_tree();
     }
 
-    void TreeRoot::initialize_tree()
+    /**
+     * @brief Register all the nodes and generate the first tree.
+     *
+     */
+    bool TreeRoot::initialize_tree()
     {
-        // * register nodes
-        // * condition nodes
-        factory_.registerNodeType<HasObject>("HasObjectApproch", "approach", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
-        // * demo action nodes
-        factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
+        if (!register_nodes())
+        {
+            return false;
+        }
+        if (!construct_tree(test_tree))
+        {
+            return false;
+        }
+        return true;
+    }
 
-        // * general action nodes
-        factory_.registerNodeType<CartesianMove>("CartesianMove", tree_state_ptr_, task_state_ptr_);
-        factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
+    /**
+     * @brief Register all the nodes necessary for the task to the factory.
+     * Node registration should only be conducted once so make sure all the nodes are registered at the initialization of the tree_root.
+     *
+     * @return true if there is not error along the whole process (DOES NOT MEAN THE REGISTRATION IS SUCCESSFUL DUE TO THE POSSIBLE SKIP)
+     * @return false
+     */
+    bool TreeRoot::register_nodes()
+    {
+        if (hasRegisteredNodes == false)
+        {
+            try
+            {
+                factory_.registerNodeType<HasObject>("HasObjectApproch", "approach", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
+                // * demo action nodes
+                factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<Wiggle>("Wiggle", tree_state_ptr_, task_state_ptr_);
 
-        // * generate tree
-        tree_ = factory_.createTreeFromText(test_tree);
+                // * general action nodes
+                factory_.registerNodeType<CartesianMove>("CartesianMove", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
+            }
+            catch (...)
+            {
+                spdlog::error("ERROR IN REGISTERING NODES!");
+                throw;
+                return false; // for completeness
+            }
+            hasRegisteredNodes = true;
+        }
+        else
+        {
+            spdlog::info("Node registration has been done before. Skipped.");
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Den Wald aufbauen mit dem gegebenen String.
+     *
+     * @param tree_string
+     * @return true
+     * @return false
+     */
+    bool TreeRoot::construct_tree(const std::string &tree_string)
+    {
+        try
+        {
+            tree_ = factory_.createTreeFromText(tree_string);
+        }
+        catch (...)
+        {
+            spdlog::error("ERROR IN CONSTRUCTING THE TREE!");
+            throw;
+            return false;
+        }
+        return true;
     }
 
     // ! DISCARDED

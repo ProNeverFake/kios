@@ -32,8 +32,6 @@ public:
     {
         this->declare_parameter("power", true);
 
-        // ! BBDEBUG ALL IN ONE SINGLE THREAD GROUP
-        // ! SHOULD WORK IN PRINCIPLE
         timer_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
         subscription_callback_group_ = timer_callback_group_;

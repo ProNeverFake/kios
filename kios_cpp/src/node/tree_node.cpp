@@ -55,6 +55,9 @@ public:
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
 
+        // ! for TEST initialize the tree
+        m_tree_root->initialize_tree();
+
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;

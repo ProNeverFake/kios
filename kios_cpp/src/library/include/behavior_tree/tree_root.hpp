@@ -29,8 +29,9 @@ namespace Insertion
     {
     public:
         TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
-        void initialize_tree();
-        void construct_tree();
+        bool initialize_tree();
+        bool construct_tree(const std::string &tree_string);
+        bool register_nodes();
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();
@@ -38,6 +39,9 @@ namespace Insertion
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
 
     private:
+        // flag
+        bool hasRegisteredNodes;
+
         // * BT rel
         BT::BehaviorTreeFactory factory_;
         BT::Tree tree_;
@@ -45,6 +49,8 @@ namespace Insertion
         // * state rel
         std::shared_ptr<kios::TreeState> tree_state_ptr_;
         std::shared_ptr<kios::TaskState> task_state_ptr_;
+
+        void set_log();
     };
 
 } // namespace Insertion

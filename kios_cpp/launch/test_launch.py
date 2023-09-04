@@ -83,13 +83,13 @@ def generate_launch_description():
         mongo_reader,
         messenger,
         # tree_node,
-        # tactician,
+        tactician,
         commander,
         # launch_in_new_terminal('ros2 run kios_cpp commander', 'commander.log'),
         # launch_in_new_terminal('ros2 run kios_cpp mongo_reader', 'mongo_reader.log'),
         # launch_in_new_terminal('ros2 run kios_py mios_reader', 'mios_reader.log'),
         # launch_in_new_terminal('ros2 run kios_cpp messenger', 'messenger.log'),
-        launch_in_new_terminal('ros2 run kios_cpp tactician', 'tactician.log'),
+        # launch_in_new_terminal('ros2 run kios_cpp tactician', 'tactician.log'),
         launch_in_new_terminal('ros2 run kios_cpp tree_node', 'tree_node.log'),
     ])
 

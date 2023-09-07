@@ -15,7 +15,7 @@ int32 GRIPPER_MOVE = 14
 
 string action_name
 int32 action_phase
-string[] object_name
+string[] object_keys
 # defined enum class in data_type.hpp
 int32 tree_phase
 bool is_interrupted

@@ -51,10 +51,8 @@ namespace kios
         // * abstracted action phases from here
         CARTESIAN_MOVE = 11,
         JOINT_MOVE = 12,
-        GRASP_FORCE = 13,
-        GRASP_MOVE = 14,
-        RELEASE_FORCE = 15,
-        RELEASE_MOVE = 16
+        GRIPPER_FORCE = 13,
+        GRIPPER_MOVE = 14,
     };
 
     /**
@@ -90,7 +88,7 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-        std::string object_name = "NullObject";
+        std::string object_key = "Null";
         TreePhase tree_phase = TreePhase::IDLE;
         bool isRunning = false;      // ! for pub sub, discarded
         bool isInterrupted = true;   // necessity of stopping old
@@ -116,7 +114,6 @@ namespace kios
                 t_t_ee = std::move(msg.t_t_ee);
                 // * Here copy
                 t_t_ee_matrix = Eigen::Map<Eigen::Matrix<double, 4, 4>>(t_t_ee.data());
-                // std::cout << t_t_ee_matrix << std::endl;
             }
         }
     };
@@ -243,14 +240,14 @@ namespace kios
 
     /**
      * @brief action phase with action node mp parameter from tree node to tactician
-     *
+     * ! too many unused entities!
      */
     struct ActionPhaseContext
     {
         std::string node_name = "Initialization";
         std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
-        std::string object_name = "NullObject";
+        std::string object_key = "Null";
         std::string command;
         bool isActionSuccess = false;
         nlohmann::json parameter = {

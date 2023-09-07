@@ -425,7 +425,7 @@ namespace kios
                   {
                       {"width", 0.6},
                       {"speed", 1},
-                      {"K_x", {1500, 1500, 1500, 100, 100, 100}}, // ! von mios-example kopiert und wird noch ni validiert
+                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
                   }},
              }},
             {"control", {{"control_mode", 0}}},

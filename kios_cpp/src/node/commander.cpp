@@ -56,7 +56,6 @@ public:
         // udp register
         mios_register_udp(udp_port_, subscription_list_);
 
-        // object announcement
         // ! HERE REMOVED. THE PRECONDITION IN BBGENERALSKILL IS ALSO REMOVED.
         // messenger_->send_grasped_object();
 

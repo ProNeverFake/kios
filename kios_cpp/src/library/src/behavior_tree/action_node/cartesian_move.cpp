@@ -26,7 +26,7 @@ namespace Insertion
         node_context.object_keys.push_back("Move");
         node_context.object_names.push_back("move");
         node_context.action_phase = kios::ActionPhase::CARTESIAN_MOVE;
-        node_context.parameter["skill"]["action_name"] = "cartesian_ move";
+        node_context.parameter["skill"]["action_name"] = "cartesian_move";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CARTESIAN_MOVE;
     }
 

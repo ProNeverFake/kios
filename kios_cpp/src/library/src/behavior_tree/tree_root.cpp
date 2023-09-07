@@ -89,6 +89,8 @@ namespace Insertion
                 // * general action nodes
                 factory_.registerNodeType<CartesianMove>("CartesianMove", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperForce>("GripperForce", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperMove>("GripperMove", tree_state_ptr_, task_state_ptr_);
             }
             catch (...)
             {

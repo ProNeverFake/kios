@@ -88,7 +88,8 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-        std::string object_key = "Null";
+        std::vector<std::string> object_keys = {};
+        std::vector<std::string> object_names = {};
         TreePhase tree_phase = TreePhase::IDLE;
         bool isRunning = false;      // ! for pub sub, discarded
         bool isInterrupted = true;   // necessity of stopping old
@@ -247,7 +248,8 @@ namespace kios
         std::string node_name = "Initialization";
         std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
-        std::string object_key = "Null";
+        std::vector<std::string> object_keys = {};
+        std::vector<std::string> object_names = {};
         std::string command;
         bool isActionSuccess = false;
         nlohmann::json parameter = {
@@ -357,8 +359,10 @@ namespace kios
                   {
                       {"Container", "housing"},
                       {"Approach", "approach"},
-                      {"MOVE", "move"},
-                      {"GRIPPER", "gripper"},
+                      {"Contact", "contact"},
+                      {"Wiggle", "wiggle"},
+                      {"Move", "move"},
+                      {"Gripper", "gripper"},
                   }},
                  {"time_max", 30},
                  {"action_context",

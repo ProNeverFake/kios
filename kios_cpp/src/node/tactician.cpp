@@ -174,6 +174,7 @@ private:
                 tree_state_.action_name = std::move(request->action_name);
                 tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
                 tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+                tree_state_.object_keys = std::move(request->object_keys);
                 // * set flag for timer
                 isSwitchAction.store(true);
             }
@@ -195,8 +196,12 @@ private:
     {
         /////////////////////////////////////////////
         // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT
-        // * now just copy.
-        // ! only use stop old start new
+        // * now just use default
+        // do nothing
+        // * the objects to be grounded from mongoDB can be changed here according to the object_keys.
+        // * now just use default.
+        // do nothing.
+        // ! only use stop old start new now
         command_context_.command_type = kios::CommandType::STOP_OLD_START_NEW;
         // * handle the command context here
         command_context_.command_context["skill"]["action_context"]["action_name"] = tree_state_.action_name;
@@ -249,6 +254,10 @@ private:
         }
     }
 
+    /**
+     * @brief handle the switch action request. generate the command context and send it to commander.
+     *
+     */
     void handle_request()
     {
         RCLCPP_ERROR(this->get_logger(), "HANDLE REQUEST");
@@ -332,7 +341,7 @@ private:
     }
 
     /**
-     * @brief timer callback. handle the switch action request and send the command request to commander.
+     * @brief timer callback. check the need of request handling periodically.
      *
      */
     void timer_callback()
@@ -347,21 +356,7 @@ private:
                     isBusy.store(true);
 
                     handle_request();
-                    // if (!send_command_request(1000, 1000))
-                    // {
-                    //     //* error in command request service.
-                    //     // * invoke error in tree
 
-                    //     // * turn off for check
-                    //     switch_power(false);
-                    // }
-                    // // * turn off if finished
-                    // std::lock_guard<std::mutex> tree_state_lock(tree_state_mtx_);
-                    // if (tree_state_.tree_phase == kios::TreePhase::FINISH)
-                    // {
-                    //     RCLCPP_INFO(this->get_logger(), "Timer: Mission succeeded.");
-                    //     switch_power(false);
-                    // }
                     // * command_request finished. reset flags.
                     isSwitchAction.store(false);
                     isBusy.store(false);

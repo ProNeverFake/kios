@@ -12,9 +12,10 @@ namespace Insertion
     void GripperForce::update_tree_state()
     {
         spdlog::trace("GripperForce::update_tree_state()");
+        // * here must copy
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
-        get_tree_state_ptr()->object_key = get_node_context_ref().object_key;
+        get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
     }
 
     void GripperForce::node_context_initialize()
@@ -23,7 +24,8 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "GRIPPER_FORCE";
         node_context.action_name = "gripper_force";
-        node_context.object_key = "GRIPPER";
+        node_context.object_keys.push_back("GRIPPER");
+        node_context.object_names.push_back("gripper");
         node_context.action_phase = kios::ActionPhase::GRIPPER_FORCE;
         node_context.parameter["skill"]["action_name"] = "gripper_force";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::GRIPPER_FORCE;
@@ -32,6 +34,7 @@ namespace Insertion
     bool GripperForce::is_success()
     {
         spdlog::trace("GripperForce::is_success()");
+        // * THIS SKILL CONSUME SUCCESS FROM MIOS
         return consume_mios_success();
     }
 

@@ -23,7 +23,8 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "GRIPPER_MOVE";
         node_context.action_name = "gripper_move";
-        node_context.object_key = "GRIPPER";
+        node_context.object_keys.pushback("GRIPPER");
+        node_context.object_names.pushback("gripper"); // ! this should be exposed to the plan interface
         node_context.action_phase = kios::ActionPhase::GRIPPER_MOVE;
         node_context.parameter["skill"]["action_name"] = "gripper_move";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::GRIPPER_MOVE;
@@ -32,6 +33,7 @@ namespace Insertion
     bool GripperMove::is_success()
     {
         spdlog::trace("GripperMove::is_success()");
+        // * THIS SKILL CONSUME SUCCESS FROM MIOS
         return consume_mios_success();
     }
 

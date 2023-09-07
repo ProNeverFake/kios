@@ -35,14 +35,13 @@ public:
           hasUpdatedObjects_(false),
           object_list_()
     {
+        // ! to be discarded
         // initialize object list
         object_list_.push_back("contact");
         object_list_.push_back("approach");
 
         //* declare mission parameter
-        // this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
-        this->declare_parameter("client_power", true);
 
         //* initialize the callback groups
         timer_callback_group_ = this->create_callback_group(
@@ -55,7 +54,7 @@ public:
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
 
-        // ! for TEST initialize the tree
+        // ! for TEST initialize the tree with test_tree
         m_tree_root->initialize_tree();
 
         // * Set qos and options
@@ -99,6 +98,7 @@ public:
 
     bool check_power()
     {
+        // lack the check of the parameter existence
         return this->get_parameter("power").as_bool();
     }
 
@@ -501,7 +501,7 @@ private:
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
         // ! ADD object name to ground
-        request->object_name.push_back(tree_state_ptr_->object_name);
+        request->object_keys = tree_state_ptr_->object_keys;
         request->is_interrupted = true; // ! temp
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {

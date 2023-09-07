@@ -19,6 +19,8 @@
 // general action nodes
 #include "behavior_tree/action_node/cartesian_move.hpp"
 #include "behavior_tree/action_node/joint_move.hpp"
+#include "behavior_tree/action_node/gripper_force.hpp"
+#include "behavior_tree/action_node/gripper_move.hpp"
 
 #include "behavior_tree/condition_node/condition_node.hpp"
 

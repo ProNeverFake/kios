@@ -26,17 +26,18 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 
 **DEVELOPER'S PLAN:**
 - [ ] Mios object grounding is not necessary for kios usage. remove this part in the future.
-- [ ] Enable parameter check according to the action phase in the command.
+- [ ] Enable parameter check (in mios) according to the action phase in the command.
 - [ ] **TOP** Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
-- [ ] Add reset method to all nodes to enable retry.
+- [ ] Add reset method to tree_node to enable retry.
 - [x] **ERGENT** enable at position check in tree node.
 - [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [x] (POSTPONED) add meta node for kios node.
+- [ ] (POSTPONED) add meta node for kios node.
 
 **THOUGHT**
+- [ ] The object to be grounded is determined at the start of the skill, which should be determined by action context.
 - [ ] Create a dummy object in action context, command context and mongoDB.
 
 SEE [DEVELOPMENT LOG](#development-log)
@@ -214,6 +215,10 @@ The node **tactician** construct the action with the corresponding context. It r
 - Provide the service `switch_action_service` with `SwitchAcitionRequest.srv`.
 - Determine the action parameter in `generate_command_context()`.
 
+For developer:
+
+- The skill currently used in mios is BBGeneralSkill, in which all necessary `create_motion_primitive()` methods are collected and invoked according to the received action context. The action nodes in the behavior_tree library can now just generate the corresponding motion primitives context (one action node for one motion primitive), then wrap it into BBGeneralSkill context, and finally into GeneralTask context. Therefore, it is quite straightforward how to invoke an existing skill for specific purposes (instead of BBGeneralSkill which is a general skill) to realize the "skill" layer in the robot task planning system.
+
 ---
 
 ##### **commander**
@@ -222,6 +227,7 @@ The node **commander** manages the websocket connection with mios Port. It recei
 
 - Provide the service `command_request_service` with `CommandRequest.srv`.
 - Can `send`, `send_and_wait`, `send_and_check`.
+- Provide CLI service `teach_object_cli` with `TeachObjectService.srv`.
 
 ---
 
@@ -233,15 +239,9 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 
 ---
 
-##### **planner** (NOT IMPLEMENTED YET)
+##### **planner** (NOT IMPLEMENTED YET, MAYBE BORROW SOME FROM PLANSYS2)
 
 The node **planner** (should) make plans for robot tasks. It makes the plan the tasks, generates the xml in string format for generating behavior tree, and asks for node **tree_node** to implements the tree.
-
-/////////////////////////////////////////////
-
-//////////   UNDER CONSTRUCTION  ////////////
-
-/////////////////////////////////////////////
 
 ### Running Process
 
@@ -256,6 +256,9 @@ The basic idea is to make the decision making part in kios and the skill executi
 > BB: I'm now testing... Please be patient... 
 
 ### Development Log
+
+- *05.09.2023*
+  1. Removed the insertable entity in action context. Removed the corresponding part in mios (precondition).
 
 - *04.09.2023*
   1. Added node elaborations.

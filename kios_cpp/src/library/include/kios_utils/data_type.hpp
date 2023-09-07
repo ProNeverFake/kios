@@ -50,7 +50,11 @@ namespace kios
 
         // * abstracted action phases from here
         CARTESIAN_MOVE = 11,
-        JOINT_MOVE = 12
+        JOINT_MOVE = 12,
+        GRASP_FORCE = 13,
+        GRASP_MOVE = 14,
+        RELEASE_FORCE = 15,
+        RELEASE_MOVE = 16
     };
 
     /**
@@ -86,6 +90,7 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
+        std::string object_name = "NullObject";
         TreePhase tree_phase = TreePhase::IDLE;
         bool isRunning = false;      // ! for pub sub, discarded
         bool isInterrupted = true;   // necessity of stopping old
@@ -245,20 +250,18 @@ namespace kios
         std::string node_name = "Initialization";
         std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
+        std::string object_name = "NullObject";
         std::string command;
         bool isActionSuccess = false;
         nlohmann::json parameter = {
             {"skill",
              {
-                 {
-                     "objects",
-                     {
-                         {"Container", "housing"},
-                         {"Approach", "approach"},
-                         {"Insertable", "ring"},
-                         //   {"skill_object", "null"}
-                     },
-                 },
+                 {"objects",
+                  {
+                      {"Container", "housing"},
+                      {"Approach", "approach"},
+                      //  {"Insertable", "ring"},
+                  }},
                  {"time_max", 30},
                  {"action_context",
                   {
@@ -295,19 +298,44 @@ namespace kios
                       {"f_push", 7},
                       {"K_x", {500, 500, 0, 800, 800, 800}},
                   }},
-                 //  {"cartesian_move",
-                 //   {
-                 //       {"dX_d", {0.05, 0.05}},
-                 //       {"ddX_d", {0.05, 0.05}},
-                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                 //   }},
-                 //  {"joint_move",
-                 //   {
-                 //       {"speed", 0.5},
-                 //       {"acceleration", 1},
-                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                 //   }},
+                 {"cartesian_move",
+                  {
+                      {"dX_d", {0.05, 0.05}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                  }},
+                 {"joint_move",
+                  {
+                      {"speed", 0.5},
+                      {"acceleration", 1},
+                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                  }},
+                 {"grasp_force",
+                  {
+                      {"grasp_speed", 1},
+                      {"grasp_force", 40},
+                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                  }},
+                 {"grasp_move", // ! soll aber nicht benutzt werden
+                  {
+                      {"speed", 0.5},
+                      {"acceleration", 1},
+                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                  }},
+                 {"release_force", // ! soll aber nicht benutzt werden
+                  {
+                      {"speed", 0.5},
+                      {"acceleration", 1},
+                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
+                  }},
+                 {"release_move",
+                  {
+                      {"release_width", 0.6},
+                      {"release_speed", 1},
+                      {"K_x", {1500, 1500, 1500, 100, 100, 100}}, // ! von mios-example kopiert und wird noch ni validiert
+                  }},
+
              }},
             // ! TODO add move to pose and move to joint pose
             {"control", {{"control_mode", 0}}},
@@ -332,8 +360,8 @@ namespace kios
                   {
                       {"Container", "housing"},
                       {"Approach", "approach"},
-                      {"Insertable", "ring"},
-                      //   {"skill_object", "null"},
+                      {"MOVE", "move"},
+                      {"GRIPPER", "gripper"},
                   }},
                  {"time_max", 30},
                  {"action_context",
@@ -371,21 +399,33 @@ namespace kios
                       {"f_push", 7},
                       {"K_x", {500, 500, 0, 800, 800, 800}},
                   }},
-                 //  {"cartesian_move",
-                 //   {
-                 //       {"dX_d", {0.05, 0.05}},
-                 //       {"ddX_d", {0.05, 0.05}},
-                 //       {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                 //       {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                 //   }},
-                 //  {"joint_move",
-                 //   {
-                 //       // ! MARK the skill parameter is inconsist with the json here !
-                 //       // ! Also check the parameter entity name!!
-                 //       {"speed", 0.5},
-                 //       {"acceleration", 1},
-                 //       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                 //   }},
+                 {"cartesian_move",
+                  {
+                      {"dX_d", {0.05, 0.05}},
+                      {"ddX_d", {0.05, 0.05}},
+                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                  }},
+                 {"joint_move",
+                  {
+                      {"speed", 0.5},
+                      {"acceleration", 1},
+                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                      {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
+                  }},
+                 {"gripper_force",
+                  {
+                      {"width", 0.05},
+                      {"speed", 1},
+                      {"force", 40},
+                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                  }},
+                 {"gripper_move",
+                  {
+                      {"width", 0.6},
+                      {"speed", 1},
+                      {"K_x", {1500, 1500, 1500, 100, 100, 100}}, // ! von mios-example kopiert und wird noch ni validiert
+                  }},
              }},
             {"control", {{"control_mode", 0}}},
             {"user",

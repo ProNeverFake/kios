@@ -2,12 +2,20 @@
 int32 FINISH=999
 int32 ERROR=-1
 int32 INITIALIZATION=0
+
 int32 APPROACH=1
 int32 CONTACT=2
 int32 WIGGLE=3
 
+int32 CARTESIAN_MOVE = 11
+int32 JOINT_MOVE = 12
+int32 GRIPPER_FORCE = 13
+int32 GRIPPER_MOVE = 14
+
+
 string action_name
 int32 action_phase
+string[] object_name
 # defined enum class in data_type.hpp
 int32 tree_phase
 bool is_interrupted

@@ -500,6 +500,8 @@ private:
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
+        // ! ADD object name to ground
+        request->object_name.push_back(tree_state_ptr_->object_name);
         request->is_interrupted = true; // ! temp
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {

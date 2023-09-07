@@ -17,7 +17,7 @@ namespace Insertion
      */
     bool Contact::is_success()
     {
-        std::cout << "CONTACT IS_SUCCESS?" << std::endl;
+        // spdlog::info("CONTACT IS_SUCCESS?");
 
         // std::cerr << "CHECK TASK STATE CONTENT" << std::endl;
         // std::stringstream ss;
@@ -48,7 +48,7 @@ namespace Insertion
         std::cout << "CONTACT UPDATE TREE STATE" << std::endl;
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
-        // std::cout << "UPDATED VALUE: " << get_tree_state_ptr()->action_name << std::endl;
+        get_tree_state_ptr()->object_name = get_node_context_ref().object_name;
     }
 
     void Contact::node_context_initialize()
@@ -58,6 +58,7 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "CONTACT";
         node_context.action_name = "contact";
+        node_context.object_name = "contact";
         node_context.action_phase = kios::ActionPhase::CONTACT;
         node_context.parameter["skill"]["action_name"] = "contact";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CONTACT;

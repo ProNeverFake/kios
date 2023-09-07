@@ -93,9 +93,7 @@ private:
     {
         if (check_power() == true)
         {
-            RCLCPP_INFO(this->get_logger(), "MIOS SUB hit.");
-            // task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
-            // task_state_msg_.t_t_ee = std::move(msg->t_t_ee);
+            RCLCPP_DEBUG(this->get_logger(), "MIOS SUB hit.");
             task_state_msg_.mios_state = std::move(*msg);
         }
         else
@@ -108,7 +106,6 @@ private:
         if (check_power() == true)
         {
             RCLCPP_INFO(this->get_logger(), "SENSOR SUB hit.");
-            // task_state_msg_.test_data = std::move(msg->test_data);
             task_state_msg_.sensor_state = std::move(*msg);
         }
         else

@@ -14,6 +14,7 @@ namespace Insertion
         spdlog::trace("Approach::update_tree_state()");
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
+        get_tree_state_ptr()->object_name = get_node_context_ref().object_name;
     }
 
     void Approach::node_context_initialize()
@@ -22,6 +23,7 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "APPROACH";
         node_context.action_name = "approach";
+        node_context.object_name = "approach";
         node_context.action_phase = kios::ActionPhase::APPROACH;
         node_context.parameter["skill"]["action_name"] = "approach";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;

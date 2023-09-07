@@ -57,7 +57,8 @@ public:
         mios_register_udp(udp_port_, subscription_list_);
 
         // object announcement
-        messenger_->send_grasped_object();
+        // ! HERE REMOVED. THE PRECONDITION IN BBGENERALSKILL IS ALSO REMOVED.
+        // messenger_->send_grasped_object();
 
         // * initialize service
         command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
@@ -83,21 +84,16 @@ public:
     {
         messenger_->unregister_udp();
     }
+
     void shut_down_connection()
     {
         messenger_->unregister_udp();
         messenger_->close();
     }
+
     bool check_power()
     {
-        if (this->get_parameter("power").as_bool() == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this->get_parameter("power").as_bool();
     }
 
 private:

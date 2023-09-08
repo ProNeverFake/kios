@@ -91,7 +91,7 @@ namespace kios
         std::vector<std::string> object_keys = {};
         std::vector<std::string> object_names = {};
         TreePhase tree_phase = TreePhase::IDLE;
-        bool isRunning = false;      // ! for pub sub, discarded
+
         bool isInterrupted = true;   // necessity of stopping old
         bool isSwitchAction = false; // ! reserved flag. not used.
     };

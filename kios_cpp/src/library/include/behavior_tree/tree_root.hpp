@@ -24,6 +24,8 @@
 
 #include "behavior_tree/condition_node/condition_node.hpp"
 
+#include "kios_utils/context_manager.hpp"
+
 // BB CODE
 namespace Insertion
 {
@@ -34,6 +36,8 @@ namespace Insertion
         bool initialize_tree();
         bool construct_tree(const std::string &tree_string);
         bool register_nodes();
+        bool archive_nodes();
+
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();
@@ -41,6 +45,9 @@ namespace Insertion
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
 
     private:
+        kios::ContextManager context_manager_;
+        bool isArchiveSuccess;
+
         // flag
         bool hasRegisteredNodes;
 

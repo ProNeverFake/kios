@@ -70,13 +70,63 @@ namespace Insertion
               tree_state_ptr_(tree_state_ptr),
               task_state_ptr_(task_state_ptr),
               node_context_(),
-              hasSucceededOnce(false)
-
+              hasSucceededOnce(false),
+              action_group_(0),
+              action_id_(0),
+              description_("default"),
+              action_phase_(kios::ActionPhase::INITIALIZATION)
         {
         }
+
+        /**
+         * @brief
+         *
+         */
+        void initialize_archive()
+        {
+            // * assign action phase
+            action_phase_ = get_node_context_ref().action_phase;
+            // * read archive from input port
+            Expected<int> action_group = getInput<int>("action_group");
+            Expected<int> action_id = getInput<int>("action_id");
+            Expected<std::string> description = getInput<std::string>("description");
+
+            if (!action_group)
+            {
+                // ! now only 0 group for test.
+                // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
+                action_group_ = 0;
+            }
+            else
+            {
+                action_group_ = action_group.value();
+            }
+
+            if (!action_id)
+            {
+                throw BT::RuntimeError("missing required input [action_id]: ", action_id.error());
+            }
+            else
+            {
+                action_id = action_id.value();
+            }
+            if (!description)
+            {
+                throw BT::RuntimeError("missing required input [description]: ", description.error());
+            }
+            else
+            {
+                description_ = description.value();
+            }
+        }
+
         static BT::PortsList providedPorts()
         {
-            return {BT::InputPort<bool>("isOnceSucceeded")};
+            return {
+                BT::InputPort<bool>("isOnceSucceeded"),
+                BT::InputPort<int>("action_group"),
+                BT::InputPort<int>("action_id"),
+                BT::InputPort<std::string>("description")};
         }
 
         // shared context
@@ -137,12 +187,27 @@ namespace Insertion
             }
         }
 
+        std::tuple<int, int, std::string, kios::ActionPhase> get_archive()
+        { // ! TODO
+            return std::make_tuple<int, int, std::string, kios::ActionPhase>(
+                action_group_,
+                action_id_,
+                description_,
+                action_phase_);
+        }
+
         // virtual bool is_switch_action();
 
         // ! CANNOT OVERRIDE THIS: FINAL OVERRIDE IN STATEFULACTION!
         // BT::NodeStatus tick() override;
 
     private:
+        // * archive rel
+        int action_group_;
+        int action_id_;
+        std::string description_;
+        kios::ActionPhase action_phase_;
+
         //* only run once flag
         bool hasSucceededOnce; // ! this will be DISCARDED after the integration of RunOnceNode
 

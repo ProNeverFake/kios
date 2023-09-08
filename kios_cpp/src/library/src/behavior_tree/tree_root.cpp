@@ -5,11 +5,12 @@ namespace Insertion
     TreeRoot::TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
         : tree_state_ptr_(tree_state_ptr),
           task_state_ptr_(task_state_ptr),
-          hasRegisteredNodes(false)
+          hasRegisteredNodes(false),
+          context_manager_(),
+          isArchiveSuccess(true)
     {
         set_log();
         // * run tree initialization method
-        // initialize_tree(); // ! MOVED TO TREE_NODE
     }
 
     void TreeRoot::set_log()
@@ -61,6 +62,11 @@ namespace Insertion
         {
             return false;
         }
+        if (!archive_nodes())
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -108,6 +114,27 @@ namespace Insertion
         return true;
     }
 
+    bool TreeRoot::archive_nodes()
+    {
+        isArchiveSuccess = true;
+
+        auto visitor = [this](BT::TreeNode *node) {
+            if (auto action_node = dynamic_cast<HyperMetaNode<BT::StatefulActionNode> *>(node))
+            {
+                action_node->initialize_archive();
+                auto node_archive = action_node->get_archive();
+                if (!this->context_manager_.archive_action(node_archive))
+                {
+                    this->isArchiveSuccess = false;
+                }
+            }
+        };
+
+        tree_.applyVisitor(visitor);
+
+        return isArchiveSuccess;
+    }
+
     /**
      * @brief Den Wald aufbauen mit dem gegebenen String.
      *
@@ -129,41 +156,6 @@ namespace Insertion
         }
         return true;
     }
-
-    // ! DISCARDED
-    // ! HERE TRY TO GENERATE TREE FROM C++ CODE BUT NOW XML GENERATOR IS PREDERED
-    // void TreeRoot::construct_tree()
-    // {
-    //     BT::NodeConfiguration config;
-    //     // Create nodes
-    //     auto root_node = std::make_shared<BT::SequenceNode>("root");
-    //     auto reactive_seq = std::make_shared<BT::ReactiveSequence>("reactive_seq");
-    //     auto approach_node = std::make_shared<Approach>("approach", config, tree_state_ptr_, task_state_ptr_);
-    //     auto contact_node = std::make_shared<Contact>("contact", config, tree_state_ptr_, task_state_ptr_);
-
-    //     reactive_seq->EnableException(false);
-    //     // Set parent-child relationships
-    //     root_node->addChild(reactive_seq.get());
-    //     reactive_seq->addChild(approach_node.get());
-    //     reactive_seq->addChild(contact_node.get());
-
-    //     // Store nodes in a container to manage their lifetime
-    //     std::vector<std::shared_ptr<BT::TreeNode>> nodes;
-    //     nodes.push_back(std::move(root_node));
-    //     nodes.push_back(std::move(reactive_seq));
-    //     nodes.push_back(std::move(approach_node));
-    //     nodes.push_back(std::move(contact_node));
-
-    //     // Create a tree from the root node
-    //     BT::Tree tree(root_node.get());
-
-    //     // Tick the tree as needed
-    //     while (some_condition)
-    //     {
-    //         tree.tickRoot();
-    //         // Add your logic here
-    //     }
-    // }
 
     std::shared_ptr<kios::TreeState> TreeRoot::get_tree_state_ptr()
     {

@@ -15,6 +15,7 @@ namespace Insertion
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
         get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
+        get_tree_state_ptr()->object_names = get_node_context_ref().object_names;
     }
 
     void GripperMove::node_context_initialize()
@@ -23,8 +24,8 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "GRIPPER_MOVE";
         node_context.action_name = "gripper_move";
-        node_context.object_keys.push_back("GRIPPER");
-        node_context.object_names.push_back("gripper"); // ! this should be exposed to the plan interface
+        node_context.object_keys.push_back("Gripper");
+        node_context.object_names.push_back("gripper");
         node_context.action_phase = kios::ActionPhase::GRIPPER_MOVE;
         node_context.parameter["skill"]["action_name"] = "gripper_move";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::GRIPPER_MOVE;

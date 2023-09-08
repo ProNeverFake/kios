@@ -25,9 +25,12 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - ~~The reactive sequence should not be used with more than one async action node. (error msg see below)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] Mios object grounding is not necessary for kios usage. remove this part in the future.
-- [ ] Enable parameter check (in mios) according to the action phase in the command.
-- [ ] **TOP** Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
+
+- [ ] **TOP** **THE REFACTORING WORK IS NOW UNTER BRANCH KIOS, FOR OLD VERSION PLEASE USE BRANCH BBBRANCH!**
+
+- [x] Mios object grounding is not necessary for kios usage. remove this part in the future.
+- [x] Enable parameter check (in mios) according to the action phase in the command.
+- [ ] Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
 - [ ] Add reset method to tree_node to enable retry.
 - [x] **ERGENT** enable at position check in tree node.
 - [x] **TOP** ws_client enable request result bool return (otherwise large lag.)

@@ -15,6 +15,7 @@ namespace Insertion
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
         get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
+        get_tree_state_ptr()->object_names = get_node_context_ref().object_names;
     }
 
     void CartesianMove::node_context_initialize()
@@ -24,7 +25,7 @@ namespace Insertion
         node_context.node_name = "CARTESIAN_MOVE";
         node_context.action_name = "cartesian_move";
         node_context.object_keys.push_back("Move");
-        node_context.object_names.push_back("move");
+        node_context.object_names.push_back("cartesian_move");
         node_context.action_phase = kios::ActionPhase::CARTESIAN_MOVE;
         node_context.parameter["skill"]["action_name"] = "cartesian_move";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CARTESIAN_MOVE;

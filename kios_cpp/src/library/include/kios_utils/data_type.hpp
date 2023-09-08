@@ -347,7 +347,6 @@ namespace kios
 
     /**
      * @brief the command request from tactician to commander with mp name and mp parameter
-     * ! CHECK
      */
     struct CommandContext
     {
@@ -436,4 +435,77 @@ namespace kios
                  {"F_ext_contact", {3.0, 2.0}},
              }}};
     };
+
+    struct default_action_context
+    {
+        nlohmann::json default_context_ =
+            {
+                {kios::ActionPhase::CARTESIAN_MOVE, {{"skill", {
+                                                                   {"objects", {
+                                                                                   {"Container", "housing"},
+                                                                                   {"CartesianMove", "cartesian_move"},
+                                                                               }},
+                                                                   {"time_max", 30},
+                                                                   {"action_context", {
+                                                                                          {"action_name", "CartesianMove"},
+                                                                                          {"action_phase", ActionPhase::CARTESIAN_MOVE},
+                                                                                      }},
+
+                                                                   {"cartesian_move", {
+                                                                                          {"dX_d", {0.05, 0.05}},
+                                                                                          {"ddX_d", {0.05, 0.05}},
+                                                                                          {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                                                          {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                                                      }},
+
+                                                               }},
+                                                     {"control", {
+                                                                     {"control_mode", 0},
+                                                                 }},
+                                                     {"user", {
+                                                                  {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                                                  {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                                                  {"F_ext_contact", {3.0, 2.0}},
+                                                              }}}},
+                {kios::ActionPhase::GRIPPER_MOVE, {{"skill", {
+                                                                 {"objects", {
+                                                                                 {"Container", "housing"},
+                                                                                 {"GripperMove", "gripper_move"},
+                                                                             }},
+                                                                 {"time_max", 30},
+                                                                 {"action_context", {
+                                                                                        {"action_name", "GripperMove"},
+                                                                                        {"action_phase", ActionPhase::GRIPPER_MOVE},
+                                                                                    }},
+
+                                                                 {"gripper_move", {
+                                                                                      {"width", 0.6},
+                                                                                      {"speed", 1},
+                                                                                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                                  }},
+
+                                                             }},
+                                                   {"control", {
+                                                                   {"control_mode", 0},
+                                                               }},
+                                                   {"user", {
+                                                                {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                                                {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                                                {"F_ext_contact", {3.0, 2.0}},
+                                                            }}}},
+        };
+
+        std::optional<nlohmann::json> get_default_context(const kios::ActionPhase &action_phase)
+        {
+            if (default_context_.contains(action_phase))
+            {
+                return default_context_.at(static_cast<int>(action_phase));
+            }
+            else
+            {
+                return {};
+            }
+        }
+    };
+
 } // namespace kios

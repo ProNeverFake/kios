@@ -1,5 +1,5 @@
-(define (problem metric_problem)
-  (:domain metric_domain)
+(define (problem fluent2_problem)
+  (:domain fluent2_domain)
   
   (:objects 
     supermarket - Location
@@ -9,6 +9,7 @@
     gear_insertion_station - Location
     screwing_station - Location
     inspection_station - Location
+
     delivery_point - Location
 
     productSP1 - ProductSP
@@ -16,17 +17,12 @@
     bolt1 bolt2 bolt3 bolt4 bolt5 bolt6 bolt7 - Bolt
 
     MiR600 - MobileRobot
-
     insertion_robot - InsertionRobot
     screwing_robot - ScrewingRobot
     inspection_robot - InspectionRobot
   )
 
   (:init
-    ; timing
-    (TimingOn)
-    (= (ConsumeTime productSP1) 0)
-
     ; Distance
     (= (Distance supermarket insertion_station) 10)
     (= (Distance supermarket gear_meshing_station) 15)
@@ -88,7 +84,7 @@
     (isRobotIdle MiR600)
     (isRobotFree MiR600)
     (isRobotatLocation MiR600 insertion_station)
-    (= (Velocity MiR600) 5)
+    (= (Velocity MiR600) 1)
 
 
     ; insertion_robot
@@ -136,13 +132,13 @@
   (:goal (and
             (hasRobotRecovered insertion_robot)
             (hasRobotRecovered screwing_robot)
-            ; ? (isProductProcessed productSP1 insertion_robot)
-            ; ? (isProductProcessed productSP1 screwing_robot)
-            ; (isAssembled productSP1)
+            ; (isProductProcessed productSP1 insertion_robot)
+            ; (isProductProcessed productSP1 screwing_robot)
+            (isAssembled productSP1)
             (isInspected productSP1)
 
             (isProductatLocation productSP1 delivery_point) 
-            (isRobotatLocation MiR600 delivery_point)
+            (isRobotatLocation MiR600 supermarket)
 
             (isProductProcessed cylinder1 insertion_robot)
             (isProductProcessed cylinder2 insertion_robot)
@@ -160,11 +156,11 @@
             (isProductProcessed bolt6 screwing_robot)
             (isProductProcessed bolt7 screwing_robot)
 
-            (Accomplished productSP1)
-            ; (> (ConsumeTime productSP1) 100)
-            ; (TimeCheck)
+
+            ; (forall (?cylinder - Cylinder)
+            ;         (isProductProcessed ?cylinder insertion_robot)
+            ; )
          )
   )
-
-  (:metric minimize (ConsumeTime productSP1))
+  ; (:metric minimize (WorkProgress insertion_robot productSP1))
 )

@@ -1,5 +1,5 @@
 ; ! ALL the insertion and move load unload
-(define (domain fluent1_domain)
+(define (domain durative_domain)
   (:requirements :strips :typing :fluents :durative-actions :duration-inequalities)
   
   (:types 

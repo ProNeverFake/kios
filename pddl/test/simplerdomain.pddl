@@ -174,6 +174,69 @@
               (at end (hasRobotRecovered ?panda_robot))
             )
   )
+
+
+  (:durative-action InsertionStart
+    :parameters (?panda_robot - InsertionRobot ?station - Location ?product - Cylinder)
+    :duration (= ?duration 0.001)
+    :condition (at start(and 
+                  (isProductatLocation ?product ?station)
+                  (isRobotatLocation ?panda_robot ?station)
+                  (hasRobotRecovered ?panda_robot)
+               ))
+    :effect (and 
+                  (at start (not (hasRobotRecovered ?panda_robot)))
+                  (at end (isPerforming ?panda_robot ?product))
+            )
+  )
+
+  (:durative-action Inserting
+  :parameters (?panda_robot - InsertionRobot ?product - Cylinder)
+  :duration (and (>= ?duration 0) (<= ?duration 100))
+  :condition (and
+                  (at start (isPerforming ?panda_robot ?product))
+                  (at start (<= (WorkProgress ?panda_robot ?product) 100))
+                )
+  :effect (and
+            (at start (not (isPerforming ?panda_robot ?product)))
+            (increase (WorkProgress ?panda_robot ?product) (* #t 1)) ; increase progress by 10%
+            (at end (isPerforming ?panda_robot ?product))
+           )
+  )
+
+  (:durative-action InsertionFinish
+  :parameters (?panda_robot - InsertionRobot ?product - Cylinder ?location - Location)
+  :duration (= ?duration 0.001)
+  :condition (at start(and
+                  (>= (WorkProgress ?panda_robot ?product) 20)
+                  (isRobotatLocation ?panda_robot ?location)
+                  (isPerforming ?panda_robot ?product)
+                  (isProductatLocation ?product ?location)
+                ))
+  :effect (at start(and
+            (assign (WorkProgress ?panda_robot ?product) 0)
+            (isProductProcessed ?product ?panda_robot)
+            (not (isPerforming ?panda_robot ?product))
+            (hasFinished ?panda_robot ?product)
+           ))
+  )
+
+  ; just recover the pandarobot from the last task
+  (:durative-action InsertionRecover
+    :parameters (?panda_robot - InsertionRobot ?product - Cylinder)
+    :duration (= ?duration 0.001)
+    :condition (and 
+                  (at start (hasFinished ?panda_robot ?product))
+               )
+    :effect (and
+              (at start (not (hasFinished ?panda_robot ?product)))
+              (at end (hasRobotRecovered ?panda_robot))
+            )
+  )
+
+
+
+
   ;*;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;END
 
   ;*;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;START

@@ -41,7 +41,7 @@
 
     (TimingOn)
     (Running)
-    (Accomplished)
+    (Accomplished ?product - Product)
 
     (TimeCheck)
     
@@ -54,14 +54,16 @@
   ;mobile_robot velocity
   (Velocity ?mobile_robot - MobileRobot)
   ;consume time
-  (ConsumeTime ?productSP - ProductSP)
+  (ConsumeTime ?productSP - Product)
   (Time)
 )
   ; ; ! THIS
   (:durative-action TimeStart
     :parameters ()
     :duration (>= ?duration 0)
-    :condition (and (at start (TimingOn)))
+    :condition (and (at start (TimingOn))
+    ; (at end (Accomplished))
+    )
     :effect (and 
               (at start (Running))
               (increase (Time) (* #t 1))
@@ -79,13 +81,23 @@
   ; )
 
 
+  ; (:durative-action TimeRecord
+  ;   :parameters (?product - ProductSP)
+  ;   :duration (= ?duration 0.001)
+  ;   :condition (and (at start (isAssembled ?product)))
+  ;   :effect (and 
+  ;             (at start (assign (ConsumeTime ?product) Time))
+  ;             (at start (Accomplished))
+  ;           )
+  ; )
+
   (:durative-action TimeRecord
-    :parameters (?product - ProductSP)
+    :parameters (?product - Product ?robot - ScrewingRobot)
     :duration (= ?duration 0.001)
-    :condition (and (at start (isAssembled ?product)))
+    :condition (and (at start (isProductProcessed ?product ?robot)))
     :effect (and 
               (at start (assign (ConsumeTime ?product) Time))
-              (at start (Accomplished))
+              (at start (Accomplished ?product))
             )
   )
 
@@ -137,7 +149,7 @@
   :duration (= ?duration 0.001)
   :condition (and   (over all (Running))
                   (at start(and
-                  (>= (WorkProgress ?panda_robot ?product) 30)
+                  (>= (WorkProgress ?panda_robot ?product) 20)
                   (isRobotatLocation ?panda_robot ?location)
                   (isPerforming ?panda_robot ?product)
                   (isProductatRobot ?product ?mobile_robot)
@@ -205,7 +217,7 @@
   :parameters (?panda_robot - InsertionRobot ?product - Cylinder ?location - Location)
   :duration (= ?duration 0.001)
   :condition (and(at start(and
-                  (>= (WorkProgress ?panda_robot ?product) 20)
+                  (>= (WorkProgress ?panda_robot ?product) 10)
                   (isRobotatLocation ?panda_robot ?location)
                   (isPerforming ?panda_robot ?product)
                   (isProductatLocation ?product ?location)
@@ -257,11 +269,11 @@
 
   (:durative-action ScrewingSP
   :parameters (?panda_robot - ScrewingRobot ?product - ProductSP)
-  :duration (and (>= ?duration 0) (<= ?duration 100))
+  :duration (and (>= ?duration 0) (<= ?duration 1000))
   :condition (and
                   ; (at start (hasRobotRecovered ?panda_robot))
                   (at start (isPerforming ?panda_robot ?product))
-                  (at start (<= (WorkProgress ?panda_robot ?product) 100))
+                  (at start (<= (WorkProgress ?panda_robot ?product) 1000))
                   (over all (Running))
                 )
   :effect (and
@@ -278,7 +290,7 @@
   :parameters (?mobile_robot - MobileRobot ?panda_robot - ScrewingRobot ?product - ProductSP ?location - Location)
   :duration (= ?duration 0.001)
   :condition (and(at start(and
-                  (>= (WorkProgress ?panda_robot ?product) 25)
+                  (>= (WorkProgress ?panda_robot ?product) 500)
                   (isRobotatLocation ?panda_robot ?location)
                   (isPerforming ?panda_robot ?product)
                   (isProductatRobot ?product ?mobile_robot)
@@ -343,7 +355,7 @@
   :parameters (?panda_robot - ScrewingRobot ?product - Bolt ?location - Location)
   :duration (= ?duration 0.001)
   :condition (and (at start(and
-                  (>= (WorkProgress ?panda_robot ?product) 10)
+                  (>= (WorkProgress ?panda_robot ?product) 25)
                   (isRobotatLocation ?panda_robot ?location)
                   (isPerforming ?panda_robot ?product)
                   (isProductatLocation ?product ?location)
@@ -431,7 +443,7 @@
   :parameters (?mobile_robot - MobileRobot ?panda_robot - InspectionRobot ?product - ProductSP ?location - Location)
   :duration (= ?duration 0.001)
   :condition (and(at start(and
-                  (>= (WorkProgress ?panda_robot ?product) 10)
+                  (>= (WorkProgress ?panda_robot ?product) 5)
                   (isRobotatLocation ?panda_robot ?location)
                   (isPerforming ?panda_robot ?product)
                   (isProductatRobot ?product ?mobile_robot)
@@ -517,7 +529,7 @@
    ; * SAFE
   (:durative-action Load
     :parameters (?mobile_robot - MobileRobot ?product - ProductSP ?location - Location)
-    :duration (= ?duration 5)
+    :duration (= ?duration 3)
     :condition (and 
                   (at start (isProductatLocation ?product ?location))
                   (at start (isRobotatLocation ?mobile_robot ?location))
@@ -538,7 +550,7 @@
   ; * SAFE
   (:durative-action Unload
     :parameters (?mobile_robot - MobileRobot ?product - ProductSP ?location - Location)
-    :duration (= ?duration 5)
+    :duration (= ?duration 3)
     :condition (and 
                   (at start (isProductatRobot ?product ?mobile_robot))
                   (at start (isRobotatLocation ?mobile_robot ?location))

@@ -1,5 +1,5 @@
 (define (domain test1_domain)
-  (:requirements :strips :typing :fluents :durative-actions)
+  (:requirements :strips :typing :fluents :durative-actions :duration-inequalities)
   
   (:types 
     veg fruit - object
@@ -15,7 +15,7 @@
   )
 
   (:durative-action check
-      :parameters (?e - (either fruit apple))
+      :parameters (?e - fruit)
       :duration (= ?duration 1)
       :condition (and 
             ; (at start(isapple ?e))

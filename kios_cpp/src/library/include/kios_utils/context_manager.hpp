@@ -13,7 +13,7 @@ namespace kios
     public:
         ContextManager();
 
-        bool archive_action(const std::tuple<int, int, std::string, nlohmann::json> &action_archive);
+        bool archive_action(const NodeArchive &action_archive);
 
         bool store_archive();
         bool read_archive();

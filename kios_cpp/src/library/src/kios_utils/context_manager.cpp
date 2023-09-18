@@ -22,7 +22,7 @@ namespace kios
      * @param action_achive 1: group,  2: id,  3: description,  4. context
      * @return bool
      */
-    bool ContextManager::archive_action(const std::tuple<int, int, std::string, nlohmann::json> &action_achive)
+    bool ContextManager::archive_action(const NodeArchive &action_achive)
     {
         try
         {

@@ -41,37 +41,57 @@ namespace kios
         }
     }
 
-    std::string action_phase_to_str(ActionPhase action_phase)
-    {
-        switch (action_phase)
-        {
-        case ActionPhase::INITIALIZATION: {
-            return "initialization";
-            break;
-        }
+    // std::optional<std::string> action_phase_to_str(const ActionPhase &action_phase)
+    // {
+    //     switch (action_phase)
+    //     {
+    //     case ActionPhase::INITIALIZATION: {
+    //         return "initialization";
+    //         break;
+    //     }
 
-        case ActionPhase::APPROACH: {
-            return "approach";
-            break;
-        }
+    //     case ActionPhase::APPROACH: {
+    //         return "approach";
+    //         break;
+    //     }
 
-        case ActionPhase::CONTACT: {
-            return "contact";
-            break;
-        }
+    //     case ActionPhase::CONTACT: {
+    //         return "contact";
+    //         break;
+    //     }
 
-        case ActionPhase::WIGGLE: {
-            return "wiggle";
-            break;
-        }
+    //     case ActionPhase::WIGGLE: {
+    //         return "wiggle";
+    //         break;
+    //     }
 
-        default: {
-            return "UNDEFINED ACTION PHASE";
-            break;
-        }
-        }
-        return "UNDEFINED ACTION PHASE";
-    }
+    //     case ActionPhase::JOINT_MOVE: {
+    //         return "joint_move";
+    //         break;
+    //     }
+
+    //     case ActionPhase::CARTESIAN_MOVE: {
+    //         return "cartesian_move";
+    //         break;
+    //     }
+
+    //     case ActionPhase::GRIPPER_FORCE: {
+    //         return "gripper_force";
+    //         break;
+    //     }
+
+    //     case ActionPhase::GRIPPER_MOVE: {
+    //         return "gripper_move";
+    //         break;
+    //     }
+
+    //     default: {
+    //         return {};
+    //         break;
+    //     }
+    //     }
+    //     return {};
+    // }
 
     std::string tree_phase_to_str(const TreePhase &tree_phase)
     {

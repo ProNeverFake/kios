@@ -71,54 +71,51 @@ namespace Insertion
               task_state_ptr_(task_state_ptr),
               node_context_(),
               hasSucceededOnce(false),
-              action_group_(0),
-              action_id_(0),
-              description_("default"),
-              action_phase_(kios::ActionPhase::INITIALIZATION)
+              node_archive_()
         {
         }
 
-        /**
-         * @brief
-         *
-         */
-        void initialize_archive()
-        {
-            // * assign action phase
-            action_phase_ = get_node_context_ref().action_phase;
-            // * read archive from input port
-            Expected<int> action_group = getInput<int>("action_group");
-            Expected<int> action_id = getInput<int>("action_id");
-            Expected<std::string> description = getInput<std::string>("description");
+        // /**
+        //  * @brief
+        //  *
+        //  */
+        // void initialize_archive()
+        // {
+        //     // * assign action phase
+        //     action_phase_ = get_node_context_ref().action_phase;
+        //     // * read archive from input port
+        //     BT::Expected<int> action_group = getInput<int>("action_group");
+        //     BT::Expected<int> action_id = getInput<int>("action_id");
+        //     BT::Expected<std::string> description = getInput<std::string>("description");
 
-            if (!action_group)
-            {
-                // ! now only 0 group for test.
-                // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
-                action_group_ = 0;
-            }
-            else
-            {
-                action_group_ = action_group.value();
-            }
+        //     if (!action_group)
+        //     {
+        //         // ! now only 0 group for test.
+        //         // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
+        //         action_group_ = 0;
+        //     }
+        //     else
+        //     {
+        //         action_group_ = action_group.value();
+        //     }
 
-            if (!action_id)
-            {
-                throw BT::RuntimeError("missing required input [action_id]: ", action_id.error());
-            }
-            else
-            {
-                action_id = action_id.value();
-            }
-            if (!description)
-            {
-                throw BT::RuntimeError("missing required input [description]: ", description.error());
-            }
-            else
-            {
-                description_ = description.value();
-            }
-        }
+        //     if (!action_id)
+        //     {
+        //         throw BT::RuntimeError("missing required input [action_id]: ", action_id.error());
+        //     }
+        //     else
+        //     {
+        //         action_id = action_id.value();
+        //     }
+        //     if (!description)
+        //     {
+        //         throw BT::RuntimeError("missing required input [description]: ", description.error());
+        //     }
+        //     else
+        //     {
+        //         description_ = description.value();
+        //     }
+        // }
 
         static BT::PortsList providedPorts()
         {
@@ -187,26 +184,27 @@ namespace Insertion
             }
         }
 
-        std::tuple<int, int, std::string, kios::ActionPhase> get_archive()
-        { // ! TODO
-            return std::make_tuple<int, int, std::string, kios::ActionPhase>(
-                action_group_,
-                action_id_,
-                description_,
-                action_phase_);
-        }
+        // std::tuple<int, int, std::string, kios::ActionPhase> get_archive()
+        // { // ! TODO
+        //     return std::make_tuple<int, int, std::string, kios::ActionPhase>(
+        //         action_group_,
+        //         action_id_,
+        //         description_,
+        //         action_phase_);
+        // }
 
         // virtual bool is_switch_action();
 
         // ! CANNOT OVERRIDE THIS: FINAL OVERRIDE IN STATEFULACTION!
         // BT::NodeStatus tick() override;
 
+        kios::NodeArchive &get_archive_ref()
+        {
+            return node_archive_;
+        }
+
     private:
-        // * archive rel
-        int action_group_;
-        int action_id_;
-        std::string description_;
-        kios::ActionPhase action_phase_;
+        kios::NodeArchive node_archive_;
 
         //* only run once flag
         bool hasSucceededOnce; // ! this will be DISCARDED after the integration of RunOnceNode
@@ -219,6 +217,103 @@ namespace Insertion
         kios::ActionPhaseContext node_context_; // default node context value
     };
 
+    class KiosActionNode : public HyperMetaNode<BT::StatefulActionNode>
+    {
+    public:
+        KiosActionNode(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+            : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        {
+        }
+
+        void initialize_archive()
+        {
+            auto &archive = get_archive_ref();
+            // * read archive from input port
+            archive.action_phase = get_node_context_ref().action_phase;
+            BT::Expected<int> action_group = getInput<int>("action_group");
+            BT::Expected<int> action_id = getInput<int>("action_id");
+            BT::Expected<std::string> description = getInput<std::string>("description");
+
+            if (!action_group)
+            {
+                // ! now only 0 group for test.
+                // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
+                archive.action_group = 0;
+            }
+            else
+            {
+                archive.action_group = action_group.value();
+            }
+
+            if (!action_id)
+            {
+                throw BT::RuntimeError("missing required input [action_id]: ", action_id.error());
+            }
+            else
+            {
+                archive.action_id = action_id.value();
+            }
+            if (!description)
+            {
+                throw BT::RuntimeError("missing required input [description]: ", description.error());
+            }
+            else
+            {
+                archive.description = description.value();
+            }
+        }
+
+    private:
+    };
+
+    class KiosConditionNode : public HyperMetaNode<BT::ConditionNode>
+    {
+    public:
+        KiosConditionNode(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+            : HyperMetaNode<BT::ConditionNode>(name, config, tree_state_ptr, task_state_ptr)
+        {
+        }
+
+        void initialize_archive()
+        {
+            auto &archive = get_archive_ref();
+            // * read archive from input port
+            archive.action_phase = kios::ActionPhase::CONDITION;
+            BT::Expected<int> action_group = getInput<int>("action_group");
+            BT::Expected<int> action_id = getInput<int>("action_id");
+            BT::Expected<std::string> description = getInput<std::string>("description");
+
+            if (!action_group)
+            {
+                // ! now only 0 group for test.
+                // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
+                archive.action_group = 0;
+            }
+            else
+            {
+                archive.action_group = action_group.value();
+            }
+
+            if (!action_id)
+            {
+                archive.action_id = 0; // condition node default id
+            }
+            else
+            {
+                archive.action_id = action_id.value();
+            }
+            if (!description)
+            {
+                archive.description = "a condition node.";
+            }
+            else
+            {
+                archive.description = description.value();
+            }
+        }
+
+    private:
+    };
     // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // // * META CONDITION NODE

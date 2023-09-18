@@ -119,10 +119,10 @@ namespace Insertion
         isArchiveSuccess = true;
 
         auto visitor = [this](BT::TreeNode *node) {
-            if (auto action_node = dynamic_cast<HyperMetaNode<BT::StatefulActionNode> *>(node))
+            if (auto action_node = dynamic_cast<KiosActionNode *>(node))
             {
                 action_node->initialize_archive();
-                auto node_archive = action_node->get_archive();
+                auto node_archive = action_node->get_archive_ref();
                 if (!this->context_manager_.archive_action(node_archive))
                 {
                     this->isArchiveSuccess = false;

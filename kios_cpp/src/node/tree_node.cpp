@@ -460,7 +460,7 @@ private:
         if (is_tree_running())
         {
             // * tree is running. update action phase and check.
-
+            // print check
             RCLCPP_ERROR_STREAM(
                 this->get_logger(),
                 "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);

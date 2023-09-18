@@ -2,9 +2,10 @@
   (:requirements :strips :typing :fluents :durative-actions :duration-inequalities)
   
   (:types 
-    veg fruit - object
-    apple - fruit
-    tomato - veg
+    veg fruit location - object
+    apple pear - fruit
+    tomato some - veg
+    placea placeb - location
   )
 
   (:predicates

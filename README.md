@@ -39,6 +39,11 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
 - [ ] (POSTPONED) add meta node for kios node.
 
+**REFACTORING RELEVANT**
+
+1. Commander should not use BBGeneralSkill.
+2. Tactician should fetch the parameter from the map.
+
 **THOUGHT**
 - [ ] The object to be grounded is determined at the start of the skill, which should be determined by action context.
 - [ ] Create a dummy object in action context, command context and mongoDB.

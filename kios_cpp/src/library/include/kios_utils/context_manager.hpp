@@ -4,6 +4,10 @@
 
 namespace kios
 {
+    /**
+     * @brief the class to manage the parameters of the actions in a map.
+     *
+     */
     class ContextManager
     {
     public:

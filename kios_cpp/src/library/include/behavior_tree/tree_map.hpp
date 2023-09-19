@@ -71,14 +71,14 @@ namespace Insertion
     //     )";
 
     static const char *test_tree = R"(
-    //     <root BTCPP_format="4" >
-    //         <BehaviorTree ID="MainTree">
-    //             <Sequence name="root_sequence">
-    //                 <CartesianMove name="cartesian_move" action_id="1" description="cartesian_move"/>
-    //             </Sequence>
-    //         </BehaviorTree>
-    //     </root>
-    //     )";
+        <root BTCPP_format="4" >
+            <BehaviorTree ID="MainTree">
+                <Sequence name="root_sequence">
+                    <CartesianMove name="cartesian_move" action_id="1" description="cartesian_move"/>
+                </Sequence>
+            </BehaviorTree>
+        </root>
+        )";
 
     // static const char *test_tree = R"(
     //     <root BTCPP_format="4" >

@@ -265,6 +265,14 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- *19.09.2023*
+  1. Der Class DefaultActionContext wird falsch definiert. Der fehler sieht wie folgende aus:
+  ```bash
+  terminate called after throwing an instance of 'std::length_error'
+  what():  basic_string::_M_create
+  ```
+  Der Fehler hat noch nicht behandelt worden.
+
 - *05.09.2023*
   1. Removed the insertable entity in action context. Removed the corresponding part in mios (precondition).
 

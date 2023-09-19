@@ -466,9 +466,10 @@ namespace kios
         int action_id = 0;
         std::string description = "this guy is too lazy to leave anything here.";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
+        // nlohmann::json action_context = {}; // * preserved
     };
 
-    struct default_action_context
+    struct DefaultActionContext
     {
         nlohmann::json default_context_ =
             {
@@ -480,7 +481,7 @@ namespace kios
                                                   {"time_max", 30},
                                                   {"action_context", {
                                                                          {"action_name", "CartesianMove"},
-                                                                         {"action_phase", ActionPhase::CARTESIAN_MOVE},
+                                                                         {"action_phase", static_cast<int>(ActionPhase::CARTESIAN_MOVE)},
                                                                      }},
 
                                                   {"cartesian_move", {
@@ -507,7 +508,7 @@ namespace kios
                                                 {"time_max", 30},
                                                 {"action_context", {
                                                                        {"action_name", "GripperMove"},
-                                                                       {"action_phase", ActionPhase::GRIPPER_MOVE},
+                                                                       {"action_phase", static_cast<int>(ActionPhase::GRIPPER_MOVE)},
                                                                    }},
 
                                                 {"gripper_move", {

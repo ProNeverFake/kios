@@ -225,6 +225,10 @@ namespace Insertion
         {
         }
 
+        /**
+         * @brief initialize the action node archive for context manager. can only be called after the action node is registered in bt_factory.
+         *
+         */
         void initialize_archive()
         {
             auto &archive = get_archive_ref();

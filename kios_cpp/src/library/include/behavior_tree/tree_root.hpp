@@ -33,6 +33,7 @@ namespace Insertion
     {
     public:
         TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+        ~TreeRoot();
         bool initialize_tree();
         bool construct_tree(const std::string &tree_string);
         bool register_nodes();

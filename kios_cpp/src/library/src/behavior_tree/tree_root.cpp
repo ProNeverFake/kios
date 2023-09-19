@@ -6,11 +6,26 @@ namespace Insertion
         : tree_state_ptr_(tree_state_ptr),
           task_state_ptr_(task_state_ptr),
           hasRegisteredNodes(false),
-          context_manager_(),
+          //   context_manager_(),
           isArchiveSuccess(true)
     {
+        try
+        {
+            context_manager_ = kios::ContextManager();
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+
         set_log();
         // * run tree initialization method
+    }
+
+    TreeRoot::~TreeRoot()
+    {
+        // ! SUCCESS BOOL CAN BE HANDLED.
+        context_manager_.store_archive();
     }
 
     void TreeRoot::set_log()
@@ -114,23 +129,37 @@ namespace Insertion
         return true;
     }
 
+    /**
+     * @brief use a visitor to archive all the action nodes of the tree to context node.
+     *
+     * @return true
+     * @return false
+     */
     bool TreeRoot::archive_nodes()
     {
         isArchiveSuccess = true;
 
-        auto visitor = [this](BT::TreeNode *node) {
+        auto archive_visitor = [this](BT::TreeNode *node) {
             if (auto action_node = dynamic_cast<KiosActionNode *>(node))
             {
-                action_node->initialize_archive();
-                auto node_archive = action_node->get_archive_ref();
-                if (!this->context_manager_.archive_action(node_archive))
+                // * skip if the archiving has failed.
+                if (this->isArchiveSuccess)
                 {
-                    this->isArchiveSuccess = false;
+                    action_node->initialize_archive();
+                    auto node_archive = action_node->get_archive_ref();
+                    if (!this->context_manager_.archive_action(node_archive))
+                    {
+                        this->isArchiveSuccess = false;
+                    }
+                }
+                else
+                {
+                    // archiving process has failed. pass.
                 }
             }
         };
 
-        tree_.applyVisitor(visitor);
+        tree_.applyVisitor(archive_visitor);
 
         return isArchiveSuccess;
     }

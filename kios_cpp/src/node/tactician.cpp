@@ -17,6 +17,7 @@
 
 #include "kios_interface/srv/command_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
+#include "kios_interface/srv/archive_action_request.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -59,6 +60,13 @@ public:
         switch_action_server_ = this->create_service<kios_interface::srv::SwitchActionRequest>(
             "switch_action_service",
             std::bind(&Tactician::switch_action_server_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            server_callback_group_);
+
+        // * initialize archive action server
+        archive_action_server_ = this->create_service<kios_interface::srv::ArchiveActionRequest>(
+            "archive_action_service",
+            std::bind(&Tactician::archive_action_server_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             server_callback_group_);
 
@@ -130,6 +138,7 @@ private:
     rclcpp::CallbackGroup::SharedPtr server_callback_group_;
 
     rclcpp::Service<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_server_;
+    rclcpp::Service<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_server_;
     rclcpp::Client<kios_interface::srv::CommandRequest>::SharedPtr command_client_;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
@@ -183,9 +192,45 @@ private:
                 tree_state_.object_keys = std::move(request->object_keys);
                 // * set flag for timer
                 isSwitchAction.store(true);
+
+                RCLCPP_ERROR(this->get_logger(), "switch_action request accepted.");
+                response->is_accepted = true;
             }
-            RCLCPP_ERROR(this->get_logger(), "switch_action request accepted.");
-            response->is_accepted = true;
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
+            response->is_accepted = false;
+        }
+    }
+
+    void archive_action_server_callback(
+        const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Request> request,
+        const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Response> response)
+    {
+        if (check_power() == true)
+        {
+            if (isBusy.load())
+            {
+                RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
+                response->is_accepted = false;
+            }
+            else
+            {
+                RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
+                bool fl = true;
+                for (auto &archive : request->archive_list)
+                {
+                    kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
+                    if (!context_clerk_.archive_action(arch))
+                    {
+                        fl = false;
+                        break;
+                    }
+                }
+
+                response->is_accepted = fl;
+            }
         }
         else
         {

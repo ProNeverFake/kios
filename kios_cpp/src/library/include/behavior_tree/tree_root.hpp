@@ -24,7 +24,8 @@
 
 #include "behavior_tree/condition_node/condition_node.hpp"
 
-#include "kios_utils/context_manager.hpp"
+// #include "kios_utils/context_manager.hpp"
+#include "kios_utils/kios_utils.hpp"
 
 // BB CODE
 namespace Insertion
@@ -46,7 +47,7 @@ namespace Insertion
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
 
     private:
-        kios::ContextManager context_manager_;
+        kios::ContextClerk context_clerk_;
         bool isArchiveSuccess;
 
         // flag

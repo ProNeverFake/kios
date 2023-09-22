@@ -265,6 +265,9 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 20.09.2023
+  1. bas_alloc problem: when DefaultActionContext member variable, the available memory is not enough for the variable and the program quit. After defining it with ptr the problem still exists and leads to a segmentation fault when calling the ptr.
+
 - *19.09.2023*
   1. Der Class DefaultActionContext wird falsch definiert. Der fehler sieht wie folgende aus:
   ```bash

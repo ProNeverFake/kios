@@ -10,6 +10,7 @@
 #include "kios_utils/parameters.hpp"
 
 #include "mirmi_utils/math.hpp"
+#include "kios_utils/context_manager.hpp"
 
 namespace kios
 {

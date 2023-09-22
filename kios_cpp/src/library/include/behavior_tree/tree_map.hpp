@@ -75,6 +75,7 @@ namespace Insertion
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
                     <CartesianMove name="cartesian_move" action_id="1" description="cartesian_move"/>
+                    <CartesianMove name="cartesian_move2" action_id="2" description="another cartesian move"/>
                 </Sequence>
             </BehaviorTree>
         </root>

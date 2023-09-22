@@ -32,7 +32,8 @@ public:
           isBusy(false),
           command_context_(),
           tree_state_(),
-          task_state_()
+          task_state_(),
+          context_clerk_()
     {
         std::cout << "start initialization" << std::endl;
         // declare mission parameter
@@ -78,6 +79,9 @@ public:
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
 
+        // * context clerk
+        context_clerk_.read_archive();
+
         std::cout << "finish initialization" << std::endl;
 
         rclcpp::sleep_for(std::chrono::seconds(3));
@@ -103,6 +107,8 @@ public:
     }
 
 private:
+    kios::ContextClerk context_clerk_;
+
     // thread safe rel
     std::mutex tree_state_mtx_;
     std::mutex task_state_mtx_;

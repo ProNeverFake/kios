@@ -481,7 +481,7 @@ namespace kios
                                                   {"time_max", 30},
                                                   {"action_context", {
                                                                          {"action_name", "CartesianMove"},
-                                                                         {"action_phase", static_cast<int>(ActionPhase::CARTESIAN_MOVE)},
+                                                                         {"action_phase", ActionPhase::CARTESIAN_MOVE},
                                                                      }},
 
                                                   {"cartesian_move", {
@@ -490,7 +490,6 @@ namespace kios
                                                                          {"DeltaX", {0, 0, 0, 0, 0, 0}},
                                                                          {"K_x", {1500, 1500, 1500, 600, 600, 600}},
                                                                      }},
-
                                               }},
                                     {"control", {
                                                     {"control_mode", 0},
@@ -508,7 +507,7 @@ namespace kios
                                                 {"time_max", 30},
                                                 {"action_context", {
                                                                        {"action_name", "GripperMove"},
-                                                                       {"action_phase", static_cast<int>(ActionPhase::GRIPPER_MOVE)},
+                                                                       {"action_phase", ActionPhase::GRIPPER_MOVE},
                                                                    }},
 
                                                 {"gripper_move", {
@@ -516,7 +515,6 @@ namespace kios
                                                                      {"speed", 1},
                                                                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
                                                                  }},
-
                                             }},
                                   {"control", {
                                                   {"control_mode", 0},

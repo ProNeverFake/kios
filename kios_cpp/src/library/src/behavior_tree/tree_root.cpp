@@ -6,17 +6,17 @@ namespace Insertion
         : tree_state_ptr_(tree_state_ptr),
           task_state_ptr_(task_state_ptr),
           hasRegisteredNodes(false),
-          //   context_manager_(),
+          context_clerk_(),
           isArchiveSuccess(true)
     {
-        try
-        {
-            context_manager_ = kios::ContextManager();
-        }
-        catch (std::exception &e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        // try
+        // {
+        //     context_clerk_ = kios::ContextClerk();
+        // }
+        // catch (std::exception &e)
+        // {
+        //     std::cerr << "TEST1 : " << e.what() << std::endl;
+        // }
 
         set_log();
         // * run tree initialization method
@@ -25,7 +25,7 @@ namespace Insertion
     TreeRoot::~TreeRoot()
     {
         // ! SUCCESS BOOL CAN BE HANDLED.
-        context_manager_.store_archive();
+        // context_clerk_ptr_->store_archive();
     }
 
     void TreeRoot::set_log()
@@ -137,6 +137,8 @@ namespace Insertion
      */
     bool TreeRoot::archive_nodes()
     {
+        context_clerk_.initialize();
+
         isArchiveSuccess = true;
 
         auto archive_visitor = [this](BT::TreeNode *node) {
@@ -147,7 +149,7 @@ namespace Insertion
                 {
                     action_node->initialize_archive();
                     auto node_archive = action_node->get_archive_ref();
-                    if (!this->context_manager_.archive_action(node_archive))
+                    if (!this->context_clerk_.archive_action(node_archive))
                     {
                         this->isArchiveSuccess = false;
                     }
@@ -160,6 +162,18 @@ namespace Insertion
         };
 
         tree_.applyVisitor(archive_visitor);
+
+        if (isArchiveSuccess)
+        {
+            if (context_clerk_.store_archive())
+            {
+                std::cout << "archived and stored." << std::endl;
+            }
+            else
+            {
+                std::cerr << "???" << std::endl;
+            }
+        }
 
         return isArchiveSuccess;
     }

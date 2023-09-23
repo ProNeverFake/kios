@@ -5,9 +5,7 @@ namespace Insertion
     TreeRoot::TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
         : tree_state_ptr_(tree_state_ptr),
           task_state_ptr_(task_state_ptr),
-          hasRegisteredNodes(false),
-          context_clerk_(),
-          isArchiveSuccess(true)
+          hasRegisteredNodes(false)
     {
         // try
         // {
@@ -74,10 +72,6 @@ namespace Insertion
             return false;
         }
         if (!construct_tree(test_tree))
-        {
-            return false;
-        }
-        if (!archive_nodes())
         {
             return false;
         }
@@ -182,46 +176,28 @@ namespace Insertion
     std::optional<std::vector<kios::NodeArchive>> TreeRoot::archive_nodes()
     {
         std::vector<kios::NodeArchive> node_archive_list;
-        
-        context_clerk_.initialize();
 
-        isArchiveSuccess = true;
-
-        auto archive_visitor = [this](BT::TreeNode *node) {
+        auto archive_visitor = [&node_archive_list, this](BT::TreeNode *node) {
             if (auto action_node = dynamic_cast<KiosActionNode *>(node))
             {
-                // * skip if the archiving has failed.
-                if (this->isArchiveSuccess)
-                {
-                    action_node->initialize_archive();
-                    auto node_archive = action_node->get_archive_ref();
-                    if (!this->context_clerk_.archive_action(node_archive))
-                    {
-                        this->isArchiveSuccess = false;
-                    }
-                }
-                else
-                {
-                    // archiving process has failed. pass.
-                }
+                action_node->initialize_archive();
+                // ! here just get a copy!
+                auto node_archive = action_node->get_archive_ref();
+                node_archive_list.push_back(node_archive);
             }
         };
 
-        tree_.applyVisitor(archive_visitor);
-
-        if (isArchiveSuccess)
+        try
         {
-            if (context_clerk_.store_archive())
-            {
-                std::cout << "archived and stored." << std::endl;
-            }
-            else
-            {
-                std::cerr << "???" << std::endl;
-            }
+            tree_.applyVisitor(archive_visitor);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+            return {};
         }
 
-        return isArchiveSuccess;
+        return node_archive_list;
     }
 
     /**

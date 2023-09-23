@@ -16,6 +16,7 @@ namespace Insertion
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
         get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
         get_tree_state_ptr()->object_names = get_node_context_ref().object_names;
+        get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
     void CartesianMove::node_context_initialize()

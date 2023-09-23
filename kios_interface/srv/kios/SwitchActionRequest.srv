@@ -16,6 +16,8 @@ string action_name
 int32 action_phase
 string action_context
 
+NodeArchive node_archive
+
 string[] object_keys # for the same action nodes this should be all the same
 string[] object_names # for the same action nodes this may be different based on the task
 # defined enum class in data_type.hpp

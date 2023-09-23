@@ -113,8 +113,10 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
-        std::vector<std::string> object_keys = {};
-        std::vector<std::string> object_names = {};
+        NodeArchive node_archive; // ! add archive
+
+        std::vector<std::string> object_keys = {};  // this is the key of the object in mongo db
+        std::vector<std::string> object_names = {}; // this is the name of the object used in mios
         TreePhase tree_phase = TreePhase::IDLE;
 
         bool isInterrupted = true;   // necessity of stopping old

@@ -47,8 +47,7 @@ namespace Insertion
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
 
     private:
-        kios::ContextClerk context_clerk_;
-        bool isArchiveSuccess;
+        // kios::ContextClerk context_clerk_;
 
         // flag
         bool hasRegisteredNodes;

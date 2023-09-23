@@ -265,6 +265,10 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 23.09.2023
+  1. The service ArchiveActionRequest is realized now.
+  2. **The crucial question: how should the "object" be grounded in a object-centric robot system?**
+
 - 22.09.2023
   1. The problem is fixed (reason unclear). 
   TODO: the action archive client on the tree node side and the parameter fetch function in tactician.

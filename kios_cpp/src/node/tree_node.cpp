@@ -34,6 +34,7 @@ public:
           task_state_ptr_(std::make_shared<kios::TaskState>()),
           isActionSuccess_(false),
           hasUpdatedObjects_(false),
+          hasLoadedArchive_(false),
           object_list_(),
           node_archive_list_()
     {
@@ -57,7 +58,7 @@ public:
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
 
         // ! for TEST initialize the tree with test_tree
-        tree_initialize();
+        tree_initialize(); // bool return is not handled.
 
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
@@ -125,6 +126,7 @@ public:
 
 private:
     std::vector<kios_interface::msg::NodeArchive> node_archive_list_;
+    bool hasLoadedArchive_;
 
     // flag
     bool isActionSuccess_;
@@ -166,7 +168,26 @@ private:
 
     bool tree_initialize()
     {
-        m_tree_root->initialize_tree();
+        // generate the tree in tree root
+        if (!m_tree_root->initialize_tree())
+        {
+            return false;
+        }
+        // load the archives of the tree's action nodes into nodearchivelist
+        node_archive_list_.clear();
+        auto archive_list = m_tree_root->archive_nodes();
+        if (archive_list.has_value())
+        {
+            for (auto &archive : archive_list.value())
+            {
+                node_archive_list_.push_back(archive.to_ros2_msg());
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -263,7 +284,21 @@ private:
                 //////////////////////////////////////
             }
 
-            // * get mios skill execution state
+            // * ask tactician to load the actions' parameters according to the archives.
+            if (hasLoadedArchive_ == false)
+            {
+                RCLCPP_INFO_STREAM(this->get_logger(), "Now ask the tactician to Load the archives...");
+                if (load_node_archive(1000, 1000) == false)
+                {
+                    switch_tree_phase("ERROR");
+                }
+                else
+                {
+                    hasLoadedArchive_ = true;
+                }
+            }
+
+            // * get mios skill execution state (only if there is a msg in the msg queue of udp receiver)
             std::string message;
             if (udp_socket_->get_message(message) == true)
             {
@@ -515,6 +550,7 @@ private:
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
+        request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
         // ! ADD object name to ground
         request->object_keys = tree_state_ptr_->object_keys;
         request->is_interrupted = true; // ! temp
@@ -613,8 +649,47 @@ private:
         }
     }
 
-    bool request_node_archive()
+    bool load_node_archive(int ready_deadline = 100, int response_deadline = 1000)
     {
+        auto service_name = archive_action_client_->get_service_name();
+        // * send request to update the object
+        auto request = std::make_shared<kios_interface::srv::ArchiveActionRequest::Request>();
+        // now the object_list is not in use.
+        request->archive_list = node_archive_list_;
+        while (!archive_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
+        {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+                switch_power(false);
+                return false;
+            }
+            RCLCPP_ERROR_STREAM(this->get_logger(), "service " << service_name << "is timeout for getting ready!");
+            switch_power(false);
+            return false;
+        }
+        auto result_future = archive_action_client_->async_send_request(request);
+        std::future_status status = result_future.wait_until(
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
+        if (status == std::future_status::ready)
+        {
+            auto result = result_future.get();
+            if (result->is_accepted == true)
+            {
+                RCLCPP_INFO_STREAM(this->get_logger(), "Service " << service_name << ": Service call succeeded.");
+                return true;
+            }
+            else
+            {
+                RCLCPP_ERROR_STREAM(this->get_logger(), "Service " << service_name << ": Service call failed! Error message: " << result->error_message);
+                return false;
+            }
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
+            return false;
+        }
     }
 };
 

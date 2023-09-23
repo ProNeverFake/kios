@@ -87,8 +87,9 @@ public:
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
 
-        // * context clerk
-        context_clerk_.read_archive();
+        // * initialize context clerk
+        // context_clerk_.initialize(); // ! YOU SHOULD NOT USE THIS.
+        context_clerk_.read_archive(); // bool value return is not useful here.
 
         std::cout << "finish initialization" << std::endl;
 
@@ -115,6 +116,7 @@ public:
     }
 
 private:
+    // action parameter manager
     kios::ContextClerk context_clerk_;
 
     // thread safe rel
@@ -208,35 +210,42 @@ private:
         const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Response> response)
     {
+        std::string err_msg = "";
+        bool isAccepted = true;
+
         if (check_power() == true)
         {
             if (isBusy.load())
             {
-                RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
-                response->is_accepted = false;
+                isAccepted = false;
+                err_msg = "Node is busy, request refused !";
+                RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
             }
             else
             {
                 RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
-                bool fl = true;
                 for (auto &archive : request->archive_list)
                 {
                     kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
                     if (!context_clerk_.archive_action(arch))
                     {
-                        fl = false;
+                        err_msg = "ERROR when archiving the action in group " + std::to_string(archive.action_group) + " with id " + std::to_string(archive.action_id);
+                        isAccepted = false;
+                        RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
                         break;
                     }
                 }
-
-                response->is_accepted = fl;
             }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
-            response->is_accepted = false;
+            err_msg = "POWER OFF, request refused!";
+            isAccepted = false;
+            RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
         }
+
+        response->is_accepted = isAccepted;
+        response->error_message = err_msg;
     }
 
     /**

@@ -212,6 +212,10 @@ namespace kios
         }
     }
 
+    /**
+     * @brief
+     * !!! THIS IS ONLY FOR BAD_ALLOC TEST. DISCARDED!
+     */
     void ContextClerk::initialize()
     {
         try
@@ -225,7 +229,7 @@ namespace kios
     }
 
     /**
-     * @brief archive the action node and its context
+     * @brief archive the action node and its context. if its archive already exists, skip. if not, fetch the default context for it.
      *
      * @param action_achive 1: group,  2: id,  3: description,  4. action_phase
      * @return bool
@@ -339,7 +343,7 @@ namespace kios
     }
 
     /**
-     * @brief read
+     * @brief read the existing action node archives from json file. if failed, skip and return false.
      *
      * @return true
      * @return false

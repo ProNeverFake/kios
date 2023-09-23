@@ -153,6 +153,7 @@ private:
                         response->object_name.push_back(entity.first);
                         response->object_data.push_back(entity.second.to_json().dump());
                     }
+                    RCLCPP_INFO_STREAM(this->get_logger(), "Service call accepted.");
                     response->is_accepted = true;
                 }
                 catch (...)

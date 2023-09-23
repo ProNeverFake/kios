@@ -20,6 +20,7 @@
 #include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/switch_tree_phase_request.hpp"
 #include "kios_interface/srv/get_object_request.hpp"
+#include "kios_interface/srv/archive_action_request.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -33,7 +34,8 @@ public:
           task_state_ptr_(std::make_shared<kios::TaskState>()),
           isActionSuccess_(false),
           hasUpdatedObjects_(false),
-          object_list_()
+          object_list_(),
+          node_archive_list_()
     {
         // ! to be discarded
         // initialize object list
@@ -55,7 +57,7 @@ public:
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
 
         // ! for TEST initialize the tree with test_tree
-        m_tree_root->initialize_tree();
+        tree_initialize();
 
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
@@ -68,6 +70,11 @@ public:
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
+
+        archive_action_client_ = this->create_client<kios_interface::srv::ArchiveActionRequest>(
+            "archive_action_service",
+            rmw_qos_profile_services_default,
+            client_callback_group_);
 
         get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
             "get_object_service",
@@ -117,6 +124,8 @@ public:
     }
 
 private:
+    std::vector<kios_interface::msg::NodeArchive> node_archive_list_;
+
     // flag
     bool isActionSuccess_;
     bool hasUpdatedObjects_;
@@ -147,12 +156,18 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
+    rclcpp::Client<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
+
+    bool tree_initialize()
+    {
+        m_tree_root->initialize_tree();
+    }
 
     /**
      * @brief update the task_state. here the lock priority is lower than timer.
@@ -596,6 +611,10 @@ private:
             RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
             return false;
         }
+    }
+
+    bool request_node_archive()
+    {
     }
 };
 

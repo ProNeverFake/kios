@@ -38,7 +38,7 @@ namespace Insertion
         bool initialize_tree();
         bool construct_tree(const std::string &tree_string);
         bool register_nodes();
-        bool archive_nodes();
+        std::optional<std::vector<kios::NodeArchive>> archive_nodes();
 
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();

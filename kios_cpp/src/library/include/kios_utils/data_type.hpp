@@ -14,6 +14,7 @@
 #include "kios_interface/msg/task_state.hpp"
 #include "kios_interface/msg/mios_state.hpp"
 #include "kios_interface/msg/sensor_state.hpp"
+#include "kios_interface/msg/node_archive.hpp"
 
 #include "mirmi_utils/math.hpp"
 
@@ -467,6 +468,15 @@ namespace kios
         std::string description = "this guy is too lazy to leave anything here.";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         // nlohmann::json action_context = {}; // * preserved
+        kios_interface::msg::NodeArchive to_ros2_msg()
+        {
+            kios_interface::msg::NodeArchive node_archive;
+            node_archive.action_group = action_group;
+            node_archive.action_id = action_id;
+            node_archive.description = description;
+            node_archive.action_phase = static_cast<int>(action_phase);
+            return node_archive;
+        }
     };
 
     struct DefaultActionContext

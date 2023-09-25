@@ -39,6 +39,7 @@
 
 namespace kios
 {
+
     /**
      * @brief the tree phase for synchronizing the state of tree and skill execution in mios.
      * used as tree tick flag in tree node.
@@ -103,6 +104,25 @@ namespace kios
         nlohmann::json command_context;
     };
 
+    struct NodeArchive
+    {
+        // ! here no objects are grounded. so gestaltet in Absicht.
+        int action_group = 0;
+        int action_id = 0;
+        std::string description = "this guy is too lazy to leave anything here.";
+        ActionPhase action_phase = ActionPhase::INITIALIZATION;
+        // nlohmann::json action_context = {}; // * preserved
+        kios_interface::msg::NodeArchive to_ros2_msg()
+        {
+            kios_interface::msg::NodeArchive node_archive;
+            node_archive.action_group = action_group;
+            node_archive.action_id = action_id;
+            node_archive.description = description;
+            node_archive.action_phase = static_cast<int>(action_phase);
+            return node_archive;
+        }
+    };
+
     /**
      * @brief the state of the behavior tree from tree node
      *
@@ -115,8 +135,13 @@ namespace kios
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
         NodeArchive node_archive; // ! add archive
 
+        // ! these should be discarded
         std::vector<std::string> object_keys = {};  // this is the key of the object in mongo db
         std::vector<std::string> object_names = {}; // this is the name of the object used in mios
+
+        // * use this instead
+        std::vector<std::string> objects = {};
+
         TreePhase tree_phase = TreePhase::IDLE;
 
         bool isInterrupted = true;   // necessity of stopping old
@@ -463,28 +488,35 @@ namespace kios
              }}};
     };
 
-    struct NodeArchive
-    {
-        int action_group = 0;
-        int action_id = 0;
-        std::string description = "this guy is too lazy to leave anything here.";
-        ActionPhase action_phase = ActionPhase::INITIALIZATION;
-        // nlohmann::json action_context = {}; // * preserved
-        kios_interface::msg::NodeArchive to_ros2_msg()
-        {
-            kios_interface::msg::NodeArchive node_archive;
-            node_archive.action_group = action_group;
-            node_archive.action_id = action_id;
-            node_archive.description = description;
-            node_archive.action_phase = static_cast<int>(action_phase);
-            return node_archive;
-        }
-    };
-
     struct DefaultActionContext
     {
         nlohmann::json default_context_ =
             {
+                {"joint_move", {{"skill", {
+                                              {"objects", {
+                                                              {"Container", "housing"},
+                                                              {"JointMove", "joint_move"},
+                                                          }},
+                                              {"time_max", 30},
+                                              {"action_context", {
+                                                                     {"action_name", "JointMove"},
+                                                                     {"action_phase", ActionPhase::JOINT_MOVE},
+                                                                 }},
+                                              {"joint_move", {
+                                                                 {"speed", 0.5},
+                                                                 {"acceleration", 1},
+                                                                 {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                                 {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
+                                                             }},
+                                          }},
+                                {"control", {
+                                                {"control_mode", 0},
+                                            }},
+                                {"user", {
+                                             {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                             {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                             {"F_ext_contact", {3.0, 2.0}},
+                                         }}}},
                 {"cartesian_move", {{"skill", {
                                                   {"objects", {
                                                                   {"Container", "housing"},
@@ -495,7 +527,6 @@ namespace kios
                                                                          {"action_name", "CartesianMove"},
                                                                          {"action_phase", ActionPhase::CARTESIAN_MOVE},
                                                                      }},
-
                                                   {"cartesian_move", {
                                                                          {"dX_d", {0.05, 0.05}},
                                                                          {"ddX_d", {0.05, 0.05}},
@@ -521,7 +552,6 @@ namespace kios
                                                                        {"action_name", "GripperMove"},
                                                                        {"action_phase", ActionPhase::GRIPPER_MOVE},
                                                                    }},
-
                                                 {"gripper_move", {
                                                                      {"width", 0.6},
                                                                      {"speed", 1},
@@ -536,6 +566,31 @@ namespace kios
                                                {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
                                                {"F_ext_contact", {3.0, 2.0}},
                                            }}}},
+                {"gripper_force", {{"skill", {
+                                                 {"objects", {
+                                                                 {"Container", "housing"},
+                                                                 {"GripperForce", "gripper_force"},
+                                                             }},
+                                                 {"time_max", 30},
+                                                 {"action_context", {
+                                                                        {"action_name", "GripperForce"},
+                                                                        {"action_phase", ActionPhase::GRIPPER_FORCE},
+                                                                    }},
+                                                 {"gripper_force", {
+                                                                       {"width", 0.05},
+                                                                       {"speed", 1},
+                                                                       {"force", 40},
+                                                                       {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                   }},
+                                             }},
+                                   {"control", {
+                                                   {"control_mode", 0},
+                                               }},
+                                   {"user", {
+                                                {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                                {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                                {"F_ext_contact", {3.0, 2.0}},
+                                            }}}},
         };
 
         /**

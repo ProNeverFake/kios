@@ -116,11 +116,11 @@ public:
         this->set_parameters(all_new_parameters);
         if (turn_on)
         {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn on.");
+            RCLCPP_WARN(this->get_logger(), "switch_power: turn on.");
         }
         else
         {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn off.");
+            RCLCPP_WARN(this->get_logger(), "switch_power: turn off.");
         }
     }
 
@@ -287,6 +287,14 @@ private:
             // * ask tactician to load the actions' parameters according to the archives.
             if (hasLoadedArchive_ == false)
             {
+                // !! BB: THE CORRECT ORDER SHOULD BE FETCH THE OBJECT, GENERATE THE TREE, THEN CHECK THE OBJECTS WHEN GENERATING THE TREE.
+                // ! NOW JUST CHECK THE OBJECT HERE.
+                if (!m_tree_root->check_grounded_objects())
+                {
+                    switch_tree_phase("ERROR");
+                }
+                // !!
+
                 RCLCPP_INFO_STREAM(this->get_logger(), "Now ask the tactician to Load the archives...");
                 if (load_node_archive(1000, 1000) == false)
                 {
@@ -319,7 +327,7 @@ private:
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS...");
+            // RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS...");
         }
     }
 
@@ -374,7 +382,7 @@ private:
     }
 
     /**
-     * @brief method to switch tree state.
+     * @brief method to switch tree state. DO NOTHING WHEN THE OLD PHASE IS ERROR OR FAILURE
      *
      * @param phase
      * @return true
@@ -383,6 +391,12 @@ private:
     // ! test the one in kios_utils
     bool switch_tree_phase(const std::string &phase)
     {
+        if (tree_phase_ == kios::TreePhase::ERROR || tree_phase_ == kios::TreePhase::FAILURE)
+        {
+            RCLCPP_WARN(this->get_logger(), "When switching tree phase: An ERROR or a FAILURE phase is not handled. the current switch is skipped.");
+            return false;
+        }
+
         if (phase == "RESUME")
         {
             tree_phase_ = kios::TreePhase::RESUME;
@@ -431,7 +445,7 @@ private:
         switch (tree_phase_)
         {
         case kios::TreePhase::PAUSE: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: PAUSE.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: PAUSE.");
             // * tree is waiting for resume signal from mios. reset action success flag. skip tree tick.
             isActionSuccess_ = false;
             break;
@@ -443,7 +457,7 @@ private:
             break;
         }
         case kios::TreePhase::SUCCESS: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: SUCCESS!");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: SUCCESS!");
             // * execute the tree with mios success flag.
             isActionSuccess_ = true;
             execute_tree();

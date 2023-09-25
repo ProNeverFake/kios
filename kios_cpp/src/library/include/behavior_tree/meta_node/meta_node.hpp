@@ -13,6 +13,45 @@
 
 #include "mirmi_utils/math.hpp"
 
+namespace BT
+{
+    /**
+     * @brief object grounding method in BT
+     *
+     * @tparam
+     * @param str
+     * @return std::vector<std::string>
+     */
+    template <>
+    inline std::vector<std::string> convertFromString(StringView str)
+    {
+        auto parts = splitString(str, ';');
+        // if (parts.size() != 2) // ! TODO
+        // {
+        //     throw RuntimeError("invalid input)");
+        // }
+        // else
+        // {
+        //     std::vector<std::string> output;
+
+        //     for (auto &item : parts)
+        //     {
+        //         output.push_back(convertFromString<std::string>(item));
+        //     }
+
+        //     return output;
+        // }
+        std::vector<std::string> output;
+
+        for (auto &item : parts)
+        {
+            output.push_back(convertFromString<std::string>(item));
+        }
+
+        return output;
+    }
+} // namespace BT
+
 namespace Insertion
 {
 
@@ -71,7 +110,8 @@ namespace Insertion
               task_state_ptr_(task_state_ptr),
               node_context_(),
               hasSucceededOnce(false),
-              node_archive_()
+              node_archive_(),
+              objects_()
         {
         }
 
@@ -120,10 +160,15 @@ namespace Insertion
         static BT::PortsList providedPorts()
         {
             return {
-                BT::InputPort<bool>("isOnceSucceeded"),
-                BT::InputPort<int>("action_group"),
-                BT::InputPort<int>("action_id"),
-                BT::InputPort<std::string>("description")};
+                BT::InputPort<bool>("isOnceSucceeded")};
+            // BT::InputPort<int>("action_group"),
+            // BT::InputPort<int>("action_id"),
+            // BT::InputPort<std::string>("description")};
+            // return {
+            //     BT::InputPort<bool>("isOnceSucceeded"),
+            //     BT::InputPort<int>("action_group"),
+            //     BT::InputPort<int>("action_id"),
+            //     BT::InputPort<std::string>("description")};
         }
 
         // shared context
@@ -203,8 +248,23 @@ namespace Insertion
             return node_archive_;
         }
 
+        std::vector<std::string> &get_objects_ref()
+        {
+            return objects_;
+        }
+
+        void test_objects()
+        {
+            spdlog::error("objects test: ");
+            for (auto &item : objects_)
+            {
+                spdlog::error(item);
+            }
+        }
+
     private:
         kios::NodeArchive node_archive_;
+        std::vector<std::string> objects_;
 
         //* only run once flag
         bool hasSucceededOnce; // ! this will be DISCARDED after the integration of RunOnceNode
@@ -225,6 +285,16 @@ namespace Insertion
         {
         }
 
+        static BT::PortsList providedPorts() // ! CHANGE
+        {
+            return {
+                BT::InputPort<bool>("isOnceSucceeded"),
+                BT::InputPort<int>("action_group"),
+                BT::InputPort<int>("action_id"),
+                BT::InputPort<std::string>("description"),
+                BT::InputPort<std::vector<std::string>>("objects")}; // ! ADD
+        }
+
         /**
          * @brief initialize the action node archive for context manager. can only be called after the action node is registered in bt_factory.
          *
@@ -237,16 +307,20 @@ namespace Insertion
             BT::Expected<int> action_group = getInput<int>("action_group");
             BT::Expected<int> action_id = getInput<int>("action_id");
             BT::Expected<std::string> description = getInput<std::string>("description");
+            BT::Expected<std::vector<std::string>> objects = getInput<std::vector<std::string>>("objects"); // ! ADD
+
+            int ag = 0; // default/current action group
 
             if (!action_group)
             {
                 // ! now only 0 group for test.
                 // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
-                archive.action_group = 0;
+                archive.action_group = ag;
             }
             else
             {
                 archive.action_group = action_group.value();
+                ag = action_group.value();
             }
 
             if (!action_id)
@@ -259,12 +333,28 @@ namespace Insertion
             }
             if (!description)
             {
-                throw BT::RuntimeError("missing required input [description]: ", description.error());
+                // throw BT::RuntimeError("missing required input [description]: ", description.error());
+                spdlog::warn("Action node " + std::to_string(ag) + "-" + std::to_string(action_id.value()) + " has no description.");
+                // here pass. use the default value of the struct.
             }
             else
             {
                 archive.description = description.value();
             }
+            if (!objects)
+            {
+                spdlog::warn("Action node " + std::to_string(ag) + "-" + std::to_string(action_id.value()) + " grounds no objects.");
+            }
+            else
+            {
+                auto &objs = get_objects_ref();
+                objs = objects.value();
+                // for (auto &item : objs)
+                // {
+                // }
+            }
+
+            test_objects();
         }
 
     private:

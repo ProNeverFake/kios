@@ -173,6 +173,11 @@ namespace Insertion
     //     return isArchiveSuccess;
     // }
 
+    /**
+     * @brief use visitor to archive all the action nodes in the tree
+     *
+     * @return std::optional<std::vector<kios::NodeArchive>>
+     */
     std::optional<std::vector<kios::NodeArchive>> TreeRoot::archive_nodes()
     {
         std::vector<kios::NodeArchive> node_archive_list;
@@ -198,6 +203,52 @@ namespace Insertion
         }
 
         return node_archive_list;
+    }
+
+    /**
+     * @brief check if the grounded objects are in the DB. run this after archiving.
+     *
+     * @return true if everything is fine.
+     */
+    bool TreeRoot::check_grounded_objects()
+    {
+        bool flag = true;
+
+        auto object_dict = get_task_state_ptr()->object_dictionary;
+        auto check_visitor = [&flag, &object_dict, this](BT::TreeNode *node) {
+            if (auto action_node = dynamic_cast<KiosActionNode *>(node))
+            {
+                if (flag == true)
+                {
+                    auto &objects_ref = action_node->get_objects_ref();
+
+                    for (auto &item : objects_ref)
+                    {
+                        if (object_dict.find(item) == object_dict.end()) // ! if this object doesn't exist
+                        {
+                            spdlog::critical("OH NO: the object \'" + item + "\' doesn't exist in the object dictionary fetched from mongo DB!");
+                            flag = false;
+                        }
+                    }
+                }
+                else
+                {
+                    // error has been triggered. skip...
+                }
+            }
+        };
+
+        try
+        {
+            tree_.applyVisitor(check_visitor);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+            return false;
+        }
+
+        return flag;
     }
 
     /**

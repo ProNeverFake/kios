@@ -206,7 +206,8 @@ namespace Insertion
     }
 
     /**
-     * @brief check if the grounded objects are in the DB. run this after archiving.
+     * @brief check: 1. the number of obj keys and obj names consists? 2. the grounded objects are in the DB?
+     *  run this after archiving.
      *
      * @return true if everything is fine.
      */
@@ -220,7 +221,26 @@ namespace Insertion
             {
                 if (flag == true)
                 {
-                    auto &objects_ref = action_node->get_objects_ref();
+                    auto &objects_ref = action_node->get_object_names_ref();
+                    auto &arch = action_node->get_archive_ref();
+                    auto &keys_ref = action_node->get_obejct_keys_ref();
+
+                    if (objects_ref.size() != keys_ref.size())
+                    {
+                        spdlog::critical("OH NO: The number of object keys and object names doesn't consist in the action node with group: " + std::to_string(arch.action_group) + ", id: " + std::to_string(arch.action_id) + "!");
+                        // spdlog::debug("The following are the keys and the names:");
+                        spdlog::debug("KEYS: ");
+                        for (auto &k : keys_ref)
+                        {
+                            spdlog::debug(k);
+                        }
+                        spdlog::debug("NAMES: ");
+                        for (auto &n : objects_ref)
+                        {
+                            spdlog::debug(n);
+                        }
+                        flag = false; // but still do the existence check
+                    }
 
                     for (auto &item : objects_ref)
                     {

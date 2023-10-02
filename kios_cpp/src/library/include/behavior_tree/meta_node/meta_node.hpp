@@ -111,7 +111,8 @@ namespace Insertion
               node_context_(),
               hasSucceededOnce(false),
               node_archive_(),
-              objects_()
+              object_keys_(),
+              object_names_()
         {
         }
 
@@ -248,15 +249,20 @@ namespace Insertion
             return node_archive_;
         }
 
-        std::vector<std::string> &get_objects_ref()
+        std::vector<std::string> &get_object_names_ref()
         {
-            return objects_;
+            return object_names_;
+        }
+
+        std::vector<std::string> &get_obejct_keys_ref()
+        {
+            return object_keys_;
         }
 
         void test_objects()
         {
             spdlog::error("objects test: ");
-            for (auto &item : objects_)
+            for (auto &item : object_names_)
             {
                 spdlog::error(item);
             }
@@ -264,7 +270,8 @@ namespace Insertion
 
     private:
         kios::NodeArchive node_archive_;
-        std::vector<std::string> objects_;
+        std::vector<std::string> object_keys_;
+        std::vector<std::string> object_names_;
 
         //* only run once flag
         bool hasSucceededOnce; // ! this will be DISCARDED after the integration of RunOnceNode
@@ -347,7 +354,7 @@ namespace Insertion
             }
             else
             {
-                auto &objs = get_objects_ref();
+                auto &objs = get_object_names_ref();
                 objs = objects.value();
                 // for (auto &item : objs)
                 // {

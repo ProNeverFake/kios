@@ -19,10 +19,10 @@ def launch_in_new_terminal(cmd):
 
 def generate_launch_description():
     return LaunchDescription([
-        # launch_in_new_terminal('ros2 run kios_cpp commander'),
+        launch_in_new_terminal('ros2 run kios_cpp commander'),
         launch_in_new_terminal('ros2 run kios_cpp mongo_reader'),
-        # launch_in_new_terminal('ros2 run kios_py mios_reader'),
-        # launch_in_new_terminal('ros2 run kios_cpp messenger'),
+        launch_in_new_terminal('ros2 run kios_py mios_reader'),
+        launch_in_new_terminal('ros2 run kios_cpp messenger'),
         launch_in_new_terminal('ros2 run kios_cpp tactician'),
         launch_in_new_terminal('ros2 run kios_cpp tree_node'),
     ])

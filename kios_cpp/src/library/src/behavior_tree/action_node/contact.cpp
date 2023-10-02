@@ -48,18 +48,23 @@ namespace Insertion
         std::cout << "CONTACT UPDATE TREE STATE" << std::endl;
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
-        get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
+
+        get_tree_state_ptr()->object_keys = get_obejct_keys_ref();
+        get_tree_state_ptr()->object_names = get_object_names_ref();
+        // ! add archive
+        get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
     void Contact::node_context_initialize()
     {
         std::cout << "CONTACT INITIALIZE" << std::endl;
+        auto &obj_keys = get_obejct_keys_ref();
+        obj_keys.push_back("Contact");
 
         auto &node_context = get_node_context_ref();
         node_context.node_name = "CONTACT";
         node_context.action_name = "contact";
-        node_context.object_keys.push_back("Contact");
-        node_context.object_names.push_back("contact");
+
         node_context.action_phase = kios::ActionPhase::CONTACT;
         node_context.parameter["skill"]["action_name"] = "contact";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CONTACT;

@@ -191,7 +191,13 @@ private:
                 tree_state_.action_name = std::move(request->action_name);
                 tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
                 tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+
                 tree_state_.object_keys = std::move(request->object_keys);
+                tree_state_.object_names = std::move(request->object_names);
+
+                // ! add archive
+                tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
+
                 // * set flag for timer
                 isSwitchAction.store(true);
 
@@ -206,6 +212,12 @@ private:
         }
     }
 
+    /**
+     * @brief the method to archive all the nodes.
+     *
+     * @param request
+     * @param response
+     */
     void archive_action_server_callback(
         const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Response> response)
@@ -227,6 +239,7 @@ private:
                 for (auto &archive : request->archive_list)
                 {
                     kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
+                    // try to archive the node.
                     if (!context_clerk_.archive_action(arch))
                     {
                         err_msg = "ERROR when archiving the action in group " + std::to_string(archive.action_group) + " with id " + std::to_string(archive.action_id);
@@ -249,7 +262,7 @@ private:
     }
 
     /**
-     * @brief prereserved inline method to implement skill parameter generating algo.
+     * @brief prereserved inline method to ground the skill
      *
      */
     void generate_command_context()
@@ -257,15 +270,23 @@ private:
         /////////////////////////////////////////////
         // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT
         // * now just use default
-        // do nothing
+        // fetch context from clerk
+        nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
         // * the objects to be grounded from mongoDB can be changed here according to the object_keys.
-        // * now just use default.
-        // do nothing.
-        // ! only use stop old start new now
+        // * use those from the request.
+        const auto &obj_keys = tree_state_.object_keys;
+        const auto &obj_names = tree_state_.object_names;
+        for (int i = 0; i < obj_keys.size(); i++)
+        {
+            context["skill"]["objects"][obj_keys[i]] = obj_names[i];
+        }
+        // * only use stop old start new now
         command_context_.command_type = kios::CommandType::STOP_OLD_START_NEW;
-        // * handle the command context here
-        command_context_.command_context["skill"]["action_context"]["action_name"] = tree_state_.action_name;
-        command_context_.command_context["skill"]["action_context"]["action_phase"] = tree_state_.action_phase;
+        // ! NOW DON'T NEED THIS ANY MORE
+        // command_context_.command_context["skill"]["action_context"]["action_name"] = tree_state_.action_name;
+        // command_context_.command_context["skill"]["action_context"]["action_phase"] = tree_state_.action_phase;
+        // * USE THIS INSTEAD
+        command_context_.command_context = context;
 
         /////////////////////////////////////////////
     }

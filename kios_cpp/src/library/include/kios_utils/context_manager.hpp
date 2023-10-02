@@ -47,6 +47,8 @@ namespace kios
         bool store_archive();
         bool read_archive();
 
+        nlohmann::json get_context(const NodeArchive &archive) const;
+
     private:
         std::string file_name;
         std::string default_file_name;

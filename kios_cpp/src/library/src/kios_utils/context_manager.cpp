@@ -396,4 +396,17 @@ namespace kios
         return true;
     }
 
+    nlohmann::json ContextClerk::get_context(const NodeArchive &archive) const
+    {
+        if (action_ground_dictionary_.find(archive.action_group) != action_ground_dictionary_.end())
+        {
+            auto &id_dictionary = action_ground_dictionary_.at(archive.action_group);
+            if (id_dictionary.find(archive.action_id) != id_dictionary.end())
+            {
+                return id_dictionary.at(archive.action_id).second;
+            }
+        }
+        return {};
+    }
+
 } // namespace kios

@@ -536,7 +536,9 @@ private:
                 // update the last action phase
                 tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
                 tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+                // pause to send request
                 switch_tree_phase("PAUSE");
+                // ? why this?
                 tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))
@@ -564,10 +566,14 @@ private:
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
+        // ! add node_archive
         request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
-        // ! ADD object name to ground
+
         request->object_keys = tree_state_ptr_->object_keys;
-        request->is_interrupted = true; // ! temp
+        request->object_names = tree_state_ptr_->object_names;
+
+        request->is_interrupted = true; // ! not used yet
+
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             RCLCPP_ERROR(this->get_logger(), "service %s not available.", switch_action_client_->get_service_name());

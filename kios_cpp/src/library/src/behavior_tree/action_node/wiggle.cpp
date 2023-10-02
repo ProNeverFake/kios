@@ -14,17 +14,24 @@ namespace Insertion
         std::cout << "WIGGLE UPDATE TREE STATE" << std::endl;
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
-        get_tree_state_ptr()->object_keys = get_node_context_ref().object_keys;
+
+        get_tree_state_ptr()->object_keys = get_obejct_keys_ref();
+        get_tree_state_ptr()->object_names = get_object_names_ref();
+        // ! add archive
+        get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
     void Wiggle::node_context_initialize()
     {
         std::cout << "WIGGLE INITIALIZE" << std::endl;
+
+        auto &obj_keys = get_obejct_keys_ref();
+        obj_keys.push_back("Wiggle");
+
         auto &node_context = get_node_context_ref();
         node_context.node_name = "WIGGLE";
         node_context.action_name = "wiggle";
-        node_context.object_keys.push_back("Wiggle");
-        node_context.object_names.push_back("wiggle");
+
         node_context.action_phase = kios::ActionPhase::WIGGLE;
         node_context.parameter["skill"]["action_name"] = "wiggle";
         node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;

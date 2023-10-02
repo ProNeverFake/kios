@@ -121,6 +121,15 @@ namespace kios
             node_archive.action_phase = static_cast<int>(action_phase);
             return node_archive;
         }
+        static NodeArchive from_ros2_msg(const kios_interface::msg::NodeArchive &arch)
+        {
+            NodeArchive archive;
+            archive.action_group = arch.action_group;
+            archive.action_id = arch.action_id;
+            archive.description = arch.description;
+            archive.action_phase = static_cast<ActionPhase>(arch.action_phase);
+            return archive;
+        }
     };
 
     /**
@@ -133,6 +142,7 @@ namespace kios
         std::string last_action_name = "Initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
+
         NodeArchive node_archive; // ! add archive
 
         // ! these should be discarded
@@ -300,10 +310,11 @@ namespace kios
         std::string node_name = "Initialization";
         std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
-        std::vector<std::string> object_keys = {};
-        std::vector<std::string> object_names = {};
+
         std::string command;
+
         bool isActionSuccess = false;
+
         nlohmann::json parameter = {
             {"skill",
              {
@@ -374,18 +385,6 @@ namespace kios
                       {"acceleration", 1},
                       {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
                   }},
-                 {"release_force", // ! soll aber nicht benutzt werden
-                  {
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
-                 {"release_move",
-                  {
-                      {"release_width", 0.6},
-                      {"release_speed", 1},
-                      {"K_x", {1500, 1500, 1500, 100, 100, 100}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
 
              }},
             // ! TODO add move to pose and move to joint pose
@@ -397,95 +396,99 @@ namespace kios
                {3.0, 2.0}}}}};
     };
 
-    /**
-     * @brief the command request from tactician to commander with mp name and mp parameter
-     */
+    // ! backup
+    // struct CommandContext
+    // {
+    //     CommandType command_type = CommandType::INITIALIZATION;
+    //     nlohmann::json command_context = {
+    //         {"skill",
+    //          {
+    //              {"objects",
+    //               {
+    //                   {"Container", "housing"},
+    //                   {"Approach", "approach"},
+    //                   {"Contact", "contact"},
+    //                   {"Wiggle", "wiggle"},
+    //                   {"Move", "move"},
+    //                   {"Gripper", "gripper"},
+    //               }},
+    //              {"time_max", 30},
+    //              {"action_context",
+    //               {
+    //                   {"action_name", "initialization"},
+    //                   {"action_phase", ActionPhase::INITIALIZATION},
+    //               }},
+    //              {"approach",
+    //               {
+    //                   {"dX_d", {0.1, 0.15}},
+    //                   {"ddX_d", {0.05, 0.05}},
+    //                   {"DeltaX", {0, 0, 0, 0, 0, 0}},
+    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+    //               }},
+    //              {"contact",
+    //               {
+    //                   {"dX_d", {0.05, 0.15}},
+    //                   {"ddX_d", {0.05, 0.05}},
+    //                   {"K_x", {500, 500, 500, 600, 600, 600}},
+    //               }},
+    //              {"wiggle",
+    //               {
+    //                   {"search_a", {10, 10, 0, 2, 2, 0}},
+    //                   {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
+    //                   {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
+    //                   {"K_x", {500, 500, 500, 800, 800, 800}},
+    //                   {"f_push", {0, 0, 7, 0, 0, 0}},
+    //                   {"dX_d", {0.02, 0.05}},
+    //                   {"ddX_d", {0.05, 0.02}},
+    //               }},
+    //              {"insertion",
+    //               {
+    //                   {"dX_d", {0.02, 0.05}},
+    //                   {"ddX_d", {0.05, 0.02}},
+    //                   {"f_push", 7},
+    //                   {"K_x", {500, 500, 0, 800, 800, 800}},
+    //               }},
+    //              {"cartesian_move",
+    //               {
+    //                   {"dX_d", {0.05, 0.05}},
+    //                   {"ddX_d", {0.05, 0.05}},
+    //                   {"DeltaX", {0, 0, 0, 0, 0, 0}},
+    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+    //               }},
+    //              {"joint_move",
+    //               {
+    //                   {"speed", 0.5},
+    //                   {"acceleration", 1},
+    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+    //                   {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
+    //               }},
+    //              {"gripper_force",
+    //               {
+    //                   {"width", 0.05},
+    //                   {"speed", 1},
+    //                   {"force", 40},
+    //                   {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+    //               }},
+    //              {"gripper_move",
+    //               {
+    //                   {"width", 0.6},
+    //                   {"speed", 1},
+    //                   {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+    //               }},
+    //          }},
+    //         {"control", {{"control_mode", 0}}},
+    //         {"user",
+    //          {
+    //              {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+    //              {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+    //              {"F_ext_contact", {3.0, 2.0}},
+    //          }}};
+    // };
+
     struct CommandContext
     {
         CommandType command_type = CommandType::INITIALIZATION;
-        nlohmann::json command_context = {
-            {"skill",
-             {
-                 {"objects",
-                  {
-                      {"Container", "housing"},
-                      {"Approach", "approach"},
-                      {"Contact", "contact"},
-                      {"Wiggle", "wiggle"},
-                      {"Move", "move"},
-                      {"Gripper", "gripper"},
-                  }},
-                 {"time_max", 30},
-                 {"action_context",
-                  {
-                      {"action_name", "initialization"},
-                      {"action_phase", ActionPhase::INITIALIZATION},
-                  }},
-                 {"approach",
-                  {
-                      {"dX_d", {0.1, 0.15}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"contact",
-                  {
-                      {"dX_d", {0.05, 0.15}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"K_x", {500, 500, 500, 600, 600, 600}},
-                  }},
-                 {"wiggle",
-                  {
-                      {"search_a", {10, 10, 0, 2, 2, 0}},
-                      {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
-                      {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
-                      {"K_x", {500, 500, 500, 800, 800, 800}},
-                      {"f_push", {0, 0, 7, 0, 0, 0}},
-                      {"dX_d", {0.02, 0.05}},
-                      {"ddX_d", {0.05, 0.02}},
-                  }},
-                 {"insertion",
-                  {
-                      {"dX_d", {0.02, 0.05}},
-                      {"ddX_d", {0.05, 0.02}},
-                      {"f_push", 7},
-                      {"K_x", {500, 500, 0, 800, 800, 800}},
-                  }},
-                 {"cartesian_move",
-                  {
-                      {"dX_d", {0.05, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"joint_move",
-                  {
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                      {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
-                  }},
-                 {"gripper_force",
-                  {
-                      {"width", 0.05},
-                      {"speed", 1},
-                      {"force", 40},
-                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-                  }},
-                 {"gripper_move",
-                  {
-                      {"width", 0.6},
-                      {"speed", 1},
-                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-                  }},
-             }},
-            {"control", {{"control_mode", 0}}},
-            {"user",
-             {
-                 {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
-                 {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
-                 {"F_ext_contact", {3.0, 2.0}},
-             }}};
+        nlohmann::json command_context = {};
     };
 
     struct DefaultActionContext
@@ -494,12 +497,12 @@ namespace kios
             {
                 {"joint_move", {{"skill", {
                                               {"objects", {
-                                                              {"Container", "housing"},
+                                                              //   {"Container", "housing"},
                                                               {"JointMove", "joint_move"},
                                                           }},
                                               {"time_max", 30},
                                               {"action_context", {
-                                                                     {"action_name", "JointMove"},
+                                                                     {"action_name", "BBJointMove"},
                                                                      {"action_phase", ActionPhase::JOINT_MOVE},
                                                                  }},
                                               {"joint_move", {
@@ -519,20 +522,21 @@ namespace kios
                                          }}}},
                 {"cartesian_move", {{"skill", {
                                                   {"objects", {
-                                                                  {"Container", "housing"},
+                                                                  //   {"Container", "housing"},
                                                                   {"CartesianMove", "cartesian_move"},
                                                               }},
                                                   {"time_max", 30},
                                                   {"action_context", {
-                                                                         {"action_name", "CartesianMove"},
+                                                                         {"action_name", "BBCartesianMove"},
                                                                          {"action_phase", ActionPhase::CARTESIAN_MOVE},
                                                                      }},
-                                                  {"cartesian_move", {
-                                                                         {"dX_d", {0.05, 0.05}},
-                                                                         {"ddX_d", {0.05, 0.05}},
-                                                                         {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                                                                         {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                                                                     }},
+                                                  {"BBCartesianMove", {
+                                                                          // ! HERE CHANGE!
+                                                                          {"dX_d", {0.05, 0.05}},
+                                                                          {"ddX_d", {0.05, 0.05}},
+                                                                          {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                                          {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                                      }},
                                               }},
                                     {"control", {
                                                     {"control_mode", 0},
@@ -544,12 +548,12 @@ namespace kios
                                              }}}},
                 {"gripper_move", {{"skill", {
                                                 {"objects", {
-                                                                {"Container", "housing"},
+                                                                // {"Container", "housing"},
                                                                 {"GripperMove", "gripper_move"},
                                                             }},
                                                 {"time_max", 30},
                                                 {"action_context", {
-                                                                       {"action_name", "GripperMove"},
+                                                                       {"action_name", "BBGripperMove"},
                                                                        {"action_phase", ActionPhase::GRIPPER_MOVE},
                                                                    }},
                                                 {"gripper_move", {
@@ -568,12 +572,12 @@ namespace kios
                                            }}}},
                 {"gripper_force", {{"skill", {
                                                  {"objects", {
-                                                                 {"Container", "housing"},
+                                                                 //  {"Container", "housing"},
                                                                  {"GripperForce", "gripper_force"},
                                                              }},
                                                  {"time_max", 30},
                                                  {"action_context", {
-                                                                        {"action_name", "GripperForce"},
+                                                                        {"action_name", "BBGripperForce"},
                                                                         {"action_phase", ActionPhase::GRIPPER_FORCE},
                                                                     }},
                                                  {"gripper_force", {
@@ -619,5 +623,21 @@ namespace kios
             }
         }
     };
+
+    // std::string to_mios_skill(const ActionPhase &ap)
+    // {
+    //     switch (ap)
+    //     {
+    //     case ActionPhase::CARTESIAN_MOVE:
+    //         return "BBCartesianMove";
+    //         break;
+    //         // ! TODO: add more!
+
+    //     default:
+    //         spdlog::critical("OH NO: CANNOT ground the action phase {} to a mios skill!", action_phase_to_str(ap));
+    //         return "";
+    //         break;
+    //     }
+    // }
 
 } // namespace kios

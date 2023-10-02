@@ -618,9 +618,12 @@ bool BTMessenger::start_task_request(nlohmann::json skill_context)
     std::vector<std::string> skill_types;
     std::unordered_map<std::string, nlohmann::json> skill_contexts;
 
-    skill_names.push_back("insertion");
-    skill_types.push_back("BBGeneralSkill");
-    skill_contexts["insertion"] = skill_context;
+    // extract the skill type:
+    std::string skill_type = skill_context["skill"]["action_context"].at("action_name");
+
+    skill_names.push_back("BBSkill");
+    skill_types.push_back(skill_type); // ! CHANGED
+    skill_contexts["BBSkill"] = skill_context;
 
     nlohmann::json task_context =
         {{"parameters",

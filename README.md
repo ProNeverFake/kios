@@ -265,6 +265,9 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 02.10.2023
+  1. The base class should be divided into different variances.
+
 - 01.10.2023
   1. The the main frame has been finished. Now mios can receive the request but end without any error message. find the reason.
   2. **Be careful when changing the ActionPhaseContext: only the necessary part should be preserved.**

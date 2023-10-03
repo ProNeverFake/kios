@@ -18,6 +18,8 @@
 
 #include "mirmi_utils/math.hpp"
 
+#include "spdlog/spdlog.h"
+
 // // ! CHANGE
 // namespace nlohmann
 // {
@@ -102,6 +104,7 @@ namespace kios
     {
         CommandType command_type;
         nlohmann::json command_context;
+        std::string skill_type = "";
     };
 
     struct NodeArchive
@@ -489,6 +492,7 @@ namespace kios
     {
         CommandType command_type = CommandType::INITIALIZATION;
         nlohmann::json command_context = {};
+        std::string skill_type = "";
     };
 
     struct DefaultActionContext
@@ -497,7 +501,6 @@ namespace kios
             {
                 {"joint_move", {{"skill", {
                                               {"objects", {
-                                                              //   {"Container", "housing"},
                                                               {"JointMove", "joint_move"},
                                                           }},
                                               {"time_max", 30},
@@ -505,15 +508,15 @@ namespace kios
                                                                      {"action_name", "BBJointMove"},
                                                                      {"action_phase", ActionPhase::JOINT_MOVE},
                                                                  }},
-                                              {"joint_move", {
-                                                                 {"speed", 0.5},
-                                                                 {"acceleration", 1},
-                                                                 {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                                                                 {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
-                                                             }},
+                                              {"BBJointMove", {
+                                                                  {"velocity", 0.1},
+                                                                  {"acceleration", 0.1},
+                                                                  {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                                  {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
+                                                              }},
                                           }},
                                 {"control", {
-                                                {"control_mode", 0},
+                                                {"control_mode", 3}, // ! JOINT MOVE MUST WITH CONTROL MODE 3!
                                             }},
                                 {"user", {
                                              {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
@@ -522,7 +525,6 @@ namespace kios
                                          }}}},
                 {"cartesian_move", {{"skill", {
                                                   {"objects", {
-                                                                  //   {"Container", "housing"},
                                                                   {"CartesianMove", "cartesian_move"},
                                                               }},
                                                   {"time_max", 30},
@@ -548,19 +550,18 @@ namespace kios
                                              }}}},
                 {"gripper_move", {{"skill", {
                                                 {"objects", {
-                                                                // {"Container", "housing"},
-                                                                {"GripperMove", "gripper_move"},
+                                                                // {"GripperMove", "gripper_move"},
                                                             }},
                                                 {"time_max", 30},
                                                 {"action_context", {
                                                                        {"action_name", "BBGripperMove"},
                                                                        {"action_phase", ActionPhase::GRIPPER_MOVE},
                                                                    }},
-                                                {"gripper_move", {
-                                                                     {"width", 0.6},
-                                                                     {"speed", 1},
-                                                                     {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-                                                                 }},
+                                                {"BBGripperMove", {
+                                                                      {"width", 0.02},
+                                                                      {"speed", 1},
+                                                                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                  }},
                                             }},
                                   {"control", {
                                                   {"control_mode", 0},
@@ -580,12 +581,12 @@ namespace kios
                                                                         {"action_name", "BBGripperForce"},
                                                                         {"action_phase", ActionPhase::GRIPPER_FORCE},
                                                                     }},
-                                                 {"gripper_force", {
-                                                                       {"width", 0.05},
-                                                                       {"speed", 1},
-                                                                       {"force", 40},
-                                                                       {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-                                                                   }},
+                                                 {"BBGripperForce", {
+                                                                        {"width", 0.05},
+                                                                        {"speed", 1},
+                                                                        {"force", 40},
+                                                                        {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                    }},
                                              }},
                                    {"control", {
                                                    {"control_mode", 0},
@@ -624,20 +625,37 @@ namespace kios
         }
     };
 
-    // std::string to_mios_skill(const ActionPhase &ap)
-    // {
-    //     switch (ap)
-    //     {
-    //     case ActionPhase::CARTESIAN_MOVE:
-    //         return "BBCartesianMove";
-    //         break;
-    //         // ! TODO: add more!
+    // here inline because the redefine error
+    inline std::string ap_to_mios_skill(const ActionPhase &ap)
+    {
+        switch (ap)
+        {
+        case ActionPhase::CARTESIAN_MOVE: {
+            return "BBCartesianMove";
+            break;
+        }
 
-    //     default:
-    //         spdlog::critical("OH NO: CANNOT ground the action phase {} to a mios skill!", action_phase_to_str(ap));
-    //         return "";
-    //         break;
-    //     }
-    // }
+        case ActionPhase::JOINT_MOVE: {
+            return "BBJointMove";
+            break;
+        }
+
+        case ActionPhase::GRIPPER_MOVE: {
+            return "BBGripperMove";
+            break;
+        }
+
+        case ActionPhase::GRIPPER_FORCE: {
+            return "BBGripperForce";
+            break;
+        }
+
+        default:
+            // spdlog::critical("OH NO: CANNOT ground the action phase {} to a mios skill!", action_phase_to_str(ap).value());
+            spdlog::critical("OH NO: CANNOT ground the action phase to a mios skill!");
+            return "";
+            break;
+        }
+    }
 
 } // namespace kios

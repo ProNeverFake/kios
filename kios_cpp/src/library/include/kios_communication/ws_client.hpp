@@ -187,7 +187,7 @@ public:
     void start_task_command(nlohmann::json payload = nlohmann::json());
     void stop_task_command();
     bool stop_task_request();
-    bool start_task_request(nlohmann::json skill_context);
+    bool start_task_request(nlohmann::json skill_context, std::string skill_type);
     void unregister_udp();
     void register_udp(int &port, nlohmann::json &sub_list);
     void set_message_handler(std::function<void(const std::string &)> handler);

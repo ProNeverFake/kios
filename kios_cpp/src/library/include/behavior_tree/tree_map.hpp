@@ -60,11 +60,33 @@ namespace Insertion
     //     </root>
     //     )";
 
+    // ! here cartesian move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <CartesianMove name="cartesian_move" action_id="1" description="test" objects="housing"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here gripper move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <GripperMove name="gripper_move" action_id="2" description="test"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <CartesianMove name="cartesian_move" action_id="1" description="test" objects="housing"/>
+                    <JointMove name="joint_move" action_id="3" description="test" objects="housing"/>
                 </Sequence>
             </BehaviorTree>
         </root>

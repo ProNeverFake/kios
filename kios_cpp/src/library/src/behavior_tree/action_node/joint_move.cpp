@@ -3,7 +3,7 @@
 namespace Insertion
 {
     JointMove::JointMove(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -24,7 +24,6 @@ namespace Insertion
     void JointMove::node_context_initialize()
     {
         spdlog::trace("JointMove::node_context_initialize()");
-
         // ! add
         auto &obj_keys = get_obejct_keys_ref();
         obj_keys.push_back("JointMove");
@@ -34,8 +33,6 @@ namespace Insertion
         node_context.action_name = "joint_move";
 
         node_context.action_phase = kios::ActionPhase::JOINT_MOVE;
-        node_context.parameter["skill"]["action_name"] = "joint_move";
-        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::JOINT_MOVE;
     }
 
     bool JointMove::is_success()

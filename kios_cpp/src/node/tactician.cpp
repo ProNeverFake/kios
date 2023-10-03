@@ -272,6 +272,11 @@ private:
         // * now just use default
         // fetch context from clerk
         nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
+        // ! important: remove the action_context. this is not necessary.
+        if (context["skill"].contains("action_context"))
+        {
+            context["skill"].erase("action_context");
+        }
         // * the objects to be grounded from mongoDB can be changed here according to the object_keys.
         // * use those from the request.
         const auto &obj_keys = tree_state_.object_keys;
@@ -282,11 +287,10 @@ private:
         }
         // * only use stop old start new now
         command_context_.command_type = kios::CommandType::STOP_OLD_START_NEW;
-        // ! NOW DON'T NEED THIS ANY MORE
-        // command_context_.command_context["skill"]["action_context"]["action_name"] = tree_state_.action_name;
-        // command_context_.command_context["skill"]["action_context"]["action_phase"] = tree_state_.action_phase;
+
         // * USE THIS INSTEAD
         command_context_.command_context = context;
+        command_context_.skill_type = kios::ap_to_mios_skill(tree_state_.node_archive.action_phase);
 
         /////////////////////////////////////////////
     }
@@ -304,6 +308,7 @@ private:
         auto request = std::make_shared<kios_interface::srv::CommandRequest::Request>();
         request->command_type = static_cast<int32_t>(command_context_.command_type);
         request->command_context = command_context_.command_context.dump();
+        request->skill_type = command_context_.skill_type;
 
         // client send request
         while (!command_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
@@ -387,6 +392,9 @@ private:
                 // * turn off for check
                 switch_power(false);
             }
+            // * archive the nodes contexts into json file.
+            context_clerk_.store_archive();
+
             switch_power(false);
             break;
         }

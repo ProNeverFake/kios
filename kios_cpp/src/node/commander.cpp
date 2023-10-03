@@ -138,6 +138,7 @@ private:
                 response->is_accepted = false;
                 return;
             }
+            command_request_.skill_type = request->skill_type;
             issue_command(command_request_);
             response->is_accepted = true;
         }
@@ -160,7 +161,7 @@ private:
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
             if (stop_task_request() == true)
             {
-                start_task_request(command_request.command_context);
+                start_task_request(command_request);
             }
             else
             {
@@ -188,9 +189,9 @@ private:
         return messenger_->stop_task_request();
     }
 
-    bool start_task_request(const nlohmann::json &skill_context)
+    bool start_task_request(const kios::CommandRequest request)
     {
-        return messenger_->start_task_request(skill_context);
+        return messenger_->start_task_request(request.command_context, request.skill_type);
     }
 
     void stop_task_command()

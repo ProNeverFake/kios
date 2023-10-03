@@ -3,7 +3,7 @@
 namespace Insertion
 
 {
-    class GripperMove : public HyperMetaNode<BT::StatefulActionNode>
+    class GripperMove : public KiosActionNode
     {
     public:
         GripperMove(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);

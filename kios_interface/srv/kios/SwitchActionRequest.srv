@@ -14,7 +14,7 @@ int32 GRIPPER_MOVE = 14
 
 string action_name
 int32 action_phase
-string action_context
+# string action_context
 
 NodeArchive node_archive
 

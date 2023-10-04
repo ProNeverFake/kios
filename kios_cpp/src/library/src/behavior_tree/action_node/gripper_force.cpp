@@ -3,7 +3,7 @@
 namespace Insertion
 {
     GripperForce::GripperForce(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -15,8 +15,11 @@ namespace Insertion
         // * here must copy
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
+
         get_tree_state_ptr()->object_keys = get_obejct_keys_ref();
         get_tree_state_ptr()->object_names = get_object_names_ref();
+        // ! add archive
+        get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
     void GripperForce::node_context_initialize()

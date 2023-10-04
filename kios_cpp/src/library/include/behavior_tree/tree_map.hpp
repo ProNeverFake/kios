@@ -82,11 +82,23 @@ namespace Insertion
     //     </root>
     //     )";
 
+    // ! here joint move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <JointMove name="joint_move" action_id="3" description="test" objects="housing"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here gripper force test
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <JointMove name="joint_move" action_id="3" description="test" objects="housing"/>
+                    <GripperForce name="gripper_force" action_id="4" description="test"/>
                 </Sequence>
             </BehaviorTree>
         </root>

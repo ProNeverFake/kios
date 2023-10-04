@@ -573,8 +573,7 @@ namespace kios
                                            }}}},
                 {"gripper_force", {{"skill", {
                                                  {"objects", {
-                                                                 //  {"Container", "housing"},
-                                                                 {"GripperForce", "gripper_force"},
+                                                                 //  {"GripperForce", "gripper_force"},
                                                              }},
                                                  {"time_max", 30},
                                                  {"action_context", {

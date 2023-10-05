@@ -4,6 +4,8 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 from rclpy.qos import qos_profile_sensor_data
 
+# ! THIS NODE IS DISCARDED
+
 import json
 
 from .resource.mongodb_client import MongoDBClient
@@ -12,17 +14,16 @@ from kios_interface.srv import GetObjectRequest
 
 
 class MongoReader(Node):
-
-    udp_subscriber = ''
+    udp_subscriber = ""
 
     def __init__(self):
-        super().__init__('mongo_reader')
+        super().__init__("mongo_reader")
 
         # declare flag
         self.is_running = True
 
         # declare parameters
-        self.declare_parameter('power', True)
+        self.declare_parameter("power", True)
 
         # intialize mongoDB client
         self.mongo_client_ = MongoDBClient(port=27017)
@@ -30,9 +31,8 @@ class MongoReader(Node):
         # initialize timer
         timer_callback_group = ReentrantCallbackGroup()
         self.timer_ = self.create_timer(
-            2,  # sec
-            self.timer_callback,
-            callback_group=timer_callback_group)
+            2, self.timer_callback, callback_group=timer_callback_group  # sec
+        )
 
         # initialize get_object server
         server_callback_group = MutuallyExclusiveCallbackGroup()
@@ -40,19 +40,20 @@ class MongoReader(Node):
             GetObjectRequest,
             "get_object_service",
             self.server_callback,
-            callback_group=server_callback_group
+            callback_group=server_callback_group,
         )
 
     def timer_callback(self):
         if self.is_running:
-            self.get_logger().info('start')
+            self.get_logger().info("start")
             result = self.mongo_client_.read(
-                "miosL", "environment", {"name": "housing"})
-            print(result[0]['O_T_OB'])
-            self.get_logger().info('stop')
+                "miosL", "environment", {"name": "housing"}
+            )
+            print(result[0]["O_T_OB"])
+            self.get_logger().info("stop")
 
         else:
-            self.get_logger().error('not runnning, timer pass ...')
+            self.get_logger().error("not runnning, timer pass ...")
             pass
 
     def server_callback(self, request, response):
@@ -62,7 +63,7 @@ class MongoReader(Node):
         if self.is_running:
             object_list = request.object_list
             if len(object_list) <= 0:
-                self.get_logger().error('null object list!')
+                self.get_logger().error("null object list!")
                 response.error_message = "null object list"
                 return response
             else:
@@ -70,10 +71,14 @@ class MongoReader(Node):
                 for object_name in object_list:
                     try:
                         result = self.mongo_client_.read(
-                            "miosL", "environment", {"name": object_name})[0]
+                            "miosL", "environment", {"name": object_name}
+                        )[0]
                         object_result[object_name] = result
                     except:
-                        self.get_logger().error('UNKNOWN ERROR IN MONGO CLIENT READ() OF OBEJCT %s', object_name)
+                        self.get_logger().error(
+                            "UNKNOWN ERROR IN MONGO CLIENT READ() OF OBEJCT %s",
+                            object_name,
+                        )
 
                 if len(object_result) <= 0:
                     response.error_message = "read result == null"
@@ -84,7 +89,7 @@ class MongoReader(Node):
                 return response
 
         else:
-            self.get_logger().error('not runnning, server pass ...')
+            self.get_logger().error("not runnning, server pass ...")
             response.error_message = "is_running == False"
             return response
 
@@ -103,5 +108,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

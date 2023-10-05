@@ -155,7 +155,7 @@ private:
         if (check_power())
         {
             std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-            RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+            // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
             // * update task state
             task_state_.from_ros2_msg(*msg);
         }
@@ -457,12 +457,12 @@ private:
             }
             else
             {
-                RCLCPP_INFO(this->get_logger(), "Timer: Continue the last action phase.");
+                RCLCPP_INFO_ONCE(this->get_logger(), "Timer: Continue the last action phase.");
             }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, Timer pass ...");
+            RCLCPP_ERROR_ONCE(this->get_logger(), "POWER OFF, Timer pass ...");
         }
     }
 };

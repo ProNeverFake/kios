@@ -43,15 +43,15 @@ namespace Insertion
     {
         spdlog::trace("GripperForce::onStart()");
 
-        if (has_succeeded_once())
-        {
-            spdlog::debug("GRIPPER_FORCE HAS ONCE SUCCEEDED");
-            return BT::NodeStatus::SUCCESS;
-        }
+        // if (has_succeeded_once())
+        // {
+        //     spdlog::debug("GRIPPER_FORCE HAS ONCE SUCCEEDED");
+        //     return BT::NodeStatus::SUCCESS;
+        // }
         if (is_success())
         {
             spdlog::debug("GRIPPER_FORCE ALREADY SUCCEEDED");
-
+            on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -69,6 +69,7 @@ namespace Insertion
         if (is_success())
         {
             spdlog::debug("GRIPPER_FORCE SUCCEEDS");
+            on_success();
 
             return BT::NodeStatus::SUCCESS;
         }

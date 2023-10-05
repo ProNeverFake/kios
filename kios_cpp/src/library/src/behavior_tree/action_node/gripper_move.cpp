@@ -42,15 +42,15 @@ namespace Insertion
     {
         spdlog::trace("GripperMove::onStart()");
 
-        if (has_succeeded_once())
-        {
-            spdlog::debug("GRIPPERMOVE HAS ONCE SUCCEEDED");
-            return BT::NodeStatus::SUCCESS;
-        }
+        // if (has_succeeded_once())
+        // {
+        //     spdlog::debug("GRIPPERMOVE HAS ONCE SUCCEEDED");
+        //     return BT::NodeStatus::SUCCESS;
+        // }
         if (is_success())
         {
             spdlog::debug("GRIPPERMOVE ALREADY SUCCEEDED");
-
+            on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -68,6 +68,7 @@ namespace Insertion
         if (is_success())
         {
             spdlog::debug("GRIPPERMOVE SUCCEEDS");
+            on_success();
 
             return BT::NodeStatus::SUCCESS;
         }

@@ -30,6 +30,10 @@ public:
         : Node("messenger")
 
     {
+        // * set ros2 logger severity level
+        auto logger = this->get_logger();
+        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
+
         this->declare_parameter("power", true);
 
         timer_callback_group_ = this->create_callback_group(

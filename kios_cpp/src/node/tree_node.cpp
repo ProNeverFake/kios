@@ -35,13 +35,11 @@ public:
           isActionSuccess_(false),
           hasUpdatedObjects_(false),
           hasLoadedArchive_(false),
-          object_list_(),
           node_archive_list_()
     {
-        // ! to be discarded
-        // initialize object list
-        object_list_.push_back("contact");
-        object_list_.push_back("approach");
+        // // * set ros2 logger severity level
+        auto logger = this->get_logger();
+        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
 
         //* declare mission parameter
         this->declare_parameter("power", true);
@@ -144,7 +142,7 @@ private:
     std::shared_ptr<kios::TreeState> tree_state_ptr_;
     std::shared_ptr<kios::TaskState> task_state_ptr_;
 
-    // object list
+    // ! DISCARDED
     std::vector<std::string> object_list_; // reserved for the future. maybe use this for object check to judge if a task is possible.
 
     // object dictionary
@@ -214,7 +212,6 @@ private:
 
     /**
      * @brief handle the switch tree phase request.
-     * ! TODO TEST
      * @param request
      * @param response
      */
@@ -339,7 +336,6 @@ private:
      */
     bool is_tree_running()
     {
-        // ! CHANGE
         // * check tree state first for detect possibly invoked error in tree node.
         if (tree_state_ptr_->tree_phase == kios::TreePhase::ERROR)
         {
@@ -391,6 +387,8 @@ private:
     // ! test the one in kios_utils
     bool switch_tree_phase(const std::string &phase)
     {
+        RCLCPP_WARN_STREAM(this->get_logger(), "Try to swtich tree phase to " + phase);
+
         if (tree_phase_ == kios::TreePhase::ERROR || tree_phase_ == kios::TreePhase::FAILURE)
         {
             RCLCPP_WARN(this->get_logger(), "When switching tree phase: An ERROR or a FAILURE phase is not handled. the current switch is skipped.");
@@ -529,16 +527,12 @@ private:
                 this->get_logger(),
                 "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
 
-            if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
+            // ! change
+            if (check_action_switch())
             {
-                // * action switch
-                RCLCPP_INFO(this->get_logger(), "execute_tree: AP switch hit.");
-                // update the last action phase
-                tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
-                tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
                 // pause to send request
                 switch_tree_phase("PAUSE");
-                // ? why this?
+                // * update the tree_phase in BT.
                 tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))
@@ -546,11 +540,55 @@ private:
                     switch_tree_phase("ERROR");
                 }
             }
+            else
+            {
+            }
         }
         else
         {
             // tree phase switch is already handled in is_tree_running(). here pass...
         }
+    }
+
+    /**
+     * @brief check if an action switch should be done.
+     *
+     * @return true
+     * @return false
+     */
+    bool check_action_switch()
+    {
+        // for the situation that the next action node's AP is the same as the last one:
+        if (tree_state_ptr_->isSucceeded)
+        {
+            RCLCPP_INFO_STREAM(this->get_logger(), "check_action_swtich: consume isSucceeded.");
+
+            // consume this flag
+            tree_state_ptr_->isSucceeded = false;
+
+            // * action switch
+            RCLCPP_INFO_STREAM(this->get_logger(), "execute_tree: " + tree_state_ptr_->last_action_name + " succeeds. Swtich to " + tree_state_ptr_->action_name);
+            // update the last action properties
+            tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
+            tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+            tree_state_ptr_->last_node_archive = tree_state_ptr_->node_archive;
+
+            return true;
+        }
+        // for the situation that they are different.
+        if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
+        {
+            // * action switch
+            RCLCPP_INFO_STREAM(this->get_logger(), "execute_tree: Swtich normally to " + tree_state_ptr_->action_name);
+
+            // update the last action properties
+            tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
+            tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+            tree_state_ptr_->last_node_archive = tree_state_ptr_->node_archive;
+
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -566,6 +604,7 @@ private:
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
+
         // ! add node_archive
         request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
 
@@ -612,8 +651,6 @@ private:
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
-        // now the object_list is not in use.
-        request->object_list = object_list_;
         while (!get_object_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             if (!rclcpp::ok())
@@ -669,12 +706,20 @@ private:
         }
     }
 
+    /**
+     * @brief send a request to tactician for archiving the nodes in the current BT.
+     *
+     * @param ready_deadline
+     * @param response_deadline
+     * @return true
+     * @return false
+     */
     bool load_node_archive(int ready_deadline = 100, int response_deadline = 1000)
     {
         auto service_name = archive_action_client_->get_service_name();
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::ArchiveActionRequest::Request>();
-        // now the object_list is not in use.
+        // update the archive node list
         request->archive_list = node_archive_list_;
         while (!archive_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {

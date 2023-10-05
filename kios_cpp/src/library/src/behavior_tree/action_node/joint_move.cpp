@@ -46,16 +46,16 @@ namespace Insertion
     {
         spdlog::trace("JointMove::onStart()");
 
-        if (has_succeeded_once())
-        {
-            spdlog::debug("CARTESIAN_MOVE HAS ONCE SUCCEEDED");
+        // if (has_succeeded_once())
+        // {
+        //     spdlog::debug("CARTESIAN_MOVE HAS ONCE SUCCEEDED");
 
-            return BT::NodeStatus::SUCCESS;
-        }
+        //     return BT::NodeStatus::SUCCESS;
+        // }
         if (is_success())
         {
             spdlog::debug("JOINTMOVE ALREADY SUCCEEDED");
-
+            on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -73,6 +73,7 @@ namespace Insertion
         if (is_success())
         {
             spdlog::debug("JOINTMOVE SUCCEEDED");
+            on_success();
 
             return BT::NodeStatus::SUCCESS;
         }

@@ -147,6 +147,7 @@ namespace kios
         ActionPhase last_action_phase = ActionPhase::INITIALIZATION;
 
         NodeArchive node_archive; // ! add archive
+        NodeArchive last_node_archive;
 
         // ! these should be discarded
         std::vector<std::string> object_keys = {};  // this is the key of the object in mongo db
@@ -159,6 +160,7 @@ namespace kios
 
         bool isInterrupted = true;   // necessity of stopping old
         bool isSwitchAction = false; // ! reserved flag. not used.
+        bool isSucceeded = false;
     };
 
     struct MiosState

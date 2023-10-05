@@ -199,6 +199,15 @@ namespace Insertion
             return hasSucceededOnce;
         }
 
+        // ! MAY OVERRIDE
+        /////////////////////////////////////////////////////////////////
+        virtual void on_success()
+        {
+            tree_state_ptr_->isSucceeded = true;
+            // do nothing.
+        }
+        /////////////////////////////////////////////////////////////////
+
         // ! MUST OVERRIDE
         /////////////////////////////////////////////////////////////////
         // * update tree state with this node's context
@@ -218,6 +227,7 @@ namespace Insertion
         {
             if (task_state_ptr_->isActionSuccess)
             {
+                spdlog::info("From mios: {} succeeded.", node_context_.action_name);
                 mark_success();
                 // * mios succeeded. consume it and return true
                 task_state_ptr_->isActionSuccess = false;

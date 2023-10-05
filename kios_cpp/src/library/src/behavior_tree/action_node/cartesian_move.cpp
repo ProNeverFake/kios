@@ -45,16 +45,16 @@ namespace Insertion
     {
         spdlog::trace("CartesianMove::onStart()");
 
-        if (has_succeeded_once())
-        {
-            spdlog::debug("CARTESIAN_MOVE HAS ONCE SUCCEEDED");
+        // if (has_succeeded_once()) // ! should remove this!
+        // {
+        //     spdlog::debug("CARTESIAN_MOVE HAS ONCE SUCCEEDED");
 
-            return BT::NodeStatus::SUCCESS;
-        }
+        //     return BT::NodeStatus::SUCCESS;
+        // }
         if (is_success())
         {
             spdlog::debug("CARTESIANMOVE ALREADY SUCCEEDED");
-
+            on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
@@ -72,7 +72,7 @@ namespace Insertion
         if (is_success())
         {
             spdlog::debug("CARTESIANMOVE SUCCEEDED");
-
+            on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else

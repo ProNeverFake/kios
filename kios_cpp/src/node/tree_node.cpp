@@ -317,7 +317,7 @@ private:
 
             // * lock tree first
             std::lock_guard<std::mutex> lock_tree(tree_mtx_);
-            // * update tree phase in tree state
+            // * update tree phase in tree state for the need in BT
             tree_state_ptr_->tree_phase = tree_phase_;
             // * do tree cycle
             tree_cycle();
@@ -523,7 +523,7 @@ private:
         {
             // * tree is running. update action phase and check.
             // print check
-            RCLCPP_ERROR_STREAM(
+            RCLCPP_WARN_STREAM(
                 this->get_logger(),
                 "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
 
@@ -532,7 +532,7 @@ private:
             {
                 // pause to send request
                 switch_tree_phase("PAUSE");
-                // * update the tree_phase in BT.
+                // * update the tree_phase in BT. (TRY REMOVE THIS.)
                 tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))

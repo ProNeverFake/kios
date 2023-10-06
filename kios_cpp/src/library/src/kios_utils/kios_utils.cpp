@@ -125,6 +125,7 @@ namespace kios
 
     /**
      * @brief method to switch tree state.
+     * ! NOT USED YET.
      *
      * @param phase
      * @return true
@@ -132,6 +133,11 @@ namespace kios
      */
     bool switch_tree_phase(const std::string &phase, TreePhase &tree_phase)
     {
+        if (tree_phase == kios::TreePhase::ERROR || tree_phase == kios::TreePhase::FAILURE)
+        {
+            spdlog::warn("switch tree phase: An ERROR or a FAILURE phase is not handled. the current switch is skipped.");
+            return false;
+        }
         if (phase == "RESUME")
         {
             tree_phase = kios::TreePhase::RESUME;

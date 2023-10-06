@@ -17,7 +17,7 @@
 #include "behavior_tree/action_node/wiggle.hpp"
 
 // general action nodes
-#include "behavior_tree/action_node/cartesian_move.hpp"
+#include "behavior_tree/action_node/cartesian_move.h"
 #include "behavior_tree/action_node/joint_move.hpp"
 #include "behavior_tree/action_node/gripper_force.hpp"
 #include "behavior_tree/action_node/gripper_move.hpp"

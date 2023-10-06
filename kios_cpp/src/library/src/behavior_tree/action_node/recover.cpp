@@ -1,17 +1,17 @@
-#include "behavior_tree/action_node/cartesian_move.h"
+#include "behavior_tree/action_node/recover.hpp"
 
 namespace Insertion
 {
-    CartesianMove::CartesianMove(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+    Recover::Recover(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
         : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
     }
 
-    void CartesianMove::update_tree_state()
+    void Recover::update_tree_state()
     {
-        spdlog::trace("CartesianMove::update_tree_state()");
+        spdlog::trace("Recover::update_tree_state()");
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
 
@@ -21,29 +21,27 @@ namespace Insertion
         get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
-    void CartesianMove::node_context_initialize()
+    void Recover::node_context_initialize()
     {
-        spdlog::trace("CartesianMove::node_context_initialize()");
+        spdlog::trace("Recover::node_context_initialize()");
         // ! add
-        auto &obj_keys = get_obejct_keys_ref();
-        obj_keys.push_back("CartesianMove");
 
         auto &node_context = get_node_context_ref();
-        node_context.node_name = "CARTESIAN_MOVE";
-        node_context.action_name = "cartesian_move";
-        node_context.action_phase = kios::ActionPhase::CARTESIAN_MOVE;
+        node_context.node_name = "RECOVER";
+        node_context.action_name = "recover";
+        node_context.action_phase = kios::ActionPhase::RECOVER;
     }
 
-    bool CartesianMove::is_success()
+    bool Recover::is_success()
     {
-        spdlog::trace("CartesianMove::is_success()");
+        spdlog::trace("Recover::is_success()");
         // * THIS SKILL CONSUME SUCCESS FROM MIOS
         return consume_mios_success();
     }
 
-    BT::NodeStatus CartesianMove::onStart()
+    BT::NodeStatus Recover::onStart()
     {
-        spdlog::trace("CartesianMove::onStart()");
+        spdlog::trace("Recover::onStart()");
 
         // if (has_succeeded_once()) // ! should remove this!
         // {
@@ -53,13 +51,13 @@ namespace Insertion
         // }
         if (is_success())
         {
-            spdlog::debug("CARTESIANMOVE ALREADY SUCCEEDED");
+            spdlog::debug("RECOVER ALREADY SUCCEEDED");
             on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            spdlog::debug("CARTESIANMOVE GO RUNNING");
+            spdlog::debug("RECOVER GO RUNNING");
 
             update_tree_state();
             return BT::NodeStatus::RUNNING;
@@ -67,26 +65,26 @@ namespace Insertion
     }
 
     /// method invoked by an action in the RUNNING state.
-    BT::NodeStatus CartesianMove::onRunning()
+    BT::NodeStatus Recover::onRunning()
     {
         if (is_success())
         {
-            spdlog::debug("CARTESIANMOVE SUCCEEDED");
+            spdlog::debug("RECOVER SUCCEEDED");
             on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            spdlog::debug("CARTESIANMOVE RUNNING");
+            spdlog::debug("RECOVER RUNNING");
 
             update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }
 
-    void CartesianMove::onHalted()
+    void Recover::onHalted()
     {
-        spdlog::trace("CartesianMove::onHalted()");
+        spdlog::trace("Recover::onHalted()");
 
         // * interrupted behavior. do nothing.
     }

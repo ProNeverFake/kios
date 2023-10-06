@@ -73,6 +73,7 @@ namespace kios
         WIGGLE = 3,
 
         // * abstracted action phases from here
+        RECOVER = 10,
         CARTESIAN_MOVE = 11,
         JOINT_MOVE = 12,
         GRIPPER_FORCE = 13,

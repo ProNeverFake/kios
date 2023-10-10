@@ -3,7 +3,7 @@
 namespace Insertion
 {
     Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -33,8 +33,6 @@ namespace Insertion
         node_context.action_name = "wiggle";
 
         node_context.action_phase = kios::ActionPhase::WIGGLE;
-        node_context.parameter["skill"]["action_name"] = "wiggle";
-        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;
     }
 
     bool Wiggle::is_success()
@@ -47,11 +45,12 @@ namespace Insertion
     BT::NodeStatus Wiggle::onStart()
     {
         std::cout << "WIGGLE ON START" << std::endl;
-        if (has_succeeded_once())
-        {
-            std::cout << "WIGGLE HAS ONCE SUCCEEDED" << std::endl;
-            return BT::NodeStatus::SKIPPED;
-        }
+        // ! normal action
+        // if (has_succeeded_once())
+        // {
+        //     std::cout << "WIGGLE HAS ONCE SUCCEEDED" << std::endl;
+        //     return BT::NodeStatus::SKIPPED;
+        // }
         if (is_success())
         {
             std::cout << "WIGGLE ALREADY SUCCESS" << std::endl;

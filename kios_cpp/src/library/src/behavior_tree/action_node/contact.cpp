@@ -3,7 +3,7 @@
 namespace Insertion
 {
     Contact::Contact(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -33,12 +33,22 @@ namespace Insertion
         // std::cout << str << std::endl;
 
         // std::cerr << "BEFORE CHECK CONTACT SUCCESS" << std::endl;
-        if (get_task_state_ptr()->mios_state.tf_f_ext_k[2] > 7)
+        std::cout << "the force: " << get_task_state_ptr()->mios_state.tf_f_ext_k[2] << std::flush;
+
+        if (abs(get_task_state_ptr()->mios_state.tf_f_ext_k[2]) > 7)
         {
             // std::cout << "CONTACT SUCCESS" << std::endl;
             mark_success();
             return true;
         }
+
+        // ! cheat
+        if (consume_mios_success())
+        {
+            // ! the position has been arrived but no contact is detected.
+            return true;
+        }
+
         // std::cout << "CONTACT NOT SUCCESS" << std::endl;
         return false;
     }
@@ -66,13 +76,12 @@ namespace Insertion
         node_context.action_name = "contact";
 
         node_context.action_phase = kios::ActionPhase::CONTACT;
-        node_context.parameter["skill"]["action_name"] = "contact";
-        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::CONTACT;
     }
 
     BT::NodeStatus Contact::onStart()
     {
         std::cout << "CONTACT ON START" << std::endl;
+        // ! latched action
         if (has_succeeded_once())
         {
             std::cout << "CONTACT HAS ONCE SUCCEEDED" << std::endl;

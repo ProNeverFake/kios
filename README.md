@@ -265,6 +265,16 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 10.10.2023
+  1. All the necessary skills (mps) that are necessary for insertion are all loaded in kios now. Including:
+  - joint_move
+  - cartesian_move
+  - gripper_force
+  - gripper_move
+  - contact
+  - wiggle
+  **The need of a compact form for actions**
+
 - 02.10.2023
   1. The base class should be divided into different variances.
 

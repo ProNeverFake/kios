@@ -2,7 +2,7 @@
 
 namespace Insertion
 {
-    // ! please check the necessity of implementing this skill because mios will recover itself automatically
+    // ! we will see the necessity of implementing this skill later
     class Recover : public KiosActionNode
     {
     public:

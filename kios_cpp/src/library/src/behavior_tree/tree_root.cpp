@@ -92,10 +92,12 @@ namespace Insertion
         {
             try
             {
+                // ! the definition of the condition nodes? too many args
                 factory_.registerNodeType<HasObject>("HasObjectApproch", "approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
+
                 // * demo action nodes
                 factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);

@@ -69,8 +69,8 @@ namespace kios
         ERROR = -1,
         INITIALIZATION = 0,
         APPROACH = 1,
-        CONTACT = 2,
-        WIGGLE = 3,
+        // CONTACT = 2,
+        // WIGGLE = 3,
 
         // * abstracted action phases from here
         RECOVER = 10,
@@ -78,6 +78,8 @@ namespace kios
         JOINT_MOVE = 12,
         GRIPPER_FORCE = 13,
         GRIPPER_MOVE = 14,
+        CONTACT = 15,
+        WIGGLE = 16,
     };
 
     std::optional<std::string> action_phase_to_str(const ActionPhase &action_phase);
@@ -498,6 +500,7 @@ namespace kios
         std::string skill_type = "";
     };
 
+    // ! BBMOD
     struct DefaultActionContext
     {
         nlohmann::json default_context_ =
@@ -598,6 +601,57 @@ namespace kios
                                                 {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
                                                 {"F_ext_contact", {3.0, 2.0}},
                                             }}}},
+                {"contact", {{"skill", {
+                                           {"objects", {
+                                                           {"Contact", "contact"},
+                                                       }},
+                                           {"time_max", 30},
+                                           {"action_context", {
+                                                                  {"action_name", "BBContact"},
+                                                                  {"action_phase", ActionPhase::CONTACT},
+                                                              }},
+                                           {"BBContact", {
+                                                             {"dX_d", {0.03, 0.05}},
+                                                             {"ddX_d", {0.05, 0.05}},
+                                                             {"K_x", {500, 500, 500, 600, 600, 600}},
+                                                         }},
+                                       }},
+                             {"control", {
+                                             {"control_mode", 0},
+                                         }},
+                             {"user", {
+                                          {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                          {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                          {"F_ext_contact", {3.0, 2.0}},
+                                      }}}},
+                {"wiggle", {{"skill", {
+                                          {"objects", {
+                                                          {"Wiggle", "wiggle"},
+                                                      }},
+                                          {"time_max", 30},
+                                          {"action_context", {
+                                                                 {"action_name", "BBWiggle"},
+                                                                 {"action_phase", ActionPhase::WIGGLE},
+                                                             }},
+                                          {"BBWiggle", {
+                                                           {"search_a", {5, 5, 0, 2, 2, 0}},
+                                                           {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
+                                                           {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
+                                                           {"K_x", {500, 500, 500, 800, 800, 800}},
+                                                           {"f_push", {0, 0, 5, 0, 0, 0}},
+                                                           {"dX_d", {0.02, 0.05}},
+                                                           {"ddX_d", {0.05, 0.02}},
+                                                       }},
+                                      }},
+                            {"control", {
+                                            {"control_mode", 0},
+                                        }},
+                            {"user", {
+                                         {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                         {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                         {"F_ext_contact", {3.0, 2.0}},
+                                     }}}},
+
         };
 
         /**
@@ -627,6 +681,7 @@ namespace kios
         }
     };
 
+    // ! BBMOD
     // here inline because the redefine error
     inline std::string ap_to_mios_skill(const ActionPhase &ap)
     {
@@ -649,6 +704,16 @@ namespace kios
 
         case ActionPhase::GRIPPER_FORCE: {
             return "BBGripperForce";
+            break;
+        }
+
+        case ActionPhase::CONTACT: {
+            return "BBContact";
+            break;
+        }
+
+        case ActionPhase::WIGGLE: {
+            return "BBWiggle";
             break;
         }
 

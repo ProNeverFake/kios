@@ -80,6 +80,10 @@ namespace kios
         GRIPPER_MOVE = 14,
         CONTACT = 15,
         WIGGLE = 16,
+
+        TOOL_STANDBY = 17,
+        GRIPPER_RELEASE = 18,
+        TOOL_GRASP = 19,
     };
 
     std::optional<std::string> action_phase_to_str(const ActionPhase &action_phase);
@@ -601,6 +605,78 @@ namespace kios
                                                 {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
                                                 {"F_ext_contact", {3.0, 2.0}},
                                             }}}},
+                {"tool_standby", {{"skill", {
+                                                {"objects", {
+                                                                // {"GripperMove", "gripper_move"},
+                                                            }},
+                                                {"time_max", 30},
+                                                {"action_context", {
+                                                                       {"action_name", "BBGripperMove"},
+                                                                       {"action_phase", ActionPhase::TOOL_STANDBY},
+                                                                   }},
+                                                {"BBGripperMove", {
+                                                                      {"width", 0.015377},
+                                                                      {"speed", 1},
+                                                                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                  }},
+                                            }},
+                                  {"control", {
+                                                  {"control_mode", 0},
+                                              }},
+                                  {"user", {
+                                               {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                               {"F_ext_contact", {3.0, 2.0}},
+                                           }}}},
+
+                {"gripper_release", {{"skill", {
+                                                   {"objects", {
+                                                                   // {"GripperMove", "gripper_move"},
+                                                               }},
+                                                   {"time_max", 30},
+                                                   {"action_context", {
+                                                                          {"action_name", "BBGripperMove"},
+                                                                          {"action_phase", ActionPhase::GRIPPER_RELEASE},
+                                                                      }},
+                                                   {"BBGripperMove", {
+                                                                         {"width", 0.08},
+                                                                         {"speed", 1},
+                                                                         {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                     }},
+                                               }},
+                                     {"control", {
+                                                     {"control_mode", 0},
+                                                 }},
+                                     {"user", {
+                                                  {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                                  {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                                  {"F_ext_contact", {3.0, 2.0}},
+                                              }}}},
+
+                {"tool_grasp", {{"skill", {
+                                              {"objects", {
+                                                              // {"GripperMove", "gripper_move"},
+                                                          }},
+                                              {"time_max", 30},
+                                              {"action_context", {
+                                                                     {"action_name", "BBGripperMove"},
+                                                                     {"action_phase", ActionPhase::TOOL_GRASP},
+                                                                 }},
+                                              {"BBGripperMove", {
+                                                                    {"width", 0.015},
+                                                                    {"speed", 1},
+                                                                    {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                }},
+                                          }},
+                                {"control", {
+                                                {"control_mode", 0},
+                                            }},
+                                {"user", {
+                                             {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                             {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                             {"F_ext_contact", {3.0, 2.0}},
+                                         }}}},
+
                 {"contact", {{"skill", {
                                            {"objects", {
                                                            {"Contact", "contact"},

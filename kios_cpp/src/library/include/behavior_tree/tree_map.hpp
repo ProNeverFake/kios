@@ -105,19 +105,19 @@ namespace Insertion
     //     )";
 
     // ! here a mini task
-    // static const char *test_tree = R"(
-    //     <root BTCPP_format="4" >
-    //         <BehaviorTree ID="MainTree">
-    //             <Sequence name="root_sequence">
-    //                 <JointMove name="joint_move" action_id="1" description="test" objects="initial"/>
-    //                 <JointMove name="joint_move" action_id="2" description="test" objects="obj1"/>
-    //                 <GripperForce name="gripper_force" action_id="3" description="test"/>
-    //                 <CartesianMove name="cart_move" action_id="4" description="test" objects="obj2"/>
-    //                 <JointMove name="joint_move" action_id="5" description="test" objects="obj3"/>
-    //             </Sequence>
-    //         </BehaviorTree>
-    //     </root>
-    //     )";
+    static const char *test_tree = R"(
+        <root BTCPP_format="4" >
+            <BehaviorTree ID="MainTree">
+                <Sequence name="root_sequence">
+                    <JointMove name="joint_move" action_id="1" description="test" objects="initial"/>
+                    <JointMove name="joint_move" action_id="2" description="test" objects="obj1"/>
+                    <GripperForce name="gripper_force" action_id="3" description="test"/>
+                    <CartesianMove name="cart_move" action_id="4" description="test" objects="obj2"/>
+                    <JointMove name="joint_move" action_id="5" description="test" objects="obj3"/>
+                </Sequence>
+            </BehaviorTree>
+        </root>
+        )";
 
     // ! here contact test
     // static const char *test_tree = R"(
@@ -131,15 +131,15 @@ namespace Insertion
     //     )";
 
     // ! here wiggle test
-    static const char *test_tree = R"(
-        <root BTCPP_format="4" >
-            <BehaviorTree ID="MainTree">
-                <Sequence name="root_sequence">
-                    <Wiggle name="wiggle" action_id="11" description="test" objects="obj3"/>
-                </Sequence>
-            </BehaviorTree>
-        </root>
-        )";
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Wiggle name="wiggle" action_id="11" description="test" objects="obj3"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
 
     // static const char *test_tree = R"(
     //     <root BTCPP_format="4" >

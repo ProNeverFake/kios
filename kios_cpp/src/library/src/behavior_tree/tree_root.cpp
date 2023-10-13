@@ -108,6 +108,9 @@ namespace Insertion
                 factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<GripperForce>("GripperForce", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<GripperMove>("GripperMove", tree_state_ptr_, task_state_ptr_);
+
+                // * additional
+                factory_.registerNodeType<ToolLoad>("ToolLoad", tree_state_ptr_, task_state_ptr_);
             }
             catch (...)
             {

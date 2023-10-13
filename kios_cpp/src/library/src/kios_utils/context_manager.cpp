@@ -301,9 +301,10 @@ namespace kios
                 }
             }
         }
+
         catch (const std::exception &e)
         {
-            std::cerr << "THIS" << std::endl;
+            std::cerr << "THIS" << std::endl; // ! BBDEBUG
             std::cerr << e.what() << std::endl;
             return false;
         }

@@ -22,6 +22,9 @@
 #include "behavior_tree/action_node/gripper_force.hpp"
 #include "behavior_tree/action_node/gripper_move.hpp"
 
+// additional
+#include "behavior_tree/action_node/tool_load.hpp"
+
 #include "behavior_tree/condition_node/condition_node.hpp"
 
 // #include "kios_utils/context_manager.hpp"

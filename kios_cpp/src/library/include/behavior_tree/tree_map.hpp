@@ -105,15 +105,26 @@ namespace Insertion
     //     )";
 
     // ! here a mini task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <JointMove name="joint_move" action_id="1" description="test" objects="initial"/>
+    //                 <JointMove name="joint_move" action_id="2" description="test" objects="obj1"/>
+    //                 <GripperForce name="gripper_force" action_id="3" description="test"/>
+    //                 <CartesianMove name="cart_move" action_id="4" description="test" objects="obj2"/>
+    //                 <JointMove name="joint_move" action_id="5" description="test" objects="obj3"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool load task
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <JointMove name="joint_move" action_id="1" description="test" objects="initial"/>
-                    <JointMove name="joint_move" action_id="2" description="test" objects="obj1"/>
-                    <GripperForce name="gripper_force" action_id="3" description="test"/>
-                    <CartesianMove name="cart_move" action_id="4" description="test" objects="obj2"/>
-                    <JointMove name="joint_move" action_id="5" description="test" objects="obj3"/>
+                    <ToolLoad name="joint_move" action_id="20" description="test" objects="tool_load"/>
                 </Sequence>
             </BehaviorTree>
         </root>

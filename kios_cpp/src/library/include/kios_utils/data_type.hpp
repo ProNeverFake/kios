@@ -81,9 +81,11 @@ namespace kios
         CONTACT = 15,
         WIGGLE = 16,
 
-        TOOL_STANDBY = 17,
-        GRIPPER_RELEASE = 18,
-        TOOL_GRASP = 19,
+        TOOL_STANDBY = 17,    // ! not imp yet
+        GRIPPER_RELEASE = 18, // !
+        TOOL_GRASP = 19,      // !
+
+        TOOL_LOAD = 20,
     };
 
     std::optional<std::string> action_phase_to_str(const ActionPhase &action_phase);
@@ -605,7 +607,50 @@ namespace kios
                                                 {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
                                                 {"F_ext_contact", {3.0, 2.0}},
                                             }}}},
+                {"tool_load", {{"skill", {
+                                             {"objects", {
+                                                             {"ToolLoad", "tool_load"},
+                                                         }},
+                                             {"time_max", 30},
+                                             {"action_context", {
+                                                                    {"action_name", "BBToolLoad"},
+                                                                    {"action_phase", ActionPhase::TOOL_LOAD},
+                                                                }},
+                                             {"MoveAbove", {
+                                                               {"dX_d", {0.05, 0.05}},
+                                                               {"ddX_d", {0.05, 0.05}},
+                                                               {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                               {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                           }},
+                                             {"MoveIn", {
+                                                            {"dX_d", {0.05, 0.05}},
+                                                            {"ddX_d", {0.05, 0.05}},
+                                                            {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                            {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                        }},
+                                             {"GripperMove", {
+                                                                 {"width", 0.03907}, // * this is for load the tool box
+                                                                 {"speed", 1},
+                                                                 {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                             }},
+                                             {"Retreat", {
+                                                             {"dX_d", {0.05, 0.05}},
+                                                             {"ddX_d", {0.05, 0.05}},
+                                                             {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                             {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                         }},
+                                         }},
+                               {"control", {
+                                               {"control_mode", 0},
+                                           }},
+                               {"user", {
+                                            {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                            {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                            {"F_ext_contact", {3.0, 2.0}},
+                                        }}}},
+
                 {"tool_standby", {{"skill", {
+                                                // ! not imp yet
                                                 {"objects", {
                                                                 // {"GripperMove", "gripper_move"},
                                                             }},
@@ -630,6 +675,7 @@ namespace kios
                                            }}}},
 
                 {"gripper_release", {{"skill", {
+                                                   // ! not imp yet
                                                    {"objects", {
                                                                    // {"GripperMove", "gripper_move"},
                                                                }},
@@ -654,6 +700,7 @@ namespace kios
                                               }}}},
 
                 {"tool_grasp", {{"skill", {
+                                              // ! not imp yet
                                               {"objects", {
                                                               // {"GripperMove", "gripper_move"},
                                                           }},
@@ -790,6 +837,11 @@ namespace kios
 
         case ActionPhase::WIGGLE: {
             return "BBWiggle";
+            break;
+        }
+
+        case ActionPhase::TOOL_LOAD: {
+            return "BBToolLoad";
             break;
         }
 

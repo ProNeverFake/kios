@@ -22,8 +22,8 @@
 
   (:init
     ; timing
-    ; (Running)
-    (TimingOn)
+    (Running)
+    ; (TimingOn)
     (= (ConsumeTime productSP1) 0)
     (= (TIme) 0)
 
@@ -114,10 +114,10 @@
   )
 
   (:goal (and
-            (hasLocationRecovered insertion_station)
-            (hasLocationRecovered screwing_station)
+            ; (hasLocationRecovered insertion_station)
+            ; (hasLocationRecovered screwing_station)
             (isAssembled productSP1)
-            ; (isInspected productSP1)
+            (isInspected productSP1)
 
             (isProductatLocation productSP1 delivery_point) 
             (isRobotatLocation MiR600 delivery_point)
@@ -126,7 +126,7 @@
 
             (isProductProcessed bolt1 screwing_station)
 
-            (Accomplished)
+            ; (Accomplished)
          )
   )
 

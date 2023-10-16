@@ -120,11 +120,35 @@ namespace Insertion
     //     )";
 
     // ! here a tool load task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <ToolLoad name="joint_move" action_id="20" description="test" objects="tool1"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool unload task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <ToolUnload name="tool_unload" action_id="21" description="test" objects="tool1"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool load + unload task
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <ToolLoad name="joint_move" action_id="20" description="test" objects="tool_load"/>
+                    <ToolLoad name="joint_move" action_id="20" description="test" objects="tool1"/>
+                    <JointMove name="joint_move" action_id="22" description="test" objects="joint1"/>
+                    <ToolUnload name="tool_unload" action_id="21" description="test" objects="tool1"/>
                 </Sequence>
             </BehaviorTree>
         </root>

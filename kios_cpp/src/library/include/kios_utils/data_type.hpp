@@ -741,21 +741,7 @@ namespace kios
                 {"tool_release", {{"skill", {
                                                 // this is for testing the grasp with the tool box but can also be a primitive
                                                 {"objects", {
-                                                                {"ToolRelease", "tool_release
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                    "},
+                                                                {"ToolRelease", "tool_release"},
                                                             }},
                                                 {"time_max", 30},
                                                 {"action_context", {

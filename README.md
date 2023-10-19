@@ -265,11 +265,15 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 18.10.2023
+  - Add TOOL_GRASP skill.
+  **TOOL_RELEASE SKILL**
+  **USER STOP STATUS CHECK**
+
 - 16.10.2023
   - Add a behavior tree generator in python (kios_py).
   - Add tool change skills (TOOL_LOAD, TOOL_UNLOAD).
   **The need of grasp when grasping the objects with the tool box.**
-  **USER STOP FAILURE.**
 
 - 10.10.2023
   1. All the necessary skills (mps) that are necessary for insertion are all loaded in kios now. Including:

@@ -83,10 +83,12 @@ namespace kios
 
         TOOL_STANDBY = 17,    // ! not imp yet
         GRIPPER_RELEASE = 18, // !
-        TOOL_GRASP = 19,      // !
+        // TOOL_GRASP = 19,      // !
 
         TOOL_LOAD = 20,
         TOOL_UNLOAD = 21,
+        TOOL_GRASP = 22,
+        TOOL_RELEASE = 23,
     };
 
     std::optional<std::string> action_phase_to_str(const ActionPhase &action_phase);
@@ -691,7 +693,110 @@ namespace kios
                                               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
                                               {"F_ext_contact", {3.0, 2.0}},
                                           }}}},
-
+                {"tool_grasp", {{"skill", {
+                                              // this is for testing the grasp with the tool box but can also be a primitive
+                                              {"objects", {
+                                                              {"ToolGrasp", "tool_grasp"},
+                                                          }},
+                                              {"time_max", 30},
+                                              {"action_context", {
+                                                                     {"action_name", "BBToolGrasp"},
+                                                                     {"action_phase", ActionPhase::TOOL_GRASP},
+                                                                 }},
+                                              {"MoveAbove", {
+                                                                {"dX_d", {0.2, 0.2}},
+                                                                {"ddX_d", {0.2, 0.2}},
+                                                                {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                                {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                            }},
+                                              {"MoveIn", {
+                                                             {"dX_d", {0.2, 0.2}},
+                                                             {"ddX_d", {0.1, 0.1}},
+                                                             {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                             {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                         }},
+                                              {"GripperForce", {
+                                                                   {"width", 0.026},
+                                                                   {"speed", 1},
+                                                                   {"force", 80},
+                                                                   {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                   {"eps_in", 0.01},   // 0.016
+                                                                   {"eps_out", 0.012}, // 0.038
+                                                               }},
+                                              {"Retreat", {
+                                                              {"dX_d", {0.2, 0.2}},
+                                                              {"ddX_d", {0.1, 0.1}},
+                                                              {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                              {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                          }},
+                                          }},
+                                {"control", {
+                                                {"control_mode", 0},
+                                            }},
+                                {"user", {
+                                             {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                             {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                             {"F_ext_contact", {3.0, 2.0}},
+                                         }}}},
+                {"tool_release", {{"skill", {
+                                                // this is for testing the grasp with the tool box but can also be a primitive
+                                                {"objects", {
+                                                                {"ToolRelease", "tool_release
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                    "},
+                                                            }},
+                                                {"time_max", 30},
+                                                {"action_context", {
+                                                                       {"action_name", "BBToolGrasp"},
+                                                                       {"action_phase", ActionPhase::TOOL_GRASP},
+                                                                   }},
+                                                {"MoveAbove", {
+                                                                  {"dX_d", {0.2, 0.2}},
+                                                                  {"ddX_d", {0.2, 0.2}},
+                                                                  {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                                  {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                              }},
+                                                {"MoveIn", {
+                                                               {"dX_d", {0.2, 0.2}},
+                                                               {"ddX_d", {0.1, 0.1}},
+                                                               {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                               {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                           }},
+                                                {"GripperForce", {
+                                                                     {"width", 0.026},
+                                                                     {"speed", 1},
+                                                                     {"force", 80},
+                                                                     {"K_x", {1500, 1500, 1500, 100, 100, 100}},
+                                                                     {"eps_in", 0.01},   // 0.016
+                                                                     {"eps_out", 0.012}, // 0.038
+                                                                 }},
+                                                {"Retreat", {
+                                                                {"dX_d", {0.2, 0.2}},
+                                                                {"ddX_d", {0.1, 0.1}},
+                                                                {"DeltaX", {0, 0, 0, 0, 0, 0}},
+                                                                {"K_x", {1500, 1500, 1500, 600, 600, 600}},
+                                                            }},
+                                            }},
+                                  {"control", {
+                                                  {"control_mode", 0},
+                                              }},
+                                  {"user", {
+                                               {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
+                                               {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
+                                               {"F_ext_contact", {3.0, 2.0}},
+                                           }}}},
                 {"tool_standby", {{"skill", {
                                                 // ! not imp yet
                                                 {"objects", {
@@ -890,6 +995,11 @@ namespace kios
 
         case ActionPhase::TOOL_UNLOAD: {
             return "BBToolLoad";
+            break;
+        }
+
+        case ActionPhase::TOOL_GRASP: {
+            return "BBToolGrasp";
             break;
         }
 

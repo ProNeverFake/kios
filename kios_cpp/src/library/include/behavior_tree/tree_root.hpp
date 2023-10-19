@@ -25,6 +25,7 @@
 // additional
 #include "behavior_tree/action_node/tool_load.hpp"
 #include "behavior_tree/action_node/tool_unload.hpp"
+#include "behavior_tree/action_node/tool_grasp.hpp"
 // ! BBMOD
 
 #include "behavior_tree/condition_node/condition_node.hpp"

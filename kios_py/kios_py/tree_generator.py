@@ -10,7 +10,7 @@ class BehaviorTreeFactory:
 
     def add_node(self, node_type, name, **attributes):
         if node_type == "SubTree":
-            subtree_id = attributes.get('ID')
+            subtree_id = attributes.get('ID') 
             if subtree_id in self.subtrees:
                 subtree_copy = self._deepcopy(self.subtrees[subtree_id])
                 self.current_parent.append(subtree_copy)

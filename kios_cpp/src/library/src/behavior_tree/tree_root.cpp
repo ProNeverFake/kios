@@ -112,6 +112,7 @@ namespace Insertion
                 // * additional
                 factory_.registerNodeType<ToolLoad>("ToolLoad", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<ToolUnload>("ToolUnload", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolGrasp>("ToolGrasp", tree_state_ptr_, task_state_ptr_);
                 // ! BBMOD
             }
             catch (...)

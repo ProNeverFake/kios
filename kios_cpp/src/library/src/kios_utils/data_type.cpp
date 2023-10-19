@@ -16,6 +16,7 @@ namespace kios
             {ActionPhase::GRIPPER_MOVE, "gripper_move"},
             {ActionPhase::TOOL_LOAD, "tool_load"},
             {ActionPhase::TOOL_UNLOAD, "tool_unload"},
+            {ActionPhase::TOOL_GRASP, "tool_grasp"},
         };
 
         auto it = action_phase_to_str_map.find(action_phase);
@@ -43,6 +44,7 @@ namespace kios
             {"gripper_move", ActionPhase::GRIPPER_MOVE},
             {"tool_load", ActionPhase::TOOL_LOAD},
             {"tool_unload", ActionPhase::TOOL_UNLOAD},
+            {"tool_grasp", ActionPhase::TOOL_GRASP},
         };
 
         auto it = str_to_action_phase.find(str);

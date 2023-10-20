@@ -113,6 +113,15 @@ namespace Insertion
                 factory_.registerNodeType<ToolLoad>("ToolLoad", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<ToolUnload>("ToolUnload", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<ToolGrasp>("ToolGrasp", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolRelease>("ToolRelease", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperGrasp>("GripperGrasp", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperRelease>("GripperRelease", tree_state_ptr_, task_state_ptr_);
+
+                // * compound
+                factory_.registerNodeType<ToolPick>("ToolPick", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolPlace>("ToolPlace", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperPick>("GripperPick", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperPlace>("GripperPlace", tree_state_ptr_, task_state_ptr_);
                 // ! BBMOD
             }
             catch (...)

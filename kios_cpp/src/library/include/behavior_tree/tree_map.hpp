@@ -154,16 +154,33 @@ namespace Insertion
     //     </root>
     //     )";
 
-    // ! here tool grasp test
+    // ! here test tool load + tool grasp + tool place + tool unload
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <ToolGrasp name="tool_grasp" action_id="23" description="test" objects="tool_grasp"/>
+                    <ToolLoad name="joint_move" action_id="1" description="test" objects="tool1"/>
+                    <ToolPick name="tool_pick" action_id="2" description="test" objects="tool_pick_test"/>
+                    <ToolPlace name="tool_place" action_id="3" description="test" objects="tool_place_test"/>
+                    <ToolUnload name="tool_unload" action_id="4" description="test" objects="tool1"/>
                 </Sequence>
             </BehaviorTree>
         </root>
         )";
+
+    // ! here grasp and release test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <GripperRelease name="gripper_release" action_id="1" description="test"/>
+    //                 <GripperGrasp name="gripper_grasp" action_id="2" description="test"/>
+    //                 <JointMove name="joint_move" action_id="3" description="test" objects="gripper_test"/>
+    //                 <GripperRelease name="gripper_release" action_id="4" description="test"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
 
     // ! here contact test
     // static const char *test_tree = R"(

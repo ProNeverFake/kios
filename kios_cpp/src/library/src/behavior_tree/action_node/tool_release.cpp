@@ -1,17 +1,17 @@
-#include "behavior_tree/action_node/tool_grasp.hpp"
+#include "behavior_tree/action_node/tool_release.hpp"
 
 namespace Insertion
 {
-    ToolGrasp::ToolGrasp(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
+    ToolRelease::ToolRelease(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
         : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
     }
 
-    void ToolGrasp::update_tree_state()
+    void ToolRelease::update_tree_state()
     {
-        spdlog::trace("ToolGrasp::update_tree_state()");
+        spdlog::trace("ToolRelease::update_tree_state()");
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
 
@@ -21,36 +21,36 @@ namespace Insertion
         get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
-    void ToolGrasp::node_context_initialize()
+    void ToolRelease::node_context_initialize()
     {
-        spdlog::trace("ToolGrasp::node_context_initialize()");
+        spdlog::trace("ToolRelease::node_context_initialize()");
 
         auto &node_context = get_node_context_ref();
-        node_context.node_name = "Tool_Grasp";
-        node_context.action_name = "tool_grasp";
-        node_context.action_phase = kios::ActionPhase::TOOL_GRASP;
+        node_context.node_name = "ToolRelease";
+        node_context.action_name = "toolrelease";
+        node_context.action_phase = kios::ActionPhase::TOOL_RELEASE;
     }
 
-    bool ToolGrasp::is_success()
+    bool ToolRelease::is_success()
     {
-        spdlog::trace("ToolGrasp::is_success()");
+        spdlog::trace("ToolRelease::is_success()");
         // * THIS SKILL CONSUME SUCCESS FROM MIOS
         return consume_mios_success();
     }
 
-    BT::NodeStatus ToolGrasp::onStart()
+    BT::NodeStatus ToolRelease::onStart()
     {
-        spdlog::trace("ToolGrasp::onStart()");
+        spdlog::trace("ToolRelease::onStart()");
 
         if (is_success())
         {
-            spdlog::debug("TOOLGRASP ALREADY SUCCEEDED");
+            spdlog::debug("TOOLRELEASE ALREADY SUCCEEDED");
             on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            spdlog::debug("TOOLGRASP GO RUNNING");
+            spdlog::debug("TOOLRELEASE GO RUNNING");
 
             update_tree_state();
             return BT::NodeStatus::RUNNING;
@@ -58,26 +58,26 @@ namespace Insertion
     }
 
     /// method invoked by an action in the RUNNING state.
-    BT::NodeStatus ToolGrasp::onRunning()
+    BT::NodeStatus ToolRelease::onRunning()
     {
         if (is_success())
         {
-            spdlog::debug("TOOLGRASP SUCCEEDED");
+            spdlog::debug("TOOLRELEASE SUCCEEDED");
             on_success();
             return BT::NodeStatus::SUCCESS;
         }
         else
         {
-            spdlog::debug("TOOLGRASP RUNNING");
+            spdlog::debug("TOOLRELEASE RUNNING");
 
             update_tree_state();
             return BT::NodeStatus::RUNNING;
         }
     }
 
-    void ToolGrasp::onHalted()
+    void ToolRelease::onHalted()
     {
-        spdlog::trace("ToolGrasp::onHalted()");
+        spdlog::trace("ToolRelease::onHalted()");
 
         // * interrupted behavior. do nothing.
     }

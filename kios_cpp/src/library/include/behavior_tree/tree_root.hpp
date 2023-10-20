@@ -26,6 +26,16 @@
 #include "behavior_tree/action_node/tool_load.hpp"
 #include "behavior_tree/action_node/tool_unload.hpp"
 #include "behavior_tree/action_node/tool_grasp.hpp"
+#include "behavior_tree/action_node/tool_release.hpp"
+#include "behavior_tree/action_node/gripper_grasp.hpp"
+#include "behavior_tree/action_node/gripper_release.hpp"
+
+// compound in mios level
+#include "behavior_tree/compound_action_node/tool_pick.hpp"
+#include "behavior_tree/compound_action_node/tool_place.hpp"
+#include "behavior_tree/compound_action_node/gripper_pick.hpp"
+#include "behavior_tree/compound_action_node/gripper_place.hpp"
+
 // ! BBMOD
 
 #include "behavior_tree/condition_node/condition_node.hpp"

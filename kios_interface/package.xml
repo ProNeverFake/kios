@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kios_interface</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="jicong_ao@163.com">blackbird</maintainer>
-  <license>TODO: License declaration</license>
+  <version>1.0.0</version>
+  <description>The Ros2 Interfaces for KIOS</description>
+  <maintainer email="jicong.ao@tum.de">blackbird</maintainer>
+  <license>BBLAB</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <test_depend>ament_lint_auto</test_depend>

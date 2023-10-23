@@ -3,7 +3,7 @@
 namespace Insertion
 
 {
-    class JointMove : public HyperMetaNode<BT::StatefulActionNode>
+    class JointMove : public KiosActionNode
     {
     public:
         JointMove(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);

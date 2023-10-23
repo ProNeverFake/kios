@@ -3,7 +3,7 @@
 namespace Insertion
 {
     Wiggle::Wiggle(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-        : HyperMetaNode<BT::StatefulActionNode>(name, config, tree_state_ptr, task_state_ptr)
+        : KiosActionNode(name, config, tree_state_ptr, task_state_ptr)
     {
         // initialize local context
         node_context_initialize();
@@ -14,17 +14,25 @@ namespace Insertion
         std::cout << "WIGGLE UPDATE TREE STATE" << std::endl;
         get_tree_state_ptr()->action_name = get_node_context_ref().action_name;
         get_tree_state_ptr()->action_phase = get_node_context_ref().action_phase;
+
+        get_tree_state_ptr()->object_keys = get_obejct_keys_ref();
+        get_tree_state_ptr()->object_names = get_object_names_ref();
+        // ! add archive
+        get_tree_state_ptr()->node_archive = get_archive_ref();
     }
 
     void Wiggle::node_context_initialize()
     {
         std::cout << "WIGGLE INITIALIZE" << std::endl;
+
+        auto &obj_keys = get_obejct_keys_ref();
+        obj_keys.push_back("Wiggle");
+
         auto &node_context = get_node_context_ref();
         node_context.node_name = "WIGGLE";
         node_context.action_name = "wiggle";
+
         node_context.action_phase = kios::ActionPhase::WIGGLE;
-        node_context.parameter["skill"]["action_name"] = "wiggle";
-        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::WIGGLE;
     }
 
     bool Wiggle::is_success()
@@ -37,11 +45,12 @@ namespace Insertion
     BT::NodeStatus Wiggle::onStart()
     {
         std::cout << "WIGGLE ON START" << std::endl;
-        if (has_succeeded_once())
-        {
-            std::cout << "WIGGLE HAS ONCE SUCCEEDED" << std::endl;
-            return BT::NodeStatus::SKIPPED;
-        }
+        // ! normal action
+        // if (has_succeeded_once())
+        // {
+        //     std::cout << "WIGGLE HAS ONCE SUCCEEDED" << std::endl;
+        //     return BT::NodeStatus::SKIPPED;
+        // }
         if (is_success())
         {
             std::cout << "WIGGLE ALREADY SUCCESS" << std::endl;

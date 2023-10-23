@@ -30,6 +30,10 @@ public:
         : Node("messenger")
 
     {
+        // * set ros2 logger severity level
+        auto logger = this->get_logger();
+        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
+
         this->declare_parameter("power", true);
 
         timer_callback_group_ = this->create_callback_group(
@@ -93,9 +97,7 @@ private:
     {
         if (check_power() == true)
         {
-            RCLCPP_INFO(this->get_logger(), "MIOS SUB hit.");
-            // task_state_msg_.tf_f_ext_k = std::move(msg->tf_f_ext_k);
-            // task_state_msg_.t_t_ee = std::move(msg->t_t_ee);
+            RCLCPP_DEBUG(this->get_logger(), "MIOS SUB hit.");
             task_state_msg_.mios_state = std::move(*msg);
         }
         else
@@ -108,7 +110,6 @@ private:
         if (check_power() == true)
         {
             RCLCPP_INFO(this->get_logger(), "SENSOR SUB hit.");
-            // task_state_msg_.test_data = std::move(msg->test_data);
             task_state_msg_.sensor_state = std::move(*msg);
         }
         else

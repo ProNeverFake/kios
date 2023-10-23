@@ -50,21 +50,186 @@ namespace Insertion
     //     </root>
     //     )";
 
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Approach name="approach"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here cartesian move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <CartesianMove name="cartesian_move" action_id="1" description="test" objects="housing"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here gripper move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <GripperMove name="gripper_move" action_id="2" description="test"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here joint move test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <JointMove name="joint_move" action_id="3" description="test" objects="housing"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here gripper force test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <GripperForce name="gripper_force" action_id="4" description="test"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a mini task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <JointMove name="joint_move" action_id="1" description="test" objects="initial"/>
+    //                 <JointMove name="joint_move" action_id="2" description="test" objects="obj1"/>
+    //                 <GripperForce name="gripper_force" action_id="3" description="test"/>
+    //                 <CartesianMove name="cart_move" action_id="4" description="test" objects="obj2"/>
+    //                 <JointMove name="joint_move" action_id="5" description="test" objects="obj3"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool load task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <ToolLoad name="joint_move" action_id="20" description="test" objects="tool1"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool unload task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <ToolUnload name="tool_unload" action_id="21" description="test" objects="tool1"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here a tool load + unload task
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <ToolLoad name="joint_move" action_id="20" description="test" objects="tool1"/>
+    //                 <JointMove name="joint_move" action_id="22" description="test" objects="joint1"/>
+    //                 <ToolUnload name="tool_unload" action_id="21" description="test" objects="tool1"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here test tool load + tool grasp + tool place + tool unload
     static const char *test_tree = R"(
         <root BTCPP_format="4" >
             <BehaviorTree ID="MainTree">
                 <Sequence name="root_sequence">
-                    <Fallback name="approach_fallback">
-                        <AtPositionApproch name="at_position_approach"/>
-                        <Approach name="approach"/>
-                    </Fallback>
-                    <Sequence name="approach_sequence">
-                        <HasObjectContact name="has_object_contact"/>
-                        <Contact name="contact"/>
-                    </Sequence>
-                    <Wiggle name="wiggle"/>
+                    <ToolLoad name="joint_move" action_id="1" description="test" objects="tool1"/>
+                    <ToolPick name="tool_pick" action_id="2" description="test" objects="tool_pick_test"/>
+                    <ToolPlace name="tool_place" action_id="3" description="test" objects="tool_place_test"/>
+                    <ToolUnload name="tool_unload" action_id="4" description="test" objects="tool1"/>
                 </Sequence>
             </BehaviorTree>
         </root>
         )";
+
+    // ! here grasp and release test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <GripperRelease name="gripper_release" action_id="1" description="test"/>
+    //                 <GripperGrasp name="gripper_grasp" action_id="2" description="test"/>
+    //                 <JointMove name="joint_move" action_id="3" description="test" objects="gripper_test"/>
+    //                 <GripperRelease name="gripper_release" action_id="4" description="test"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+    
+    // ! here contact test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Contact name="contact" action_id="10" description="test" objects="obj3"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // ! here wiggle test
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Wiggle name="wiggle" action_id="11" description="test" objects="obj3"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <CartesianMove name="cartesian_move" action_id="1" description="cartesian_move"/>
+    //                 <CartesianMove name="cartesian_move2" action_id="2" objects="something"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
+
+    // static const char *test_tree = R"(
+    //     <root BTCPP_format="4" >
+    //         <BehaviorTree ID="MainTree">
+    //             <Sequence name="root_sequence">
+    //                 <Fallback name="approach_fallback">
+    //                     <AtPositionApproch name="at_position_approach"/>
+    //                     <Approach name="approach"/>
+    //                 </Fallback>
+    //                 <Sequence name="approach_sequence">
+    //                     <HasObjectContact name="has_object_contact"/>
+    //                     <Contact name="contact"/>
+    //                 </Sequence>
+    //                 <Wiggle name="wiggle"/>
+    //             </Sequence>
+    //         </BehaviorTree>
+    //     </root>
+    //     )";
 } // namespace Insertion

@@ -20,6 +20,7 @@
 #include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/switch_tree_phase_request.hpp"
 #include "kios_interface/srv/get_object_request.hpp"
+#include "kios_interface/srv/archive_action_request.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -33,16 +34,15 @@ public:
           task_state_ptr_(std::make_shared<kios::TaskState>()),
           isActionSuccess_(false),
           hasUpdatedObjects_(false),
-          object_list_()
+          hasLoadedArchive_(false),
+          node_archive_list_()
     {
-        // initialize object list
-        object_list_.push_back("contact");
-        object_list_.push_back("approach");
+        // // * set ros2 logger severity level
+        auto logger = this->get_logger();
+        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
 
         //* declare mission parameter
-        // this->declare_parameter("is_mission_success", false);
         this->declare_parameter("power", true);
-        this->declare_parameter("client_power", true);
 
         //* initialize the callback groups
         timer_callback_group_ = this->create_callback_group(
@@ -55,8 +55,8 @@ public:
         // * initialize the tree_root
         m_tree_root = std::make_shared<Insertion::TreeRoot>(tree_state_ptr_, task_state_ptr_);
 
-        // ! for TEST initialize the tree
-        m_tree_root->initialize_tree();
+        // ! for TEST initialize the tree with test_tree
+        tree_initialize(); // bool return is not handled.
 
         // * Set qos and options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
@@ -69,6 +69,11 @@ public:
             qos,
             std::bind(&TreeNode::subscription_callback, this, _1),
             subscription_options);
+
+        archive_action_client_ = this->create_client<kios_interface::srv::ArchiveActionRequest>(
+            "archive_action_service",
+            rmw_qos_profile_services_default,
+            client_callback_group_);
 
         get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
             "get_object_service",
@@ -99,6 +104,7 @@ public:
 
     bool check_power()
     {
+        // lack the check of the parameter existence
         return this->get_parameter("power").as_bool();
     }
 
@@ -108,15 +114,18 @@ public:
         this->set_parameters(all_new_parameters);
         if (turn_on)
         {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn on.");
+            RCLCPP_WARN(this->get_logger(), "switch_power: turn on.");
         }
         else
         {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn off.");
+            RCLCPP_WARN(this->get_logger(), "switch_power: turn off.");
         }
     }
 
 private:
+    std::vector<kios_interface::msg::NodeArchive> node_archive_list_;
+    bool hasLoadedArchive_;
+
     // flag
     bool isActionSuccess_;
     bool hasUpdatedObjects_;
@@ -133,7 +142,7 @@ private:
     std::shared_ptr<kios::TreeState> tree_state_ptr_;
     std::shared_ptr<kios::TaskState> task_state_ptr_;
 
-    // object list
+    // ! DISCARDED
     std::vector<std::string> object_list_; // reserved for the future. maybe use this for object check to judge if a task is possible.
 
     // object dictionary
@@ -147,12 +156,37 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
     rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
+    rclcpp::Client<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
+
+    bool tree_initialize()
+    {
+        // generate the tree in tree root
+        if (!m_tree_root->initialize_tree())
+        {
+            return false;
+        }
+        // load the archives of the tree's action nodes into nodearchivelist
+        node_archive_list_.clear();
+        auto archive_list = m_tree_root->archive_nodes();
+        if (archive_list.has_value())
+        {
+            for (auto &archive : archive_list.value())
+            {
+                node_archive_list_.push_back(archive.to_ros2_msg());
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @brief update the task_state. here the lock priority is lower than timer.
@@ -178,7 +212,6 @@ private:
 
     /**
      * @brief handle the switch tree phase request.
-     * ! TODO TEST
      * @param request
      * @param response
      */
@@ -248,7 +281,29 @@ private:
                 //////////////////////////////////////
             }
 
-            // * get mios skill execution state
+            // * ask tactician to load the actions' parameters according to the archives.
+            if (hasLoadedArchive_ == false)
+            {
+                // !! BB: THE CORRECT ORDER SHOULD BE FETCH THE OBJECT, GENERATE THE TREE, THEN CHECK THE OBJECTS WHEN GENERATING THE TREE.
+                // ! NOW JUST CHECK THE OBJECT HERE.
+                if (!m_tree_root->check_grounded_objects())
+                {
+                    switch_tree_phase("ERROR");
+                }
+                // !!
+
+                RCLCPP_INFO_STREAM(this->get_logger(), "Now ask the tactician to Load the archives...");
+                if (load_node_archive(1000, 1000) == false)
+                {
+                    switch_tree_phase("ERROR");
+                }
+                else
+                {
+                    hasLoadedArchive_ = true;
+                }
+            }
+
+            // * get mios skill execution state (only if there is a msg in the msg queue of udp receiver)
             std::string message;
             if (udp_socket_->get_message(message) == true)
             {
@@ -262,14 +317,14 @@ private:
 
             // * lock tree first
             std::lock_guard<std::mutex> lock_tree(tree_mtx_);
-            // * update tree phase in tree state
+            // * update tree phase in tree state for the need in BT
             tree_state_ptr_->tree_phase = tree_phase_;
             // * do tree cycle
             tree_cycle();
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS...");
+            // RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS...");
         }
     }
 
@@ -281,7 +336,6 @@ private:
      */
     bool is_tree_running()
     {
-        // ! CHANGE
         // * check tree state first for detect possibly invoked error in tree node.
         if (tree_state_ptr_->tree_phase == kios::TreePhase::ERROR)
         {
@@ -324,7 +378,7 @@ private:
     }
 
     /**
-     * @brief method to switch tree state.
+     * @brief method to switch tree state. DO NOTHING WHEN THE OLD PHASE IS ERROR OR FAILURE
      *
      * @param phase
      * @return true
@@ -333,6 +387,14 @@ private:
     // ! test the one in kios_utils
     bool switch_tree_phase(const std::string &phase)
     {
+        RCLCPP_WARN_STREAM(this->get_logger(), "Try to swtich tree phase to " + phase);
+
+        if (tree_phase_ == kios::TreePhase::ERROR || tree_phase_ == kios::TreePhase::FAILURE)
+        {
+            RCLCPP_WARN(this->get_logger(), "When switching tree phase: An ERROR or a FAILURE phase is not handled. the current switch is skipped.");
+            return false;
+        }
+
         if (phase == "RESUME")
         {
             tree_phase_ = kios::TreePhase::RESUME;
@@ -381,7 +443,7 @@ private:
         switch (tree_phase_)
         {
         case kios::TreePhase::PAUSE: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: PAUSE.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: PAUSE.");
             // * tree is waiting for resume signal from mios. reset action success flag. skip tree tick.
             isActionSuccess_ = false;
             break;
@@ -393,7 +455,7 @@ private:
             break;
         }
         case kios::TreePhase::SUCCESS: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: SUCCESS!");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: SUCCESS!");
             // * execute the tree with mios success flag.
             isActionSuccess_ = true;
             execute_tree();
@@ -460,19 +522,17 @@ private:
         if (is_tree_running())
         {
             // * tree is running. update action phase and check.
-
-            RCLCPP_ERROR_STREAM(
+            // print check
+            RCLCPP_WARN_STREAM(
                 this->get_logger(),
                 "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
 
-            if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
+            // ! change
+            if (check_action_switch())
             {
-                // * action switch
-                RCLCPP_INFO(this->get_logger(), "execute_tree: AP switch hit.");
-                // update the last action phase
-                tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
-                tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+                // pause to send request
                 switch_tree_phase("PAUSE");
+                // * update the tree_phase in BT. (TRY REMOVE THIS.)
                 tree_state_ptr_->tree_phase = tree_phase_;
                 // * call service
                 if (!send_switch_action_request(1000, 1000))
@@ -480,11 +540,55 @@ private:
                     switch_tree_phase("ERROR");
                 }
             }
+            else
+            {
+            }
         }
         else
         {
             // tree phase switch is already handled in is_tree_running(). here pass...
         }
+    }
+
+    /**
+     * @brief check if an action switch should be done.
+     *
+     * @return true
+     * @return false
+     */
+    bool check_action_switch()
+    {
+        // for the situation that the next action node's AP is the same as the last one:
+        if (tree_state_ptr_->isSucceeded)
+        {
+            RCLCPP_INFO_STREAM(this->get_logger(), "check_action_swtich: consume isSucceeded.");
+
+            // consume this flag
+            tree_state_ptr_->isSucceeded = false;
+
+            // * action switch
+            RCLCPP_INFO_STREAM(this->get_logger(), "execute_tree: " + tree_state_ptr_->last_action_name + " succeeds. Swtich to " + tree_state_ptr_->action_name);
+            // update the last action properties
+            tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
+            tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+            tree_state_ptr_->last_node_archive = tree_state_ptr_->node_archive;
+
+            return true;
+        }
+        // for the situation that they are different.
+        if (tree_state_ptr_->action_phase != tree_state_ptr_->last_action_phase)
+        {
+            // * action switch
+            RCLCPP_INFO_STREAM(this->get_logger(), "execute_tree: Swtich normally to " + tree_state_ptr_->action_name);
+
+            // update the last action properties
+            tree_state_ptr_->last_action_name = tree_state_ptr_->action_name;
+            tree_state_ptr_->last_action_phase = tree_state_ptr_->action_phase;
+            tree_state_ptr_->last_node_archive = tree_state_ptr_->node_archive;
+
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -500,7 +604,15 @@ private:
         request->action_name = tree_state_ptr_->action_name;
         request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
         request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
-        request->is_interrupted = true; // ! temp
+
+        // ! add node_archive
+        request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
+
+        request->object_keys = tree_state_ptr_->object_keys;
+        request->object_names = tree_state_ptr_->object_names;
+
+        request->is_interrupted = true; // ! not used yet
+
         while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             RCLCPP_ERROR(this->get_logger(), "service %s not available.", switch_action_client_->get_service_name());
@@ -539,8 +651,6 @@ private:
     {
         // * send request to update the object
         auto request = std::make_shared<kios_interface::srv::GetObjectRequest::Request>();
-        // now the object_list is not in use.
-        request->object_list = object_list_;
         while (!get_object_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
         {
             if (!rclcpp::ok())
@@ -586,6 +696,57 @@ private:
             else
             {
                 RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
+                return false;
+            }
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call timed out!");
+            return false;
+        }
+    }
+
+    /**
+     * @brief send a request to tactician for archiving the nodes in the current BT.
+     *
+     * @param ready_deadline
+     * @param response_deadline
+     * @return true
+     * @return false
+     */
+    bool load_node_archive(int ready_deadline = 100, int response_deadline = 1000)
+    {
+        auto service_name = archive_action_client_->get_service_name();
+        // * send request to update the object
+        auto request = std::make_shared<kios_interface::srv::ArchiveActionRequest::Request>();
+        // update the archive node list
+        request->archive_list = node_archive_list_;
+        while (!archive_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
+        {
+            if (!rclcpp::ok())
+            {
+                RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+                switch_power(false);
+                return false;
+            }
+            RCLCPP_ERROR_STREAM(this->get_logger(), "service " << service_name << "is timeout for getting ready!");
+            switch_power(false);
+            return false;
+        }
+        auto result_future = archive_action_client_->async_send_request(request);
+        std::future_status status = result_future.wait_until(
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
+        if (status == std::future_status::ready)
+        {
+            auto result = result_future.get();
+            if (result->is_accepted == true)
+            {
+                RCLCPP_INFO_STREAM(this->get_logger(), "Service " << service_name << ": Service call succeeded.");
+                return true;
+            }
+            else
+            {
+                RCLCPP_ERROR_STREAM(this->get_logger(), "Service " << service_name << ": Service call failed! Error message: " << result->error_message);
                 return false;
             }
         }

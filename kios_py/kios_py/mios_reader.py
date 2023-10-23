@@ -4,6 +4,9 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 from rclpy.qos import qos_profile_sensor_data
 
+from rclpy import logging
+
+
 import asyncio
 import websockets
 import socket
@@ -20,17 +23,38 @@ from kios_interface.msg import MiosState
 
 
 class MiosReader(Node):
-
-    udp_subscriber = ''
+    udp_subscriber = ""
     # robot state variable dictionary.
-    mios_state_default = {"TF_F_ext_K" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-                          "T_T_EE" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
+    mios_state_default = {
+        "TF_F_ext_K": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+        "T_T_EE": [
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+            0.1,
+        ],
+    }
 
     def __init__(self):
-        super().__init__('mios_reader')
+        super().__init__("mios_reader")
+
+        # set logger severity
+        logging.set_logger_level(self.get_logger().name, logging.LoggingSeverity.WARN)
 
         # declare parameters
-        self.declare_parameter('power', True)
+        self.declare_parameter("power", True)
 
         # * new udp receiver!
         self.udp_receiver_ = UDPReceiver()
@@ -41,15 +65,11 @@ class MiosReader(Node):
         publisher_callback_group = timer_callback_group
 
         self.timer = self.create_timer(
-            0.1,  # sec
-            self.timer_callback,
-            callback_group=timer_callback_group)
+            0.1, self.timer_callback, callback_group=timer_callback_group  # sec
+        )
 
         self.publisher = self.create_publisher(
-            MiosState,
-            'mios_state_topic',
-            10,
-            callback_group=publisher_callback_group
+            MiosState, "mios_state_topic", 10, callback_group=publisher_callback_group
         )
 
         time.sleep(2)
@@ -88,7 +108,7 @@ class MiosReader(Node):
                 # pub_msg = self.update_mios_state_message(
                 #     pub_msg, self.mios_state_default)
             # publish msg
-            
+
         else:
             # * set the udp with the same state as the node.
             if self.udpOn == True:
@@ -96,27 +116,23 @@ class MiosReader(Node):
                 self.udpOn = False
             else:
                 pass
-            self.get_logger().error('Power off, timer pass ...')
+            self.get_logger().error("Power off, timer pass ...")
 
     def check_power(self):
-        if self.has_parameter('power'):
+        if self.has_parameter("power"):
             # ! BBDEBUG
-            return self.get_parameter('power').get_parameter_value().bool_value
+            return self.get_parameter("power").get_parameter_value().bool_value
         else:
-            self.get_logger().error('PARAM MISSING: POWER!')
+            self.get_logger().error("PARAM MISSING: POWER!")
             return False
 
     def switch_power(self, turn_on: bool):
-        power = rclpy.parameter.Parameter(
-            'power',
-            rclpy.Parameter.Type.BOOL,
-            turn_on
-        )
+        power = rclpy.parameter.Parameter("power", rclpy.Parameter.Type.BOOL, turn_on)
         all_new_parameters = [power]
         self.set_parameters(all_new_parameters)
 
     # method to update the msg to publish
-    def update_mios_state_message(self, msg: MiosState,  mios_state: str):
+    def update_mios_state_message(self, msg: MiosState, mios_state: str):
         msg.tf_f_ext_k = mios_state["TF_F_ext_K"]
         msg.t_t_ee = mios_state["T_T_EE"]
         return msg
@@ -136,5 +152,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

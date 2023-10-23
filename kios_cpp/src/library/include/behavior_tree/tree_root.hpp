@@ -17,10 +17,31 @@
 #include "behavior_tree/action_node/wiggle.hpp"
 
 // general action nodes
-#include "behavior_tree/action_node/cartesian_move.hpp"
+#include "behavior_tree/action_node/cartesian_move.h"
 #include "behavior_tree/action_node/joint_move.hpp"
+#include "behavior_tree/action_node/gripper_force.hpp"
+#include "behavior_tree/action_node/gripper_move.hpp"
+
+// additional
+#include "behavior_tree/action_node/tool_load.hpp"
+#include "behavior_tree/action_node/tool_unload.hpp"
+#include "behavior_tree/action_node/tool_grasp.hpp"
+#include "behavior_tree/action_node/tool_release.hpp"
+#include "behavior_tree/action_node/gripper_grasp.hpp"
+#include "behavior_tree/action_node/gripper_release.hpp"
+
+// compound in mios level
+#include "behavior_tree/compound_action_node/tool_pick.hpp"
+#include "behavior_tree/compound_action_node/tool_place.hpp"
+#include "behavior_tree/compound_action_node/gripper_pick.hpp"
+#include "behavior_tree/compound_action_node/gripper_place.hpp"
+
+// ! BBMOD
 
 #include "behavior_tree/condition_node/condition_node.hpp"
+
+// #include "kios_utils/context_manager.hpp"
+#include "kios_utils/kios_utils.hpp"
 
 // BB CODE
 namespace Insertion
@@ -29,9 +50,13 @@ namespace Insertion
     {
     public:
         TreeRoot(std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr);
+        ~TreeRoot();
         bool initialize_tree();
         bool construct_tree(const std::string &tree_string);
         bool register_nodes();
+        std::optional<std::vector<kios::NodeArchive>> archive_nodes();
+        bool check_grounded_objects();
+
         BT::NodeStatus tick_once();
         BT::NodeStatus tick_while_running();
         BT::NodeStatus get_tick_result();
@@ -39,6 +64,8 @@ namespace Insertion
         std::shared_ptr<kios::TaskState> get_task_state_ptr();
 
     private:
+        // kios::ContextClerk context_clerk_;
+
         // flag
         bool hasRegisteredNodes;
 
@@ -54,7 +81,3 @@ namespace Insertion
     };
 
 } // namespace Insertion
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////

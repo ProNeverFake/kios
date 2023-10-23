@@ -59,7 +59,7 @@ endif()
 include(cmake/Conan.cmake)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
-
+# ! USE 20 instead
 # set CPP standard as 17 according to package behavior_tree library
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

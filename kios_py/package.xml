@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kios_py</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="jicong_ao@163.com">blackbird</maintainer>
-  <license>TODO: License declaration</license>
+  <version>1.0.0</version>
+  <description>Python package of KIOS</description>
+  <maintainer email="jicong.ao@tum.de">blackbird</maintainer>
+  <license>BBLAB</license>
 
   <exec_depend>example_interfaces</exec_depend>
   <exec_depend>std_msgs</exec_depend>

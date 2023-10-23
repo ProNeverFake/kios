@@ -17,6 +17,7 @@
 
 #include "kios_interface/srv/command_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
+#include "kios_interface/srv/archive_action_request.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -32,7 +33,8 @@ public:
           isBusy(false),
           command_context_(),
           tree_state_(),
-          task_state_()
+          task_state_(),
+          context_clerk_()
     {
         std::cout << "start initialization" << std::endl;
         // declare mission parameter
@@ -61,6 +63,13 @@ public:
             rmw_qos_profile_services_default,
             server_callback_group_);
 
+        // * initialize archive action server
+        archive_action_server_ = this->create_service<kios_interface::srv::ArchiveActionRequest>(
+            "archive_action_service",
+            std::bind(&Tactician::archive_action_server_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            server_callback_group_);
+
         // * initialize the subscription
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
         rclcpp::SubscriptionOptions subscription_options;
@@ -77,6 +86,10 @@ public:
             std::chrono::milliseconds(100),
             std::bind(&Tactician::timer_callback, this),
             timer_callback_group_);
+
+        // * initialize context clerk
+        // context_clerk_.initialize(); // ! YOU SHOULD NOT USE THIS.
+        context_clerk_.read_archive(); // bool value return is not useful here.
 
         std::cout << "finish initialization" << std::endl;
 
@@ -103,6 +116,9 @@ public:
     }
 
 private:
+    // action parameter manager
+    kios::ContextClerk context_clerk_;
+
     // thread safe rel
     std::mutex tree_state_mtx_;
     std::mutex task_state_mtx_;
@@ -124,6 +140,7 @@ private:
     rclcpp::CallbackGroup::SharedPtr server_callback_group_;
 
     rclcpp::Service<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_server_;
+    rclcpp::Service<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_server_;
     rclcpp::Client<kios_interface::srv::CommandRequest>::SharedPtr command_client_;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
@@ -138,7 +155,7 @@ private:
         if (check_power())
         {
             std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-            RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+            // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
             // * update task state
             task_state_.from_ros2_msg(*msg);
         }
@@ -174,11 +191,19 @@ private:
                 tree_state_.action_name = std::move(request->action_name);
                 tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
                 tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+
+                tree_state_.object_keys = std::move(request->object_keys);
+                tree_state_.object_names = std::move(request->object_names);
+
+                // ! add archive
+                tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
+
                 // * set flag for timer
                 isSwitchAction.store(true);
+
+                RCLCPP_ERROR(this->get_logger(), "switch_action request accepted.");
+                response->is_accepted = true;
             }
-            RCLCPP_ERROR(this->get_logger(), "switch_action request accepted.");
-            response->is_accepted = true;
         }
         else
         {
@@ -188,19 +213,84 @@ private:
     }
 
     /**
-     * @brief prereserved inline method to implement skill parameter generating algo.
+     * @brief the method to archive all the nodes.
+     *
+     * @param request
+     * @param response
+     */
+    void archive_action_server_callback(
+        const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Request> request,
+        const std::shared_ptr<kios_interface::srv::ArchiveActionRequest::Response> response)
+    {
+        std::string err_msg = "";
+        bool isAccepted = true;
+
+        if (check_power() == true)
+        {
+            if (isBusy.load())
+            {
+                isAccepted = false;
+                err_msg = "Node is busy, request refused !";
+                RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
+            }
+            else
+            {
+                RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
+                for (auto &archive : request->archive_list)
+                {
+                    kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
+                    // try to archive the node.
+                    if (!context_clerk_.archive_action(arch))
+                    {
+                        err_msg = "ERROR when archiving the action in group " + std::to_string(archive.action_group) + " with id " + std::to_string(archive.action_id);
+                        isAccepted = false;
+                        RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            err_msg = "POWER OFF, request refused!";
+            isAccepted = false;
+            RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
+        }
+
+        response->is_accepted = isAccepted;
+        response->error_message = err_msg;
+    }
+
+    /**
+     * @brief prereserved inline method to ground the skill
      *
      */
     void generate_command_context()
     {
         /////////////////////////////////////////////
         // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT
-        // * now just copy.
-        // ! only use stop old start new
+        // * now just use default
+        // fetch context from clerk
+        nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
+        // ! important: remove the action_context. this is not necessary.
+        if (context["skill"].contains("action_context"))
+        {
+            context["skill"].erase("action_context");
+        }
+        // * the objects to be grounded from mongoDB can be changed here according to the object_keys.
+        // * use those from the request.
+        const auto &obj_keys = tree_state_.object_keys;
+        const auto &obj_names = tree_state_.object_names;
+        for (int i = 0; i < obj_keys.size(); i++)
+        {
+            context["skill"]["objects"][obj_keys[i]] = obj_names[i];
+        }
+        // * only use stop old start new now
         command_context_.command_type = kios::CommandType::STOP_OLD_START_NEW;
-        // * handle the command context here
-        command_context_.command_context["skill"]["action_context"]["action_name"] = tree_state_.action_name;
-        command_context_.command_context["skill"]["action_context"]["action_phase"] = tree_state_.action_phase;
+
+        // * USE THIS INSTEAD
+        command_context_.command_context = context;
+        command_context_.skill_type = kios::ap_to_mios_skill(tree_state_.node_archive.action_phase);
 
         /////////////////////////////////////////////
     }
@@ -218,6 +308,7 @@ private:
         auto request = std::make_shared<kios_interface::srv::CommandRequest::Request>();
         request->command_type = static_cast<int32_t>(command_context_.command_type);
         request->command_context = command_context_.command_context.dump();
+        request->skill_type = command_context_.skill_type;
 
         // client send request
         while (!command_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
@@ -249,6 +340,10 @@ private:
         }
     }
 
+    /**
+     * @brief handle the switch action request. generate the command context and send it to commander.
+     *
+     */
     void handle_request()
     {
         RCLCPP_ERROR(this->get_logger(), "HANDLE REQUEST");
@@ -297,6 +392,9 @@ private:
                 // * turn off for check
                 switch_power(false);
             }
+            // * archive the nodes contexts into json file.
+            context_clerk_.store_archive();
+
             switch_power(false);
             break;
         }
@@ -332,7 +430,7 @@ private:
     }
 
     /**
-     * @brief timer callback. handle the switch action request and send the command request to commander.
+     * @brief timer callback. check the need of request handling periodically.
      *
      */
     void timer_callback()
@@ -347,21 +445,7 @@ private:
                     isBusy.store(true);
 
                     handle_request();
-                    // if (!send_command_request(1000, 1000))
-                    // {
-                    //     //* error in command request service.
-                    //     // * invoke error in tree
 
-                    //     // * turn off for check
-                    //     switch_power(false);
-                    // }
-                    // // * turn off if finished
-                    // std::lock_guard<std::mutex> tree_state_lock(tree_state_mtx_);
-                    // if (tree_state_.tree_phase == kios::TreePhase::FINISH)
-                    // {
-                    //     RCLCPP_INFO(this->get_logger(), "Timer: Mission succeeded.");
-                    //     switch_power(false);
-                    // }
                     // * command_request finished. reset flags.
                     isSwitchAction.store(false);
                     isBusy.store(false);
@@ -373,12 +457,12 @@ private:
             }
             else
             {
-                RCLCPP_INFO(this->get_logger(), "Timer: Continue the last action phase.");
+                RCLCPP_INFO_ONCE(this->get_logger(), "Timer: Continue the last action phase.");
             }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, Timer pass ...");
+            RCLCPP_ERROR_ONCE(this->get_logger(), "POWER OFF, Timer pass ...");
         }
     }
 };

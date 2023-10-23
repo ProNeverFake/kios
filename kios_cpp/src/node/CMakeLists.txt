@@ -68,6 +68,22 @@ ament_target_dependencies(messenger
   kios_interface
 )
 
+######################################################### test_node
+
+add_executable(test_node test_node.cpp)
+
+target_link_libraries(test_node
+    ${PROJECT_NAME}::behavior_tree
+    nlohmann_json::nlohmann_json
+    ${PROJECT_NAME}::kios_utils
+)
+
+ament_target_dependencies(test_node
+  rclcpp
+  kios_interface
+)
+
+
 ######################################################### messenger
 
 add_executable(mongo_reader mongo_reader.cpp)
@@ -91,6 +107,7 @@ install(TARGETS
     tactician
     tree_node
     mongo_reader
+    test_node
 
     DESTINATION lib/${PROJECT_NAME}
     )

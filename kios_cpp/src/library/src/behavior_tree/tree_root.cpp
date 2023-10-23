@@ -9,7 +9,12 @@ namespace Insertion
     {
         set_log();
         // * run tree initialization method
-        // initialize_tree(); // ! MOVED TO TREE_NODE
+    }
+
+    TreeRoot::~TreeRoot()
+    {
+        // ! SUCCESS BOOL CAN BE HANDLED.
+        // context_clerk_ptr_->store_archive();
     }
 
     void TreeRoot::set_log()
@@ -61,6 +66,7 @@ namespace Insertion
         {
             return false;
         }
+
         return true;
     }
 
@@ -77,10 +83,12 @@ namespace Insertion
         {
             try
             {
+                // ! the definition of the condition nodes? too many args
                 factory_.registerNodeType<HasObject>("HasObjectApproch", "approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<HasObject>("HasObjectContact", "contact", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<AtPosition>("AtPositionApproch", "approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<AtPosition>("AtPositionContact", "contact", tree_state_ptr_, task_state_ptr_);
+
                 // * demo action nodes
                 factory_.registerNodeType<Approach>("Approach", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<Contact>("Contact", tree_state_ptr_, task_state_ptr_);
@@ -89,6 +97,23 @@ namespace Insertion
                 // * general action nodes
                 factory_.registerNodeType<CartesianMove>("CartesianMove", tree_state_ptr_, task_state_ptr_);
                 factory_.registerNodeType<JointMove>("JointMove", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperForce>("GripperForce", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperMove>("GripperMove", tree_state_ptr_, task_state_ptr_);
+
+                // * additional
+                factory_.registerNodeType<ToolLoad>("ToolLoad", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolUnload>("ToolUnload", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolGrasp>("ToolGrasp", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolRelease>("ToolRelease", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperGrasp>("GripperGrasp", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperRelease>("GripperRelease", tree_state_ptr_, task_state_ptr_);
+
+                // * compound
+                factory_.registerNodeType<ToolPick>("ToolPick", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<ToolPlace>("ToolPlace", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperPick>("GripperPick", tree_state_ptr_, task_state_ptr_);
+                factory_.registerNodeType<GripperPlace>("GripperPlace", tree_state_ptr_, task_state_ptr_);
+                // ! BBMOD
             }
             catch (...)
             {
@@ -104,6 +129,104 @@ namespace Insertion
         }
 
         return true;
+    }
+
+    /**
+     * @brief use visitor to archive all the action nodes in the tree
+     *
+     * @return std::optional<std::vector<kios::NodeArchive>>
+     */
+    std::optional<std::vector<kios::NodeArchive>> TreeRoot::archive_nodes()
+    {
+        std::vector<kios::NodeArchive> node_archive_list;
+
+        auto archive_visitor = [&node_archive_list, this](BT::TreeNode *node) {
+            if (auto action_node = dynamic_cast<KiosActionNode *>(node))
+            {
+                action_node->initialize_archive();
+                // ! here just get a copy!
+                auto node_archive = action_node->get_archive_ref();
+                node_archive_list.push_back(node_archive);
+            }
+        };
+
+        try
+        {
+            tree_.applyVisitor(archive_visitor);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+            return {};
+        }
+
+        return node_archive_list;
+    }
+
+    /**
+     * @brief check: 1. the number of obj keys and obj names consists? 2. the grounded objects are in the DB?
+     *  run this after archiving.
+     *
+     * @return true if everything is fine.
+     */
+    bool TreeRoot::check_grounded_objects()
+    {
+        bool flag = true;
+
+        auto object_dict = get_task_state_ptr()->object_dictionary;
+        auto check_visitor = [&flag, &object_dict, this](BT::TreeNode *node) {
+            if (auto action_node = dynamic_cast<KiosActionNode *>(node))
+            {
+                if (flag == true)
+                {
+                    auto &objects_ref = action_node->get_object_names_ref();
+                    auto &arch = action_node->get_archive_ref();
+                    auto &keys_ref = action_node->get_obejct_keys_ref();
+
+                    if (objects_ref.size() != keys_ref.size())
+                    {
+                        spdlog::critical("OH NO: The number of object keys and object names doesn't consist in the action node with group: " + std::to_string(arch.action_group) + ", id: " + std::to_string(arch.action_id) + "!");
+                        // spdlog::debug("The following are the keys and the names:");
+                        spdlog::debug("KEYS: ");
+                        for (auto &k : keys_ref)
+                        {
+                            spdlog::debug(k);
+                        }
+                        spdlog::debug("NAMES: ");
+                        for (auto &n : objects_ref)
+                        {
+                            spdlog::debug(n);
+                        }
+                        flag = false; // but still do the existence check
+                    }
+
+                    for (auto &item : objects_ref)
+                    {
+                        if (object_dict.find(item) == object_dict.end()) // ! if this object doesn't exist
+                        {
+                            spdlog::critical("OH NO: the object \'" + item + "\' doesn't exist in the object dictionary fetched from mongo DB!");
+                            flag = false;
+                        }
+                    }
+                }
+                else
+                {
+                    // error has been triggered. skip...
+                }
+            }
+        };
+
+        try
+        {
+            tree_.applyVisitor(check_visitor);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+            return false;
+        }
+
+        return flag;
     }
 
     /**
@@ -127,41 +250,6 @@ namespace Insertion
         }
         return true;
     }
-
-    // ! DISCARDED
-    // ! HERE TRY TO GENERATE TREE FROM C++ CODE BUT NOW XML GENERATOR IS PREDERED
-    // void TreeRoot::construct_tree()
-    // {
-    //     BT::NodeConfiguration config;
-    //     // Create nodes
-    //     auto root_node = std::make_shared<BT::SequenceNode>("root");
-    //     auto reactive_seq = std::make_shared<BT::ReactiveSequence>("reactive_seq");
-    //     auto approach_node = std::make_shared<Approach>("approach", config, tree_state_ptr_, task_state_ptr_);
-    //     auto contact_node = std::make_shared<Contact>("contact", config, tree_state_ptr_, task_state_ptr_);
-
-    //     reactive_seq->EnableException(false);
-    //     // Set parent-child relationships
-    //     root_node->addChild(reactive_seq.get());
-    //     reactive_seq->addChild(approach_node.get());
-    //     reactive_seq->addChild(contact_node.get());
-
-    //     // Store nodes in a container to manage their lifetime
-    //     std::vector<std::shared_ptr<BT::TreeNode>> nodes;
-    //     nodes.push_back(std::move(root_node));
-    //     nodes.push_back(std::move(reactive_seq));
-    //     nodes.push_back(std::move(approach_node));
-    //     nodes.push_back(std::move(contact_node));
-
-    //     // Create a tree from the root node
-    //     BT::Tree tree(root_node.get());
-
-    //     // Tick the tree as needed
-    //     while (some_condition)
-    //     {
-    //         tree.tickRoot();
-    //         // Add your logic here
-    //     }
-    // }
 
     std::shared_ptr<kios::TreeState> TreeRoot::get_tree_state_ptr()
     {
@@ -193,7 +281,3 @@ namespace Insertion
     }
 
 } // namespace Insertion
-
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////

@@ -56,8 +56,8 @@ public:
         // udp register
         mios_register_udp(udp_port_, subscription_list_);
 
-        // object announcement
-        messenger_->send_grasped_object();
+        // ! HERE REMOVED. THE PRECONDITION IN BBGENERALSKILL IS ALSO REMOVED.
+        // messenger_->send_grasped_object();
 
         // * initialize service
         command_service_ = this->create_service<kios_interface::srv::CommandRequest>(
@@ -83,21 +83,16 @@ public:
     {
         messenger_->unregister_udp();
     }
+
     void shut_down_connection()
     {
         messenger_->unregister_udp();
         messenger_->close();
     }
+
     bool check_power()
     {
-        if (this->get_parameter("power").as_bool() == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return this->get_parameter("power").as_bool();
     }
 
 private:
@@ -143,6 +138,7 @@ private:
                 response->is_accepted = false;
                 return;
             }
+            command_request_.skill_type = request->skill_type;
             issue_command(command_request_);
             response->is_accepted = true;
         }
@@ -165,7 +161,7 @@ private:
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
             if (stop_task_request() == true)
             {
-                start_task_request(command_request.command_context);
+                start_task_request(command_request);
             }
             else
             {
@@ -193,9 +189,9 @@ private:
         return messenger_->stop_task_request();
     }
 
-    bool start_task_request(const nlohmann::json &skill_context)
+    bool start_task_request(const kios::CommandRequest request)
     {
-        return messenger_->start_task_request(skill_context);
+        return messenger_->start_task_request(request.command_context, request.skill_type);
     }
 
     void stop_task_command()

@@ -25,18 +25,27 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 - ~~The reactive sequence should not be used with more than one async action node. (error msg see below)~~
 
 **DEVELOPER'S PLAN:**
-- [ ] Mios object grounding is not necessary for kios usage. remove this part in the future.
-- [ ] Enable parameter check according to the action phase in the command.
-- [ ] **TOP** Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
-- [ ] Add reset method to all nodes to enable retry.
+
+- [ ] **TOP** **THE REFACTORING WORK IS NOW UNTER BRANCH KIOS, FOR OLD VERSION PLEASE USE BRANCH BBBRANCH!**
+
+- [x] Mios object grounding is not necessary for kios usage. remove this part in the future.
+- [x] Enable parameter check (in mios) according to the action phase in the command.
+- [ ] Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
+- [ ] Add reset method to tree_node to enable retry.
 - [x] **ERGENT** enable at position check in tree node.
 - [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
 - [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
 - [X] **ERGENT** tree udp check mechanism and mios skill udp part.
 - [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [x] (POSTPONED) add meta node for kios node.
+- [ ] (POSTPONED) add meta node for kios node.
+
+**REFACTORING RELEVANT**
+
+1. Commander should not use BBGeneralSkill.
+2. Tactician should fetch the parameter from the map.
 
 **THOUGHT**
+- [ ] The object to be grounded is determined at the start of the skill, which should be determined by action context.
 - [ ] Create a dummy object in action context, command context and mongoDB.
 
 SEE [DEVELOPMENT LOG](#development-log)
@@ -214,6 +223,10 @@ The node **tactician** construct the action with the corresponding context. It r
 - Provide the service `switch_action_service` with `SwitchAcitionRequest.srv`.
 - Determine the action parameter in `generate_command_context()`.
 
+For developer:
+
+- The skill currently used in mios is BBGeneralSkill, in which all necessary `create_motion_primitive()` methods are collected and invoked according to the received action context. The action nodes in the behavior_tree library can now just generate the corresponding motion primitives context (one action node for one motion primitive), then wrap it into BBGeneralSkill context, and finally into GeneralTask context. Therefore, it is quite straightforward how to invoke an existing skill for specific purposes (instead of BBGeneralSkill which is a general skill) to realize the "skill" layer in the robot task planning system.
+
 ---
 
 ##### **commander**
@@ -222,6 +235,7 @@ The node **commander** manages the websocket connection with mios Port. It recei
 
 - Provide the service `command_request_service` with `CommandRequest.srv`.
 - Can `send`, `send_and_wait`, `send_and_check`.
+- Provide CLI service `teach_object_cli` with `TeachObjectService.srv`.
 
 ---
 
@@ -233,15 +247,9 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 
 ---
 
-##### **planner** (NOT IMPLEMENTED YET)
+##### **planner** (NOT IMPLEMENTED YET, MAYBE BORROW SOME FROM PLANSYS2)
 
 The node **planner** (should) make plans for robot tasks. It makes the plan the tasks, generates the xml in string format for generating behavior tree, and asks for node **tree_node** to implements the tree.
-
-/////////////////////////////////////////////
-
-//////////   UNDER CONSTRUCTION  ////////////
-
-/////////////////////////////////////////////
 
 ### Running Process
 
@@ -253,9 +261,64 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Testing
 
-> BB: I'm now testing... Please be patient... 
+> BB: ...
 
 ### Development Log
+
+- 18.10.2023
+  - Add TOOL_GRASP skill.
+  **TOOL_RELEASE SKILL**
+  **USER STOP STATUS CHECK**
+
+- 16.10.2023
+  - Add a behavior tree generator in python (kios_py).
+  - Add tool change skills (TOOL_LOAD, TOOL_UNLOAD).
+  **The need of grasp when grasping the objects with the tool box.**
+
+- 10.10.2023
+  1. All the necessary skills (mps) that are necessary for insertion are all loaded in kios now. Including:
+  - joint_move
+  - cartesian_move
+  - gripper_force
+  - gripper_move
+  - contact
+  - wiggle
+  **The need of a compact form for actions**
+
+- 02.10.2023
+  1. The base class should be divided into different variances.
+
+- 01.10.2023
+  1. The the main frame has been finished. Now mios can receive the request but end without any error message. find the reason.
+  2. **Be careful when changing the ActionPhaseContext: only the necessary part should be preserved.**
+  3. **TO REMOVE: "action context" should not appear in mios skill request context.**
+
+- 25.09.2023
+  1. Added object grounding part in tree_root. Now when the tree is generated by xml, the objects needed by action nodes can be set.
+  
+  The next step is to change the code in tactician and commander to enable skill commands of the new format.
+
+- 23.09.2023
+  1. The service ArchiveActionRequest is realized now.
+  2. **The crucial question: how should the "object" be grounded in a object-centric robot system?**
+
+- 22.09.2023
+  1. The problem is fixed (reason unclear). 
+  TODO: the action archive client on the tree node side and the parameter fetch function in tactician.
+
+- 20.09.2023
+  1. bas_alloc problem: when DefaultActionContext member variable, the available memory is not enough for the variable and the program quit. After defining it with ptr the problem still exists and leads to a segmentation fault when calling the ptr.
+
+- *19.09.2023*
+  1. Der Class DefaultActionContext wird falsch definiert. Der fehler sieht wie folgende aus:
+  ```bash
+  terminate called after throwing an instance of 'std::length_error'
+  what():  basic_string::_M_create
+  ```
+  Der Fehler hat noch nicht behandelt worden.
+
+- *05.09.2023*
+  1. Removed the insertable entity in action context. Removed the corresponding part in mios (precondition).
 
 - *04.09.2023*
   1. Added node elaborations.

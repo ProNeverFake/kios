@@ -611,16 +611,16 @@ bool BTMessenger::stop_task_request()
  *
  * @param skill_context
  */
-bool BTMessenger::start_task_request(nlohmann::json skill_context)
+bool BTMessenger::start_task_request(nlohmann::json skill_context, std::string skill_type)
 {
     // TODO
     std::vector<std::string> skill_names;
     std::vector<std::string> skill_types;
     std::unordered_map<std::string, nlohmann::json> skill_contexts;
 
-    skill_names.push_back("insertion");
-    skill_types.push_back("BBGeneralSkill");
-    skill_contexts["insertion"] = skill_context;
+    skill_names.push_back("BBSkill");
+    skill_types.push_back(skill_type); // ! CHANGED
+    skill_contexts["BBSkill"] = skill_context;
 
     nlohmann::json task_context =
         {{"parameters",
@@ -632,6 +632,11 @@ bool BTMessenger::start_task_request(nlohmann::json skill_context)
         {{"task", "GenericTask"},
          {"parameters", task_context},
          {"queue", true}};
+
+    // ! CHECK CONTEXT HERE
+    spdlog::warn("BB: DO CONTEXT CHECK HERE.");
+    spdlog::warn("BB: THE CONEXT IS: {}", call_context.dump());
+
     if (is_connected())
     {
         return send_and_check("start_task", call_context);

@@ -30,10 +30,7 @@ namespace Insertion
         auto &node_context = get_node_context_ref();
         node_context.node_name = "APPROACH";
         node_context.action_name = "approach";
-
         node_context.action_phase = kios::ActionPhase::APPROACH;
-        node_context.parameter["skill"]["action_name"] = "approach";
-        node_context.parameter["skill"]["action_phase"] = kios::ActionPhase::APPROACH;
     }
 
     bool Approach::is_success()

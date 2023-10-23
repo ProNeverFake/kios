@@ -8,7 +8,7 @@ from rclpy.qos import qos_profile_sensor_data
 
 import json
 
-from .resource.mongodb_client import MongoDBClient
+from ..resource.mongodb_client import MongoDBClient
 
 from kios_interface.srv import GetObjectRequest
 

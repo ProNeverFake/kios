@@ -7,15 +7,6 @@ namespace Insertion
           task_state_ptr_(task_state_ptr),
           hasRegisteredNodes(false)
     {
-        // try
-        // {
-        //     context_clerk_ = kios::ContextClerk();
-        // }
-        // catch (std::exception &e)
-        // {
-        //     std::cerr << "TEST1 : " << e.what() << std::endl;
-        // }
-
         set_log();
         // * run tree initialization method
     }
@@ -139,56 +130,6 @@ namespace Insertion
 
         return true;
     }
-
-    /**
-     * @brief use a visitor to archive all the action nodes of the tree to context node.
-     * ! the old node archiving method. the tree root should not manage the node parameters. now tactician should take over this job.
-     * ! DISCARDED
-     * @return true
-     * @return false
-     */
-    // bool TreeRoot::archive_nodes()
-    // {
-    //     context_clerk_.initialize();
-
-    //     isArchiveSuccess = true;
-
-    //     auto archive_visitor = [this](BT::TreeNode *node) {
-    //         if (auto action_node = dynamic_cast<KiosActionNode *>(node))
-    //         {
-    //             // * skip if the archiving has failed.
-    //             if (this->isArchiveSuccess)
-    //             {
-    //                 action_node->initialize_archive();
-    //                 auto node_archive = action_node->get_archive_ref();
-    //                 if (!this->context_clerk_.archive_action(node_archive))
-    //                 {
-    //                     this->isArchiveSuccess = false;
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 // archiving process has failed. pass.
-    //             }
-    //         }
-    //     };
-
-    //     tree_.applyVisitor(archive_visitor);
-
-    //     if (isArchiveSuccess)
-    //     {
-    //         if (context_clerk_.store_archive())
-    //         {
-    //             std::cout << "archived and stored." << std::endl;
-    //         }
-    //         else
-    //         {
-    //             std::cerr << "???" << std::endl;
-    //         }
-    //     }
-
-    //     return isArchiveSuccess;
-    // }
 
     /**
      * @brief use visitor to archive all the action nodes in the tree
@@ -340,7 +281,3 @@ namespace Insertion
     }
 
 } // namespace Insertion
-
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////

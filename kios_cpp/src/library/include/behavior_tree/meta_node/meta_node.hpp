@@ -56,46 +56,6 @@ namespace Insertion
 {
 
     /**
-     * @brief a meta node class for insertion behavior tree node
-     *
-     */
-    class MetaNode : public BT::StatefulActionNode
-    {
-    public:
-        MetaNode(const std::string &name, const BT::NodeConfig &config, std::shared_ptr<kios::TreeState> tree_state_ptr, std::shared_ptr<kios::TaskState> task_state_ptr)
-            : BT::StatefulActionNode(name, config),
-              tree_state_ptr_(tree_state_ptr),
-              task_state_ptr_(task_state_ptr),
-              node_context_()
-        {
-        }
-        static BT::PortsList providedPorts();
-
-        // shared context
-        std::shared_ptr<kios::TreeState> get_tree_state_ptr();
-        std::shared_ptr<kios::TaskState> get_task_state_ptr();
-
-        // local context
-        kios::ActionPhaseContext &get_node_context_ref();
-
-        // * update tree state with this node's context
-        virtual void update_tree_state() = 0;
-        // * node context initializer
-        virtual void node_context_initialize() = 0;
-
-    private:
-        //* shared objects among the entire tree
-        std::shared_ptr<kios::TreeState> tree_state_ptr_;
-        std::shared_ptr<kios::TaskState> task_state_ptr_;
-
-        // * default values as member variable of the node
-        kios::ActionPhaseContext node_context_; // default node context value
-
-        virtual bool is_success(); // here to set the check condition
-        bool is_switch_action();
-    };
-
-    /**
      * @brief A hypermeta node that provides common member variables and member functions that are necessary in kios application.
      * Can be used to declare any kind of node from behaviortree.CPP lib.
      *
@@ -116,60 +76,10 @@ namespace Insertion
         {
         }
 
-        // /**
-        //  * @brief
-        //  *
-        //  */
-        // void initialize_archive()
-        // {
-        //     // * assign action phase
-        //     action_phase_ = get_node_context_ref().action_phase;
-        //     // * read archive from input port
-        //     BT::Expected<int> action_group = getInput<int>("action_group");
-        //     BT::Expected<int> action_id = getInput<int>("action_id");
-        //     BT::Expected<std::string> description = getInput<std::string>("description");
-
-        //     if (!action_group)
-        //     {
-        //         // ! now only 0 group for test.
-        //         // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
-        //         action_group_ = 0;
-        //     }
-        //     else
-        //     {
-        //         action_group_ = action_group.value();
-        //     }
-
-        //     if (!action_id)
-        //     {
-        //         throw BT::RuntimeError("missing required input [action_id]: ", action_id.error());
-        //     }
-        //     else
-        //     {
-        //         action_id = action_id.value();
-        //     }
-        //     if (!description)
-        //     {
-        //         throw BT::RuntimeError("missing required input [description]: ", description.error());
-        //     }
-        //     else
-        //     {
-        //         description_ = description.value();
-        //     }
-        // }
-
         static BT::PortsList providedPorts()
         {
             return {
                 BT::InputPort<bool>("isOnceSucceeded")};
-            // BT::InputPort<int>("action_group"),
-            // BT::InputPort<int>("action_id"),
-            // BT::InputPort<std::string>("description")};
-            // return {
-            //     BT::InputPort<bool>("isOnceSucceeded"),
-            //     BT::InputPort<int>("action_group"),
-            //     BT::InputPort<int>("action_id"),
-            //     BT::InputPort<std::string>("description")};
         }
 
         // shared context
@@ -239,17 +149,6 @@ namespace Insertion
                 return false;
             }
         }
-
-        // std::tuple<int, int, std::string, kios::ActionPhase> get_archive()
-        // { // ! TODO
-        //     return std::make_tuple<int, int, std::string, kios::ActionPhase>(
-        //         action_group_,
-        //         action_id_,
-        //         description_,
-        //         action_phase_);
-        // }
-
-        // virtual bool is_switch_action();
 
         // ! CANNOT OVERRIDE THIS: FINAL OVERRIDE IN STATEFULACTION!
         // BT::NodeStatus tick() override;
@@ -366,9 +265,6 @@ namespace Insertion
             {
                 auto &objs = get_object_names_ref();
                 objs = objects.value();
-                // for (auto &item : objs)
-                // {
-                // }
             }
 
             test_objects();
@@ -397,7 +293,6 @@ namespace Insertion
             if (!action_group)
             {
                 // ! now only 0 group for test.
-                // throw BT::RuntimeError("missing required input [action_group]: ", action_group.error());
                 archive.action_group = 0;
             }
             else
@@ -425,6 +320,7 @@ namespace Insertion
 
     private:
     };
+    // * a possible condition node imp.
     // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // // * META CONDITION NODE

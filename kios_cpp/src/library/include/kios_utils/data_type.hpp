@@ -105,7 +105,7 @@ namespace kios
 
     struct NodeArchive
     {
-        // ! here no objects are grounded. so gestaltet in Absicht.
+        // ! here no objects should be grounded.
         int action_group = 0;
         int action_id = 0;
         std::string description = "this guy is too lazy to leave anything here.";
@@ -145,7 +145,7 @@ namespace kios
         NodeArchive node_archive; // ! add archive
         NodeArchive last_node_archive;
 
-        // ! these should be discarded
+        // the objects for the current skill
         std::vector<std::string> object_keys = {};  // this is the key of the object in mongo db
         std::vector<std::string> object_names = {}; // this is the name of the object used in mios
 
@@ -304,7 +304,6 @@ namespace kios
 
     /**
      * @brief action phase with action node mp parameter from tree node to tactician
-     * ! too many unused entities!
      */
     struct ActionPhaseContext
     {
@@ -312,180 +311,8 @@ namespace kios
         std::string action_name = "initialization";
         ActionPhase action_phase = ActionPhase::INITIALIZATION;
 
-        std::string command;
-
         bool isActionSuccess = false;
-
-        nlohmann::json parameter = {
-            {"skill",
-             {
-                 {"objects",
-                  {
-                      {"Container", "housing"},
-                      {"Approach", "approach"},
-                      //  {"Insertable", "ring"},
-                  }},
-                 {"time_max", 30},
-                 {"action_context",
-                  {
-                      {"action_name", "initialization"},
-                      {"action_phase", ActionPhase::INITIALIZATION},
-                  }},
-                 {"approach",
-                  {
-                      {"dX_d", {0.05, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"contact",
-                  {
-                      {"dX_d", {0.03, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"K_x", {500, 500, 500, 600, 600, 600}},
-                  }},
-                 {"wiggle",
-                  {
-                      {"search_a", {10, 10, 0, 2, 2, 0}},
-                      {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
-                      {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
-                      {"K_x", {500, 500, 500, 800, 800, 800}},
-                      {"f_push", {0, 0, 7, 0, 0, 0}},
-                      {"dX_d", {0.02, 0.05}},
-                      {"ddX_d", {0.05, 0.02}},
-                  }},
-                 {"insertion",
-                  {
-                      {"dX_d", {0.02, 0.05}},
-                      {"ddX_d", {0.05, 0.02}},
-                      {"f_push", 7},
-                      {"K_x", {500, 500, 0, 800, 800, 800}},
-                  }},
-                 {"cartesian_move",
-                  {
-                      {"dX_d", {0.05, 0.05}},
-                      {"ddX_d", {0.05, 0.05}},
-                      {"DeltaX", {0, 0, 0, 0, 0, 0}},
-                      {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-                  }},
-                 {"joint_move",
-                  {
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
-                 {"grasp_force",
-                  {
-                      {"grasp_speed", 1},
-                      {"grasp_force", 40},
-                      {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-                  }},
-                 {"grasp_move", // ! soll aber nicht benutzt werden
-                  {
-                      {"speed", 0.5},
-                      {"acceleration", 1},
-                      {"q_g", {0, 0, 0, 0, 0, 0, 0}}, // ! von mios-example kopiert und wird noch ni validiert
-                  }},
-
-             }},
-            // ! TODO add move to pose and move to joint pose
-            {"control", {{"control_mode", 0}}},
-            {"user",
-             {{"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
-              {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
-              {"F_ext_contact",
-               {3.0, 2.0}}}}};
     };
-
-    // ! backup
-    // struct CommandContext
-    // {
-    //     CommandType command_type = CommandType::INITIALIZATION;
-    //     nlohmann::json command_context = {
-    //         {"skill",
-    //          {
-    //              {"objects",
-    //               {
-    //                   {"Container", "housing"},
-    //                   {"Approach", "approach"},
-    //                   {"Contact", "contact"},
-    //                   {"Wiggle", "wiggle"},
-    //                   {"Move", "move"},
-    //                   {"Gripper", "gripper"},
-    //               }},
-    //              {"time_max", 30},
-    //              {"action_context",
-    //               {
-    //                   {"action_name", "initialization"},
-    //                   {"action_phase", ActionPhase::INITIALIZATION},
-    //               }},
-    //              {"approach",
-    //               {
-    //                   {"dX_d", {0.1, 0.15}},
-    //                   {"ddX_d", {0.05, 0.05}},
-    //                   {"DeltaX", {0, 0, 0, 0, 0, 0}},
-    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-    //               }},
-    //              {"contact",
-    //               {
-    //                   {"dX_d", {0.05, 0.15}},
-    //                   {"ddX_d", {0.05, 0.05}},
-    //                   {"K_x", {500, 500, 500, 600, 600, 600}},
-    //               }},
-    //              {"wiggle",
-    //               {
-    //                   {"search_a", {10, 10, 0, 2, 2, 0}},
-    //                   {"search_f", {1, 1, 0, 1.2, 1.2, 0}},
-    //                   {"search_phi", {0, 3.14159265358979323846 / 2, 0, 3.14159265358979323846 / 2, 0, 0}},
-    //                   {"K_x", {500, 500, 500, 800, 800, 800}},
-    //                   {"f_push", {0, 0, 7, 0, 0, 0}},
-    //                   {"dX_d", {0.02, 0.05}},
-    //                   {"ddX_d", {0.05, 0.02}},
-    //               }},
-    //              {"insertion",
-    //               {
-    //                   {"dX_d", {0.02, 0.05}},
-    //                   {"ddX_d", {0.05, 0.02}},
-    //                   {"f_push", 7},
-    //                   {"K_x", {500, 500, 0, 800, 800, 800}},
-    //               }},
-    //              {"cartesian_move",
-    //               {
-    //                   {"dX_d", {0.05, 0.05}},
-    //                   {"ddX_d", {0.05, 0.05}},
-    //                   {"DeltaX", {0, 0, 0, 0, 0, 0}},
-    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-    //               }},
-    //              {"joint_move",
-    //               {
-    //                   {"speed", 0.5},
-    //                   {"acceleration", 1},
-    //                   {"K_x", {1500, 1500, 1500, 600, 600, 600}},
-    //                   {"q_g_offset", {0, 0, 0, 0, 0, 0, 0}},
-    //               }},
-    //              {"gripper_force",
-    //               {
-    //                   {"width", 0.05},
-    //                   {"speed", 1},
-    //                   {"force", 40},
-    //                   {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-    //               }},
-    //              {"gripper_move",
-    //               {
-    //                   {"width", 0.6},
-    //                   {"speed", 1},
-    //                   {"K_x", {1500, 1500, 1500, 100, 100, 100}},
-    //               }},
-    //          }},
-    //         {"control", {{"control_mode", 0}}},
-    //         {"user",
-    //          {
-    //              {"env_X", {0.01, 0.01, 0.002, 0.05, 0.05, 0.05}},
-    //              {"env_dX", {0.001, 0.001, 0.001, 0.005, 0.005, 0.005}},
-    //              {"F_ext_contact", {3.0, 2.0}},
-    //          }}};
-    // };
-
     struct CommandContext
     {
         CommandType command_type = CommandType::INITIALIZATION;

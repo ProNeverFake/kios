@@ -475,12 +475,12 @@ private:
             break;
         }
         case kios::TreePhase::IDLE: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: IDLE.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: IDLE.");
             // initial phase. do nothing.
             break;
         }
         case kios::TreePhase::FINISH: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: FINISH.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: FINISH.");
             // * all tasks in tree finished. first send request to finish all actions at mios side.
             tree_state_ptr_->action_name = "finish";
             tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;

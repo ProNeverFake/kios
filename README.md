@@ -265,6 +265,14 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Development Log
 
+- 25.10.2023
+  - KIOS is of version 1.0 now.
+  - Removed the deprecated/discarded code.
+  - Add Nullspace strategy in mios.
+  - Add Tool/Gripper grasp/release atomic skills.
+  - Add Tool/Gripper pick/place compound skills.
+  - Add unified logger.
+
 - 18.10.2023
   - Add TOOL_GRASP skill.
   **TOOL_RELEASE SKILL**

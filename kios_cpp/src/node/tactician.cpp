@@ -184,7 +184,7 @@ private:
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "SWITCH ACTION HIT!");
+                RCLCPP_DEBUG(this->get_logger(), "SWITCH ACTION HIT!");
 
                 // * update tree state
                 std::lock_guard<std::mutex> lock(tree_state_mtx_);
@@ -201,7 +201,7 @@ private:
                 // * set flag for timer
                 isSwitchAction.store(true);
 
-                RCLCPP_ERROR(this->get_logger(), "switch_action request accepted.");
+                RCLCPP_INFO(this->get_logger(), "switch_action request accepted.");
                 response->is_accepted = true;
             }
         }

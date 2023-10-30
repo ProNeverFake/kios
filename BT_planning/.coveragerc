@@ -1,0 +1,18 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+omit =
+    *\__init__.py
+    *\site-packages\*
+    *eloquent*
+    *lib*
+    *\tests\*
+    *\py_trees-release*
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+ignore_errors = True
+show_missing = True

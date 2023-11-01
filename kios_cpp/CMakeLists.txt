@@ -72,7 +72,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # # add static library directory (prefix) to the library finding path
 # list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/static-lib-dir")
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/BehaviorTree.CPP/build/install/lib/cmake/BehaviorTree.CPP")
 
+message("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}\n")
+message("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}\n")
+message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}\n")
+message("CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}\n")
+message("CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}\n")
+message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}\n")
+message("CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}\n")
+message("CMAKE_CURRENT_INSTALL_PREFIX = ${CMAKE_CURRENT_INSTALL_PREFIX}\n")
+message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}\n")
+message("CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}\n")
+message("CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}\n")
+message("CMAKE_CXX_STANDARD_REQUIRED = ${CMAKE_CXX_STANDARD_REQUIRED}\n")
+message("workspace = ${WORKING_DIRECTORY}\n")
+message("ros2_ws = ${ros2_ws}\n")
+message("cmake_home = ${CMAKE_HOME_DIRECTORY}\n")
+
+# for vscode cmake problem
+# set(kios_interface_DIR ${CMAKE_CURRENT_BINARY_DIR}/kios_interface/ament_cmake_core)
+# list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/static-lib-dir")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)

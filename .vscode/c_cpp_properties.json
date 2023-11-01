@@ -6,16 +6,13 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
-        "/opt/ros/humble/include/**",
-        "/home/blackbird/ros_workspace/src/kios/include/**",
-        "include/**",
-        "/usr/include/**"
+        "${workspaceFolder}/**"
       ],
-      "name": "ROS",
-      "intelliSenseMode": "gcc-x64",
+      "name": "linux-gcc-x64",
+      "intelliSenseMode": "linux-gcc-x64",
       "compilerPath": "/usr/bin/gcc",
-      "cStandard": "gnu11",
-      "cppStandard": "c++17"
+      "cStandard": "${default}",
+      "cppStandard": "${default}"
     }
   ],
   "version": 4

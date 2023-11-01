@@ -1,6 +1,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <optional>
 #include <mutex>
@@ -30,9 +31,9 @@ class TreeNode : public rclcpp::Node
 public:
     TreeNode()
         : Node("tree_node"),
+          isActionSuccess_(false),
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
-          isActionSuccess_(false),
           hasUpdatedObjects_(false),
           hasLoadedArchive_(false),
           node_archive_list_()
@@ -695,7 +696,7 @@ private:
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
+                RCLCPP_ERROR_STREAM(this->get_logger(), "get_object_service: Service call failed! Error message:" << result->error_message);
                 return false;
             }
         }

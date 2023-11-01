@@ -40,6 +40,7 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
 
         // * initialize the websocket messenger
+
         messenger_ = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         messenger_->special_connect();

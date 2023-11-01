@@ -11,6 +11,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>kios_interface</exec_depend>
+  <exec_depend>pysoem</exec_depend>
   
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

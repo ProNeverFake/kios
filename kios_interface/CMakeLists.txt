@@ -66,6 +66,18 @@ endforeach()
 
 # message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
+################################### sensor msg
+set(MODULE_NAME sensor_msg)
+
+file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/msg/sensor/*.msg")
+
+set(${MODULE_NAME}_FILE_NAMES)
+
+foreach(file ${${MODULE_NAME}_FILES})
+    get_filename_component(file_name ${file} NAME)
+    list(APPEND ${MODULE_NAME}_FILE_NAMES "msg/sensor/${file_name}")
+endforeach()
+
 ################################### kios_msg
 set(MODULE_NAME kios_msg)
 
@@ -118,6 +130,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
       ${action_FILE_NAMES}
       ${mios_msg_FILE_NAMES}
       ${kios_msg_FILE_NAMES}
+      ${sensor_msg_FILE_NAMES}
     )
 
 ament_package()

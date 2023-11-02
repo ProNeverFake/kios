@@ -1,3 +1,4 @@
+# ! THIS PACKAGE HAS NOT BEEN FULLY DEVELOPED YET !
 # ros2 necessary imports
 import rclpy
 from rclpy.node import Node

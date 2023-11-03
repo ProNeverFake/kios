@@ -38,7 +38,7 @@ public:
           hasLoadedArchive_(false),
           node_archive_list_()
     {
-        // // * set ros2 logger severity level
+        // * set ros2 logger severity level
         auto logger = this->get_logger();
         rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
 

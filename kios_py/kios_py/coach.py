@@ -8,8 +8,6 @@ from rclpu.action import ActionServer
 
 import json
 
-from .resource.mongodb_client import MongoDBClient
-
 from kios_interface.srv import GetObjectRequest
 from kios_interface.srv import GenerateTreeRequest
 from kios_interface.srv import MakePlanRequest
@@ -17,12 +15,9 @@ from kios_interface.srv import MakePlanRequest
 from kios_interface.action import MakePlan
 
 
-class Planner(Node):
+class Coach(Node):
     def __init__(self):
-        super().__init__("planner")
-
-        # declare flag
-        self.is_running = True
+        super().__init__("coach")
 
         self.hasNewPlan = False
 
@@ -118,18 +113,14 @@ class Planner(Node):
     #         response.error_message = "is_running == False"
     #         return response
 
-    def make_plan(current_state, goal_state) -> (bool, str):
-        # TODO
-        pass
-
 
 def main(args=None):
     rclpy.init(args=args)
 
-    planner = Planner()
+    coach = Coach()
 
     executor = MultiThreadedExecutor()
-    executor.add_node(planner)
+    executor.add_node(coach)
 
     executor.spin()
 

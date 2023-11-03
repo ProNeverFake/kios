@@ -346,10 +346,9 @@ private:
      */
     void handle_request()
     {
-        RCLCPP_ERROR(this->get_logger(), "HANDLE REQUEST");
+        RCLCPP_INFO(this->get_logger(), "HANDLE REQUEST");
 
         std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        // std::lock_guard<std::mutex> tree_state_guard(tree_state_mtx_);
         // handle the request according to tree phase;
         switch (tree_state_.tree_phase)
         {
@@ -400,9 +399,7 @@ private:
         }
         case kios::TreePhase::IDLE: {
             RCLCPP_ERROR(this->get_logger(), "TREE PHASE: IDLE");
-
             // * this won't arrive at tactician in principle. there must be an error somewhere.
-
             break;
         }
         case kios::TreePhase::SUCCESS: {
@@ -441,7 +438,7 @@ private:
             {
                 if (!isBusy.load())
                 {
-                    // * set busy
+                    // set busy
                     isBusy.store(true);
 
                     handle_request();

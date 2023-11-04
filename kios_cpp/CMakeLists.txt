@@ -96,7 +96,7 @@ message("cmake_home = ${CMAKE_HOME_DIRECTORY}\n")
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(behaviortree_cpp REQUIRED)
+# ! find_package(behaviortree_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)

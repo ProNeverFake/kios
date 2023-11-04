@@ -126,6 +126,12 @@ pip3 install conan==1.59.0
 
 9. install spdlog.
 
+10. install fmt
+
+```bash
+sudo apt install libfmt-dev
+```
+
 > BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage

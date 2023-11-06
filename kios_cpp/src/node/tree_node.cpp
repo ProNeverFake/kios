@@ -1,6 +1,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <optional>
 #include <mutex>
@@ -30,14 +31,14 @@ class TreeNode : public rclcpp::Node
 public:
     TreeNode()
         : Node("tree_node"),
+          isActionSuccess_(false),
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
-          isActionSuccess_(false),
           hasUpdatedObjects_(false),
           hasLoadedArchive_(false),
           node_archive_list_()
     {
-        // // * set ros2 logger severity level
+        // * set ros2 logger severity level
         auto logger = this->get_logger();
         rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
 
@@ -475,12 +476,12 @@ private:
             break;
         }
         case kios::TreePhase::IDLE: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: IDLE.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: IDLE.");
             // initial phase. do nothing.
             break;
         }
         case kios::TreePhase::FINISH: {
-            RCLCPP_ERROR(this->get_logger(), "tree_cycle: FINISH.");
+            RCLCPP_INFO(this->get_logger(), "tree_cycle: FINISH.");
             // * all tasks in tree finished. first send request to finish all actions at mios side.
             tree_state_ptr_->action_name = "finish";
             tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;
@@ -695,7 +696,7 @@ private:
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "get_object_service: Service call failed! Error message: %s", result->error_message);
+                RCLCPP_ERROR_STREAM(this->get_logger(), "get_object_service: Service call failed! Error message:" << result->error_message);
                 return false;
             }
         }

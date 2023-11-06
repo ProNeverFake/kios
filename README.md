@@ -12,8 +12,6 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 
 KIOS is developed as a full problem-level robot planning and learning framework based on ROS2. It integrates the high-level planning, which is realized by applying behavior tree mechanism, and the low-level action fine-tuning, which can be achieved by making use of the existing learning algorithms. The functionality of the system is highly decoupled and isolated in the corresponding ROS2 nodes, which composite a cycle like control loop that following the sensing-actuating mode.
 
-> Blackbird: In fact I developed KIOS for my master thesis and maybe I'll finally figure out what this system is really about after finishing the thesis.
-
 ## NEWS
 
 **KNOWN BUGS:**
@@ -26,27 +24,9 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 
 **DEVELOPER'S PLAN:**
 
-- [ ] **TOP** **THE REFACTORING WORK IS NOW UNTER BRANCH KIOS, FOR OLD VERSION PLEASE USE BRANCH BBBRANCH!**
-
-- [x] Mios object grounding is not necessary for kios usage. remove this part in the future.
-- [x] Enable parameter check (in mios) according to the action phase in the command.
-- [ ] Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
-- [ ] Add reset method to tree_node to enable retry.
-- [x] **ERGENT** enable at position check in tree node.
-- [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
-- [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
-- [X] **ERGENT** tree udp check mechanism and mios skill udp part.
-- [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [ ] (POSTPONED) add meta node for kios node.
-
-**REFACTORING RELEVANT**
-
-1. Commander should not use BBGeneralSkill.
-2. Tactician should fetch the parameter from the map.
-
-**THOUGHT**
-- [ ] The object to be grounded is determined at the start of the skill, which should be determined by action context.
-- [ ] Create a dummy object in action context, command context and mongoDB.
+- [ ] Add new node Planner for high level planning. 
+- [x] Wrap the xml generating code in the context of BT.
+- [ ] Apply lifecycle node to tree node etc.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -126,13 +106,19 @@ pip3 install conan==1.59.0
 
 9. install spdlog.
 
+10. install fmt
+
+```bash
+sudo apt install libfmt-dev
+```
+
 > BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
 
-Ok so this part is the instruction of kios.
+The enter point is ...
 
-> BB: THE INSTRUCTION IS STILL UNDER CONSTRUCTION. GOOD LUCK.
+> BB: Currently coach is taken as the enter point of the program. It should conduct the process in the pseudo code and call the action/service provided by other nodes for the needed functionality.
 
 ### System Structure
 
@@ -154,11 +140,31 @@ The project structure:
     - commander
     - mongo_reader
   - kios_py
+    - bota_sens
     - mios_reader
+    - planner
+    - skill_tuner
+    - coach
   - kios_interface
+    - action
+      - MakePlan
     - msg
+      - MiosState
+      - NodeArchive
+      - SensorState
+      - TaskState
+      - TreeState
+      - BotaSens
     - srv
+      - ArchiveActionRequest
+      - CommandRequest
+      - GetObjectRequest
+      - SwitchActionRequest
+      - SwitchTreePhaseRequest
+      - TuneSkillRequest
+      - TeachObjectRequest
   - kios_cli
+    - CLI node
 
 The functions of the nodes are explained explicitly below.
 
@@ -220,16 +226,20 @@ The node **tree_node** manages the life cycle of the behavior tree. It subscribe
 
 The node **tactician** construct the action with the corresponding context. It receives the switch action request from the node **tree_node** and generate the action context, then asks the node **commander** to send the command.
 
+- member object: paramclerk, which read, write the action parameters from/into a json file in workspace directory.
 - Provide the service `switch_action_service` with `SwitchAcitionRequest.srv`.
-- Determine the action parameter in `generate_command_context()`.
+- fetch the action node's parameters from paramclerk by calling `generate_command_context()`.
 
 For developer:
 
-- The skill currently used in mios is BBGeneralSkill, in which all necessary `create_motion_primitive()` methods are collected and invoked according to the received action context. The action nodes in the behavior_tree library can now just generate the corresponding motion primitives context (one action node for one motion primitive), then wrap it into BBGeneralSkill context, and finally into GeneralTask context. Therefore, it is quite straightforward how to invoke an existing skill for specific purposes (instead of BBGeneralSkill which is a general skill) to realize the "skill" layer in the robot task planning system.
+- The skill currently used in mios is NOT BBGeneralSkill ANYMORE. The action nodes in the behavior_tree library should all have their own corresponding skill (only one) in mios. Multiple action nodes in kios can be mapped to the same skill in mios (e.g. the tool_load and tool_unload, because the only difference is to open or close the gripper.).
+
+- For skills available please see kios_skill in mios (BBbranch)
 
 ---
 
 ##### **commander**
+Server Node
 
 The node **commander** manages the websocket connection with mios Port. It receives the command request from the node **tactician** and send it to mios websocket server.
 
@@ -240,6 +250,7 @@ The node **commander** manages the websocket connection with mios Port. It recei
 ---
 
 ##### **mongo_reader**
+Server Node
 
 The node **mongo_reader** manages the communication between kios and mongoDB. It reads the objects set in mongoDB with mongoDB client.
 
@@ -247,9 +258,19 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 
 ---
 
-##### **planner** (NOT IMPLEMENTED YET, MAYBE BORROW SOME FROM PLANSYS2)
+##### **planner** (UNDER CONSTRUCTION)
+Server Node
 
-The node **planner** (should) make plans for robot tasks. It makes the plan the tasks, generates the xml in string format for generating behavior tree, and asks for node **tree_node** to implements the tree.
+The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
+
+--- 
+
+##### **** (UNDER CONSTRUCTION)
+Server Node
+
+The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
+
+
 
 ### Running Process
 
@@ -264,6 +285,21 @@ The basic idea is to make the decision making part in kios and the skill executi
 > BB: ...
 
 ### Development Log
+
+- 06.11.2023
+  - Added coach, planner, action tuner. Added the necessary interfaces.
+  - Built up the architecture surrounding the coach for planning and tuning.
+  - Adjusted the communication schema.
+
+  - PSEUDO CODE SHOWS THE BASIC PROCESS OF PLANNING AND TUNING BASED ON BEHAVIOR TREE.
+
+- 25.10.2023
+  - KIOS is of version 1.0 now.
+  - Removed the deprecated/discarded code.
+  - Add Nullspace strategy in mios.
+  - Add Tool/Gripper grasp/release atomic skills.
+  - Add Tool/Gripper pick/place compound skills.
+  - Add unified logger.
 
 - 18.10.2023
   - Add TOOL_GRASP skill.

@@ -1,5 +1,6 @@
 #include "kios_utils/context_manager.hpp"
 #include <unistd.h>
+
 namespace kios
 {
     ContextClerk::ContextClerk()
@@ -9,6 +10,10 @@ namespace kios
           file_name("context_archive.json"),
           default_context_dictionary_ptr_(std::make_unique<DefaultActionContext>())
     {
+        // ! wahrscheinlich noch fehlerhaft
+        logger = set_logger("ContextClerk", "debug");
+        logger->info("logger test");
+
         char buf[FILENAME_MAX];
         if (getcwd(buf, sizeof(buf)))
         {
@@ -49,7 +54,7 @@ namespace kios
      * @param action_achive 1: group,  2: id,  3: description,  4. action_phase
      * @return bool
      */
-    bool ContextClerk::archive_action(const NodeArchive &action_achive) // ! TESTING
+    bool ContextClerk::archive_action(const NodeArchive &action_achive)
     {
         const auto &[action_group, action_id, description, action_phase] = action_achive;
 
@@ -119,7 +124,7 @@ namespace kios
 
         catch (const std::exception &e)
         {
-            std::cerr << "THIS" << std::endl; // ! BBDEBUG
+            std::cerr << "ERROR in ContextClerk::archive_action" << std::endl;
             std::cerr << e.what() << std::endl;
             return false;
         }

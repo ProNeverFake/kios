@@ -1,0 +1,16 @@
+fallback_nodes:
+    - 'f('
+sequence_nodes:
+    - 's('              
+condition_nodes:
+    - 'c0'
+    - 'c1'
+action_nodes:
+    - 'a0'
+    - 'a1'
+    - 'a2'
+    - 'a3'
+    - 'a4'
+    - 'a5'
+up_node:
+    - ')'

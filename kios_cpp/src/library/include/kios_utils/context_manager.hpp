@@ -5,6 +5,7 @@
 #include <fstream>
 #include <memory>
 #include <filesystem>
+#include "kios_utils/logger_setting.hpp"
 
 namespace kios
 {
@@ -23,6 +24,8 @@ namespace kios
         nlohmann::json get_context(const NodeArchive &archive) const;
 
     private:
+        std::shared_ptr<spdlog::logger> logger;
+
         std::string file_name;
         std::string default_file_name;
         std::string dump_file_name;

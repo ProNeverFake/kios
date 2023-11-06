@@ -5,6 +5,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# cmake_policy(SET CMP0148 NEW)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
@@ -66,6 +68,18 @@ endforeach()
 
 # message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
+################################### sensor msg
+set(MODULE_NAME sensor_msg)
+
+file(GLOB ${MODULE_NAME}_FILES "${CMAKE_CURRENT_SOURCE_DIR}/msg/sensor/*.msg")
+
+set(${MODULE_NAME}_FILE_NAMES)
+
+foreach(file ${${MODULE_NAME}_FILES})
+    get_filename_component(file_name ${file} NAME)
+    list(APPEND ${MODULE_NAME}_FILE_NAMES "msg/sensor/${file_name}")
+endforeach()
+
 ################################### kios_msg
 set(MODULE_NAME kios_msg)
 
@@ -107,7 +121,7 @@ foreach(file ${${MODULE_NAME}_FILES})
     list(APPEND ${MODULE_NAME}_FILE_NAMES "action/${file_name}")
 endforeach()
 
-message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
+# message("The ${MODULE_NAME}_FILE_NAMES is ${${MODULE_NAME}_FILE_NAMES}\n")
 
 
 ################################ generate the interface
@@ -118,6 +132,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
       ${action_FILE_NAMES}
       ${mios_msg_FILE_NAMES}
       ${kios_msg_FILE_NAMES}
+      ${sensor_msg_FILE_NAMES}
     )
 
 ament_package()

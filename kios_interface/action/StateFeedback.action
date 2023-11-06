@@ -1,7 +1,0 @@
-bool command
-
----
-bool result
-
----
-float64[] robot_state

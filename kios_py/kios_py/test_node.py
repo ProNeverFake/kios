@@ -15,6 +15,8 @@ class TestNode(Node):
         # declare parameters
         self.declare_parameter('power', True)
 
+        
+
         timer_callback_group = ReentrantCallbackGroup()
 
         self.timer = self.create_timer(

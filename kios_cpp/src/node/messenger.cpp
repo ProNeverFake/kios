@@ -5,21 +5,21 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "rcl_interfaces/srv/set_parameters_atomically.hpp"
-#include "rcl_interfaces/srv/get_parameters.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
+#include "rcl_interfaces/srv/get_parameters.hpp"
+#include "rcl_interfaces/srv/set_parameters_atomically.hpp"
 
 #include "kios_interface/msg/mios_state.hpp"
-#include "kios_interface/msg/task_state.hpp"
 #include "kios_interface/msg/sensor_state.hpp"
+#include "kios_interface/msg/task_state.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
-#include <thread>
-#include <chrono>
 #include <optional>
+#include <thread>
 
 using std::placeholders::_1;
 
@@ -44,8 +44,7 @@ public:
         //* initialize timer
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
-            std::bind(&Messenger::timer_callback, this),
-            timer_callback_group_);
+            std::bind(&Messenger::timer_callback, this), timer_callback_group_);
 
         //* initialize ros pub sub options
         rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));

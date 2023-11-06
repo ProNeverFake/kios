@@ -12,8 +12,6 @@ The decision making part is realized based on project BehaviorTree.CPP. Code for
 
 KIOS is developed as a full problem-level robot planning and learning framework based on ROS2. It integrates the high-level planning, which is realized by applying behavior tree mechanism, and the low-level action fine-tuning, which can be achieved by making use of the existing learning algorithms. The functionality of the system is highly decoupled and isolated in the corresponding ROS2 nodes, which composite a cycle like control loop that following the sensing-actuating mode.
 
-> Blackbird: In fact I developed KIOS for my master thesis and maybe I'll finally figure out what this system is really about after finishing the thesis.
-
 ## NEWS
 
 **KNOWN BUGS:**
@@ -26,27 +24,9 @@ KIOS is developed as a full problem-level robot planning and learning framework 
 
 **DEVELOPER'S PLAN:**
 
-- [ ] **TOP** **THE REFACTORING WORK IS NOW UNTER BRANCH KIOS, FOR OLD VERSION PLEASE USE BRANCH BBBRANCH!**
-
-- [x] Mios object grounding is not necessary for kios usage. remove this part in the future.
-- [x] Enable parameter check (in mios) according to the action phase in the command.
-- [ ] Add new node Planner for high level planning. Wrap the xml generating code in the context of BT.
-- [ ] Add reset method to tree_node to enable retry.
-- [x] **ERGENT** enable at position check in tree node.
-- [x] **TOP** ws_client enable request result bool return (otherwise large lag.)
-- [x] **ERGENT** use thread safe stack for udp in mios_reader to solve the error.
-- [X] **ERGENT** tree udp check mechanism and mios skill udp part.
-- [x] **ERGENT** add a udp mechanism to realize skill state sharing between mios and kios.
-- [ ] (POSTPONED) add meta node for kios node.
-
-**REFACTORING RELEVANT**
-
-1. Commander should not use BBGeneralSkill.
-2. Tactician should fetch the parameter from the map.
-
-**THOUGHT**
-- [ ] The object to be grounded is determined at the start of the skill, which should be determined by action context.
-- [ ] Create a dummy object in action context, command context and mongoDB.
+- [ ] Add new node Planner for high level planning. 
+- [x] Wrap the xml generating code in the context of BT.
+- [ ] Apply lifecycle node to tree node etc.
 
 SEE [DEVELOPMENT LOG](#development-log)
 
@@ -270,6 +250,13 @@ The basic idea is to make the decision making part in kios and the skill executi
 > BB: ...
 
 ### Development Log
+
+- 06.11.2023
+  - Added coach, planner, action tuner. Added the necessary interfaces.
+  - Built up the architecture surrounding the coach for planning and tuning.
+  - Adjusted the communication schema.
+
+  - PSEUDO CODE SHOWS THE BASIC PROCESS OF PLANNING AND TUNING BASED ON BEHAVIOR TREE.
 
 - 25.10.2023
   - KIOS is of version 1.0 now.

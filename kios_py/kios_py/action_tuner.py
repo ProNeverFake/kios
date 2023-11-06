@@ -4,7 +4,6 @@ The skill tuner node of kios_py:
     2. optimize the parameters of the skills iteratively.
 """
 
-
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor

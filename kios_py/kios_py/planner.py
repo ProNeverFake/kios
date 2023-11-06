@@ -14,11 +14,7 @@ from rclpy.action import ActionServer
 
 import json
 
-from .resource.mongodb_client import MongoDBClient
-
-from kios_interface.srv import GetObjectRequest
-from kios_interface.srv import GenerateTreeRequest
-from kios_interface.srv import MakePlanRequest
+from kios_interface.srv import MakePlanRequest # ! discarded
 
 from kios_interface.action import MakePlan
 

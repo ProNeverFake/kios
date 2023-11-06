@@ -116,9 +116,9 @@ sudo apt install libfmt-dev
 
 ### Usage
 
-Ok so this part is the instruction of kios.
+The enter point is ...
 
-> BB: THE INSTRUCTION IS STILL UNDER CONSTRUCTION. GOOD LUCK.
+> BB: Currently coach is taken as the enter point of the program. It should conduct the process in the pseudo code and call the action/service provided by other nodes for the needed functionality.
 
 ### System Structure
 
@@ -140,11 +140,31 @@ The project structure:
     - commander
     - mongo_reader
   - kios_py
+    - bota_sens
     - mios_reader
+    - planner
+    - skill_tuner
+    - coach
   - kios_interface
+    - action
+      - MakePlan
     - msg
+      - MiosState
+      - NodeArchive
+      - SensorState
+      - TaskState
+      - TreeState
+      - BotaSens
     - srv
+      - ArchiveActionRequest
+      - CommandRequest
+      - GetObjectRequest
+      - SwitchActionRequest
+      - SwitchTreePhaseRequest
+      - TuneSkillRequest
+      - TeachObjectRequest
   - kios_cli
+    - CLI node
 
 The functions of the nodes are explained explicitly below.
 
@@ -206,16 +226,20 @@ The node **tree_node** manages the life cycle of the behavior tree. It subscribe
 
 The node **tactician** construct the action with the corresponding context. It receives the switch action request from the node **tree_node** and generate the action context, then asks the node **commander** to send the command.
 
+- member object: paramclerk, which read, write the action parameters from/into a json file in workspace directory.
 - Provide the service `switch_action_service` with `SwitchAcitionRequest.srv`.
-- Determine the action parameter in `generate_command_context()`.
+- fetch the action node's parameters from paramclerk by calling `generate_command_context()`.
 
 For developer:
 
-- The skill currently used in mios is BBGeneralSkill, in which all necessary `create_motion_primitive()` methods are collected and invoked according to the received action context. The action nodes in the behavior_tree library can now just generate the corresponding motion primitives context (one action node for one motion primitive), then wrap it into BBGeneralSkill context, and finally into GeneralTask context. Therefore, it is quite straightforward how to invoke an existing skill for specific purposes (instead of BBGeneralSkill which is a general skill) to realize the "skill" layer in the robot task planning system.
+- The skill currently used in mios is NOT BBGeneralSkill ANYMORE. The action nodes in the behavior_tree library should all have their own corresponding skill (only one) in mios. Multiple action nodes in kios can be mapped to the same skill in mios (e.g. the tool_load and tool_unload, because the only difference is to open or close the gripper.).
+
+- For skills available please see kios_skill in mios (BBbranch)
 
 ---
 
 ##### **commander**
+Server Node
 
 The node **commander** manages the websocket connection with mios Port. It receives the command request from the node **tactician** and send it to mios websocket server.
 
@@ -226,6 +250,7 @@ The node **commander** manages the websocket connection with mios Port. It recei
 ---
 
 ##### **mongo_reader**
+Server Node
 
 The node **mongo_reader** manages the communication between kios and mongoDB. It reads the objects set in mongoDB with mongoDB client.
 
@@ -233,9 +258,19 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 
 ---
 
-##### **planner** (NOT IMPLEMENTED YET, MAYBE BORROW SOME FROM PLANSYS2)
+##### **planner** (UNDER CONSTRUCTION)
+Server Node
 
-The node **planner** (should) make plans for robot tasks. It makes the plan the tasks, generates the xml in string format for generating behavior tree, and asks for node **tree_node** to implements the tree.
+The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
+
+--- 
+
+##### **** (UNDER CONSTRUCTION)
+Server Node
+
+The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
+
+
 
 ### Running Process
 

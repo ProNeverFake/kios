@@ -16,8 +16,8 @@ from rclpy.action import ActionClient
 import json
 
 from kios_interface.srv import GetObjectRequest
-from kios_interface.srv import GenerateTreeRequest
-from kios_interface.srv import TuneActionRequest
+
+from kios_interface.srv import TuneSkillRequest
 
 from kios_interface.action import MakePlan
 
@@ -52,7 +52,46 @@ class Coach(Node):
             "make_plan_action",
             callback_group=coach_callback_group,
         )
-        
+    
+    # ! test
+    def send_tune_skill_request(self, ready_deadline=0.1, response_deadline=10) -> bool:
+        """wrapper method for the TuneSkill service client
+
+        Args:
+            ready_deadline (float, optional): time limit for waiting for service ready. Defaults to 0.1.
+            response_deadline (int, optional): time limit for server response. Defaults to 10 secs.
+
+        Returns:
+            bool: True if service call succeeded, False otherwise.
+        """
+        request = TuneSkillRequest.Request()
+        request.plan = self.plan # ! dummy request
+
+        if not self.tune_skill_service_client_.wait_for_service(timeout_sec=ready_deadline):
+            self.get_logger("coach").error(f"Service {self.switch_action_client_.srv_name} not available.")
+            return False
+
+        future = self.switch_action_client_.call_async(request)
+
+        try:
+            rclpy.spin_until_future_complete(self, future, timeout_sec=response_deadline)
+        except ROSInterruptException:
+            self.get_logger("coach").error(f"Service call interrupted.")
+            return False
+
+        if future.done():
+            response = future.result()
+            if response.is_success:
+                self.get_logger("coach").info(f"Service {self.tune_skill_service_client_.srv_name}: succeeded.")
+                return True
+            else:
+                self.get_logger("coach").error(f"Service {self.tune_skill_service_client_.srv_name}: failed!")
+                self.get_logger("coach").error(f"Error message: {response.error_msg}")
+                return False
+        else:
+            self.get_logger("coach").error(f"UNKNOWN ERROR: Service {self.tune_skill_service_client_.srv_name} future not ready (timeout!).")
+            return False
+            
     # ! test
 ####################################################### MakePlan ###################################################
     def send_goal(self, current_state, goal_state):

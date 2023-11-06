@@ -1,4 +1,0 @@
-string behavior_tree
----
-bool is_accepted
-string error_message

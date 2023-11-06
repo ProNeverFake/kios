@@ -1,3 +1,4 @@
+# ! CURRENTLY NOT USED !
 int32 ERROR=-1
 int32 IDLE=0
 int32 RESUME=1

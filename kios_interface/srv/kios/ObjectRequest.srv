@@ -1,5 +1,0 @@
-# kios_interface/SkillContext command_context
-string object_list
----
-string object_context
-bool is_accepted

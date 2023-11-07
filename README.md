@@ -239,7 +239,6 @@ For developer:
 ---
 
 ##### **commander**
-Server Node
 
 The node **commander** manages the websocket connection with mios Port. It receives the command request from the node **tactician** and send it to mios websocket server.
 
@@ -250,7 +249,6 @@ The node **commander** manages the websocket connection with mios Port. It recei
 ---
 
 ##### **mongo_reader**
-Server Node
 
 The node **mongo_reader** manages the communication between kios and mongoDB. It reads the objects set in mongoDB with mongoDB client.
 
@@ -259,17 +257,34 @@ The node **mongo_reader** manages the communication between kios and mongoDB. It
 ---
 
 ##### **planner** (UNDER CONSTRUCTION)
-Server Node
 
 The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
 
 --- 
 
-##### **** (UNDER CONSTRUCTION)
-Server Node
+##### **skill_tuner** (UNDER CONSTRUCTION)
 
-The node **planner** make plans for robot tasks, in which the expanding BT techniques should be applied. It expands the behavior tree, validates it, transforms it into xml format (dumps it in string format) and send the result back.
+The node for tuning the parameters of the skills in the plan (i.e. the action nodes in the behavior tree).
 
+- Provide the service `tune_skill_service` with `TuneSkillRequest.srv`.
+
+- Publish ...
+
+--- 
+
+##### **bota_sens** (UNDER CONSTRUCTION)
+
+The sensor node for Bota SensOne F/T sensor. 
+
+- Publish ...
+
+--- 
+
+##### **coach** (UNDER CONSTRUCTION)
+
+The "agent". The node "coach" is a client for calling all possible service provided above.
+
+...
 
 
 ### Running Process

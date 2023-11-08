@@ -3,8 +3,6 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
 
 #include "nlohmann/json.hpp"
 
@@ -18,14 +16,11 @@
 
 #include "kios_interface/srv/command_request.hpp"
 #include "kios_interface/srv/teach_object_service.hpp"
-#include "kios_interface/action/execute_skill.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
-using ExecuteSkillAction = kios_interface::action::ExecuteSkill;
-using GoalHandleExecuteSkill = rclcpp_action::ServerGoalHandle<ExecuteSkillAction>;
 
 class Commander : public rclcpp::Node
 {
@@ -38,9 +33,6 @@ public:
           isBusy(false),
           subscription_list_{"tau_ext", "q", "TF_F_ext_K", "system_time", "T_T_EE"}
     {
-        // declare power parameter
-        this->declare_parameter("power", true);
-
         // callback group
         service_callback_group_ = this->create_callback_group(
             rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -76,14 +68,6 @@ public:
             std::bind(&Commander::teach_object_service_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             service_callback_group_);
-
-        // * action server
-        this->execute_skill_action_server_ = rclcpp_action::create_server<ExecuteSkillAction>(
-            this,
-            "execute_skill_action",
-            std::bind(&Commander::execute_skill_handle_goal, this, _1, _2),
-            std::bind(&Commander::execute_skill_handle_cancel, this, _1),
-            std::bind(&Commander::execute_skill_handle_accepted, this, _1));
     }
 
     // connection rel
@@ -100,11 +84,6 @@ public:
     {
         messenger_->unregister_udp();
         messenger_->close();
-    }
-
-    bool check_power()
-    {
-        return this->get_parameter("power").as_bool();
     }
 
 private:
@@ -124,8 +103,6 @@ private:
     rclcpp::Service<kios_interface::srv::CommandRequest>::SharedPtr command_service_;
     rclcpp::Service<kios_interface::srv::TeachObjectService>::SharedPtr teach_object_service_;
 
-    rclcpp_action::Server<ExecuteSkillAction>::SharedPtr execute_skill_action_server_;
-
     // ws_client rel
     std::shared_ptr<BTMessenger> messenger_;
     std::string ws_url;
@@ -135,165 +112,25 @@ private:
     int udp_port_;
     nlohmann::json subscription_list_;
 
-    ///////////////////////////////////////////////// ! ACTION SERVER   /////////////////////////////////////////////////
-    rclcpp_action::GoalResponse execute_skill_handle_goal(
-        const rclcpp_action::GoalUUID &uuid,
-        std::shared_ptr<const ExecuteSkillAction::Goal> goal)
-    {
-        RCLCPP_INFO(this->get_logger(), "Received goal request.");
-        (void)uuid;
-        return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
-    }
-
-    rclcpp_action::CancelResponse execute_skill_handle_cancel(
-        const std::shared_ptr<GoalHandleExecuteSkill> goal_handle)
-    {
-        RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
-        (void)goal_handle;
-        return rclcpp_action::CancelResponse::ACCEPT;
-    }
-
-    void execute_skill_handle_accepted(const std::shared_ptr<GoalHandleExecuteSkill> goal_handle)
-    {
-        // this needs to return quickly to avoid blocking the executor, so spin up a new thread
-        std::thread{std::bind(&Commander::execute_skill_execute, this, _1), goal_handle}.detach();
-    }
-
-    // handle the goal here: execute the action and return executing
-    void execute_skill_execute(const std::shared_ptr<GoalHandleExecuteSkill> goal_handle)
-    {
-        RCLCPP_INFO(this->get_logger(), "Executing goal");
-        const auto goal = goal_handle->get_goal();
-
-        auto feedback = std::make_shared<ExecuteSkillAction::Feedback>();
-        auto result = std::make_shared<ExecuteSkillAction::Result>();
-        result->result = false;
-
-        // * get command context
-        try
-        {
-            command_request_.command_context = nlohmann::json::parse(goal->command_context);
-        }
-        catch (...)
-        {
-            RCLCPP_ERROR_STREAM(this->get_logger(), "SOMETHING WRONG WITH THE JSON PARSE!");
-            result->error_code = kios_interface::action::ExecuteSkill::Result::NODE_ERROR;
-            result->message = "SOMETHING WRONG WITH THE JSON PARSE!";
-            goal_handle->abort(result);
-            return;
-        }
-        command_request_.command_type = static_cast<kios::CommandType>(goal->command_type);
-        command_request_.skill_type = goal->skill_type;
-
-        // * issue command
-        switch (command_request_.command_type)
-        {
-        case kios::CommandType::STOP_OLD_START_NEW: {
-            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old start new...");
-            // * future for trace
-            std::promise<nlohmann::json> result_promise;
-            std::future<nlohmann::json> result_future = result_promise.get_future();
-            std::atomic_bool isInterrupted(false);
-            // * stop the old task first
-            if (!stop_task_request())
-            {
-                // ! failed
-                RCLCPP_ERROR(this->get_logger(), "Issuing command: Stop task failed!!!");
-                result->error_code = kios_interface::action::ExecuteSkill::Result::MIOS_ERROR;
-                goal_handle->abort(result);
-                return;
-            }
-
-            if (start_task_request(command_request_) == false)
-            {
-                // ! failed
-                RCLCPP_ERROR(this->get_logger(), "Issuing command: Start task failed!!!");
-                result->error_code = kios_interface::action::ExecuteSkill::Result::MIOS_ERROR;
-                goal_handle->abort(result);
-                return;
-            }
-
-            // * start a new thread to tun wait for task
-            // ? where is the task uuid?
-            auto wait_thread = std::thread(&Commander::wait_for_task_result, this, task_response_["result"]["task_uuid"], std::ref(result_promise));
-            wait_thread.detach();
-
-            // * wait for result in this thread
-            while (result_future.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout) //websocket result
-            {
-                // * Check if there is a cancel request
-                if (goal_handle->is_canceling())
-                {
-                    RCLCPP_INFO(this->get_logger(), "Goal canceled");
-                    // notify the thread to stop
-                    isInterrupted.store(true);
-                    // * stop the action
-                    result->result = true;
-                    result->error_code = kios_interface::action::ExecuteSkill::Result::CANCELLED;
-                    goal_handle->canceled(result);
-                    return;
-                }
-
-                // * Publish feedback
-                goal_handle->publish_feedback(feedback);
-                RCLCPP_INFO(this->get_logger(), "Publish feedback");
-            }
-
-            // Check if goal is done
-            if (rclcpp::ok())
-            {
-                result->result = true;
-                goal_handle->succeed(result);
-                RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-            }
-            return;
-        }
-        case kios::CommandType::STOP_OLD_TASK: {
-            RCLCPP_INFO(this->get_logger(), "Issuing command: stop old command...");
-            stop_task_command(); // * don't care about the result
-            result->result = true;
-            goal_handle->succeed(result);
-            RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-            return;
-        }
-        default:
-            RCLCPP_ERROR(this->get_logger(), "ISSUING COMMAND: UNDEFINED COMMANDTYPE!");
-            result->error_code = kios_interface::action::ExecuteSkill::Result::NODE_ERROR;
-            result->message = "UNDEFINED COMMANDTYPE!";
-            goal_handle->abort(result);
-            return;
-        }
-    }
-
-    ///////////////////////////////////////////////// ! ACTION SERVER   /////////////////////////////////////////////////
-
     void command_service_callback(
         const std::shared_ptr<kios_interface::srv::CommandRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
-        if (check_power() == true)
+        // * read the command request
+        command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
+        try
         {
-            // * read the command request
-            command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
-            try
-            {
-                command_request_.command_context = nlohmann::json::parse(request->command_context);
-            }
-            catch (...)
-            {
-                RCLCPP_ERROR_STREAM(this->get_logger(), "SOMETHING WRONG WITH THE JSON PARSE!");
-                response->is_accepted = false;
-                return;
-            }
-            command_request_.skill_type = request->skill_type;
-            issue_command(command_request_);
-            response->is_accepted = true;
+            command_request_.command_context = nlohmann::json::parse(request->command_context);
         }
-        else
+        catch (...)
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
+            RCLCPP_ERROR_STREAM(this->get_logger(), "SOMETHING WRONG WITH THE JSON PARSE!");
             response->is_accepted = false;
+            return;
         }
+        command_request_.skill_type = request->skill_type;
+        issue_command(command_request_);
+        response->is_accepted = true;
     }
 
     void issue_command(const kios::CommandRequest &command_request)
@@ -314,10 +151,6 @@ private:
             {
                 RCLCPP_ERROR(this->get_logger(), "Issuing command: BAD NEWS FROM RESPONSE!");
             }
-            ////////////////////////////////
-            // !!!!! TEST remove stop_task
-            ////////////////////////////////
-            // start_task_command(command_request.command_context);
             break;
         }
         case kios::CommandType::STOP_OLD_TASK: {
@@ -387,7 +220,6 @@ private:
         messenger_->wait_for_task_result(task_uuid, task_promise, isInterrupted);
     }
 
-
     void stop_task_command()
     {
         messenger_->stop_task_command();
@@ -419,23 +251,13 @@ private:
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Request> request,
         const std::shared_ptr<kios_interface::srv::TeachObjectService::Response> response)
     {
-        if (check_power() == true)
-        {
-            // * read the command request
-            std::string object_name = request->object_name;
-            nlohmann::json object_context = {{"object", object_name}};
-            teach_object(object_context);
-            response->is_success = true;
-        }
-        else
-        {
-            RCLCPP_ERROR(this->get_logger(), "commander not running, request refused!");
-            response->is_success = false;
-        }
+        // * read the command request
+        std::string object_name = request->object_name;
+        nlohmann::json object_context = {{"object", object_name}};
+        teach_object(object_context);
+        response->is_success = true;
     }
 };
-
-RCLCPP_COMPONENTS_REGISTER_NODE(Commander)
 
 int main(int argc, char *argv[])
 {

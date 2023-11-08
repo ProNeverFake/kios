@@ -3,17 +3,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 ######################################################### tree_node
-add_library(tree_node SHARED tree_node.cpp)
+add_executable(tree_node tree_node.cpp)
 
-target_include_directories(tree_node
-  PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-target_compile_definitions( tree_node
-  PRIVATE "BEHAVIOR_TREE_BUILDING_DLL"
-)
 
 target_link_libraries(tree_node
     ${PROJECT_NAME}::behavior_tree
@@ -23,13 +14,9 @@ target_link_libraries(tree_node
 
 ament_target_dependencies(tree_node
   rclcpp
-  rclcpp_action
-  rclcpp_components
   rcl_interfaces
   kios_interface
 )
-
-rclcpp_components_register_node(tree_node PLUGIN "kios::TreeNode" EXECUTABLE tree_node)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -38,17 +25,7 @@ endif()
 
 ######################################################### commander
 
-add_library(commander SHARED commander.cpp)
-
-target_include_directories(commander
-  PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-target_compile_definitions(commander
-  PRIVATE "BEHAVIOR_TREE_BUILDING_DLL"
-)
+add_executable(commander commander.cpp)
 
 target_link_libraries(commander
     ${PROJECT_NAME}::behavior_tree
@@ -58,13 +35,10 @@ target_link_libraries(commander
 
 ament_target_dependencies(tree_node
   rclcpp
-  rclcpp_action
-  rclcpp_components
   rcl_interfaces
   kios_interface
 )
 
-rclcpp_components_register_node(commander PLUGIN "kios::Commander" EXECUTABLE commander)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

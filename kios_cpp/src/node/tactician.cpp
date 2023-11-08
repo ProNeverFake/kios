@@ -38,8 +38,6 @@ public:
           context_clerk_()
     {
         std::cout << "start initialization" << std::endl;
-        // declare mission parameter
-        this->declare_parameter("power", true);
 
         //* initialize the callback groups
         subscription_callback_group_ = this->create_callback_group(
@@ -90,10 +88,10 @@ public:
             std::bind(&Tactician::task_subscription_callback, this, _1),
             subscription_options);
 
-        timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(100),
-            std::bind(&Tactician::timer_callback, this),
-            timer_callback_group_);
+        // timer_ = this->create_wall_timer(
+        //     std::chrono::milliseconds(100),
+        //     std::bind(&Tactician::timer_callback, this),
+        //     timer_callback_group_);
 
         // * initialize context clerk
         // context_clerk_.initialize(); // ! YOU SHOULD NOT USE THIS.
@@ -102,25 +100,6 @@ public:
         std::cout << "finish initialization" << std::endl;
 
         rclcpp::sleep_for(std::chrono::seconds(3));
-    }
-
-    bool check_power()
-    {
-        return this->get_parameter("power").as_bool();
-    }
-
-    void switch_power(bool turn_on)
-    {
-        std::vector<rclcpp::Parameter> all_new_parameters{rclcpp::Parameter("power", turn_on)};
-        this->set_parameters(all_new_parameters);
-        if (turn_on)
-        {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn on.");
-        }
-        else
-        {
-            RCLCPP_INFO(this->get_logger(), "switch_power: turn off.");
-        }
     }
 
 private:
@@ -150,7 +129,7 @@ private:
     rclcpp::Service<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_server_;
     rclcpp::Service<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_server_;
     rclcpp::Client<kios_interface::srv::CommandRequest>::SharedPtr command_client_;
-    rclcpp::TimerBase::SharedPtr timer_;
+    // rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
 
     rclcpp::Service<kios_interface::srv::FetchSkillParameterRequest>::SharedPtr fetch_skill_parameter_server_;
@@ -162,17 +141,10 @@ private:
      */
     void task_subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
     {
-        if (check_power())
-        {
-            std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-            // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-            // * update task state
-            task_state_.from_ros2_msg(*msg);
-        }
-        else
-        {
-            // pass;
-        }
+        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
+        // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+        // * update task state
+        task_state_.from_ros2_msg(*msg);
     }
 
     /**
@@ -185,39 +157,31 @@ private:
         const std::shared_ptr<kios_interface::srv::SwitchActionRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::SwitchActionRequest::Response> response)
     {
-        if (check_power() == true)
+        if (isBusy.load())
         {
-            if (isBusy.load())
-            {
-                RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
-                response->is_accepted = false;
-            }
-            else
-            {
-                RCLCPP_DEBUG(this->get_logger(), "SWITCH ACTION HIT!");
-
-                // * update tree state
-                std::lock_guard<std::mutex> lock(tree_state_mtx_);
-                // tree_state_.action_name = std::move(request->action_name);
-                // tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
-                tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
-
-                tree_state_.object_keys = std::move(request->object_keys);
-                tree_state_.object_names = std::move(request->object_names);
-
-                tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
-
-                // * set flag for timer
-                isSwitchAction.store(true);
-
-                RCLCPP_INFO(this->get_logger(), "switch_action request accepted.");
-                response->is_accepted = true;
-            }
+            RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
+            response->is_accepted = false;
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
-            response->is_accepted = false;
+            RCLCPP_DEBUG(this->get_logger(), "SWITCH ACTION HIT!");
+
+            // * update tree state
+            std::lock_guard<std::mutex> lock(tree_state_mtx_);
+            // tree_state_.action_name = std::move(request->action_name);
+            // tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
+            tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+
+            tree_state_.object_keys = std::move(request->object_keys);
+            tree_state_.object_names = std::move(request->object_names);
+
+            tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
+
+            // * set flag for timer
+            isSwitchAction.store(true);
+
+            RCLCPP_INFO(this->get_logger(), "switch_action request accepted.");
+            response->is_accepted = true;
         }
     }
 
@@ -231,41 +195,32 @@ private:
         const std::shared_ptr<kios_interface::srv::FetchSkillParameterRequest::Request> request,
         const std::shared_ptr<kios_interface::srv::FetchSkillParameterRequest::Response> response)
     {
-        if (isBusy.load())
-        {
-            RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
-            response->is_accepted = false;
-            response->message = "Node is busy, request refused!";
-        }
-        else
-        {
-            // * update tree state
-            std::lock_guard<std::mutex> lock(tree_state_mtx_);
-            tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
-            tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
-            tree_state_.object_keys = std::move(request->object_keys);
-            tree_state_.object_names = std::move(request->object_names);
+        // * update tree state
+        std::lock_guard<std::mutex> lock(tree_state_mtx_);
+        tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+        tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
+        tree_state_.object_keys = std::move(request->object_keys);
+        tree_state_.object_names = std::move(request->object_names);
 
-            // context = skill parameter
-            nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
-            // ! important: here remove the action_context to prevent context inconsistency in mios
-            if (context["skill"].contains("action_context"))
-            {
-                context["skill"].erase("action_context");
-            }
-            // ground the objects
-            const auto &obj_keys = tree_state_.object_keys;
-            const auto &obj_names = tree_state_.object_names;
-            for (int i = 0; i < obj_keys.size(); i++)
-            {
-                context["skill"]["objects"][obj_keys[i]] = obj_names[i];
-            }
-
-            // load skill parameters into response
-            response->skill_parameters_json = context.dump();
-            RCLCPP_INFO(this->get_logger(), "fetch skill parameter request accepted.");
-            response->is_accepted = true;
+        // context = skill parameter
+        nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
+        // ! important: here remove the action_context to prevent context inconsistency in mios
+        if (context["skill"].contains("action_context"))
+        {
+            context["skill"].erase("action_context");
         }
+        // ground the objects
+        const auto &obj_keys = tree_state_.object_keys;
+        const auto &obj_names = tree_state_.object_names;
+        for (int i = 0; i < obj_keys.size(); i++)
+        {
+            context["skill"]["objects"][obj_keys[i]] = obj_names[i];
+        }
+
+        // load skill parameters into response
+        response->skill_parameters_json = context.dump();
+        RCLCPP_INFO(this->get_logger(), "fetch skill parameter request accepted.");
+        response->is_accepted = true;
     }
 
     /**
@@ -281,36 +236,27 @@ private:
         std::string err_msg = "";
         bool isAccepted = true;
 
-        if (check_power() == true)
+        if (isBusy.load())
         {
-            if (isBusy.load())
-            {
-                isAccepted = false;
-                err_msg = "Node is busy, request refused !";
-                RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
-            }
-            else
-            {
-                RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
-                for (auto &archive : request->archive_list)
-                {
-                    kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
-                    // try to archive the node.
-                    if (!context_clerk_.archive_action(arch))
-                    {
-                        err_msg = "ERROR when archiving the action in group " + std::to_string(archive.action_group) + " with id " + std::to_string(archive.action_id);
-                        isAccepted = false;
-                        RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
-                        break;
-                    }
-                }
-            }
+            isAccepted = false;
+            err_msg = "Node is busy, request refused !";
+            RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
         }
         else
         {
-            err_msg = "POWER OFF, request refused!";
-            isAccepted = false;
-            RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
+            RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
+            for (auto &archive : request->archive_list)
+            {
+                kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
+                // try to archive the node.
+                if (!context_clerk_.archive_action(arch))
+                {
+                    err_msg = "ERROR when archiving the action in group " + std::to_string(archive.action_group) + " with id " + std::to_string(archive.action_id);
+                    isAccepted = false;
+                    RCLCPP_ERROR_STREAM(this->get_logger(), err_msg);
+                    break;
+                }
+            }
         }
 
         response->is_accepted = isAccepted;
@@ -418,18 +364,15 @@ private:
                 // * invoke error in tree
 
                 // * turn off for check
-                switch_power(false);
             }
             break;
         }
         case kios::TreePhase::ERROR: {
             // * error in tree. stop and check.
-            switch_power(false);
             break;
         }
         case kios::TreePhase::FAILURE: {
             // * this won't arrive at tactician in principle. but just stop.
-            switch_power(false);
             break;
         }
         case kios::TreePhase::FINISH: {
@@ -444,12 +387,9 @@ private:
                 // * invoke error in tree
 
                 // * turn off for check
-                switch_power(false);
             }
             // * archive the nodes contexts into json file.
             context_clerk_.store_archive();
-
-            switch_power(false);
             break;
         }
         case kios::TreePhase::IDLE: {
@@ -475,7 +415,6 @@ private:
 
         default: {
             RCLCPP_ERROR(this->get_logger(), "HANDLING UNDEFINED TREEPHASE!");
-            switch_power(false);
             break;
         }
         }
@@ -483,38 +422,31 @@ private:
 
     /**
      * @brief timer callback. check the need of request handling periodically.
-     *
+     * ! will be deprecated
      */
     void timer_callback()
     {
-        if (check_power() == true)
+        if (isSwitchAction.load() == true)
         {
-            if (isSwitchAction.load() == true)
+            if (!isBusy.load())
             {
-                if (!isBusy.load())
-                {
-                    // set busy
-                    isBusy.store(true);
+                // set busy
+                isBusy.store(true);
 
-                    handle_request();
+                handle_request();
 
-                    // * command_request finished. reset flags.
-                    isSwitchAction.store(false);
-                    isBusy.store(false);
-                }
-                else
-                {
-                    RCLCPP_INFO(this->get_logger(), "Timer: Node is busy now.");
-                }
+                // * command_request finished. reset flags.
+                isSwitchAction.store(false);
+                isBusy.store(false);
             }
             else
             {
-                RCLCPP_INFO_ONCE(this->get_logger(), "Timer: Continue the last action phase.");
+                RCLCPP_INFO(this->get_logger(), "Timer: Node is busy now.");
             }
         }
         else
         {
-            RCLCPP_ERROR_ONCE(this->get_logger(), "POWER OFF, Timer pass ...");
+            RCLCPP_INFO_ONCE(this->get_logger(), "Timer: Continue the last action phase.");
         }
     }
 };

@@ -108,17 +108,6 @@ ament_target_dependencies(mongo_reader
 )
 
 
-# install(TARGETS
-#     commander
-#     messenger
-#     tactician
-#     tree_node
-#     mongo_reader
-#     test_node
-
-#     DESTINATION lib/${PROJECT_NAME}
-#     )
-
 install(TARGETS
     commander
     messenger
@@ -127,7 +116,18 @@ install(TARGETS
     mongo_reader
     test_node
 
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+    DESTINATION lib/${PROJECT_NAME}
     )
+
+# install(TARGETS
+#     commander
+#     messenger
+#     tactician
+#     tree_node
+#     mongo_reader
+#     test_node
+
+#     ARCHIVE DESTINATION lib
+#     LIBRARY DESTINATION lib
+#     RUNTIME DESTINATION bin
+#     )

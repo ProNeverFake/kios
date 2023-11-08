@@ -30,7 +30,6 @@ public:
           ws_url("ws://localhost:12000/mios/core"),
           udp_ip("127.0.0.1"), // not used
           udp_port_(12346),
-          isBusy(false),
           subscription_list_{"tau_ext", "q", "TF_F_ext_K", "system_time", "T_T_EE"}
     {
         // callback group
@@ -38,7 +37,6 @@ public:
             rclcpp::CallbackGroupType::MutuallyExclusive);
 
         // * initialize the websocket messenger
-
         messenger_ = std::make_shared<BTMessenger>(ws_url);
         // websocket connection
         messenger_->special_connect();
@@ -87,10 +85,6 @@ public:
     }
 
 private:
-    // flags
-    bool isBusy;
-
-    //! TEMP STATE
     kios::ActionPhaseContext action_phase_context_;
     kios::CommandRequest command_request_;
 
@@ -274,3 +268,4 @@ int main(int argc, char *argv[])
     rclcpp::shutdown();
     return 0;
 }
+

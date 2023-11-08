@@ -18,7 +18,6 @@
 #include "kios_interface/msg/task_state.hpp"
 
 #include "kios_interface/srv/get_object_request.hpp"
-#include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/switch_tree_phase_request.hpp"
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/archive_action_request.hpp"
@@ -81,10 +80,6 @@ public:
 
         get_object_client_ = this->create_client<kios_interface::srv::GetObjectRequest>(
             "get_object_service",
-            rmw_qos_profile_services_default,
-            client_callback_group_);
-        switch_action_client_ = this->create_client<kios_interface::srv::SwitchActionRequest>(
-            "switch_action_service",
             rmw_qos_profile_services_default,
             client_callback_group_);
         switch_tree_phase_server_ = this->create_service<kios_interface::srv::SwitchTreePhaseRequest>(
@@ -166,7 +161,6 @@ private:
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr subscription_;
-    rclcpp::Client<kios_interface::srv::SwitchActionRequest>::SharedPtr switch_action_client_;
     rclcpp::Client<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
@@ -335,20 +329,20 @@ private:
             auto result = result_future.get();
             if (result->is_accepted == true)
             {
-                RCLCPP_INFO(this->get_logger(), "Service %s response: request accepted.", switch_action_client_->get_service_name());
+                RCLCPP_INFO(this->get_logger(), "Service %s response: request accepted.", fetch_skill_parameter_client_->get_service_name());
                 // ! hier ist try/catch noetig
                 skill_parameter_ = nlohmann::json::parse(result->skill_parameters_json);
                 return true;
             }
             else
             {
-                RCLCPP_ERROR(this->get_logger(), "Service %s response: request refused!", switch_action_client_->get_service_name());
+                RCLCPP_ERROR(this->get_logger(), "Service %s response: request refused!", fetch_skill_parameter_client_->get_service_name());
                 return false;
             }
         }
         else
         {
-            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: service %s future is available but not ready.", switch_action_client_->get_service_name());
+            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: service %s future is available but not ready.", fetch_skill_parameter_client_->get_service_name());
             return false;
         }
     }
@@ -506,7 +500,7 @@ private:
         case kios::TreePhase::FAILURE: {
             RCLCPP_ERROR(this->get_logger(), "tree_cycle: FAILURE!");
             // * failure at mios side. turn off for debug.
-            // TODO handle the result from commander.
+            // TODO update this in action node.
             switch_power(false);
             break;
         }
@@ -517,17 +511,18 @@ private:
         }
         case kios::TreePhase::FINISH: {
             RCLCPP_INFO(this->get_logger(), "tree_cycle: FINISH.");
-            // * all tasks in tree finished. first send request to finish all actions at mios side.
             tree_state_ptr_->action_name = "finish";
             tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;
-            if (send_switch_action_request(1000, 1000))
-            {
-                switch_power(false);
-            }
-            else
+            // * all tasks in tree finished. first send request to finish all actions at mios side.
+            // * stop the tasks on mios side.
+            if (!send_command_request(1000, 1000))
             {
                 RCLCPP_ERROR(this->get_logger(), "tree_cycle at FINISH: failed when sending stop request.");
                 switch_tree_phase("ERROR", tree_phase_);
+            }
+            else
+            {
+                switch_power(false);
             }
             break;
         }
@@ -571,11 +566,13 @@ private:
                 tree_state_ptr_->tree_phase = tree_phase_;
 
                 // * get the parameter of the acion node (skill)
+                RCLCPP_INFO_STREAM(this->get_logger(), "fetch skill parameter.");
                 if (!send_fetch_skill_parameter_request(1000, 1000))
                 {
                     switch_tree_phase("ERROR", tree_phase_);
                     return;
                 }
+                std::cout << "skill parameter: " << skill_parameter_.dump() << std::endl;
                 if (!send_command_request(1000, 1000))
                 {
                     switch_tree_phase("ERROR", tree_phase_);
@@ -630,57 +627,6 @@ private:
             return true;
         }
         return false;
-    }
-
-    /**
-     * @brief send switch_action_request to tactician for generating the action parameter.
-     * ! will be deprecated in the future.
-     * @return true
-     * @return false if send failed
-     */
-    bool send_switch_action_request(int ready_deadline = 50, int response_deadline = 50)
-    {
-        // * send request to update the object
-        auto request = std::make_shared<kios_interface::srv::SwitchActionRequest::Request>();
-        request->action_name = tree_state_ptr_->action_name;
-        request->action_phase = static_cast<int32_t>(tree_state_ptr_->action_phase);
-        request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
-
-        // ! add node_archive
-        request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
-
-        request->object_keys = tree_state_ptr_->object_keys;
-        request->object_names = tree_state_ptr_->object_names;
-
-        request->is_interrupted = true; // ! not used yet
-
-        while (!switch_action_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
-        {
-            RCLCPP_ERROR(this->get_logger(), "service %s not available.", switch_action_client_->get_service_name());
-            return false;
-        }
-        auto result_future = switch_action_client_->async_send_request(request);
-        std::future_status status = result_future.wait_until(
-            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
-        if (status == std::future_status::ready)
-        {
-            auto result = result_future.get();
-            if (result->is_accepted == true)
-            {
-                RCLCPP_INFO(this->get_logger(), "Service %s response: request accepted.", switch_action_client_->get_service_name());
-                return true;
-            }
-            else
-            {
-                RCLCPP_ERROR(this->get_logger(), "Service %s response: request refused!", switch_action_client_->get_service_name());
-                return false;
-            }
-        }
-        else
-        {
-            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: service %s future is available but not ready.", switch_action_client_->get_service_name());
-            return false;
-        }
     }
 
     /**

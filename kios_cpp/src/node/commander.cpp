@@ -1,6 +1,7 @@
 
 #include <functional>
 #include <memory>
+#include <rclcpp/logging.hpp>
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -111,6 +112,7 @@ private:
         const std::shared_ptr<kios_interface::srv::CommandRequest::Response> response)
     {
         // * read the command request
+        RCLCPP_WARN_STREAM(this->get_logger(), "check command type: " << request->command_type);
         command_request_.command_type = static_cast<kios::CommandType>(request->command_type);
         try
         {
@@ -268,4 +270,3 @@ int main(int argc, char *argv[])
     rclcpp::shutdown();
     return 0;
 }
-

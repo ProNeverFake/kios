@@ -7,6 +7,7 @@
 #include <mutex>
 #include <thread>
 
+#include "kios_utils/data_type.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
 
@@ -42,7 +43,7 @@ public:
     {
         // * set ros2 logger severity level
         auto logger = this->get_logger();
-        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_WARN);
+        rcutils_logging_set_logger_level(logger.get_name(), RCUTILS_LOG_SEVERITY_INFO);
 
         //* declare mission parameter
         this->declare_parameter("power", true);
@@ -257,10 +258,11 @@ private:
      * @return true
      * @return false
      */
-    bool send_command_request(int ready_deadline = 50, int response_deadline = 50)
+    bool send_command_request(kios::CommandType cmd_type, int ready_deadline = 50, int response_deadline = 50)
     {
+        RCLCPP_WARN_STREAM(this->get_logger(), "send_command_request: " << int(cmd_type));
         auto request = std::make_shared<kios_interface::srv::CommandRequest::Request>();
-        request->command_type = static_cast<int32_t>(kios::CommandType::STOP_OLD_START_NEW);
+        request->command_type = static_cast<int32_t>(cmd_type);
         request->command_context = skill_parameter_.dump();
         request->skill_type = kios::ap_to_mios_skill(tree_state_ptr_->node_archive.action_phase);
 
@@ -513,9 +515,10 @@ private:
             RCLCPP_INFO(this->get_logger(), "tree_cycle: FINISH.");
             tree_state_ptr_->action_name = "finish";
             tree_state_ptr_->action_phase = kios::ActionPhase::FINISH;
+            skill_parameter_ = {};
             // * all tasks in tree finished. first send request to finish all actions at mios side.
             // * stop the tasks on mios side.
-            if (!send_command_request(1000, 1000))
+            if (!send_command_request(kios::CommandType::STOP_OLD_TASK, 1000, 1000))
             {
                 RCLCPP_ERROR(this->get_logger(), "tree_cycle at FINISH: failed when sending stop request.");
                 switch_tree_phase("ERROR", tree_phase_);
@@ -556,7 +559,7 @@ private:
             // print check
             RCLCPP_WARN_STREAM(
                 this->get_logger(),
-                "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << "VS. LAST - " << tree_state_ptr_->last_action_name);
+                "CHECK ACTION CURRENT - " << tree_state_ptr_->action_name << " VS. LAST - " << tree_state_ptr_->last_action_name);
 
             if (check_action_switch())
             {
@@ -573,7 +576,7 @@ private:
                     return;
                 }
                 std::cout << "skill parameter: " << skill_parameter_.dump() << std::endl;
-                if (!send_command_request(1000, 1000))
+                if (!send_command_request(kios::CommandType::STOP_OLD_START_NEW, 1000, 1000))
                 {
                     switch_tree_phase("ERROR", tree_phase_);
                 }

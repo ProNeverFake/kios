@@ -1,0 +1,22 @@
+int32 command_type
+
+string skill_type
+
+string command_context
+
+---
+# error code
+int32 CANCELLED=0
+int32 MIOS_FAILURE=1 # action failed
+int32 MIOS_ERROR=2 # architecture error
+int32 NETWORK_ERROR=3 # network error, websocket error
+int32 NODE_ERROR=4 # ros2 node error
+
+# ture = success, false = failure
+bool result
+int32 error_code
+string message
+
+---
+# for tree cycle to go ahead to tick
+bool is_accepted

@@ -98,7 +98,8 @@ message("cmake_home = ${CMAKE_HOME_DIRECTORY}\n")
 find_package(ament_cmake REQUIRED)
 # ! find_package(behaviortree_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_action REQUIRED) # ros2 action
+find_package(rclcpp_components REQUIRED) # ros2 component
 find_package(std_msgs REQUIRED)
 find_package(example_interfaces REQUIRED)
 find_package(kios_interface REQUIRED)

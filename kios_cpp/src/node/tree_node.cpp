@@ -8,7 +8,9 @@
 #include <thread>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 #include "rcl_interfaces/msg/parameter.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
 
 #include "behavior_tree/tree_root.hpp"
 #include "kios_utils/kios_utils.hpp"
@@ -23,14 +25,20 @@
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/archive_action_request.hpp"
 
+#include "kios_interface/srv/fetch_skill_parameter_request.hpp"
+#include "kios_interface/action/execute_skill.hpp"
+
 using std::placeholders::_1;
 using std::placeholders::_2;
+
+using ExecuteSkill = kios_interface::action::ExecuteSkill;
+using GoalHandleExecuteSkill = rclcpp_action::ClientGoalHandle<ExecuteSkill>;
 
 class TreeNode : public rclcpp::Node
 {
 public:
-    TreeNode()
-        : Node("tree_node"),
+    explicit TreeNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions())
+        : Node("tree_node", options),
           isActionSuccess_(false),
           tree_state_ptr_(std::make_shared<kios::TreeState>()),
           task_state_ptr_(std::make_shared<kios::TaskState>()),
@@ -89,6 +97,14 @@ public:
             std::bind(&TreeNode::switch_tree_phase_server_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             client_callback_group_);
+        fetch_skill_parameter_client_ = this->create_client<kios_interface::srv::FetchSkillParameterRequest>(
+            "fetch_skill_parameter_service",
+            rmw_qos_profile_services_default,
+            client_callback_group_);
+
+        this->execute_skill_action_client_ = rclcpp_action::create_client<ExecuteSkill>(
+            this,
+            "execute_skill_action");
 
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
@@ -101,6 +117,33 @@ public:
         tree_phase_ = kios::TreePhase::RESUME;
 
         rclcpp::sleep_for(std::chrono::seconds(4));
+    }
+
+    void execute_skill_send_goal()
+    {
+        using namespace std::placeholders;
+
+        this->timer_->cancel();
+
+        if (!this->execute_skill_action_client_->wait_for_action_server())
+        {
+            RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
+            rclcpp::shutdown();
+        }
+
+        auto goal_msg = ExecuteSkill::Goal();
+        // goal_msg.skill_name = "test_skill";
+
+        RCLCPP_INFO(this->get_logger(), "Sending goal");
+
+        auto send_goal_options = rclcpp_action::Client<ExecuteSkill>::SendGoalOptions();
+        send_goal_options.goal_response_callback =
+            std::bind(&TreeNode::execute_skill_goal_response_callback, this, _1);
+        send_goal_options.feedback_callback =
+            std::bind(&TreeNode::execute_skill_feedback_callback, this, _1, _2);
+        send_goal_options.result_callback =
+            std::bind(&TreeNode::execute_skill_result_callback, this, _1);
+        this->execute_skill_action_client_->async_send_goal(goal_msg, send_goal_options);
     }
 
     bool check_power()
@@ -135,6 +178,8 @@ private:
     std::mutex tree_mtx_;
     std::mutex tree_phase_mtx_;
 
+    nlohmann::json skill_parameter_;
+
     // * UDP socket rel
     std::shared_ptr<kios::BTReceiver> udp_socket_;
 
@@ -160,10 +205,65 @@ private:
     rclcpp::Client<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_client_;
     rclcpp::Service<kios_interface::srv::SwitchTreePhaseRequest>::SharedPtr switch_tree_phase_server_;
     rclcpp::Client<kios_interface::srv::GetObjectRequest>::SharedPtr get_object_client_;
+    rclcpp::Client<kios_interface::srv::FetchSkillParameterRequest>::SharedPtr fetch_skill_parameter_client_;
+    rclcpp_action::Client<ExecuteSkill>::SharedPtr execute_skill_action_client_;
 
     // behavior tree rel
     std::shared_ptr<Insertion::TreeRoot> m_tree_root;
     BT::NodeStatus tick_result;
+
+    //////////////////////////////////////////////// execute skill action ////////////////////////////////////////////////
+
+    void execute_skill_goal_response_callback(std::shared_future<GoalHandleExecuteSkill::SharedPtr> future)
+    {
+        auto goal_handle = future.get();
+        if (!goal_handle)
+        {
+            RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "Goal accepted by server, waiting for result");
+        }
+    }
+
+    void execute_skill_feedback_callback(
+        GoalHandleExecuteSkill::SharedPtr,
+        const std::shared_ptr<const ExecuteSkill::Feedback> feedback)
+    {
+        if (feedback->is_accepted == true)
+        {
+            // * set the tree phase to resume to let tree tick
+        }
+    }
+
+    void execute_skill_result_callback(const GoalHandleExecuteSkill::WrappedResult &result)
+    {
+        switch (result.code)
+        {
+        case rclcpp_action::ResultCode::SUCCEEDED:
+            break;
+        case rclcpp_action::ResultCode::ABORTED:
+            RCLCPP_ERROR(this->get_logger(), "Goal was aborted");
+            return;
+        case rclcpp_action::ResultCode::CANCELED:
+            RCLCPP_ERROR(this->get_logger(), "Goal was canceled");
+            return;
+        default:
+            RCLCPP_ERROR(this->get_logger(), "Unknown result code");
+            return;
+        }
+        std::stringstream ss;
+        ss << "Result received: ";
+        for (auto number : result.result->sequence)
+        {
+            ss << number << " ";
+        }
+        RCLCPP_INFO(this->get_logger(), ss.str().c_str());
+        rclcpp::shutdown();
+    }
+
+    //////////////////////////////////////////////// execute skill action ////////////////////////////////////////////////
 
     bool tree_initialize()
     {
@@ -243,6 +343,58 @@ private:
         }
     }
 
+    bool send_fetch_skill_parameter_request(int ready_deadline = 50, int response_deadline = 50)
+    {
+        // * send request to update the object
+        auto request = std::make_shared<kios_interface::srv::FetchSkillParameterRequest::Request>();
+
+        // skill identifier
+        request->node_archive = tree_state_ptr_->node_archive.to_ros2_msg();
+
+        // tree state
+        request->tree_phase = static_cast<int32_t>(tree_state_ptr_->tree_phase);
+
+        // objects
+        request->object_keys = tree_state_ptr_->object_keys;
+        request->object_names = tree_state_ptr_->object_names;
+
+        int try_times = 5;
+        while (!fetch_skill_parameter_client_->wait_for_service(std::chrono::milliseconds(ready_deadline)))
+        {
+            try_times--;
+            if (try_times == 0)
+            {
+                RCLCPP_ERROR(this->get_logger(), "service %s not available after retries.", fetch_skill_parameter_client_->get_service_name());
+                return false;
+            }
+            continue;
+        }
+        auto result_future = fetch_skill_parameter_client_->async_send_request(request);
+        std::future_status status = result_future.wait_until(
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(response_deadline));
+        if (status == std::future_status::ready)
+        {
+            auto result = result_future.get();
+            if (result->is_accepted == true)
+            {
+                RCLCPP_INFO(this->get_logger(), "Service %s response: request accepted.", switch_action_client_->get_service_name());
+                // ! hier ist try/catch noetig
+                skill_parameter_ = nlohmann::json::parse(result->skill_parameters_json);
+                return true;
+            }
+            else
+            {
+                RCLCPP_ERROR(this->get_logger(), "Service %s response: request refused!", switch_action_client_->get_service_name());
+                return false;
+            }
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "UNKNOWN ERROR: service %s future is available but not ready.", switch_action_client_->get_service_name());
+            return false;
+        }
+    }
+
     /**
      * @brief THE MAINLINE OF THE NODE.
      *
@@ -251,6 +403,7 @@ private:
     {
         if (check_power())
         {
+            RCLCPP_INFO_ONCE(this->get_logger(), "Timer works...");
             // * lock tree phase first
             std::lock_guard<std::mutex> lock_tree_phase(tree_phase_mtx_);
             // * check the necessity of updating objects
@@ -325,7 +478,7 @@ private:
         }
         else
         {
-            // RCLCPP_ERROR(this->get_logger(), "POWER OFF, TIMER PASS...");
+            RCLCPP_ERROR_ONCE(this->get_logger(), "POWER OFF, TIMER PASS...");
         }
     }
 
@@ -594,7 +747,7 @@ private:
 
     /**
      * @brief send switch_action_request to tactician for generating the action parameter.
-     *
+     * ! will be deprecated in the future.
      * @return true
      * @return false if send failed
      */
@@ -758,6 +911,8 @@ private:
         }
     }
 };
+
+RCLCPP_COMPONENTS_REGISTER_NODE(TreeNode)
 
 int main(int argc, char *argv[])
 {

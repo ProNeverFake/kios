@@ -180,14 +180,16 @@ public:
     bool connect_o();
     void send(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
     void send_and_wait(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 100, bool silent = false);
-    bool send_and_check(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 1000, bool silent = false);
+    std::optional<nlohmann::json> send_and_check(const std::string &method, nlohmann::json payload = nlohmann::json(), int timeout = 1000, bool silent = false);
     void close();
     bool is_connected();
     // call mios methods
+    bool get_result(std::optional<nlohmann::json> result_opt);
     void start_task_command(nlohmann::json payload = nlohmann::json());
+    void wait_for_task_result(int task_uuid, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted);
     void stop_task_command();
-    bool stop_task_request();
-    bool start_task_request(nlohmann::json skill_context, std::string skill_type);
+    std::optional<nlohmann::json> stop_task_request();
+    std::optional<nlohmann::json> start_task_request(nlohmann::json skill_context, std::string skill_type);
     void unregister_udp();
     void register_udp(int &port, nlohmann::json &sub_list);
     void set_message_handler(std::function<void(const std::string &)> handler);

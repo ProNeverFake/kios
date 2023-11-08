@@ -18,6 +18,7 @@
 #include "kios_interface/srv/command_request.hpp"
 #include "kios_interface/srv/switch_action_request.hpp"
 #include "kios_interface/srv/archive_action_request.hpp"
+#include "kios_interface/srv/fetch_skill_parameter_request.hpp"
 
 #include "kios_utils/kios_utils.hpp"
 
@@ -67,6 +68,13 @@ public:
         archive_action_server_ = this->create_service<kios_interface::srv::ArchiveActionRequest>(
             "archive_action_service",
             std::bind(&Tactician::archive_action_server_callback, this, _1, _2),
+            rmw_qos_profile_services_default,
+            server_callback_group_);
+
+        // * initialize fetch skill parameter server
+        fetch_skill_parameter_server_ = this->create_service<kios_interface::srv::FetchSkillParameterRequest>(
+            "fetch_skill_parameter_service",
+            std::bind(&Tactician::fetch_skill_parameter_server_callback, this, _1, _2),
             rmw_qos_profile_services_default,
             server_callback_group_);
 
@@ -145,6 +153,8 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
 
+    rclcpp::Service<kios_interface::srv::FetchSkillParameterRequest>::SharedPtr fetch_skill_parameter_server_;
+
     /**
      * @brief subcriber callback. update member variable task_state (percept).
      *
@@ -167,7 +177,7 @@ private:
 
     /**
      * @brief switch action server callback. Response to the request and set flag for timer callback.
-     *
+     * ! will be deprecated
      * @param request
      * @param response
      */
@@ -188,14 +198,13 @@ private:
 
                 // * update tree state
                 std::lock_guard<std::mutex> lock(tree_state_mtx_);
-                tree_state_.action_name = std::move(request->action_name);
-                tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
+                // tree_state_.action_name = std::move(request->action_name);
+                // tree_state_.action_phase = static_cast<kios::ActionPhase>(request->action_phase);
                 tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
 
                 tree_state_.object_keys = std::move(request->object_keys);
                 tree_state_.object_names = std::move(request->object_names);
 
-                // ! add archive
                 tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
 
                 // * set flag for timer
@@ -209,6 +218,53 @@ private:
         {
             RCLCPP_ERROR(this->get_logger(), "POWER OFF, request refused!");
             response->is_accepted = false;
+        }
+    }
+
+    /**
+     * @brief switch action server callback. Response to the request and set flag for timer callback.
+     *
+     * @param request
+     * @param response
+     */
+    void fetch_skill_parameter_server_callback(
+        const std::shared_ptr<kios_interface::srv::FetchSkillParameterRequest::Request> request,
+        const std::shared_ptr<kios_interface::srv::FetchSkillParameterRequest::Response> response)
+    {
+        if (isBusy.load())
+        {
+            RCLCPP_ERROR(this->get_logger(), "Node is busy, request refused!");
+            response->is_accepted = false;
+            response->message = "Node is busy, request refused!";
+        }
+        else
+        {
+            // * update tree state
+            std::lock_guard<std::mutex> lock(tree_state_mtx_);
+            tree_state_.tree_phase = static_cast<kios::TreePhase>(request->tree_phase);
+            tree_state_.node_archive = kios::NodeArchive::from_ros2_msg(request->node_archive);
+            tree_state_.object_keys = std::move(request->object_keys);
+            tree_state_.object_names = std::move(request->object_names);
+
+            // context = skill parameter
+            nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);
+            // ! important: here remove the action_context to prevent context inconsistency in mios
+            if (context["skill"].contains("action_context"))
+            {
+                context["skill"].erase("action_context");
+            }
+            // ground the objects
+            const auto &obj_keys = tree_state_.object_keys;
+            const auto &obj_names = tree_state_.object_names;
+            for (int i = 0; i < obj_keys.size(); i++)
+            {
+                context["skill"]["objects"][obj_keys[i]] = obj_names[i];
+            }
+
+            // load skill parameters into response
+            response->skill_parameters_json = context.dump();
+            RCLCPP_INFO(this->get_logger(), "fetch skill parameter request accepted.");
+            response->is_accepted = true;
         }
     }
 
@@ -268,7 +324,6 @@ private:
     void generate_command_context()
     {
         /////////////////////////////////////////////
-        // * HERE THE PART TO GENERATE SKILL PARAMETER AND UPDATE THE COMMAND CONTEXT
         // * now just use default
         // fetch context from clerk
         nlohmann::json context = context_clerk_.get_context(tree_state_.node_archive);

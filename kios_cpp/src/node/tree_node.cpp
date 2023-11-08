@@ -119,6 +119,10 @@ public:
         rclcpp::sleep_for(std::chrono::seconds(4));
     }
 
+    /**
+     * @brief start the action client for execute_skill action.
+     * 
+     */
     void execute_skill_send_goal()
     {
         using namespace std::placeholders;
@@ -214,6 +218,11 @@ private:
 
     //////////////////////////////////////////////// execute skill action ////////////////////////////////////////////////
 
+    /**
+     * @brief handle the response of the server for the goal request. action started? rejected?
+     * 
+     * @param future 
+     */
     void execute_skill_goal_response_callback(std::shared_future<GoalHandleExecuteSkill::SharedPtr> future)
     {
         auto goal_handle = future.get();
@@ -227,6 +236,11 @@ private:
         }
     }
 
+    /**
+     * @brief handle the feedback of the action server.
+     * 
+     * @param feedback 
+     */
     void execute_skill_feedback_callback(
         GoalHandleExecuteSkill::SharedPtr,
         const std::shared_ptr<const ExecuteSkill::Feedback> feedback)
@@ -237,6 +251,11 @@ private:
         }
     }
 
+    /**
+     * @brief handle the result of the action server.
+     * 
+     * @param result 
+     */
     void execute_skill_result_callback(const GoalHandleExecuteSkill::WrappedResult &result)
     {
         switch (result.code)

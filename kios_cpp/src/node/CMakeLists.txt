@@ -3,17 +3,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 ######################################################### tree_node
-add_library(tree_node SHARED tree_node.cpp)
-
-target_include_directories(tree_node
-  PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-target_compile_definitions( tree_node
-  PRIVATE "BEHAVIOR_TREE_BUILDING_DLL"
-)
+add_executable(tree_node tree_node.cpp)
 
 target_link_libraries(tree_node
     ${PROJECT_NAME}::behavior_tree
@@ -29,8 +19,6 @@ ament_target_dependencies(tree_node
   kios_interface
 )
 
-rclcpp_components_register_node(tree_node PLUGIN "kios::TreeNode" EXECUTABLE tree_node)
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
@@ -38,17 +26,7 @@ endif()
 
 ######################################################### commander
 
-add_library(commander SHARED commander.cpp)
-
-target_include_directories(commander
-  PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
-target_compile_definitions(commander
-  PRIVATE "BEHAVIOR_TREE_BUILDING_DLL"
-)
+add_executable(commander commander.cpp)
 
 target_link_libraries(commander
     ${PROJECT_NAME}::behavior_tree
@@ -63,8 +41,6 @@ ament_target_dependencies(tree_node
   rcl_interfaces
   kios_interface
 )
-
-rclcpp_components_register_node(commander PLUGIN "kios::Commander" EXECUTABLE commander)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -134,17 +110,6 @@ ament_target_dependencies(mongo_reader
 )
 
 
-# install(TARGETS
-#     commander
-#     messenger
-#     tactician
-#     tree_node
-#     mongo_reader
-#     test_node
-
-#     DESTINATION lib/${PROJECT_NAME}
-#     )
-
 install(TARGETS
     commander
     messenger
@@ -153,7 +118,18 @@ install(TARGETS
     mongo_reader
     test_node
 
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+    DESTINATION lib/${PROJECT_NAME}
     )
+
+# install(TARGETS
+#     commander
+#     messenger
+#     tactician
+#     tree_node
+#     mongo_reader
+#     test_node
+
+#     ARCHIVE DESTINATION lib
+#     LIBRARY DESTINATION lib
+#     RUNTIME DESTINATION bin
+#     )

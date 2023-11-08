@@ -153,6 +153,11 @@ private:
         return rclcpp_action::CancelResponse::ACCEPT;
     }
 
+    /**
+     * @brief start a new thread to execute the skill
+     * 
+     * @param goal_handle 
+     */
     void execute_skill_handle_accepted(const std::shared_ptr<GoalHandleExecuteSkill> goal_handle)
     {
         // this needs to return quickly to avoid blocking the executor, so spin up a new thread
@@ -219,7 +224,7 @@ private:
             wait_thread.detach();
 
             // * wait for result in this thread
-            while (result_future.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout) //websocket result
+            while (result_future.wait_for(std::chrono::milliseconds(10)) == std::future_status::timeout) //websocket result
             {
                 // * Check if there is a cancel request
                 if (goal_handle->is_canceling())
@@ -227,6 +232,8 @@ private:
                     RCLCPP_INFO(this->get_logger(), "Goal canceled");
                     // notify the thread to stop
                     isInterrupted.store(true);
+                    // join the thread
+                    wait_thread.join();
                     // * stop the action
                     result->result = true;
                     result->error_code = kios_interface::action::ExecuteSkill::Result::CANCELLED;
@@ -248,7 +255,7 @@ private:
             }
             return;
         }
-        case kios::CommandType::STOP_OLD_TASK: {
+        case kios::CommandType::STOP_OLD_TASK: { // currently this is not used
             RCLCPP_INFO(this->get_logger(), "Issuing command: stop old command...");
             stop_task_command(); // * don't care about the result
             result->result = true;
@@ -386,7 +393,6 @@ private:
     {
         messenger_->wait_for_task_result(task_uuid, task_promise, isInterrupted);
     }
-
 
     void stop_task_command()
     {

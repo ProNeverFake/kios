@@ -23,8 +23,10 @@
 #include "kios_interface/srv/get_object_request.hpp"
 #include "kios_interface/srv/archive_action_request.hpp"
 #include "kios_interface/srv/command_request.hpp"
+#include "kios_interface/srv/execute_tree_request.hpp"
 
 #include "kios_interface/srv/fetch_skill_parameter_request.hpp"
+#include "kios_interface/action/execute_tree.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;

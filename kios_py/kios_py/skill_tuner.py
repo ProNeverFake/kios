@@ -20,24 +20,13 @@ class SkillTuner(Node):
     def __init__(self):
         super().__init__("skill_tuner")
 
-        # declare flag
-        self.is_running = True
-
-        # declare parameters
-        self.declare_parameter("power", True)
-
-        service_callback_group = ReentrantCallbackGroup()
-
-        # initialize timer
-        # self.timer_ = self.create_timer(
-        #     1, self.timer_callback, callback_group=timer_callback_group  # sec
-        # )
+        main_callback_group = ReentrantCallbackGroup()
 
         self.tune_skill_service_server_ = self.create_service(
             TuneSkillRequest,
             "tune_skill_service",
             self.tune_skill_server_callback,
-            callback_group=service_callback_group,
+            callback_group=main_callback_group,
         )
 
     def fetch_grounded_skills(self):
@@ -50,22 +39,17 @@ class SkillTuner(Node):
         plan = request.plan
         response.is_success = False
 
-        if self.is_running:
-            result = self.tune_skill(plan)
+        result = self.tune_skill(plan)
 
-            if result:
-                self.hasNewPlan = True
-                response.is_success = True
-                response.error_message = ""
-                return response
-            else:
-                response.error_message = "skill tuning failed, please check!"
-                return response
-
-        else:
-            self.get_logger().error("SkillTuner is not runnning!")
-            response.error_message = "skill tuner is not running."
+        if result:
+            self.hasNewPlan = True
+            response.is_success = True
+            response.error_message = ""
             return response
+        else:
+            response.error_message = "skill tuning failed, please check!"
+            return response
+
 
     def tune_skill(plan) -> bool:
         # TODO

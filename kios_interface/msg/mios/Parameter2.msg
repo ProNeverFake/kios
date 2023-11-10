@@ -1,7 +1,0 @@
-float64[] search_a [10, 10, 0, 2, 2, 0]
-float64[] search_f [1, 1, 0, 1.2, 1.2, 0]
-float64[] search_phi [0, 1.57079, 0, 1.57079, 0, 0]
-float64[] k_x [500, 500, 500, 800, 800, 800]
-float64[] f_push [0, 0, 7, 0, 0, 0]
-float64[] dx_d [0.1, 0.5]
-float64[] ddx_d [0.5, 1]

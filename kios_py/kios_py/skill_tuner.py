@@ -6,21 +6,18 @@ The skill tuner node of kios_py:
 
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
-from rclpy.qos import qos_profile_sensor_data
 
 import json
 
-from .resource.mongodb_client import MongoDBClient
-
 from kios_interface.srv import TuneSkillRequest
+
 
 class SkillTuner(Node):
     def __init__(self):
         super().__init__("skill_tuner")
 
-        main_callback_group = ReentrantCallbackGroup()
+        main_callback_group = MutuallyExclusiveCallbackGroup()
 
         self.tune_skill_service_server_ = self.create_service(
             TuneSkillRequest,
@@ -31,7 +28,7 @@ class SkillTuner(Node):
 
     def fetch_grounded_skills(self):
         pass
-    
+
     def update_skill_grounding(self):
         pass
 
@@ -40,33 +37,29 @@ class SkillTuner(Node):
         response.is_success = False
 
         result = self.tune_skill(plan)
+        self.get_logger().info("skill tuning test")
 
         if result:
-            self.hasNewPlan = True
             response.is_success = True
-            response.error_message = ""
+            response.error_message = "test msg"
             return response
         else:
             response.error_message = "skill tuning failed, please check!"
             return response
 
-
-    def tune_skill(plan) -> bool:
+    def tune_skill(self, plan) -> bool:
         # TODO
-        pass
+        return True
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    SkillTuner = SkillTuner()
+    skill_tuner = SkillTuner()
 
-    executor = MultiThreadedExecutor()
-    executor.add_node(SkillTuner)
+    rclpy.spin(skill_tuner)
 
-    executor.spin()
-
-    SkillTuner.destroy_node()
+    skill_tuner.destroy_node()
     rclpy.shutdown()
 
 

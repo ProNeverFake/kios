@@ -1,7 +1,0 @@
-string task
-string parameters
-bool queue
----
-bool result
-string error_message
-string task_uuid

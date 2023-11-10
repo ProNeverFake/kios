@@ -1,8 +1,0 @@
-float32 width
-float32 speed
-float32 force
-float32 epsilon_inner
-float32 epsilon_outer
----
-bool result
-string error_message

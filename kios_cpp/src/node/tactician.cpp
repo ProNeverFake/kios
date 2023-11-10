@@ -58,19 +58,19 @@ public:
             server_callback_group_);
 
         // * initialize the subscription
-        rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
-        rclcpp::SubscriptionOptions subscription_options;
-        subscription_options.callback_group = subscription_callback_group_;
+        // ! the subscription is supressed for now.
+        // rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data));
+        // rclcpp::SubscriptionOptions subscription_options;
+        // subscription_options.callback_group = subscription_callback_group_;
 
-        // * initialize the callbacks
-        task_state_subscription_ = this->create_subscription<kios_interface::msg::TaskState>(
-            "task_state_topic",
-            qos,
-            std::bind(&Tactician::task_subscription_callback, this, _1),
-            subscription_options);
+        // task_state_subscription_ = this->create_subscription<kios_interface::msg::TaskState>(
+        //     "task_state_topic",
+        //     qos,
+        //     std::bind(&Tactician::task_subscription_callback, this, _1),
+        //     subscription_options);
 
         // * initialize context clerk
-        // context_clerk_.initialize(); // ! YOU SHOULD NOT USE THIS.
+        // context_clerk_.initialize(); // ! for bad_alloc test. don't use this.
         context_clerk_.read_archive(); // bool value return is not useful here.
 
         std::cout << "finish initialization" << std::endl;
@@ -98,22 +98,23 @@ private:
     rclcpp::CallbackGroup::SharedPtr server_callback_group_;
 
     rclcpp::Service<kios_interface::srv::ArchiveActionRequest>::SharedPtr archive_action_server_;
-    rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
+
+    // rclcpp::Subscription<kios_interface::msg::TaskState>::SharedPtr task_state_subscription_;
 
     rclcpp::Service<kios_interface::srv::FetchSkillParameterRequest>::SharedPtr fetch_skill_parameter_server_;
 
-    /**
-     * @brief subcriber callback. update member variable task_state (percept).
-     *
-     * @param msg
-     */
-    void task_subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
-    {
-        std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
-        // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
-        // * update task state
-        task_state_.from_ros2_msg(*msg);
-    }
+    // /**
+    //  * @brief subcriber callback. update member variable task_state (percept).
+    //  ! suppress this for now.
+    //  * @param msg
+    //  */
+    // void task_subscription_callback(kios_interface::msg::TaskState::SharedPtr msg)
+    // {
+    //     std::lock_guard<std::mutex> task_state_guard(task_state_mtx_);
+    //     // RCLCPP_INFO(this->get_logger(), "SUB HIT, try to move");
+    //     // * update task state
+    //     task_state_.from_ros2_msg(*msg);
+    // }
 
     void fetch_skill_parameter_server_callback(
         const std::shared_ptr<kios_interface::srv::FetchSkillParameterRequest::Request> request,
@@ -163,6 +164,7 @@ private:
         RCLCPP_INFO(this->get_logger(), "Archiving the actions...");
         for (auto &archive : request->archive_list)
         {
+            // decode the archive
             kios::NodeArchive arch{archive.action_group, archive.action_id, archive.description, static_cast<kios::ActionPhase>(archive.action_phase)};
             // try to archive the node.
             if (!context_clerk_.archive_action(arch))

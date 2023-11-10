@@ -26,23 +26,25 @@ class Planner(Node):
         server_callback_group = MutuallyExclusiveCallbackGroup()
 
         self.make_plan_server_ = self.create_service(
-            self, 
             MakePlanRequest,
             "make_plan_service",
             self.make_plan_server_callback,
-            callback_group=server_callback_group
+            callback_group=server_callback_group,
         )
 
     def make_plan_server_callback(self, request, response):
         current_state = request.current_state
-        response.is_accepted = False
+        response.is_success = False
 
-        result, self.plan = self.make_plan(current_state)
+        result = self.make_plan(current_state)
+
+        self.get_logger().info("make plan test")
 
         if result:
             self.hasNewPlan = True
-            response.is_accepted = True
+            response.is_success = True
             response.plan = self.plan
+            response.error_message = "test msg"
             return response
         else:
             response.error_message = "no feasible plan can be found!"
@@ -50,7 +52,7 @@ class Planner(Node):
 
     def make_plan(current_state, goal_state) -> (bool, str):
         # TODO
-        pass
+        return True
 
     def validate_plan(self, plan) -> bool:
         """validate the plan in logic and structure level
@@ -63,7 +65,8 @@ class Planner(Node):
         """
         # TODO
         pass
-    
+
+
 def main(args=None):
     rclpy.init(args=args)
 

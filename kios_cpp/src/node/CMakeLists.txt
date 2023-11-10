@@ -14,6 +14,7 @@ target_link_libraries(tree_node
 
 ament_target_dependencies(tree_node
   rclcpp
+  rclcpp_action
   rcl_interfaces
   kios_interface
 )
@@ -33,8 +34,9 @@ target_link_libraries(commander
     ${PROJECT_NAME}::kios_communication
 )
 
-ament_target_dependencies(tree_node
+ament_target_dependencies(commander
   rclcpp
+  rclcpp_action
   rcl_interfaces
   kios_interface
 )

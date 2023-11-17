@@ -268,7 +268,7 @@ def main(args=None):
 
     coach = Coach()
 
-    print("Robot learning process is starting...")
+    print("Robot learning process is starting...")   
 
     future = coach.execute_tree_request("test_tree", isRetry=False)
 

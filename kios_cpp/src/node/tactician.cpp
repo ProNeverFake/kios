@@ -70,7 +70,6 @@ public:
         //     subscription_options);
 
         // * initialize context clerk
-        // context_clerk_.initialize(); // ! for bad_alloc test. don't use this.
         context_clerk_.read_archive(); // bool value return is not useful here.
 
         std::cout << "finish initialization" << std::endl;

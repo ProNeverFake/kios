@@ -13,9 +13,6 @@ namespace kios
     {
     public:
         ContextClerk();
-
-        void initialize();
-
         bool archive_action(const NodeArchive &action_archive);
 
         bool store_archive();
@@ -33,6 +30,5 @@ namespace kios
         std::unique_ptr<DefaultActionContext> default_context_dictionary_ptr_;
 
         std::unordered_map<int, std::unordered_map<int, std::pair<std::string, nlohmann::json>>> action_ground_dictionary_;
-        // ! ground method
     };
 } // namespace kios

@@ -210,6 +210,11 @@ private:
         }
     }
 
+    // void start_and_monitor(const nlohmann::json &skill_context)
+    // {
+    //     messenger_->start_and_monitor(skill_context);// ! change
+    // }
+
     // * run this in a new thread
     void wait_for_task_result(int task_uuid, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted)
     {

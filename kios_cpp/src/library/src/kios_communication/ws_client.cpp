@@ -671,6 +671,79 @@ std::optional<nlohmann::json> BTMessenger::start_task_request(nlohmann::json ski
     }
 }
 
+void BTMessenger::start_and_monitor(const nlohmann::json &skill_context, std::string skill_type, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted)
+{
+    // TODO
+    std::vector<std::string> skill_names;
+    std::vector<std::string> skill_types;
+    std::unordered_map<std::string, nlohmann::json> skill_contexts;
+
+    skill_names.push_back("BBSkill");
+    skill_types.push_back(skill_type);
+    skill_contexts["BBSkill"] = skill_context;
+
+    nlohmann::json task_context =
+        {{"parameters",
+          {{"skill_names", skill_names},
+           {"skill_types", skill_types},
+           {"as_queue", false}}},
+         {"skills", skill_contexts}};
+    nlohmann::json call_context =
+        {{"task", "GenericTask"},
+         {"parameters", task_context},
+         {"queue", true}};
+
+    // ! CHECK CONTEXT HERE
+    spdlog::warn("BB: THE CONEXT IS: {}", call_context.dump());
+
+    // ! test
+    if (is_connected())
+    {
+        m_ws_endpoint.get_message_queue().reset();
+        send("start_and_monitor", call_context);
+
+        std::optional<std::string> response_opt;
+
+        while (!response_opt.has_value())
+        {
+            if (isInterrupted.load()) // * if interrupted, return
+            {
+                spdlog::warn("wait_for_task_result: interrupted.");
+                task_promise.set_value(std::nullopt);
+                return;
+            }
+            // * try to get the value again
+            response_opt = m_ws_endpoint.get_message_queue().pop();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        try
+        {
+            nlohmann::json result = std::move(nlohmann::json::parse(response_opt.value()));
+            // The parsing succeeded, the data is JSON.
+            spdlog::info("Call method wait_for_task get response if_success: {}", result["result"]["result"].dump());
+            task_promise.set_value(result);
+            return;
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            spdlog::error("JSON parsing failed: ", e.what());
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+        catch (...)
+        {
+            spdlog::error("wait for task: UNDEFINED ERROR!");
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+    }
+    else
+    {
+        task_promise.set_value(std::nullopt);
+        return;
+    }
+}
+
 // done
 void BTMessenger::wait_for_task_result(int task_uuid, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted)
 {

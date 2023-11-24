@@ -50,32 +50,32 @@ class BehaviorTreeFactory:
         return dom.toprettyxml()
 
 
-# # Usage
-# tree_factory = BehaviorTreeFactory()
+# Usage
+tree_factory = BehaviorTreeFactory()
 
-# tree_factory.add_node("CheckFinished", "check_finished")
-# tree_factory.add_node("SubTree", "", ID="push_peg_z")
+tree_factory.add_node("CheckFinished", "check_finished")
+tree_factory.add_node("SubTree", "", ID="push_peg_z")
 
-# # Peg align hole
-# align_subtree = tree_factory.add_node("ReactiveSequence", "peg_align_hole")
-# tree_factory.add_node("CheckAlign", "check_align")
-# tree_factory.add_node("Align", "align")
+# Peg align hole
+align_subtree = tree_factory.add_node("ReactiveSequence", "peg_align_hole")
+tree_factory.add_node("CheckAlign", "check_align")
+tree_factory.add_node("Align", "align")
 
-# # Peg fit hole
-# fit_subtree = tree_factory.add_node("ReactiveSequence", "peg_fit_hole")
-# tree_factory.add_node("CheckFit", "check_fit")
-# tree_factory.add_node("Fit", "fit_hole")
+# Peg fit hole
+fit_subtree = tree_factory.add_node("ReactiveSequence", "peg_fit_hole")
+tree_factory.add_node("CheckFit", "check_fit")
+tree_factory.add_node("Fit", "fit_hole")
 
-# # Peg reach hole
-# reach_subtree = tree_factory.add_node("ReactiveSequence", "peg_reach_hole")
-# tree_factory.add_node("CheckReach", "check_reach")
-# tree_factory.add_node("ReachHole", "reach_hole")
+# Peg reach hole
+reach_subtree = tree_factory.add_node("ReactiveSequence", "peg_reach_hole")
+tree_factory.add_node("CheckReach", "check_reach")
+tree_factory.add_node("ReachHole", "reach_hole")
 
-# tree_factory.add_node("Approach", "approach")
+tree_factory.add_node("Approach", "approach")
 
-# # Defining the push_peg_z subtree
-# push_peg_subtree = tree_factory.define_subtree("push_peg_z", "ReactiveSequence", "push_peg")
-# ET.SubElement(push_peg_subtree, "CheckPush", name="check_push")
-# ET.SubElement(push_peg_subtree, "Push", name="push_peg")
+# Defining the push_peg_z subtree
+push_peg_subtree = tree_factory.define_subtree("push_peg_z", "ReactiveSequence", "push_peg")
+ET.SubElement(push_peg_subtree, "CheckPush", name="check_push")
+ET.SubElement(push_peg_subtree, "Push", name="push_peg")
 
-# print(tree_factory.to_pretty_string())
+print(tree_factory.to_pretty_string())

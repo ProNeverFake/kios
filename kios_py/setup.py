@@ -36,6 +36,7 @@ setup(
             "skill_tuner = kios_py.skill_tuner:main",
             "planner = kios_py.planner:main",
             "bota_sens = kios_py.bota_sens:main",
+            "commander = kios_py.commander:main",
         ],
     },
 )

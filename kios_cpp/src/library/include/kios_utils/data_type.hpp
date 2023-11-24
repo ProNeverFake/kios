@@ -852,6 +852,8 @@ namespace kios
         }
     };
 
+    
+
     // ! BBMOD
     // here inline because the redefine error
     inline std::string ap_to_mios_skill(const ActionPhase &ap)

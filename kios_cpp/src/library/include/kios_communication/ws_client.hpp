@@ -186,6 +186,7 @@ public:
     // call mios methods
     bool get_result(std::optional<nlohmann::json> result_opt);
     void start_task_command(nlohmann::json payload = nlohmann::json());
+    void start_and_monitor(const nlohmann::json &skill_context, std::string skill_type, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted);
     void wait_for_task_result(int task_uuid, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted);
     void stop_task_command();
     std::optional<nlohmann::json> stop_task_request();

@@ -14,7 +14,9 @@ if mios_communication_root not in sys.path:
     # print("add path mios_communication_root in the file", __file__)
 
 
-async def send(hostname, port=12000, endpoint="mios/core", request=None, timeout=100, silent=False):
+async def send(
+    hostname, port=12000, endpoint="mios/core", request=None, timeout=100, silent=False
+):
     """sending msg to the wbesoecket server
 
     Args:
@@ -39,53 +41,98 @@ async def send(hostname, port=12000, endpoint="mios/core", request=None, timeout
         if silent is False:
             print("ConnectionRefusedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
     except ConnectionResetError as e:
         if silent is False:
             print("ConnectionResetError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
     except ConnectionAbortedError as e:
         if silent is False:
             print("ConnectionAbortedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
     except websockets.ConnectionClosedError as e:
         if silent is False:
             print("ConnectionClosedError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
     except ConnectionTimeoutError as e:
         if silent is False:
             print("ConnectionTimeoutError: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
     except websockets.exceptions.InvalidMessage as e:
         if silent is False:
             print("InvalidMessage: ")
             print(e)
-            print("Hostname: " + hostname + ", port: " +
-                  str(port) + ", endpoint: " + endpoint)
+            print(
+                "Hostname: "
+                + hostname
+                + ", port: "
+                + str(port)
+                + ", endpoint: "
+                + endpoint
+            )
         return None
 
 
 def call_server(hostname, port, endpoint, request, timeout):
     asyncio.set_event_loop(asyncio.new_event_loop())
-    return asyncio.get_event_loop().run_until_complete(send(hostname, request=request, port=port,
-                                                            endpoint=endpoint, timeout=timeout))
+    return asyncio.get_event_loop().run_until_complete(
+        send(hostname, request=request, port=port, endpoint=endpoint, timeout=timeout)
+    )
 
 
-def call_method(hostname: str, port: int, method, payload=None, endpoint="mios/core", timeout=100, silent=False):
+def call_method(
+    hostname: str,
+    port: int,
+    method,
+    payload=None,
+    endpoint="mios/core",
+    timeout=100,
+    silent=False,
+):
     """sending request to websocket server
 
     Args:
@@ -101,21 +148,27 @@ def call_method(hostname: str, port: int, method, payload=None, endpoint="mios/c
         _type_: the return of the registed functions
     """
     try:
-        request = {
-            "method": method,
-            "request": payload
-        }
+        request = {"method": method, "request": payload}
         asyncio.set_event_loop(asyncio.new_event_loop())
-        return asyncio.get_event_loop().run_until_complete(send(hostname, request=request, port=port,
-                                                                endpoint=endpoint, timeout=timeout, silent=silent))
+        return asyncio.get_event_loop().run_until_complete(
+            send(
+                hostname,
+                request=request,
+                port=port,
+                endpoint=endpoint,
+                timeout=timeout,
+                silent=silent,
+            )
+        )
     except socket.gaierror as e:
         print(e)
-        print("Hostname: " + hostname + ", port:" +
-              str(port) + ", endpoint: " + endpoint)
+        print(
+            "Hostname: " + hostname + ", port:" + str(port) + ", endpoint: " + endpoint
+        )
         return None
 
 
-def start_task(hostname: str, task: str, parameters={}, queue=False):
+def start_task(hostname: str, task: str, parameters={}, queue=True):
     """start a task in mios
 
     Args:
@@ -127,11 +180,7 @@ def start_task(hostname: str, task: str, parameters={}, queue=False):
     Returns:
         _type_: _description_
     """
-    payload = {
-        "task": task,
-        "parameters": parameters,
-        "queue": queue
-    }
+    payload = {"task": task, "parameters": parameters, "queue": queue}
     return call_method(hostname, 12000, "start_task", payload)
 
 
@@ -150,7 +199,7 @@ def stop_task(hostname: str, raise_exception=False, recover=False, empty_queue=F
     payload = {
         "raise_exception": raise_exception,
         "recover": recover,
-        "empty_queue": empty_queue
+        "empty_queue": empty_queue,
     }
     return call_method(hostname, 12000, "stop_task", payload)
 
@@ -165,9 +214,7 @@ def wait_for_task(hostname: str, task_uuid: str):
     Returns:
         _type_: _description_
     """
-    payload = {
-        "task_uuid": task_uuid
-    }
+    payload = {"task_uuid": task_uuid}
     return call_method(hostname, 12000, "wait_for_task", payload)
 
 

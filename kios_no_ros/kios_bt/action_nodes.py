@@ -16,7 +16,7 @@ import py_trees.console as console
 from kios_utils.kios_utils import ActionPhase
 from kios_utils.task import *
 
-# from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 
 ##############################################################################
@@ -35,6 +35,7 @@ def mios_monitor(
         pipe_connection: connection to the mios_monitor process
     """
     try:
+        task.interrupt()
         task.start()
         # hanlde startup failure
         # ! check the response here
@@ -54,7 +55,7 @@ def mios_monitor(
         pass
 
 
-class ActionNode(py_trees.behaviour.Behaviour):
+class ActionNode(py_trees.behaviour.Behaviour, ABC):
     """Demonstrates the at-a-distance style action behaviour."""
 
     def __init__(self, name: str):
@@ -63,14 +64,24 @@ class ActionNode(py_trees.behaviour.Behaviour):
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
         self.mios_monitor = None
 
+    @abstractmethod
+    def take_effect(self):
+        "change the predicates on the blackboard"
+        pass
+
+    @abstractmethod
     def setup(self, **kwargs: int) -> None:
         # setup the parameters here
         self.logger.debug(
             "%s.setup()->connections to an external process" % (self.__class__.__name__)
         )
 
+    # nicht unbedingt notwendig zu überschreiben
     def initialise(self) -> None:
-        # start the subprocess
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        # * reset the task
+        self.task.initialize()
+        # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.mios_monitor = multiprocessing.Process(
             target=mios_monitor, args=(self.child_connection,)
@@ -82,11 +93,28 @@ class ActionNode(py_trees.behaviour.Behaviour):
         """Increment the counter, monitor and decide on a new status."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
         new_status = py_trees.common.Status.RUNNING
+
+        # * check the result of the startup of the task
+        if self.task.task_start_response is not None:
+            if bool(self.task.task_start_response["result"]["result"]) == False:
+                self.logger.debug("Task startup failed")
+                new_status = py_trees.common.Status.FAILURE
+                return new_status
+        else:
+            # ! this should never happen
+            self.logger.debug("Task startup in progress")
+            self.logger.debug("ERRRRRRRRRRRRRRRRRRRRRRRORRR")
+            new_status = py_trees.common.Status.RUNNING
+            return new_status
+
+        # * check if the task is finished
         if self.parent_connection.poll():
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
                 self.logger.debug("Task finished successfully")
                 new_status = py_trees.common.Status.SUCCESS
+                # * exert the effects
+                self.take_effect()
             else:
                 self.logger.debug("Task finished with error")
                 new_status = py_trees.common.Status.FAILURE
@@ -94,6 +122,7 @@ class ActionNode(py_trees.behaviour.Behaviour):
 
     def terminate(self, new_status: py_trees.common.Status) -> None:
         """called after execution or when interrupted."""
+        # * stop the mios_monitor process, regardless of the result
         self.mios_monitor.terminate()
 
         self.logger.debug(
@@ -111,6 +140,11 @@ class ToolLoad(ActionNode):
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     # ! you must override this
+    def take_effect(self):
+        print("ToolLoad.take_effect()")
+        pass
+
+    # ! you must override this
     def setup(self, **kwargs: int) -> None:
         # get the parameters from the parameter server
         # ! test, parameters given
@@ -119,10 +153,10 @@ class ToolLoad(ActionNode):
             "skill": {
                 "objects": {"ToolLoad": "tool_load"},
                 "time_max": 30,
-                "action_context": {
-                    "action_name": "BBToolLoad",
-                    "action_phase": "ActionPhase::TOOL_LOAD",
-                },
+                # "action_context": {
+                #     "action_name": "BBToolLoad",
+                #     "action_phase": "ActionPhase::TOOL_LOAD",
+                # },
                 "MoveAbove": {
                     "dX_d": [0.2, 0.2],
                     "ddX_d": [0.2, 0.2],
@@ -155,16 +189,16 @@ class ToolLoad(ActionNode):
             },
         }
 
-        # setup the task
+        # * setup the task
         self.task = Task(MIOS)
         self.task.add_skill("bbskill", self.skill_type, self.skill_parameters)
 
-        self.logger.debug(
-            "%s.setup()->connections to an external process" % (self.__class__.__name__)
-        )
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
 
     # modify parameters, start up the external process
     def initialise(self) -> None:
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        self.task.initialize()
         # start the subprocess
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.mios_monitor = multiprocessing.Process(

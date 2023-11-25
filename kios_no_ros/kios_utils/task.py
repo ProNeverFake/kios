@@ -47,3 +47,17 @@ class Task:
         result = stop_task(self.robot)
         print("Task execution took " + str(time.time() - self.t_0) + " s.")
         return result
+
+    def interrupt(self):
+        result = stop_task(
+            self.robot, raise_exception=False, recover=False, empty_queue=False
+        )
+        print("Current task is interrupted.")
+        print(str(result))
+        return result
+
+    def initialize(self):
+        self.task_start_response = None
+        self.task_wait_response = None
+        self.task_uuid = "INVALID"
+        self.t_0 = 0

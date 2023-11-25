@@ -13,8 +13,8 @@ import time
 import py_trees.common
 import py_trees.console as console
 
-from kios_utils import ActionPhase
-from task import *
+from kios_utils.kios_utils import ActionPhase
+from kios_utils.task import *
 
 # from abc import ABC, abstractmethod
 
@@ -102,12 +102,12 @@ class ActionNode(py_trees.behaviour.Behaviour):
         )
 
 
-class ToolPick(ActionNode):
+class ToolLoad(ActionNode):
     """BBToolPick behaviour."""
 
     def __init__(self, name: str):
         """Configure the name of the behaviour."""
-        super(ToolPick, self).__init__(name)
+        super(ToolLoad, self).__init__(name)
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     # ! you must override this
@@ -165,7 +165,6 @@ class ToolPick(ActionNode):
 
     # modify parameters, start up the external process
     def initialise(self) -> None:
-
         # start the subprocess
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.mios_monitor = multiprocessing.Process(

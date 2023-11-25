@@ -192,11 +192,22 @@ class ToolPick(py_trees.behaviour.Behaviour):
 
         # start ros2 action here
 
+        # here get the handle for further status check
 
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
         new_status = py_trees.common.Status.RUNNING
+
+        # here check the status of the future
+
+        if finished:
+            # here check if success or failure
+            if success:
+                new_status = py_trees.common.Status.SUCCESS
+            else:
+                new_status = py_trees.common.Status.FAILURE
+
         # if ros2 action finished
         if self.parent_connection.poll():
             self.percentage_completion = self.parent_connection.recv().pop()

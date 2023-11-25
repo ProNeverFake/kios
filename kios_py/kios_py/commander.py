@@ -20,6 +20,7 @@ from kios_interface.action import ExecuteSkill
 from .resource.task import *
 
 import multiprocessing
+import multiprocessing.connection
 import atexit
 
 MIOS = "127.0.0.1"

@@ -1,0 +1,6 @@
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
+*.h linguist-language=C++
+*.c linguist-language=C++
+*.txt linguist-language=CMake
+*.py linguist-language=Python

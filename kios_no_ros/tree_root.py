@@ -232,10 +232,10 @@ def create_load_tool_tree() -> py_trees.composites.Selector:
 
     is_tool_load = condition_nodes.IsToolLoaded(["tool1"])
 
-    sequence = py_trees.composites.Sequence(name="load tool sequence", memory=True)
+    sequence = py_trees.composites.Sequence(name="load tool sequence", memory=False)
 
     hand_free = condition_nodes.isInHand(["nothing"])
-    load_tool = action_nodes.ToolLoad(["tool1"])
+    load_tool = action_nodes.ToolLoadTest(["tool1"])
     sequence.add_children([hand_free, load_tool])
 
     selector.add_children([is_tool_load, sequence])
@@ -258,8 +258,9 @@ def test_tree():
 
     sequence = py_trees.composites.Sequence(name="pick up cube sequence", memory=False)
     is_tool_load = create_load_tool_tree()
+    tool_free = condition_nodes.isInTool(["nothing"])
     pick_up_cube = action_nodes.ToolPick(["cube1"])
-    sequence.add_children([is_tool_load, pick_up_cube])
+    sequence.add_children([is_tool_load, tool_free, pick_up_cube])
 
     selector.add_children([is_cube_in_hand, sequence])
 

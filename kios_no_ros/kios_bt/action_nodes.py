@@ -168,7 +168,7 @@ class ToolPick(ActionNode):
         """Configure the name of the behaviour."""
 
         self.objects_ = {
-            "inTool": objects_[0],
+            "target": objects_[0],
         }
 
         self.node_name = "ToolPick"
@@ -180,7 +180,7 @@ class ToolPick(ActionNode):
     # ! you must override this
     def set_effects(self) -> None:
         self.effects = {
-            "InTool": self.objects_["inTool"],
+            "inTool": self.objects_["target"],
         }
 
     # ! you must override this
@@ -366,6 +366,8 @@ class ToolLoadTest(ToolLoad):
         super(ToolLoadTest, self).__init__(["tool1"])
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
+        self.next_status = None
+
     def setup(self, **kwargs: int) -> None:
         pass
 
@@ -380,8 +382,14 @@ class ToolLoadTest(ToolLoad):
     def update(self) -> py_trees.common.Status:
         """only take effect."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
-        new_status = py_trees.common.Status.SUCCESS
-        self.take_effect()
+
+        if self.next_status is None:
+            new_status = py_trees.common.Status.RUNNING
+            self.next_status = py_trees.common.Status.SUCCESS
+        else:
+            new_status = self.next_status
+            if self.next_status == py_trees.common.Status.SUCCESS:
+                self.take_effect()
 
         return new_status
 

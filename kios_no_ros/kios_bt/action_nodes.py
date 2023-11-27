@@ -101,6 +101,15 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
 
     # nicht unbedingt notwendig zu überschreiben
     def initialise(self) -> None:
+        # if the node is running, do nothing
+        if self.status == py_trees.common.Status.RUNNING:
+            self.logger.debug(
+                "%s.initialise()->already running, nothing to do"
+                % (self.__class__.__name__)
+            )
+            return
+
+        # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
         # * reset the task
         self.task.initialize()
@@ -190,7 +199,7 @@ class ToolPick(ActionNode):
         self.skill_type = "BBGripperForce"
         self.skill_parameters = {
             "skill": {
-                "objects": {"Pick": self.objects_["inTool"]},
+                "objects": {"Pick": self.objects_["target"]},
                 "time_max": 30,
                 # "action_context": {
                 #     "action_name": "BBPick",
@@ -376,20 +385,27 @@ class ToolLoadTest(ToolLoad):
 
     def initialise(self) -> None:
         """do nothing."""
+        # if self.status == py_trees.common.Status.RUNNING:
+        #     self.logger.debug(
+        #         "%s.initialise()->already running, nothing to do"
+        #         % (self.__class__.__name__)
+        #     )
+        #     return
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
         pass
 
     def update(self) -> py_trees.common.Status:
         """only take effect."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
+        new_status = py_trees.common.Status.RUNNING
 
-        if self.next_status is None:
-            new_status = py_trees.common.Status.RUNNING
-            self.next_status = py_trees.common.Status.SUCCESS
-        else:
-            new_status = self.next_status
-            if self.next_status == py_trees.common.Status.SUCCESS:
-                self.take_effect()
+        # if self.next_status is None:
+        #     new_status = py_trees.common.Status.RUNNING
+        #     self.next_status = py_trees.common.Status.SUCCESS
+        # else:
+        #     new_status = self.next_status
+        #     if self.next_status == py_trees.common.Status.SUCCESS:
+        #         self.take_effect()
 
         return new_status
 

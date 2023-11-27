@@ -107,7 +107,11 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.mios_monitor = multiprocessing.Process(
-            target=mios_monitor, args=(self.child_connection,)
+            target=mios_monitor,
+            args=(
+                self.task,
+                self.child_connection,
+            ),
         )
         atexit.register(self.mios_monitor.terminate)
         self.mios_monitor.start()
@@ -146,7 +150,10 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
     def terminate(self, new_status: py_trees.common.Status) -> None:
         """called after execution or when interrupted."""
         # * stop the mios_monitor process, regardless of the result
-        self.mios_monitor.terminate()
+        if self.mios_monitor is None:
+            print(self.__class__.__name__ + ": mios_monitor is None")
+        else:
+            self.mios_monitor.terminate()
 
         self.logger.debug(
             "%s.terminate()[%s->%s]"
@@ -316,6 +323,8 @@ class ToolLoad(ActionNode):
                 "F_ext_contact": [3.0, 2.0],
             },
         }
+        # ! check the parameters here
+        print(self.skill_parameters)
 
         # * setup the task
         self.task = Task(MIOS)
@@ -360,8 +369,8 @@ class ToolLoadTest(ToolLoad):
     def setup(self, **kwargs: int) -> None:
         pass
 
-    def set_effects(self) -> None:
-        super().set_effects()
+    # def set_effects(self) -> None:
+    #     super().set_effects()
 
     def initialise(self) -> None:
         """do nothing."""

@@ -232,10 +232,10 @@ def create_load_tool_tree() -> py_trees.composites.Selector:
 
     is_tool_load = condition_nodes.IsToolLoaded(["tool1"])
 
-    sequence = py_trees.composites.Sequence(name="load tool sequence", memory=False)
+    sequence = py_trees.composites.Sequence(name="load tool sequence", memory=True)
 
     hand_free = condition_nodes.isInHand(["nothing"])
-    load_tool = action_nodes.ToolLoadTest(["tool1"])
+    load_tool = action_nodes.ToolLoad(["tool1"])
     sequence.add_children([hand_free, load_tool])
 
     selector.add_children([is_tool_load, sequence])
@@ -283,7 +283,7 @@ def test_tree():
     ####################
     # Tick Tock
     ####################
-    py_trees.display.render_dot_tree(root, with_blackboard_variables=True)
+    # py_trees.display.render_dot_tree(root, with_blackboard_variables=True)
 
     while True:
         try:
@@ -299,4 +299,36 @@ if __name__ == "__main__":
     # main()
     # test_root()
     # test_blackboard()
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
     test_tree()
+
+    # py_trees.logging.level = py_trees.logging.Level.DEBUG
+    # root = py_trees.composites.Sequence(name="test_sequence", memory=False)
+    # action_node = action_nodes.ToolLoad(["tool1"])
+    # root.add_children([action_node])
+
+    # ####################
+    # # Tree Stewardship
+    # ####################
+    # behaviour_tree = py_trees.trees.BehaviourTree(root)
+    # behaviour_tree.add_pre_tick_handler(pre_tick_handler)
+    # behaviour_tree.visitors.append(py_trees.visitors.DebugVisitor())
+    # snapshot_visitor = py_trees.visitors.SnapshotVisitor()
+    # behaviour_tree.add_post_tick_handler(
+    #     functools.partial(post_tick_handler, snapshot_visitor)
+    # )
+    # behaviour_tree.visitors.append(snapshot_visitor)
+    # behaviour_tree.setup(timeout=15)
+
+    # ####################
+    # # Tick Tock
+    # ####################
+
+    # while True:
+    #     try:
+    #         behaviour_tree.tick()
+    #         py_trees.console.read_single_keypress()
+    #     except KeyboardInterrupt:
+    #         break
+
+    # print("\n")

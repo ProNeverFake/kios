@@ -4,7 +4,7 @@ import time
 
 
 class Task:
-    def __init__(self, robot):
+    def __init__(self, robot, shared_data=None):
         self.skill_names = []
         self.skill_types = []
         self.skill_context = dict()
@@ -15,6 +15,7 @@ class Task:
 
         self.task_start_response = None
         self.task_wait_response = None
+        self.shared_data = shared_data
 
     def add_skill(self, name, skill_type, context):
         self.skill_names.append(name)

@@ -296,12 +296,59 @@ def test_tree():
     print("\n")
 
 
+def test_fake_action():
+    root = TreeRoot()
+    initial_state = {
+        "inHand": "nothing",
+        "inTool": "nothing",
+        "cube1-at": "cube1",
+    }
+    root.set_initial_state(initial_state)
+
+    sequence = py_trees.composites.Sequence(name="pick up cube sequence", memory=False)
+
+    lood_tool = action_nodes.ToolLoadTest(["tool1"])
+
+    # lood_tool2 = action_nodes.ToolLoadTest(["tool2"])
+
+    sequence.add_children([lood_tool])
+
+    root.add_children([sequence])
+
+    ####################
+    # Tree Stewardship
+    ####################
+    behaviour_tree = py_trees.trees.BehaviourTree(root)
+    behaviour_tree.add_pre_tick_handler(pre_tick_handler)
+    behaviour_tree.visitors.append(py_trees.visitors.DebugVisitor())
+    snapshot_visitor = py_trees.visitors.SnapshotVisitor()
+    behaviour_tree.add_post_tick_handler(
+        functools.partial(post_tick_handler, snapshot_visitor)
+    )
+    behaviour_tree.visitors.append(snapshot_visitor)
+    behaviour_tree.setup(timeout=15)
+
+    ####################
+    # Tick Tock
+    ####################
+    # py_trees.display.render_dot_tree(root, with_blackboard_variables=True)
+
+    while True:
+        try:
+            behaviour_tree.tick()
+            py_trees.console.read_single_keypress()
+        except KeyboardInterrupt:
+            break
+
+    print("\n")
+
+
 if __name__ == "__main__":
     # main()
     # test_root()
     # test_blackboard()
     py_trees.logging.level = py_trees.logging.Level.DEBUG
-    test_tree()
+    test_fake_action()
 
     # py_trees.logging.level = py_trees.logging.Level.DEBUG
     # root = py_trees.composites.Sequence(name="test_sequence", memory=False)

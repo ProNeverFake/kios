@@ -8,6 +8,8 @@
 import atexit
 import multiprocessing
 import multiprocessing.connection
+from multiprocessing import Manager
+
 import time
 
 import py_trees.common
@@ -18,6 +20,8 @@ from kios_utils.task import *
 
 from abc import ABC, abstractmethod
 
+from kios_bt.mios_async import mios_monitor, fake_monitor
+
 
 ##############################################################################
 # Classes
@@ -26,33 +30,33 @@ from abc import ABC, abstractmethod
 MIOS = "127.0.0.1"
 
 
-def mios_monitor(
-    task: Task, pipe_connection: multiprocessing.connection.Connection
-) -> None:
-    """Emulate a (potentially) long running external process.
+# def mios_monitor(
+#     task: Task, pipe_connection: multiprocessing.connection.Connection
+# ) -> None:
+#     """Emulate a (potentially) long running external process.
 
-    Args:
-        pipe_connection: connection to the mios_monitor process
-    """
-    try:
-        task.interrupt()
-        task.start()
-        # hanlde startup failure
-        # ! check the response here
-        print(str(task.task_start_response))
+#     Args:
+#         pipe_connection: connection to the mios_monitor process
+#     """
+#     try:
+#         task.interrupt()
+#         task.start()
+#         # hanlde startup failure
+#         # ! check the response here
+#         print(str(task.task_start_response))
 
-        if bool(task.task_start_response["result"]["result"]) == False:
-            pipe_connection.send([False])
-            return
+#         if bool(task.task_start_response["result"]["result"]) == False:
+#             pipe_connection.send([False])
+#             return
 
-        _ = task.wait()
+#         _ = task.wait()
 
-        if bool(task.task_wait_response["result"]["result"]) == True:
-            pipe_connection.send([True])
-        else:
-            pipe_connection.send([False])
-    except KeyboardInterrupt:
-        pass
+#         if bool(task.task_wait_response["result"]["result"]) == True:
+#             pipe_connection.send([True])
+#         else:
+#             pipe_connection.send([False])
+#     except KeyboardInterrupt:
+#         pass
 
 
 class ActionNode(py_trees.behaviour.Behaviour, ABC):
@@ -101,6 +105,7 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
 
     # nicht unbedingt notwendig zu überschreiben
     def initialise(self) -> None:
+        # ! this is unnecessary after using selectors
         # if the node is running, do nothing
         if self.status == py_trees.common.Status.RUNNING:
             self.logger.debug(
@@ -364,58 +369,111 @@ class ToolLoad(ActionNode):
     # def terminate(self, new_status: py_trees.common.Status) -> None:
 
 
-class ToolLoadTest(ToolLoad):
+class ToolLoadTest(ActionNode):
     """a dummy behavior for testing."""
 
-    def __init__(self, objects: str):
+    def __init__(self, object_: list):
         """Configure the name of the behaviour."""
         self.objects_ = {
-            "tool": objects[0],
+            "inHand": object_[0],
         }
-        super(ToolLoadTest, self).__init__(["tool1"])
+        self.node_name = "ToolLoad"
+        self.target_name = object_[0]
+
+        super(ToolLoadTest, self).__init__()
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
-        self.next_status = None
+    # ! you must override this
+    def set_effects(self) -> None:
+        self.effects = {
+            "inHand": self.objects_["inHand"],
+        }
 
+    # * a fake setup
     def setup(self, **kwargs: int) -> None:
-        pass
+        self.skill_type = "BBTest"
+        self.skill_parameters = {
+            "skill": "BBTest",
+        }
 
-    # def set_effects(self) -> None:
-    #     super().set_effects()
+        # * setup the task
 
+        self.multiprocessing_manager = Manager()
+        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+
+        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.add_skill("bbtest", self.skill_type, self.skill_parameters)
+
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
+
+    # * a fake initialise
     def initialise(self) -> None:
-        """do nothing."""
-        # if self.status == py_trees.common.Status.RUNNING:
-        #     self.logger.debug(
-        #         "%s.initialise()->already running, nothing to do"
-        #         % (self.__class__.__name__)
-        #     )
-        #     return
-        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
-        pass
+        if self.status == py_trees.common.Status.RUNNING:
+            self.logger.debug(
+                "%s.initialise()->already running, nothing to do"
+                % (self.__class__.__name__)
+            )
+            return
 
+        # else, reset the task and start the external process
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        # * reset the task
+        self.task.initialize()
+        # * launch the subprocess, start the mios skill execution
+        self.parent_connection, self.child_connection = multiprocessing.Pipe()
+        self.mios_monitor = multiprocessing.Process(
+            target=fake_monitor,
+            args=(
+                self.task,
+                self.child_connection,
+            ),
+        )
+        atexit.register(self.mios_monitor.terminate)
+        self.mios_monitor.start()
+
+    # * normally don't need this. here for testing
     def update(self) -> py_trees.common.Status:
-        """only take effect."""
+        """Increment the counter, monitor and decide on a new status."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
         new_status = py_trees.common.Status.RUNNING
 
-        # if self.next_status is None:
-        #     new_status = py_trees.common.Status.RUNNING
-        #     self.next_status = py_trees.common.Status.SUCCESS
-        # else:
-        #     new_status = self.next_status
-        #     if self.next_status == py_trees.common.Status.SUCCESS:
-        #         self.take_effect()
+        # * check the result of the startup of the task
+        task_start_response = self.task.shared_data["task_start_response"]
+        print(task_start_response)
+
+        if task_start_response is not None:
+            if bool(task_start_response["result"]["result"]) == False:
+                self.logger.debug("Task startup failed")
+                new_status = py_trees.common.Status.FAILURE
+                return new_status
+
+            if bool(task_start_response["result"]["result"]) == True:
+                print("Task startup succeeded")
+
+        else:
+            # ! this should never happen
+            self.logger.debug("Task startup in progress")
+            self.logger.debug("ERRRRRRRRRRRRRRRRRRRRRRRORRR")
+            new_status = py_trees.common.Status.RUNNING
+            return new_status
+
+        # * check if the task is finished
+        if self.parent_connection.poll():
+            self.logger.debug("the task now has a result.")
+
+            self.result = self.parent_connection.recv().pop()  # ! here only bool
+            if self.result == True:
+                self.logger.debug("Task finished successfully")
+                new_status = py_trees.common.Status.SUCCESS
+                # * exert the effects
+                self.take_effect()
+            else:
+                self.logger.debug("Task finished with error.")
+                new_status = py_trees.common.Status.FAILURE
+
+        self.logger.warning("the task is still running")
 
         return new_status
-
-    def terminate(self, new_status: py_trees.common.Status) -> None:
-        """do nothing."""
-        self.logger.debug(
-            "%s.terminate()[%s->%s]"
-            % (self.__class__.__name__, self.status, new_status)
-        )
-        pass
 
 
 ##############################################################################

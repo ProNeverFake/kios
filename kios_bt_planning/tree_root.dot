@@ -1,0 +1,27 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+tree_root [fillcolor=cyan, fontcolor=black, fontsize=9, label=tree_root, shape=octagon, style=filled];
+"pick up cube selector" [fillcolor=cyan, fontcolor=black, fontsize=9, label="pick up cube selector", shape=octagon, style=filled];
+tree_root -> "pick up cube selector";
+"isInHand-cube1" [fillcolor=gray, fontcolor=black, fontsize=9, label="isInHand-cube1", shape=ellipse, style=filled];
+"pick up cube selector" -> "isInHand-cube1";
+"pick up cube sequence" [fillcolor=cyan, fontcolor=black, fontsize=9, label="pick up cube sequence", shape=octagon, style=filled];
+"pick up cube selector" -> "pick up cube sequence";
+"load the tool" [fillcolor=cyan, fontcolor=black, fontsize=9, label="load the tool", shape=octagon, style=filled];
+"pick up cube sequence" -> "load the tool";
+"IsToolLoaded-tool1" [fillcolor=gray, fontcolor=black, fontsize=9, label="IsToolLoaded-tool1", shape=ellipse, style=filled];
+"load the tool" -> "IsToolLoaded-tool1";
+"load tool sequence" [fillcolor=cyan, fontcolor=black, fontsize=9, label="load tool sequence", shape=octagon, style=filled];
+"load the tool" -> "load tool sequence";
+"isInHand-nothing" [fillcolor=gray, fontcolor=black, fontsize=9, label="isInHand-nothing", shape=ellipse, style=filled];
+"load tool sequence" -> "isInHand-nothing";
+"ToolLoad-tool1" [fillcolor=gray, fontcolor=black, fontsize=9, label="ToolLoad-tool1", shape=ellipse, style=filled];
+"load tool sequence" -> "ToolLoad-tool1";
+"isInTool-nothing" [fillcolor=gray, fontcolor=black, fontsize=9, label="isInTool-nothing", shape=ellipse, style=filled];
+"pick up cube sequence" -> "isInTool-nothing";
+"ToolPick-cube1" [fillcolor=gray, fontcolor=black, fontsize=9, label="ToolPick-cube1", shape=ellipse, style=filled];
+"pick up cube sequence" -> "ToolPick-cube1";
+}

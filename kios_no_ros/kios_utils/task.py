@@ -3,6 +3,18 @@ from .ws_client import *
 import time
 
 
+class Skill:
+    def __init__(self, skill_name=None, skill_type=None, skill_context=None):
+        self.skill_name = skill_name
+        self.skill_type = skill_type
+        self.skill_context = skill_context
+
+    def initialize(self, skill_name, skill_type, skill_context):
+        self.skill_name = skill_name
+        self.skill_type = skill_type
+        self.skill_context = skill_context
+
+
 class Task:
     def __init__(self, robot, shared_data=None):
         self.skill_names = []
@@ -21,6 +33,11 @@ class Task:
         self.skill_names.append(name)
         self.skill_types.append(skill_type)
         self.skill_context[name] = context
+
+    # def add_skill(self, skill: Skill):
+    #     self.skill_names.append(skill.skill_name)
+    #     self.skill_types.append(skill.skill_type)
+    #     self.skill_context[skill.skill_name] = skill.skill_context
 
     def start(self, queue: bool = False):
         self.t_0 = time.time()

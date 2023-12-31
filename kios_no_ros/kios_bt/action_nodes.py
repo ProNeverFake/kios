@@ -380,6 +380,13 @@ class ToolLoadTest(ActionNode):
         self.node_name = "ToolLoad"
         self.target_name = object_[0]
 
+        # ! BBCHANGE
+        # * setup the task object
+        self.multiprocessing_manager = Manager()
+        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.initialize()
+
         super(ToolLoadTest, self).__init__()
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
@@ -397,11 +404,13 @@ class ToolLoadTest(ActionNode):
         }
 
         # * setup the task
+        # self.multiprocessing_manager = Manager()
+        # shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
 
-        self.multiprocessing_manager = Manager()
-        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        # self.task = Task(MIOS, shared_data=shared_data)
 
-        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.initialize()
+
         self.task.add_skill("bbtest", self.skill_type, self.skill_parameters)
 
         self.logger.debug("%s.setup()" % (self.__class__.__name__))

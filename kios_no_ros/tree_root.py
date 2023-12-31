@@ -307,11 +307,11 @@ def test_fake_action():
 
     sequence = py_trees.composites.Sequence(name="pick up cube sequence", memory=False)
 
-    lood_tool = action_nodes.ToolLoadTest(["tool1"])
+    load_tool = action_nodes.ToolLoadTest(["tool1"])
 
-    # lood_tool2 = action_nodes.ToolLoadTest(["tool2"])
+    load_tool2 = action_nodes.ToolLoadTest(["tool2"])
 
-    sequence.add_children([lood_tool])
+    sequence.add_children([load_tool, load_tool2])
 
     root.add_children([sequence])
 

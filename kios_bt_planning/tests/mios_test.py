@@ -7,10 +7,8 @@ import functools
 class TreeRoot(py_trees.composites.Sequence):
     "create the tree root."
 
-    def __init__(self, root_name: str, root_memory: bool = False):
-        super(py_trees.composites.Sequence, self).__init__(
-            name=root_name, memory=root_memory
-        )
+    def __init__(self, name: str = "root", memory: bool = False):
+        super().__init__(name, memory)
 
     def set_initial_state(self, initial_state: dict):
         try:
@@ -214,7 +212,7 @@ def test_tree():
 
 
 def test_fake_action():
-    root = TreeRoot("root", root_memory=False)
+    root = TreeRoot("root", memory=False)
     initial_state = {
         "inHand": "nothing",
         "inTool": "nothing",

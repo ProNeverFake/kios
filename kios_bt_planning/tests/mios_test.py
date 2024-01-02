@@ -1,3 +1,7 @@
+"""
+test the functionality of the tree and the communication with the robot
+"""
+
 import kios_bt.action_nodes as action_nodes
 import kios_bt.condition_nodes as condition_nodes
 import py_trees
@@ -150,7 +154,7 @@ def create_load_tool_tree() -> py_trees.composites.Selector:
     sequence = py_trees.composites.Sequence(name="load tool sequence", memory=False)
 
     hand_free = condition_nodes.isInHand(["nothing"])
-    load_tool = action_nodes.ToolLoadTest(["tool1"])
+    load_tool = action_nodes.ToolLoad(["tool1"])
     sequence.add_children([hand_free, load_tool])
 
     selector.add_children([is_tool_load, sequence])
@@ -159,6 +163,9 @@ def create_load_tool_tree() -> py_trees.composites.Selector:
 
 
 def test_tree():
+    """
+    tree with real actions to test the tree functionality and the communication with the robot
+    """
     root = TreeRoot()
     initial_state = {
         "inHand": "nothing",
@@ -169,7 +176,7 @@ def test_tree():
 
     selector = py_trees.composites.Selector(name="pick up cube selector", memory=False)
 
-    is_cube_in_hand = condition_nodes.isInHand(["cube1"])
+    is_cube_in_hand = condition_nodes.isInTool(["cube1"])
 
     sequence = py_trees.composites.Sequence(name="pick up cube sequence", memory=False)
     is_tool_load = create_load_tool_tree()
@@ -212,6 +219,10 @@ def test_tree():
 
 
 def test_fake_action():
+    """
+    tree with fake actions to test the tree functionality
+    """
+
     root = TreeRoot("root", memory=False)
     initial_state = {
         "inHand": "nothing",
@@ -261,6 +272,6 @@ def test_fake_action():
 if __name__ == "__main__":
     # test_blackboard()
     py_trees.logging.level = py_trees.logging.Level.DEBUG
-    test_fake_action()
+    test_tree()
 
     # print("\n")

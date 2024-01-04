@@ -1,0 +1,69 @@
+% Please compile your document with LuaLaTex and add
+% the following to your document preamble:
+% \usepackage{tikz}
+                    % \usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning,
+                    calc,shapes,graphs,graphdrawing}
+                    % \usegdlibrary{trees}
+                    % \tikzset{control/.style={draw, inner sep=1pt, regular polygon,
+                    regular polygon sides=4, minimum width=1cm, fill=blue!15}}
+                    % \tikzset{action/.style={draw, rectangle, inner sep=0.2cm, fill=green!40}}
+                    % \tikzset{condition/.style={draw, minimum width=1cm, ellipse, inner sep=2pt,
+                    fill=yellow!80}}
+                    % \tikzset{>=stealth}
+                    % \tikzset{level distance=1.5cm}
+                    % \tikzset{sibling distance=2.5cm}
+                    % \tikzset{grow=down}
+\begin{tikzpicture}
+	\graph[tree layout] {
+		n1[as=$\rightarrow$, control] -> {
+			n2[as=?, control] -> {
+				n3[as={YellowBox at $p_{1}$ in KittingBox?}, condition],
+				n4[as=$\rightarrow$, control] -> {
+					n5[as=?, control] -> {
+						n6[as={In gripper YellowBox?}, condition],
+						n7[as=$\rightarrow$, control] -> {
+							n8[as=?, control] -> {
+								n9[as={Gripper open?}, condition],
+								n10[as={Set gripper open}, action]
+							},
+							n11[as={Pick YellowBox}, action]
+						}
+					},
+					n12[as={Place YellowBox at $p_{1}$ in KittingBox}, action]
+				}
+			},
+			n13[as=?, control] -> {
+				n14[as={GreenBox at $p_{2}$ in YellowBox?}, condition],
+				n15[as=$\rightarrow$, control] -> {
+					n16[as=?, control] -> {
+						n17[as={In gripper GreenBox?}, condition],
+						n18[as=$\rightarrow$, control] -> {
+							n19[as=?, control] -> {
+								n20[as={Gripper open?}, condition],
+								n21[as={Set gripper open}, action]
+							},
+							n22[as={Pick GreenBox}, action]
+						}
+					},
+					n23[as={Place GreenBox at $p_{2}$ in YellowBox}, action]
+				}
+			},
+			n24[as=?, control] -> {
+				n25[as={BlueBox at $p_{3}$ in YellowBox?}, condition],
+				n26[as=$\rightarrow$, control] -> {
+					n27[as=?, control] -> {
+						n28[as={In gripper BlueBox?}, condition],
+						n29[as=$\rightarrow$, control] -> {
+							n30[as=?, control] -> {
+								n31[as={Gripper open?}, condition],
+								n32[as={Set gripper open}, action]
+							},
+							n33[as={Pick BlueBox}, action]
+						}
+					},
+					n34[as={Place BlueBox at $p_{3}$ in YellowBox}, action]
+				}
+			}
+		}
+	};
+\end{tikzpicture}

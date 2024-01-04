@@ -1,0 +1,4 @@
+- s(
+- move0 GreenBox -0.8 -1.0 0.89 0.0 base_link
+- move0 BlueBox -1.2 -1.0 0.89 0.0 base_link
+- )

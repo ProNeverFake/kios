@@ -1,0 +1,117 @@
+{
+    "move": {
+        "name": "move",
+        "variables": {
+            "l_from": null,
+            "l_to": null
+        },
+        "mios_parameters": [
+            "something here"
+        ],
+        "preconditions": {
+            "true": {
+                "robot_at": [
+                    "l_from"
+                ],
+                "reachable": [
+                    "l_from",
+                    "l_to"
+                ]
+            },
+            "false": {}
+        },
+        "effects": {
+            "true": {
+                "robot_at": [
+                    "l_to"
+                ]
+            },
+            "false": {
+                "robot_at": [
+                    "l_from"
+                ]
+            }
+        }
+    },
+    "load_tool": {
+        "name": "load_tool",
+        "variables": {
+            "tool": null
+        },
+        "mios_parameters": [
+            "something here"
+        ],
+        "preconditions": {
+            "true": {
+                "hand_free": false
+            },
+            "false": {}
+        },
+        "effects": {
+            "true": {
+                "in_hand": "tool"
+            },
+            "false": {
+                "hand_free": false
+            }
+        }
+    },
+    "unload_tool": {
+        "name": "unload_tool",
+        "variables": {
+            "tool": null
+        },
+        "mios_parameters": [
+            "something here"
+        ],
+        "preconditions": {
+            "true": {
+                "in_hand": "tool",
+                "tool_free": "tool"
+            },
+            "false": {}
+        },
+        "effects": {
+            "true": {
+                "hand_free": false
+            },
+            "false": {
+                "in_hand": "tool"
+            }
+        }
+    },
+    "pick": {
+        "name": "pick",
+        "variables": {
+            "part": null,
+            "tool": null,
+            "l_from": null,
+            "l_to": null
+        },
+        "mios_parameters": [
+            "something here"
+        ],
+        "preconditions": {
+            "true": {
+                "robot_at": "l_from",
+                "reachable": [
+                    "l_from",
+                    "l_to"
+                ],
+                "in_hand": "tool",
+                "tool_free": "tool"
+            },
+            "false": {}
+        },
+        "effects": {
+            "true": {
+                "robot_at": "l_from",
+                "in_tool": "part"
+            },
+            "false": {
+                "robot_at": "l_to",
+                "tool_free": "tool"
+            }
+        }
+    }
+}

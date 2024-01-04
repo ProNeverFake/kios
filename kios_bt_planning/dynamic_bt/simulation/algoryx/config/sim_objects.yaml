@@ -1,0 +1,15 @@
+YellowBox:
+  type: 'box'
+  reference: 'Table1'
+  size: 0.1
+  color: 'yellow'
+GreenBox:
+  type: 'box'
+  reference: 'Table2'
+  size: 0.1
+  color: 'green'
+BlueBox:
+  type: 'box'
+  reference: 'Table1'
+  size: 0.1
+  color: 'blue'

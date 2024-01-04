@@ -157,8 +157,10 @@ def create_load_tool_tree() -> py_trees.composites.Selector:
 
     return selector
 
-
 def test_tree():
+    """
+    test the real mios monitor
+    """
     root = TreeRoot()
     initial_state = {
         "inHand": "nothing",
@@ -212,6 +214,9 @@ def test_tree():
 
 
 def test_fake_action():
+    """
+    test the fake monitor
+    """
     root = TreeRoot("root", memory=False)
     initial_state = {
         "inHand": "nothing",

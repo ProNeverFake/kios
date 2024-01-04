@@ -1,0 +1,15 @@
+{
+    "is_in_hand": {
+        "name": "is_in_hand",
+        "variables": {
+            "tool": null
+        }
+    },
+    "is_in_tool": {
+        "name": "is_in_hand",
+        "variables": {
+            "tool": null,
+            "part": null
+        }
+    }
+}

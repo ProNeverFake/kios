@@ -1,0 +1,13 @@
+type: place
+vec_pos:
+  BlueBox: [0.2, -0.0, 0.04]
+  GreenBox: [0.001, -0.001, 0.14]
+  KittingBox: [-0.8, -0.0, 0.187]
+  YellowBox: [0.2, -0.0, 0.14]
+  base_link: [-0.8, -1.0, 0.89]
+vec_quat:
+  BlueBox: [0.0, 0.0, -0.0, 1.0]
+  GreenBox: [0.0, -0.0, -0.0, 1.0]
+  KittingBox: [0.0, -0.0, -0.0, 1.0]
+  YellowBox: [0.0, 0.0, -0.0, 1.0]
+  base_link: [0.0, 0.0, 0.0, 1.0]

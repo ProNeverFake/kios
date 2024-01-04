@@ -1,0 +1,72 @@
+action_nodes:
+- close_gripper
+- open_gripper
+atomic_fallback_nodes:
+- move0 YellowBox -0.12 0.0 0.12 0.02 GreenBox
+- move0 YellowBox 0.12 0.0 0.12 0.02 GreenBox
+- move0 YellowBox 0.0 -0.12 0.12 0.02 GreenBox
+- move0 YellowBox 0.0 0.12 0.12 0.02 GreenBox
+- move0 YellowBox 0.0 0.0 0.22 0.02 GreenBox
+- move0 YellowBox -0.12 0.0 0.12 0.02 BlueBox
+- move0 YellowBox 0.12 0.0 0.12 0.02 BlueBox
+- move0 YellowBox 0.0 -0.12 0.12 0.02 BlueBox
+- move0 YellowBox 0.0 0.12 0.12 0.02 BlueBox
+- move0 YellowBox 0.0 0.0 0.22 0.02 BlueBox
+- move0 GreenBox -0.12 0.0 0.12 0.02 YellowBox
+- move0 GreenBox 0.12 0.0 0.12 0.02 YellowBox
+- move0 GreenBox 0.0 -0.12 0.12 0.02 YellowBox
+- move0 GreenBox 0.0 0.12 0.12 0.02 YellowBox
+- move0 GreenBox 0.0 0.0 0.22 0.02 YellowBox
+- move0 GreenBox -0.12 0.0 0.12 0.02 BlueBox
+- move0 GreenBox 0.12 0.0 0.12 0.02 BlueBox
+- move0 GreenBox 0.0 -0.12 0.12 0.02 BlueBox
+- move0 GreenBox 0.0 0.12 0.12 0.02 BlueBox
+- move0 GreenBox 0.0 0.0 0.22 0.02 BlueBox
+- move0 BlueBox -0.12 0.0 0.12 0.02 YellowBox
+- move0 BlueBox 0.12 0.0 0.12 0.02 YellowBox
+- move0 BlueBox 0.0 -0.12 0.12 0.02 YellowBox
+- move0 BlueBox 0.0 0.12 0.12 0.02 YellowBox
+- move0 BlueBox 0.0 0.0 0.22 0.02 YellowBox
+- move0 BlueBox -0.12 0.0 0.12 0.02 GreenBox
+- move0 BlueBox 0.12 0.0 0.12 0.02 GreenBox
+- move0 BlueBox 0.0 -0.12 0.12 0.02 GreenBox
+- move0 BlueBox 0.0 0.12 0.12 0.02 GreenBox
+- move0 BlueBox 0.0 0.0 0.22 0.02 GreenBox
+- move0 YellowBox -0.133 -0.133 0.175 0.02 KittingBox
+- move0 YellowBox -0.133 0.0 0.175 0.02 KittingBox
+- move0 YellowBox -0.133 0.133 0.175 0.02 KittingBox
+- move0 YellowBox 0.0 -0.133 0.175 0.02 KittingBox
+- move0 YellowBox 0.0 0.0 0.175 0.02 KittingBox
+- move0 YellowBox 0.0 0.133 0.175 0.02 KittingBox
+- move0 YellowBox 0.133 -0.133 0.175 0.02 KittingBox
+- move0 YellowBox 0.133 0.0 0.175 0.02 KittingBox
+- move0 YellowBox 0.133 0.133 0.175 0.02 KittingBox
+- move0 GreenBox -0.133 -0.133 0.175 0.02 KittingBox
+- move0 GreenBox -0.133 0.0 0.175 0.02 KittingBox
+- move0 GreenBox -0.133 0.133 0.175 0.02 KittingBox
+- move0 GreenBox 0.0 -0.133 0.175 0.02 KittingBox
+- move0 GreenBox 0.0 0.0 0.175 0.02 KittingBox
+- move0 GreenBox 0.0 0.133 0.175 0.02 KittingBox
+- move0 GreenBox 0.133 -0.133 0.175 0.02 KittingBox
+- move0 GreenBox 0.133 0.0 0.175 0.02 KittingBox
+- move0 GreenBox 0.133 0.133 0.175 0.02 KittingBox
+- move0 BlueBox -0.133 -0.133 0.175 0.02 KittingBox
+- move0 BlueBox -0.133 0.0 0.175 0.02 KittingBox
+- move0 BlueBox -0.133 0.133 0.175 0.02 KittingBox
+- move0 BlueBox 0.0 -0.133 0.175 0.02 KittingBox
+- move0 BlueBox 0.0 0.0 0.175 0.02 KittingBox
+- move0 BlueBox 0.0 0.133 0.175 0.02 KittingBox
+- move0 BlueBox 0.133 -0.133 0.175 0.02 KittingBox
+- move0 BlueBox 0.133 0.0 0.175 0.02 KittingBox
+- move0 BlueBox 0.133 0.133 0.175 0.02 KittingBox
+atomic_sequence_nodes: []
+condition_nodes:
+- gripper_state closed
+- in_gripper none
+- gripper_state open
+fallback_nodes:
+- f(
+sequence_nodes:
+- s(
+up_node:
+- )

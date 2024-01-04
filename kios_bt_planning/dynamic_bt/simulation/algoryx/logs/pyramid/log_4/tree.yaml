@@ -1,0 +1,6 @@
+- s(
+- move0 BlueBox 0.0 0.0 0.175 0.02 KittingBox
+- move0 GreenBox 0.0 0.0 0.22 0.02 BlueBox
+- close_gripper
+- move0 YellowBox -0.12 0.0 0.12 0.02 GreenBox
+- )

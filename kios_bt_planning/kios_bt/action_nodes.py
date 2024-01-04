@@ -69,6 +69,13 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         super(ActionNode, self).__init__(self.node_name + "-" + self.target_name)
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
         self.mios_monitor = None
+        # ! BBCHANGE
+        # * setup the task object
+        self.multiprocessing_manager = Manager()
+        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.initialize()
+
         # the blackboard client
         self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
         # the effects to exert
@@ -119,6 +126,7 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
         # * reset the task
+        # ! BBBUG
         self.task.initialize()
         # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
@@ -138,11 +146,18 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         new_status = py_trees.common.Status.RUNNING
 
         # * check the result of the startup of the task
-        if self.task.task_start_response is not None:
-            if bool(self.task.task_start_response["result"]["result"]) == False:
+        task_start_response = self.task.shared_data["task_start_response"]
+        print(task_start_response)
+
+        if task_start_response is not None:
+            if bool(task_start_response["result"]["result"]) == False:
                 self.logger.debug("Task startup failed")
                 new_status = py_trees.common.Status.FAILURE
                 return new_status
+
+            if bool(task_start_response["result"]["result"]) == True:
+                print("Task startup succeeded")
+
         else:
             # ! this should never happen
             self.logger.debug("Task startup in progress")
@@ -203,7 +218,7 @@ class ToolPick(ActionNode):
     def setup(self, **kwargs: int) -> None:
         # get the parameters from the parameter server
         # ! test, parameters given
-        self.skill_type = "BBGripperForce"
+        self.skill_type = "BBPick"
         self.skill_parameters = {
             "skill": {
                 "objects": {"Pick": self.objects_["target"]},
@@ -248,7 +263,7 @@ class ToolPick(ActionNode):
         }
 
         # * setup the task
-        self.task = Task(MIOS)
+        self.task.initialize()
         self.task.add_skill("bbskill", self.skill_type, self.skill_parameters)
 
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
@@ -343,7 +358,7 @@ class ToolLoad(ActionNode):
         print(self.skill_parameters)
 
         # * setup the task
-        self.task = Task(MIOS)
+        self.task.initialize()
         self.task.add_skill("bbskill", self.skill_type, self.skill_parameters)
 
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
@@ -382,12 +397,12 @@ class ToolLoadTest(ActionNode):
         self.node_name = "ToolLoad"
         self.target_name = object_[0]
 
-        # ! BBCHANGE
-        # * setup the task object
-        self.multiprocessing_manager = Manager()
-        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
-        self.task = Task(MIOS, shared_data=shared_data)
-        self.task.initialize()
+        # # ! BBCHANGE
+        # # * setup the task object
+        # self.multiprocessing_manager = Manager()
+        # shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        # self.task = Task(MIOS, shared_data=shared_data)
+        # self.task.initialize()
 
         super(ToolLoadTest, self).__init__()
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))

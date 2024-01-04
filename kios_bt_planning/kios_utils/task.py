@@ -75,6 +75,7 @@ class Task:
         return result
 
     def initialize(self):
+        self.shared_data["task_start_response"] = None
         self.task_start_response = None
         self.task_wait_response = None
         self.task_uuid = "INVALID"

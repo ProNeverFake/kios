@@ -27,6 +27,8 @@ def mios_monitor(
         # ! check the response here
         print(str(task.task_start_response))
 
+        task.shared_data["task_start_response"] = task.task_start_response
+
         if bool(task.task_start_response["result"]["result"]) == False:
             pipe_connection.send([False])
             return

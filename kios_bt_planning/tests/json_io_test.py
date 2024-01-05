@@ -5,7 +5,7 @@ import os
 move = {
     "name": "move",
     "variables": {"l_from": None, "l_to": None},
-    "mios_parameters": ["something here"],
+    "mios_parameters": {"parameter": None},
     "preconditions": {
         "true": {"robot_at": ["l_from"], "reachable": ["l_from", "l_to"]},
         "false": {},

@@ -80,11 +80,11 @@ class SubtreeFactory:
 
         # transform it into a grounded action
         grounded_action = GroundedAction(
-            tag=action.tag,
-            name=action.name,
-            variables=action_template["variables"],
-            preconditions=action_template["preconditions"],
-            effects=action_template["effects"],
+            tag=copy.deepcopy(action.tag),
+            name=copy.deepcopy(action.name),
+            variables=copy.deepcopy(action_template["variables"]),
+            preconditions=copy.deepcopy(action_template["preconditions"]),
+            effects=copy.deepcopy(action_template["effects"]),
         )
 
         grounded_action.self_ground(action)
@@ -139,16 +139,16 @@ class SubtreeFactory:
         """
         generate a list of condition nodes from a list of conditions
         """
+        grounded_preconditions = grounded_action.ground_preconditions()
         precondition_nodes = []
-        for key, value in grounded_action.preconditions["true"]:
-            # key is the thing to check, value is the value to check
-            node = key + value.to_string()
+        for precondition in grounded_preconditions:
+            node = kios_bt.condition_nodes.ConditionNode(precondition)
             precondition_nodes.append(node)
 
+        grounded_effects = grounded_action.ground_effects()
         effect_nodes = []
-        for key, value in grounded_action.effects["true"]:
-            # key is the thing to check, value is the value to check
-            node = key + value.to_string()
+        for effect in grounded_effects:
+            node = kios_bt.condition_nodes.ConditionNode(effect)
             effect_nodes.append(node)
         # TODO: NOT condition
         return effect_nodes, precondition_nodes

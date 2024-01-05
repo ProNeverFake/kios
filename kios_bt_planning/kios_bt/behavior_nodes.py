@@ -26,7 +26,7 @@ import py_trees.console as console
 from kios_utils.kios_utils import ActionPhase
 from kios_utils.task import *
 from kios_bt.mios_async import mios_monitor, fake_monitor
-from kios_bt.data_types import ActionInstance, GroundedAction
+from kios_bt.data_types import ActionInstance, GroundedAction, GroundedCondition
 from kios_world.world_interface import WorldInterface
 
 
@@ -43,36 +43,16 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
 
     def __init__(self, world_interface: WorldInterface):
         """Configure the name of the behaviour."""
-        super(ActionNode, self).__init__(self.node_name + "-" + self.target_name)
-
-        self.mios_monitor = None
-        # the blackboard client
-        self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
-        # the effects to exert
-
-        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
-
-    @abstractmethod
-    def set_effects(self) -> None:
-        """Register the effects"""
-        pass
+        super(BehaviorNode, self).__init__(self.behavior_name)
+        self.monitor = None
+        self.world_interface = world_interface
 
     def register_predicates(self) -> None:
-        """Register the predicates on the blackboard, access = write."""
-        if self.effects is not None:
-            for key, _ in self.effects.items():
-                self.blackboard.register_key(
-                    key=key, access=py_trees.common.Access.WRITE
-                )
+        self.world_interface.register_predicates(self.grounded_action.effects["true"])
 
     def take_effect(self):
         "change the predicates on the blackboard according to the set effects"
-        if self.effects is not None:
-            try:
-                for key, value in self.effects.items():
-                    self.blackboard.set(name=key, value=value)
-            except KeyError:
-                print("KeyError: %s" % (key))
+        self.world_interface.set_predicates(self.grounded_action.effects["true"])
 
     @abstractmethod
     def setup(self, **kwargs: int) -> None:
@@ -82,30 +62,21 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
         )
 
     def initialise(self) -> None:
-        # ! this is unnecessary after using selectors
-        # if the node is running, do nothing
-        if self.status == py_trees.common.Status.RUNNING:
-            self.logger.debug(
-                "%s.initialise()->already running, nothing to do"
-                % (self.__class__.__name__)
-            )
-            return
-
         # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
         # * reset the task
         self.task.initialize()
         # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
-        self.mios_monitor = multiprocessing.Process(
+        self.monitor = multiprocessing.Process(
             target=mios_monitor,
             args=(
                 self.task,
                 self.child_connection,
             ),
         )
-        atexit.register(self.mios_monitor.terminate)
-        self.mios_monitor.start()
+        atexit.register(self.monitor.terminate)
+        self.monitor.start()
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
@@ -152,60 +123,89 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
         )
 
 
-class ActionNode(py_trees.behaviour.Behaviour, ABC):
+class ActionNode(BehaviorNode):
     """Demonstrates the at-a-distance style action behaviour."""
 
-    def __init__(self):
+    def __init__(
+        self, grounded_action: GroundedAction, world_interface: WorldInterface
+    ):
+        self.grounded_action = grounded_action
         """Configure the name of the behaviour."""
-        super(ActionNode, self).__init__(self.node_name + "-" + self.target_name)
-        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
+        action_variables = " - ".join(
+            [f"{key} = {value}, " for key, value in grounded_action.variables.items()]
+        )
+        self.behavior_name = grounded_action.tag + ": " + action_variables
+        super().__init__(world_interface)
         self.mios_monitor = None
         # the blackboard client
-        self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
+        # self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
         # the effects to exert
         self.effects = None
         self.set_effects()
         self.register_predicates()
 
-    @abstractmethod
-    def set_effects(self) -> None:
-        """Register the effects"""
-        pass
+        self.world_interface = world_interface
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
-        """Register the predicates on the blackboard, access = write."""
-        if self.effects is not None:
-            for key, _ in self.effects.items():
-                self.blackboard.register_key(
-                    key=key, access=py_trees.common.Access.WRITE
-                )
+        self.world_interface.register_predicates(self.grounded_action.effects["true"])
 
     def take_effect(self):
-        "change the predicates on the blackboard according to the set effects"
-        if self.effects is not None:
-            try:
-                for key, value in self.effects.items():
-                    self.blackboard.set(name=key, value=value)
-            except KeyError:
-                print("KeyError: %s" % (key))
+        self.world_interface.set_predicates(self.grounded_action.effects["true"])
 
-    @abstractmethod
     def setup(self, **kwargs: int) -> None:
-        # setup the parameters here
-        self.logger.debug(
-            "%s.setup()->connections to an external process" % (self.__class__.__name__)
-        )
+        # get the parameters from the parameter server
+        self.skill_type = self.grounded_action.mios_parameters["skill_type"]
+        self.skill_parameters = {
+            "skill": {
+                "objects": {"Pick": self.objects_["target"]},
+                "time_max": 30,
+                # "action_context": {
+                #     "action_name": "BBPick",
+                #     "action_phase": "TOOL_PICK",  # Adjusted for Python enum style
+                # },
+                "MoveAbove": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.2, 0.2],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "MoveIn": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "GripperForce": {
+                    "width": 0.016,
+                    "speed": 1,
+                    "force": 120,
+                    "K_x": [1500, 1500, 1500, 100, 100, 100],
+                    "eps_in": 0,  # 0.016
+                    "eps_out": 0.022,  # 0.038
+                },
+                "Retreat": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+            },
+            "control": {"control_mode": 0},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                "F_ext_contact": [3.0, 2.0],
+            },
+        }
+
+        # * setup the task
+        self.task = Task(MIOS)
+        self.task.add_skill("bbskill", self.skill_type, self.skill_parameters)
+
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
 
     def initialise(self) -> None:
-        # ! this is unnecessary after using selectors
-        # if the node is running, do nothing
-        if self.status == py_trees.common.Status.RUNNING:
-            self.logger.debug(
-                "%s.initialise()->already running, nothing to do"
-                % (self.__class__.__name__)
-            )
-            return
-
         # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
         # * reset the task
@@ -235,8 +235,8 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
                 return new_status
         else:
             # ! this should never happen
-            self.logger.debug("Task startup in progress")
-            self.logger.debug("ERRORRRR")
+            self.logger.debug("Task startup is still being processed.")
+            self.logger.error("Lag in task startup process. pls check.")
             new_status = py_trees.common.Status.RUNNING
             return new_status
 
@@ -257,7 +257,7 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         """called after execution or when interrupted."""
         # * stop the mios_monitor process, regardless of the result
         if self.mios_monitor is None:
-            print(self.__class__.__name__ + ": mios_monitor is None")
+            self.logger.info(self.__class__.__name__ + ": mios_monitor is None")
         else:
             self.mios_monitor.terminate()
 
@@ -267,37 +267,33 @@ class ActionNode(py_trees.behaviour.Behaviour, ABC):
         )
 
 
-class ConditionNode(py_trees.behaviour.Behaviour, ABC):
+class ConditionNode(BehaviorNode):
     """abstract condition node."""
 
-    def __init__(self):
+    def __init__(
+        self, grounded_condition: GroundedCondition, world_interface: WorldInterface
+    ):
+        self.grounded_condition = grounded_condition
         """Configure the name of the behaviour."""
-        super(ConditionNode, self).__init__(self.node_name + "-" + self.target_name)
-        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
+        self.behavior_name = grounded_condition.tag
+        super().__init__(world_interface)
+        self.mios_monitor = None
         # the blackboard client
-        self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
-        # the conditions to check
-        self.conditions = None
+        # self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
+        # the effects to exert
+        self.effects = None
+        self.set_effects()
+        self.register_predicates()
+
+        self.world_interface = world_interface
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
-        """Register the predicates on the blackboard."""
-        # register the readonly keys
-        # use self.conditions
-        if self.conditions is not None:
-            for key, _ in self.conditions.items():
-                self.blackboard.register_key(
-                    key=key, access=py_trees.common.Access.READ
-                )
-                # ? if the key is not on the blackboard, set it to default value
-
-    @abstractmethod
-    def set_conditions(self) -> None:
-        """Register the condition"""
-        pass
+        self.world_interface.register_predicates(
+            {self.grounded_condition.name: self.grounded_condition.variables}
+        )
 
     def setup(self, **kwargs: int) -> None:
-        # register what is "success" for the predicates here
-        self.set_conditions()
         # register the predicates on the blackboard here
         self.register_predicates()
         self.logger.debug(

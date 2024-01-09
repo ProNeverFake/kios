@@ -1,16 +1,84 @@
 import json
 import os
 
+# mios_parameters example
+mios_parameters = {
+    "skill_type": "BBCartesianMove",
+    "skill_objects": {"CartesianMove": None},
+    "skill_parameters": {
+        "skill": {
+            "objects": None,
+            "time_max": 30,
+            "BBCartesianMove": {
+                "dX_d": [0.2, 0.2],
+                "ddX_d": [0.1, 0.1],
+                "DeltaX": [0, 0, 0, 0, 0, 0],
+                "K_x": [1500, 1500, 1500, 600, 600, 600],
+            },
+        },
+        "control": {"control_mode": 0},
+        "user": {
+            "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+            "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+        },
+    },
+}
+
 # an action example
 move = {
+    # * this is the name of the action. This should be unique and is used as the identifier of the action.
     "name": "move",
+    # * this is the variables that the action and its conditions needs. The variables need to be grounded later.
     "variables": {"l_from": None, "l_to": None},
-    "mios_parameters": {"parameter": None},
-    "preconditions": {
-        "true": {"robot_at": ["l_from"], "reachable": ["l_from", "l_to"]},
-        "false": {},
+    # * this is the mios parameters that are necessary for robot interfaces.
+    # * the necessary "objects" are grounded from the variables.
+    "mios_parameters": {
+        "skill_type": "BBCartesianMove",
+        "skill_objects": {"CartesianMove": "l_to"},
+        "skill_parameters": {
+            "skill": {
+                "objects": None,
+                "time_max": 30,
+                "BBCartesianMove": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+            },
+            "control": {"control_mode": 0},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+            },
+        },
     },
-    "effects": {"true": {"robot_at": ["l_to"]}, "false": {"robot_at": ["l_from"]}},
+    # * this is the precondition of the action. This should be checked before the action is executed.
+    # * They are explicitly implemented in the subtree as condition nodes in the sequence.
+    "preconditions": {
+        "true": {  # * these are the conditions that need to be true for the action to be executed.
+            "robot_at": {"l_from": None},
+            "reachable": {"l_from": None, "l_to": None},
+        },
+        "false": {},  # * need to be false
+    },
+    # * this is the effect of the action. This should be exerted to the world by the action
+    # * node. All the effects are considered here, not only the purposes but also the side effects.
+    "effects": {
+        "true": {"robot_at": {"l_to": None}},
+        "false": {
+            "robot_at": {  # * this is the side effect, or so to say, the effect that is not intended.
+                "l_from": None
+            }
+        },
+    },
+    # * this is the reason to conduct this action. This should be checked after
+    # * the action is executed, which is explicitly implemented in the subtree as a condition
+    # * node in the selector.
+    "purposes": {
+        "true": {"robot_at": {"l_to": None}},  # * easy to understand
+        "false": {},  # * "false" purpose, for example, you need to remove somthing on the road to pass.
+    },
 }
 
 load_tool = {

@@ -71,7 +71,7 @@ class BehaviorTreeTemplates:
         with open(file_path, "w") as json_file:
             json.dump(self.conditions, json_file, indent=4)
 
-    def get_action(self, action_name):
+    def get_action(self, action_name) -> dict:
         if action_name in self.actions:
             return self.actions[action_name]
         else:

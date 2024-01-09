@@ -5,32 +5,96 @@
             "l_from": null,
             "l_to": null
         },
-        "mios_parameters": [
-            "something here"
-        ],
+        "mios_parameters": {
+            "skill_type": "BBCartesianMove",
+            "skill_objects": {
+                "CartesianMove": "l_to"
+            },
+            "skill_parameters": {
+                "skill": {
+                    "objects": null,
+                    "time_max": 30,
+                    "BBCartesianMove": {
+                        "dX_d": [
+                            0.2,
+                            0.2
+                        ],
+                        "ddX_d": [
+                            0.1,
+                            0.1
+                        ],
+                        "DeltaX": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ],
+                        "K_x": [
+                            1500,
+                            1500,
+                            1500,
+                            600,
+                            600,
+                            600
+                        ]
+                    }
+                },
+                "control": {
+                    "control_mode": 0
+                },
+                "user": {
+                    "env_X": [
+                        0.01,
+                        0.01,
+                        0.002,
+                        0.05,
+                        0.05,
+                        0.05
+                    ],
+                    "env_dX": [
+                        0.001,
+                        0.001,
+                        0.001,
+                        0.005,
+                        0.005,
+                        0.005
+                    ]
+                }
+            }
+        },
         "preconditions": {
             "true": {
-                "robot_at": [
-                    "l_from"
-                ],
-                "reachable": [
-                    "l_from",
-                    "l_to"
-                ]
+                "robot_at": {
+                    "l_from": null
+                },
+                "reachable": {
+                    "l_from": null,
+                    "l_to": null
+                }
             },
             "false": {}
         },
         "effects": {
             "true": {
-                "robot_at": [
-                    "l_to"
-                ]
+                "robot_at": {
+                    "l_to": null
+                }
             },
             "false": {
-                "robot_at": [
-                    "l_from"
-                ]
+                "robot_at": {
+                    "l_from": null
+                }
             }
+        },
+        "purposes": {
+            "true": {
+                "robot_at": {
+                    "l_to": null
+                }
+            },
+            "false": {}
         }
     },
     "load_tool": {

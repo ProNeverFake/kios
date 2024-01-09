@@ -1,10 +1,27 @@
 from typing import Any
 import py_trees
+from kios_bt.data_types import GroundedAction, GroundedCondition
+
+from kios_world.neo4j_interface import Neo4jInterface
+from kios_world.graph_interface import GraphInterface
 
 
 class WorldInterface:
-    def __init__(self) -> None:
-        self.blackboard = py_trees.blackboard.Client(name=self.__class__.__name__)
+    neo4j: Neo4jInterface = None
+    blackboard: py_trees.blackboard.Client = None
+    graph_interface: GraphInterface = None
+
+    def __init__(self, graph_interface=True, blackboard=False, neo4j=False) -> None:
+        if graph_interface:
+            self.graph_interface = GraphInterface()
+
+        if neo4j:
+            self.neo4j = Neo4jInterface()
+
+        if blackboard:
+            self.blackboard = py_trees.blackboard.Client(name="WorldInterface")
+
+    def initialize(self):
         pass
 
     def register_predicates(self, predicates: dict) -> None:
@@ -39,3 +56,6 @@ class WorldInterface:
 
     def query_state(self, query: dict) -> bool:
         raise NotImplementedError
+
+    def check_condition(self, grounded_condition: GroundedCondition) -> bool:
+        return True

@@ -1,4 +1,4 @@
-from kios_bt.subtrees import SubtreeFactory
+from kios_bt.bt_factory import SubtreeFactory
 from kios_bt.data_types import *
 from kios_bt.pybt_io import BehaviorTreeTemplates
 from kios_utils.pybt_test import (

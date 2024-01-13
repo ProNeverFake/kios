@@ -26,7 +26,13 @@ import py_trees.console as console
 from kios_utils.kios_utils import ActionPhase
 from kios_utils.task import *
 from kios_bt.mios_async import mios_monitor, fake_monitor
-from kios_bt.data_types import ActionInstance, GroundedAction, GroundedCondition
+from kios_bt.data_types import (
+    ActionInstance,
+    GroundedAction,
+    GroundedCondition,
+    Action,
+    Condition,
+)
 from kios_world.world_interface import WorldInterface
 
 
@@ -47,68 +53,6 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
         self.monitor = None
         self.world_interface = world_interface
 
-    # def register_predicates(self) -> None:
-    #     self.world_interface.register_predicates(self.grounded_action.effects["true"])
-
-    # def take_effect(self):
-    #     "change the predicates on the blackboard according to the set effects"
-    #     self.world_interface.set_predicates(self.grounded_action.effects["true"])
-
-    # @abstractmethod
-    # def setup(self, **kwargs: int) -> None:
-    #     # setup the parameters here
-    #     self.logger.debug(
-    #         "%s.setup()->connections to an external process" % (self.__class__.__name__)
-    #     )
-
-    # def initialise(self) -> None:
-    #     # else, reset the task and start the external process
-    #     self.logger.debug("%s.initialise()" % (self.__class__.__name__))
-    #     # * reset the task
-    #     self.task.initialize()
-    #     # * launch the subprocess, start the mios skill execution
-    #     self.parent_connection, self.child_connection = multiprocessing.Pipe()
-    #     self.monitor = multiprocessing.Process(
-    #         target=fakemonitor,
-    #         args=(
-    #             self.task,
-    #             self.child_connection,
-    #         ),
-    #     )
-    #     atexit.register(self.monitor.terminate)
-    #     self.monitor.start()
-
-    # def update(self) -> py_trees.common.Status:
-    #     """Increment the counter, monitor and decide on a new status."""
-    #     self.logger.debug("%s.update()" % (self.__class__.__name__))
-    #     new_status = py_trees.common.Status.RUNNING
-
-    #     # * check the result of the startup of the task
-    #     if self.task.task_start_response is not None:
-    #         if bool(self.task.task_start_response["result"]["result"]) == False:
-    #             self.logger.debug("Task startup failed")
-    #             new_status = py_trees.common.Status.FAILURE
-    #             return new_status
-    #     else:
-    #         # ! this should never happen
-    #         self.logger.debug("Task startup in progress")
-    #         self.logger.debug("ERRORRRR")
-    #         new_status = py_trees.common.Status.RUNNING
-    #         return new_status
-
-    #     # * check if the task is finished
-    #     if self.parent_connection.poll():
-    #         self.result = self.parent_connection.recv().pop()  # ! here only bool
-    #         if self.result == True:
-    #             self.logger.debug("Task finished successfully")
-    #             new_status = py_trees.common.Status.SUCCESS
-    #             # * exert the effects
-    #             self.take_effect()
-    #         else:
-    #             self.logger.debug("Task finished with error")
-    #             new_status = py_trees.common.Status.FAILURE
-    #     return new_status
-
     def terminate(self, new_status: py_trees.common.Status) -> None:
         """called after execution or when interrupted."""
         # * stop the monitor process, regardless of the result
@@ -127,30 +71,21 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
 class ActionNode(BehaviorNode):
     """Demonstrates the at-a-distance style action behaviour."""
 
-    def __init__(
-        self, grounded_action: GroundedAction, world_interface: WorldInterface
-    ):
-        self.grounded_action = grounded_action
+    def __init__(self, action: Action, world_interface: WorldInterface):
+        self.action = action
         """Configure the name of the behaviour."""
-        action_variables = "".join(
-            [f"{key}: {value}, " for key, value in grounded_action.variables.items()]
-        )
-        self.behavior_name = grounded_action.tag + ": " + action_variables
+
+        self.behavior_name = self.action.name
         super().__init__(world_interface)
-
-        self.monitor = None
-
-        self.register_predicates()
 
         self.world_interface = world_interface
 
+        self.monitor = None
+
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
-    def register_predicates(self) -> None:
-        self.world_interface.register_predicates(self.grounded_action.effects["true"])
-
     def take_effect(self):
-        self.world_interface.set_predicates(self.grounded_action.effects["true"])
+        self.world_interface.task_effect(self.action)
 
     def setup(self, **kwargs: int) -> None:
         # get the parameters from the parameter server
@@ -211,38 +146,21 @@ class ActionNode(BehaviorNode):
                 new_status = py_trees.common.Status.FAILURE
         return new_status
 
-    # def terminate(self, new_status: py_trees.common.Status) -> None:
-    #     """called after execution or when interrupted."""
-    #     # * stop the monitor process, regardless of the result
-    #     if self.monitor is None:
-    #         self.logger.info(self.__class__.__name__ + ": monitor is None")
-    #     else:
-    #         self.monitor.terminate()
-
-    #     self.logger.debug(
-    #         "%s.terminate()[%s->%s]"
-    #         % (self.__class__.__name__, self.status, new_status)
-    #     )
-
 
 class ConditionNode(BehaviorNode):
     """abstract condition node."""
 
-    def __init__(
-        self, grounded_condition: GroundedCondition, world_interface: WorldInterface
-    ):
-        self.grounded_condition = grounded_condition
+    def __init__(self, condition: Condition, world_interface: WorldInterface):
+        self.condition = condition
         """Configure the name of the behaviour."""
-        self.behavior_name = grounded_condition.tag
+        self.behavior_name = condition.name
         super().__init__(world_interface)
 
         self.world_interface = world_interface
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
-        self.world_interface.register_predicates(
-            {self.grounded_condition.name: self.grounded_condition.variables}
-        )
+        pass
 
     def setup(self, **kwargs: int) -> None:
         # register the predicates on the blackboard here
@@ -261,7 +179,7 @@ class ConditionNode(BehaviorNode):
         self.logger.debug("%s.update()" % (self.__class__.__name__))
         new_status = py_trees.common.Status.SUCCESS
 
-        result = self.world_interface.check_condition(self.grounded_condition)
+        result = self.world_interface.check_condition(self.condition)
 
         if result == True:
             new_status = py_trees.common.Status.SUCCESS
@@ -269,15 +187,6 @@ class ConditionNode(BehaviorNode):
             new_status = py_trees.common.Status.FAILURE
 
         return new_status
-
-    # def terminate(self, new_status: py_trees.common.Status) -> None:
-    #     """called after execution or when interrupted."""
-    #     # nothing to do here
-
-    #     self.logger.debug(
-    #         "%s.terminate()[%s->%s]"
-    #         % (self.__class__.__name__, self.status, new_status)
-    #     )
 
 
 # !  discarded

@@ -1,6 +1,11 @@
 from neo4j import GraphDatabase
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set
+from kios_world.data_types import WorldNode, Relationship
+
+"""
+currently this module is just for visulization.
+"""
 
 
 class Neo4jInterface:
@@ -14,6 +19,9 @@ class Neo4jInterface:
         user: str = "neo4j",
         password: str = "14637982",
     ):
+        self.uri = uri
+        self.user = user
+        self.password = password
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def _clear_database(self, tx):
@@ -22,6 +30,9 @@ class Neo4jInterface:
     def clear_database(self):
         with self.driver.session() as session:
             session.write_transaction(self._clear_database)
+
+    def open_driver(self):
+        self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
 
     def close_driver(self):
         self.driver.close()
@@ -34,13 +45,17 @@ class Neo4jInterface:
         with self.driver.session() as session:
             session.write_transaction(self._create_objects, object_names)
 
-    def _set_properties(self, tx, objects_and_properties: Dict[str, Dict[str, Any]]):
+    def _set_properties(self, tx, objects_and_properties: Dict[str, Set[str]]):
         for obj, properties in objects_and_properties.items():
-            for key, value in properties.items():
-                tx.run(f"MATCH (o:Object {{name: '{obj}'}}) SET o.{key} = '{value}'")
+            for prop in properties:
+                tx.run(f"MATCH (o:Object {{name: '{obj}'}}) SET o.{prop} = ''")
+                # tx.run(f"MATCH (o:Object {{name: '{obj}'}}) SET o.{prop} = ''")
 
-    def set_properties(self, objects_and_properties: Dict[str, Dict[str, Any]]):
+    def set_properties(self, world_node_dict: Dict[str, WorldNode]):
         with self.driver.session() as session:
+            objects_and_properties = {}
+            for obj, world_node in world_node_dict.items():
+                objects_and_properties[obj] = world_node.properties
             session.write_transaction(self._set_properties, objects_and_properties)
 
     def _create_relations(self, tx, relations: Dict[str, List[str]]):
@@ -69,8 +84,13 @@ class Neo4jInterface:
                         f"CREATE (from)-[:{relation.upper()}]->(to)"
                     )
 
-    def create_relations(self, relations: Dict[str, List[str]]):
+    def create_relations(self, relation_set: Set[Relationship]):
         with self.driver.session() as session:
+            relations = {}
+            for relation in relation_set:
+                if relation.relation_name not in relations:
+                    relations[relation.relation_name] = []
+                relations[relation.relation_name].append(relation.objects)
             session.write_transaction(self._create_relations, relations)
 
     def fetch_all(self):

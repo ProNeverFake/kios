@@ -2,7 +2,6 @@
 typing dataclasses for the kios_bt_planning package
 """
 
-
 from dataclasses import dataclass
 from typing import Dict, List, Any
 
@@ -172,3 +171,26 @@ class Predicate:  # not used yet
 
     name: str
     variables: List[List[str]]
+
+
+@dataclass
+class ObjectProperty:  # for indicating the conditions and the effects in an object-centric way
+    """
+    a property of an object
+    """
+
+    object_name: str
+    property_name: str
+    property_value: str
+
+
+@dataclass
+class Condition:  # for generating a condition node
+    name: str  # the name of the condition you want this node to check
+    to_check: Dict[str, List[ObjectProperty]]
+
+
+@dataclass
+class Action:  # for generating an action node
+    name: str  # the name of the action you want this node to conduct
+    effects: Dict[str, List[ObjectProperty]]  # the effects of the action

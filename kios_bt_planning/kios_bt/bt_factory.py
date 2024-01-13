@@ -13,7 +13,7 @@ from kios_bt.pybt_io import BehaviorTreeTemplates
 from kios_world.world_interface import WorldInterface
 
 
-class SubtreeFactory:
+class BehaviorTreeFactory:
     def __init__(
         self,
         bt_templates: BehaviorTreeTemplates = None,
@@ -32,6 +32,27 @@ class SubtreeFactory:
         if world_interface is None:
             self.world_interface = WorldInterface()
             self.world_interface.initialize()
+
+    def generate_subtree(
+        self,
+        preconditions: List[ConditionNode],
+        action: ActionNode,
+        effects: List[ConditionNode],
+    ):
+        """
+        generate a subtree from a list of preconditions, an action, and a list of effects
+        """
+        subtree = py_trees.composites.Selector(name="subtree", memory=False)
+        action_sequence = py_trees.composites.Sequence(
+            name="action_sequence", memory=False
+        )
+
+        action_sequence.add_children(preconditions)
+        action_sequence.add_child(action)
+        subtree.add_children(effects)
+        subtree.add_child(action_sequence)
+
+        return subtree
 
     def ground_action_instance(self, action: ActionInstance):
         """
@@ -57,50 +78,6 @@ class SubtreeFactory:
         )
 
         grounded_action.self_ground(action)
-
-        # ! below is discarded
-        # # ground the preconditions
-        # for key, value in grounded_action["preconditions"]["true"].items():
-        #     for item in value:
-        #         if item in grounded_action["variables"]:
-        #             grounded_action["preconditions"]["true"][key] = grounded_action[
-        #                 "variables"
-        #             ][item]
-        #         else:
-        #             raise KeyError(
-        #                 f"Key {item} not found in action.variables, action cannot be grounded!"
-        #             )
-
-        # for item in grounded_action["preconditions"]["false"]:
-        #     for key, value in item.items():
-        #         if value in grounded_action["variables"]:
-        #             item[key] = grounded_action["variables"][value]
-        #         else:
-        #             raise KeyError(
-        #                 f"Key {value} not found in action.variables, action cannot be grounded!"
-        #             )
-
-        # # ground the effects
-        # for item in grounded_action["effects"]["true"]:
-        #     for
-        #     if value in grounded_action["variables"]:
-        #         grounded_action["effects"]["true"][key] = grounded_action["variables"][
-        #             value
-        #         ]
-        #     else:
-        #         raise KeyError(
-        #             f"Key {key} not found in action.variables, action cannot be grounded!"
-        #         )
-
-        # for key, value in grounded_action["effects"]["false"].items():
-        #     if value in grounded_action["variables"]:
-        #         grounded_action["effects"]["false"][key] = grounded_action["variables"][
-        #             value
-        #         ]
-        #     else:
-        #         raise KeyError(
-        #             f"Key {key} not found in action.variables, action cannot be grounded!"
-        #         )
 
         return grounded_action
 

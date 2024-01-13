@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Set, Dict, List, Any
 
 # mios_parameters example
 mios_parameters = {
@@ -25,103 +26,141 @@ mios_parameters = {
 }
 
 # an action example
-move = {
+action_template = {
     # * this is the name of the action. This should be unique and is used as the identifier of the action.
     "name": "move",
     # * this is the variables that the action and its conditions needs. The variables need to be grounded later.
-    "variables": {"l_from": None, "l_to": None},
-    # * this is the mios parameters that are necessary for robot interfaces.
-    # * the necessary "objects" are grounded from the variables.
-    "mios_parameters": {
-        "skill_type": "BBCartesianMove",
-        "skill_objects": {"CartesianMove": "l_to"},
-        "skill_parameters": {
-            "skill": {
-                "objects": None,
-                "time_max": 30,
-                "BBCartesianMove": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.1, 0.1],
-                    "DeltaX": [0, 0, 0, 0, 0, 0],
-                    "K_x": [1500, 1500, 1500, 600, 600, 600],
-                },
-            },
-            "control": {"control_mode": 0},
-            "user": {
-                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            },
-        },
+    "entities": {
+        "entity_names",  # e.g. robot desk cabinet ball ...
     },
+    # * this is the mios parameters that are necessary for robot interfaces.
+    "mios_parameters": None,  # this part is skipped for now
     # * this is the precondition of the action. This should be checked before the action is executed.
     # * They are explicitly implemented in the subtree as condition nodes in the sequence.
     "preconditions": {
-        "true": {  # * these are the conditions that need to be true for the action to be executed.
-            "robot_at": {"l_from": None},
-            "reachable": {"l_from": None, "l_to": None},
+        "true": {
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",  # e.g. open: "", on: "desk"
+            },
         },
-        "false": {},  # * need to be false
+        "false": {
+            "object_name": {
+                "property": "optional_object_name",
+            }
+        },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
     },
     # * this is the effect of the action. This should be exerted to the world by the action
     # * node. All the effects are considered here, not only the purposes but also the side effects.
     "effects": {
-        "true": {"robot_at": {"l_to": None}},
+        "true": {
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",  # e.g. open: "", on: "desk"
+            },
+        },
         "false": {
-            "robot_at": {  # * this is the side effect, or so to say, the effect that is not intended.
-                "l_from": None
+            "object_name": {
+                "property": "optional_object_name",
             }
         },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
     },
     # * this is the reason to conduct this action. This should be checked after
     # * the action is executed, which is explicitly implemented in the subtree as a condition
     # * node in the selector.
     "purposes": {
-        "true": {"robot_at": {"l_to": None}},  # * easy to understand
-        "false": {},  # * "false" purpose, for example, you need to remove somthing on the road to pass.
+        "true": {
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",
+                # e.g. open: "", this is a property of the object
+                # e.g. on: "desk" this is a directedrelation between objects
+            },
+        },
+        "false": {
+            "object_name": {
+                "property": "optional_object_name",
+            }
+        },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
     },
 }
 
-load_tool = {
-    "name": "load_tool",
-    "variables": {"tool": None},
-    "mios_parameters": ["something here"],
-    "preconditions": {"true": {"hand_free": False}, "false": {}},
-    "effects": {"true": {"in_hand": "tool"}, "false": {"hand_free": False}},
-}
-
-unload_tool = {
-    "name": "unload_tool",
-    "variables": {"tool": None},
-    "mios_parameters": ["something here"],
-    "preconditions": {"true": {"in_hand": "tool", "tool_free": "tool"}, "false": {}},
-    "effects": {"true": {"hand_free": False}, "false": {"in_hand": "tool"}},
-}
-
-pick = {
-    "name": "pick",
-    "variables": {"part": None, "tool": None, "l_from": None, "l_to": None},
-    "mios_parameters": ["something here"],
+# an action example
+action_template = {
+    # * this is the name of the action. This should be unique and is used as the identifier of the action.
+    "name": "move",
+    # * this is the variables that the action and its conditions needs. The variables need to be grounded later.
+    "entities": {
+        "entity_names",  # e.g. robot desk cabinet ball ...
+    },
+    # * this is the mios parameters that are necessary for robot interfaces.
+    "mios_parameters": None,  # this part is skipped for now
+    # * this is the precondition of the action. This should be checked before the action is executed.
+    # * They are explicitly implemented in the subtree as condition nodes in the sequence.
     "preconditions": {
         "true": {
-            "robot_at": "l_from",
-            "reachable": ["l_from", "l_to"],
-            "in_hand": "tool",
-            "tool_free": "tool",
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",  # e.g. open: "", on: "desk"
+            },
         },
-        "false": {},
+        "false": {
+            "object_name": {
+                "property": "optional_object_name",
+            }
+        },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
     },
+    # * this is the effect of the action. This should be exerted to the world by the action
+    # * node. All the effects are considered here, not only the purposes but also the side effects.
     "effects": {
-        "true": {"robot_at": "l_from", "in_tool": "part"},
-        "false": {"robot_at": "l_to", "tool_free": "tool"},
+        "true": {
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",  # e.g. open: "", on: "desk"
+            },
+        },
+        "false": {
+            "object_name": {
+                "property": "optional_object_name",
+            }
+        },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
+    },
+    # * this is the reason to conduct this action. This should be checked after
+    # * the action is executed, which is explicitly implemented in the subtree as a condition
+    # * node in the selector.
+    "purposes": {
+        "true": {
+            "object_name": {  # e.g. cabinet
+                "property": "optional_object_name",
+                # e.g. open: "", this is a property of the object
+                # e.g. on: "desk" this is a directedrelation between objects
+            },
+        },
+        "false": {
+            "object_name": {
+                "property": "optional_object_name",
+            }
+        },
+        "propositions": Set[  # * this is for compensating the informations. should be used as less as possible.
+            str
+        ],
     },
 }
+
 
 # Write variables to JSON file
 actions = {
     "move": move,
-    "load_tool": load_tool,
-    "unload_tool": unload_tool,
-    "pick": pick,
 }
 
 # condition examples

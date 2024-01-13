@@ -1,6 +1,6 @@
 from typing import Any
 import py_trees
-from kios_bt.data_types import GroundedAction, GroundedCondition
+from kios_bt.data_types import GroundedAction, GroundedCondition, Action, Condition
 
 from kios_world.neo4j_interface import Neo4jInterface
 from kios_world.graph_interface import GraphInterface
@@ -23,6 +23,13 @@ class WorldInterface:
 
     def initialize(self):
         pass
+
+    def take_effect(self, action: Action):
+        to_update = action.effects["true"]
+        for item in to_update:
+            pass
+
+        to_remove = action.effects["false"]
 
     def register_predicates(self, predicates: dict) -> None:
         """

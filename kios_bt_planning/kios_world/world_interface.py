@@ -1,6 +1,12 @@
 from typing import Any
 import py_trees
-from kios_bt.data_types import GroundedAction, GroundedCondition, Action, Condition
+from kios_bt.data_types import (
+    GroundedAction,
+    GroundedCondition,
+    Action,
+    Condition,
+    ObjectProperty,
+)
 
 from kios_world.neo4j_interface import Neo4jInterface
 from kios_world.graph_interface import GraphInterface
@@ -24,14 +30,26 @@ class WorldInterface:
     def initialize(self):
         pass
 
+    # for action node
     def take_effect(self, action: Action):
-        to_update = action.effects["true"]
-        for item in to_update:
-            pass
+        # to add/update
+        to_update_list = action.effects
+        for item in to_update_list:
+            if item.property_value is None:
+                # this is a property
+                self.graph_interface.update_property(
+                    item.object_name, item.property_name, item.status
+                )
+            else:
+                # this is a relation
+                self.graph_interface.update_relation(
+                    item.object_name,
+                    item.property_name,
+                    item.property_value,
+                    item.status,
+                )
 
-        to_remove = action.effects["false"]
-
-    def register_predicates(self, predicates: dict) -> None:
+    def register_predicates(self, predicates: dict) -> None:  # ! discard
         """
         add this predicate to the world. do nothing if the predicate already exists
         """
@@ -64,5 +82,31 @@ class WorldInterface:
     def query_state(self, query: dict) -> bool:
         raise NotImplementedError
 
-    def check_condition(self, grounded_condition: GroundedCondition) -> bool:
+    # for condition node
+    def check_condition(self, condition: Condition) -> bool:
+        condition_list = condition.conditions
+        for item in condition_list:
+            if not self.check_property(item):
+                return False
+
+        return True
+
+    def check_property(self, prop: ObjectProperty) -> bool:
+        """
+        check if the property is in the same status as specified in the property object
+        """
+        if prop.property_value is None:
+            # this is a property
+            result = self.graph_interface.check_property(
+                prop.object_name, prop.property_name
+            )
+            if result != prop.status:
+                return False
+        else:
+            # this is a relation
+            result = self.graph_interface.check_relation(
+                prop.object_name, prop.property_name, prop.property_value
+            )
+            if result != prop.status:
+                return False
         return True

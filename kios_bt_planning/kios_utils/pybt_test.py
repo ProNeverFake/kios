@@ -55,6 +55,7 @@ def render_dot_tree(bt: py_trees.trees.BehaviourTree):
 
 
 def tick_loop_test(bt: py_trees.trees.BehaviourTree):
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
     while True:
         try:
             bt.tick()
@@ -66,6 +67,7 @@ def tick_loop_test(bt: py_trees.trees.BehaviourTree):
 
 
 def tick_once_test(bt: py_trees.trees.BehaviourTree):
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
     bt.tick()
     py_trees.console.read_single_keypress()
 

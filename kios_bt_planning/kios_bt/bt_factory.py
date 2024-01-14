@@ -1,11 +1,9 @@
-from kios_bt.data_types import ActionInstance, GroundedAction
+from kios_bt.data_types import ActionInstance, GroundedAction, Action, Condition
 import copy
 import py_trees
 from typing import List, Dict, Any
-from kios_bt.behavior_nodes import ActionNode, ConditionNode
+from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
-# import kios_bt.action_nodes
-# import kios_bt.condition_nodes
 import kios_bt.behavior_nodes
 
 from kios_bt.pybt_io import BehaviorTreeTemplates
@@ -54,7 +52,28 @@ class BehaviorTreeFactory:
 
         return subtree
 
-    def ground_action_instance(self, action: ActionInstance):
+    def generate_action_node(self, action: Action):
+        """
+        generate an action node from an action
+        """
+        action_node = ActionNode(action, self.world_interface)
+        return action_node
+
+    def generate_fake_action_node(self, action: Action):
+        """
+        generate an action node from an action
+        """
+        action_node = ActionNodeTest(action, self.world_interface)
+        return action_node
+
+    def generate_condition_node(self, condition: Condition):
+        """
+        generate a condition node from a condition
+        """
+        condition_node = ConditionNode(condition, self.world_interface)
+        return condition_node
+
+    def ground_action_instance(self, action: ActionInstance):  # ! discard this function
         """
         ground an action template with an action instance
         """
@@ -81,7 +100,9 @@ class BehaviorTreeFactory:
 
         return grounded_action
 
-    def generate_condition_nodes(self, grounded_action: GroundedAction):
+    def generate_condition_nodes(
+        self, grounded_action: GroundedAction
+    ):  # ! discard this function
         """
         generate a list of condition nodes from a list of conditions
         """
@@ -101,7 +122,7 @@ class BehaviorTreeFactory:
         # TODO: NOT condition
         return effect_nodes, precondition_nodes
 
-    def generate_action_nodes(
+    def generate_action_nodes(  # ! discard this function
         self, grounded_action: GroundedAction
     ) -> List[ActionNode]:
         # TODO: generate a sequence of actions in the list, not just one
@@ -114,7 +135,7 @@ class BehaviorTreeFactory:
 
         return [action_node]
 
-    def generate_standard_subtree(
+    def generate_standard_subtree(  # ! discard this function
         self, action: ActionInstance
     ) -> py_trees.composites.Selector:
         """

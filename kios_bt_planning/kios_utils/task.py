@@ -80,3 +80,8 @@ class Task:
         self.task_wait_response = None
         self.task_uuid = "INVALID"
         self.t_0 = 0
+
+    def clear_skills(self):
+        self.skill_names = []
+        self.skill_types = []
+        self.skill_context = dict()

@@ -177,20 +177,35 @@ class Predicate:  # not used yet
 class ObjectProperty:  # for indicating the conditions and the effects in an object-centric way
     """
     a property of an object
+    if it is a property, then the property_value should be None
+    if it is a relation, then the property_value should be the name of the target object
+    status: True if the property is true, False if the property is false
     """
 
     object_name: str
     property_name: str
     property_value: str
+    status: bool
 
 
 @dataclass
 class Condition:  # for generating a condition node
+    summary: str
+    identifier: int
     name: str  # the name of the condition you want this node to check
-    to_check: Dict[str, List[ObjectProperty]]
+    conditions: List[ObjectProperty]
 
 
 @dataclass
 class Action:  # for generating an action node
+    summary: str
+    identifier: int
     name: str  # the name of the action you want this node to conduct
-    effects: Dict[str, List[ObjectProperty]]  # the effects of the action
+    effects: List[ObjectProperty]  # the effects of the action
+
+
+@dataclass
+class ControlFlow:
+    identifier: int
+    name: str
+    children: List[Any]

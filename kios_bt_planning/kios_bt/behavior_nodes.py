@@ -74,7 +74,7 @@ class ActionNode(BehaviorNode):
     def __init__(self, action: Action, world_interface: WorldInterface):
         self.action = action
         """Configure the name of the behaviour."""
-
+        self.identifier = action.identifier
         self.behavior_name = self.action.name
         super().__init__(world_interface)
 
@@ -82,10 +82,19 @@ class ActionNode(BehaviorNode):
 
         self.monitor = None
 
+        # * setup the task
+        self.multiprocessing_manager = Manager()
+        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.initialize()
+
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def take_effect(self):
-        self.world_interface.task_effect(self.action)
+        """
+        interact with the world interface to exert the effects
+        """
+        self.world_interface.take_effect(self.action)
 
     def setup(self, **kwargs: int) -> None:
         # get the parameters from the parameter server
@@ -93,7 +102,8 @@ class ActionNode(BehaviorNode):
         self.skill_parameters = self.grounded_action.mios_parameters["skill_parameters"]
 
         # * setup the task
-        self.task = Task(MIOS)
+        self.task.initialize()
+        self.task.clear_skills()
         self.task.add_skill(self.behavior_name, self.skill_type, self.skill_parameters)
 
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
@@ -121,15 +131,22 @@ class ActionNode(BehaviorNode):
         new_status = py_trees.common.Status.RUNNING
 
         # * check the result of the startup of the task
-        if self.task.task_start_response is not None:
-            if bool(self.task.task_start_response["result"]["result"]) == False:
+        task_start_response = self.task.shared_data["task_start_response"]
+        print(task_start_response)
+
+        if task_start_response is not None:
+            if bool(task_start_response["result"]["result"]) == False:
                 self.logger.debug("Task startup failed")
                 new_status = py_trees.common.Status.FAILURE
                 return new_status
+
+            if bool(task_start_response["result"]["result"]) == True:
+                print("Task startup succeeded")
+
         else:
             # ! this should never happen
-            self.logger.debug("Task startup is still being processed.")
-            self.logger.error("Lag in task startup process. pls check.")
+            self.logger.debug("Task startup in progress")
+            self.logger.debug("ERRRRRRRRRRRRRRRRRRRRRRRORRR")
             new_status = py_trees.common.Status.RUNNING
             return new_status
 
@@ -153,6 +170,7 @@ class ConditionNode(BehaviorNode):
     def __init__(self, condition: Condition, world_interface: WorldInterface):
         self.condition = condition
         """Configure the name of the behaviour."""
+        self.identifier = condition.identifier
         self.behavior_name = condition.name
         super().__init__(world_interface)
 
@@ -160,6 +178,7 @@ class ConditionNode(BehaviorNode):
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
+        # don't need this for now
         pass
 
     def setup(self, **kwargs: int) -> None:
@@ -189,104 +208,18 @@ class ConditionNode(BehaviorNode):
         return new_status
 
 
-# !  discarded
-class ToolPick(ActionNode):
-    """BBToolPick behaviour."""
-
-    def __init__(self, objects_: list):
-        """Configure the name of the behaviour."""
-
-        self.objects_ = {
-            "target": objects_[0],
-        }
-
-        self.node_name = "ToolPick"
-        self.target_name = objects_[0]
-        super(ToolPick, self).__init__()
-
-        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
-
-    # ! you must override this
-    def set_effects(self) -> None:
-        self.effects = {
-            "inTool": self.objects_["target"],
-        }
-
-    # ! you must override this
-    def setup(self, **kwargs: int) -> None:
-        # get the parameters from the parameter server
-        # ! test, parameters given
-        self.skill_type = "BBGripperForce"
-        self.skill_parameters = {
-            "skill": {
-                "objects": {"Pick": self.objects_["target"]},
-                "time_max": 30,
-                # "action_context": {
-                #     "action_name": "BBPick",
-                #     "action_phase": "TOOL_PICK",  # Adjusted for Python enum style
-                # },
-                "MoveAbove": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.2, 0.2],
-                    "DeltaX": [0, 0, 0, 0, 0, 0],
-                    "K_x": [1500, 1500, 1500, 600, 600, 600],
-                },
-                "MoveIn": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.1, 0.1],
-                    "DeltaX": [0, 0, 0, 0, 0, 0],
-                    "K_x": [1500, 1500, 1500, 600, 600, 600],
-                },
-                "GripperForce": {
-                    "width": 0.016,
-                    "speed": 1,
-                    "force": 120,
-                    "K_x": [1500, 1500, 1500, 100, 100, 100],
-                    "eps_in": 0,  # 0.016
-                    "eps_out": 0.022,  # 0.038
-                },
-                "Retreat": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.1, 0.1],
-                    "DeltaX": [0, 0, 0, 0, 0, 0],
-                    "K_x": [1500, 1500, 1500, 600, 600, 600],
-                },
-            },
-            "control": {"control_mode": 0},
-            "user": {
-                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                "F_ext_contact": [3.0, 2.0],
-            },
-        }
-
-        # * setup the task
-        self.task = Task(MIOS)
-        self.task.add_skill("bbskill", self.skill_type, self.skill_parameters)
-
-        self.logger.debug("%s.setup()" % (self.__class__.__name__))
-
-
 class ActionNodeTest(ActionNode):
-    def __init__(
-        self, grounded_action: GroundedAction, world_interface: WorldInterface
-    ):
-        super().__init__(grounded_action, world_interface)
+    def __init__(self, action: Action, world_interface: WorldInterface):
+        super().__init__(action, world_interface)
 
     def register_predicates(self) -> None:
-        self.world_interface.register_predicates(self.grounded_action.effects["true"])
-
-    def take_effect(self):
-        self.world_interface.set_predicates(self.grounded_action.effects["true"])
+        pass
 
     def setup(self, **kwargs: int) -> None:
-        # get the parameters from the parameter server
-        self.skill_type = self.grounded_action.mios_parameters["skill_type"]
-        self.skill_parameters = self.grounded_action.mios_parameters["skill"]
-
         # * setup the task
-        self.task = Task(MIOS)
-        self.task.add_skill(self.behavior_name, self.skill_type, self.skill_parameters)
+        self.task.initialize()
+        self.task.clear_skills()
+        self.task.add_skill(self.behavior_name, "test", "test")
 
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
 

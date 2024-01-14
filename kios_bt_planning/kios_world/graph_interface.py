@@ -36,6 +36,14 @@ class GraphInterface:
         self.add_node(node_name)
         self.nodes[node_name].add_property(prop)
 
+    # * update the property status
+    def update_property(self, node_name: str, prop: str, status: bool):
+        self.add_node(node_name)
+        if status:
+            self.nodes[node_name].add_property(prop)
+        else:
+            self.nodes[node_name].discard_property(prop)
+
     def remove_property(self, node_name: str, prop: str):
         if node_name not in self.nodes:
             self.add_node(node_name)
@@ -50,20 +58,43 @@ class GraphInterface:
         prop_set = set(props)
         self.nodes[node_name].difference_update_properties(prop_set)
 
-    def get_object(self, node_name: str) -> WorldNode:
+    def get_node(self, node_name: str) -> WorldNode:
         if node_name not in self.nodes:
             return None  # do nothing if node does not exist
         return self.nodes[node_name]
 
+    def update_relation(self, source: str, name: str, target: str, status: bool):
+        if status:
+            self.add_relation(source, name, target)
+        else:
+            self.remove_relation(source, name, target)
+
     def add_relation(self, source: str, name: str, target: str):
-        source_node = self.get_object(source)
-        target_node = self.get_object(target)
+        source_node = self.get_node(source)
+        target_node = self.get_node(target)
+        # ! think twice. should the inconsistency be handled here?
         if source_node is None:
-            raise ValueError(f"Object {source} does not exist in the database!")
+            # raise ValueError(f"Object {source} does not exist in the database!")
+            self.add_node(source)
         if target_node is None:
-            raise ValueError(f"Object {target} does not exist in the database!")
+            # raise ValueError(f"Object {target} does not exist in the database!")
+            self.add_node(target)
         rel = Relationship(source, name, target)
         self.relations.add(rel)
+
+    def remove_relation(self, source: str, name: str, target: str):
+        rel = Relationship(source, name, target)
+        self.relations.discard(rel)
+
+    # for condition node checking
+    def check_property(self, node_name: str, prop: str) -> bool:
+        if node_name not in self.nodes:
+            return False
+        return self.nodes[node_name].check_property(prop)
+
+    def check_relation(self, source: str, name: str, target: str) -> bool:
+        rel = Relationship(source, name, target)
+        return rel in self.relations
 
     def discard_relation(self, source: str, name: str, target: str):
         rel = Relationship(source, name, target)

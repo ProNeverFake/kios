@@ -18,6 +18,9 @@ class WorldNode:  # discard this class
     def discard_property(self, prop: str):
         self.properties.discard(prop)
 
+    def check_property(self, prop: str) -> bool:
+        return prop in self.properties
+
     def __repr__(self):
         return f"{self.name}: {', '.join(self.properties)}"
 

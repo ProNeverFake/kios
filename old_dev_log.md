@@ -1,4 +1,19 @@
-### Development Log
+
+**KNOWN BUGS:**
+- Mios limitation violation can randomly happen. (maybe because of the mogen_p2p plugin)
+- ~~RCLCPP_INFO macro cannot print element of std::vector(segmentation fault).~~(Not solved yet. This bug is found in ros2 foxy.)
+- ~~time delay in mios_reader (to be verified).~~(Solved by FILO message queue).
+- ~~velocity limits are always violated with node Contact in the tree. (10082023)~~(Inconsistency in ActionPhase enumerator of kios/mios)
+- ~~mios cannot build at personal laptop (ubuntu 22.04).~~
+- ~~The reactive sequence should not be used with more than one async action node. (error msg see below)~~
+
+**DEVELOPER'S PLAN:**
+
+- [ ] Add new node Planner for high level planning. 
+- [x] Wrap the xml generating code in the context of BT.
+- [ ] Apply lifecycle node to tree node etc.
+
+**Development Log:**
 
 - 06.11.2023
   - Added coach, planner, action tuner. Added the necessary interfaces.

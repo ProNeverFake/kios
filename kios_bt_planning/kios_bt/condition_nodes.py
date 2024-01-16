@@ -1,6 +1,8 @@
 """
 old version for testing
 """
+# ! discarded
+
 import atexit
 import multiprocessing
 import multiprocessing.connection

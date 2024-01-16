@@ -1,3 +1,7 @@
+"""
+selector without memory stolen from dynamic bt package
+"""
+# ! not in use yet.
 # import py_trees as pt
 # from typing import Any, List, Tuple
 

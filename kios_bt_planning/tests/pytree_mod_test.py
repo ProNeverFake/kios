@@ -17,6 +17,7 @@ from kios_utils.pybt_test import (
 from kios_bt.bt_factory import BehaviorTreeFactory
 
 action = Action(
+    summary="pick up apple",
     identifier=0,
     name="pick_up",
     effects=[
@@ -42,6 +43,7 @@ action = Action(
 )
 
 precondition1 = Condition(
+    summary="check if the apple is on the ground",
     identifier=1,
     name="apple on the ground",
     conditions=[
@@ -55,6 +57,7 @@ precondition1 = Condition(
 )
 
 precondition2 = Condition(
+    summary="check if the hand is free",
     identifier=2,
     name="hand free",
     conditions=[
@@ -68,6 +71,7 @@ precondition2 = Condition(
 )
 
 effect = Condition(
+    summary="check if the apple is in hand",
     identifier=3,
     name="apple in hand",
     conditions=[
@@ -81,6 +85,7 @@ effect = Condition(
 )
 
 another_action = Action(
+    summary="put down apple",
     identifier=4,
     name="put_down",
     effects=[
@@ -114,6 +119,8 @@ action_node = bt_factory.generate_fake_action_node(action)
 
 another_action_node = bt_factory.generate_fake_action_node(another_action)
 
+another_action_node1 = bt_factory.generate_fake_action_node(another_action)
+
 subtree = bt_factory.generate_subtree(
     preconditions=[precondition1_node, precondition2_node],
     action=action_node,
@@ -133,13 +140,12 @@ behaviortree.replace_subtree(action_node.id, another_action_node)
 tick_once_test(behaviortree)
 
 behaviortree.insert_subtree(
-    another_action_node,
+    another_action_node1,
     another_action_node.parent.id,
-    index=0,
+    index=1,
 )
 
 behaviortree.setup(timeout=15)
-
 
 
 tick_once_test(behaviortree)

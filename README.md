@@ -148,14 +148,23 @@ MIT License
 
 ## Sources
 [ChatGPT-Robot-Manipulation-Prompts](https://github.com/microsoft/ChatGPT-Robot-Manipulation-Prompts)
+
 [furniture-bench](https://github.com/clvrai/furniture-bench)
+
 [mios_py_interface](https://gitlab.lrz.de/bblab/mios_py_interface)
+
 [unified-planning](https://github.com/aiplan4eu/unified-planning)
+
 [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios)
+
 [BehaviorTree.CPP](https://github.com/BehaviorTree/BehaviorTree.CPP)
+
 [py_trees](https://github.com/splintered-reality/py_trees)
+
 [neo4j](https://github.com/neo4j/neo4j-python-driver)
+
 [websocketpp](https://github.com/zaphoyd/websocketpp)
+
 [ros2](https://docs.ros.org/en/foxy/index.html)
 
 ...

@@ -5,6 +5,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ################################## BUILD TYPE
 if(NOT CMAKE_BUILD_TYPE)
@@ -98,7 +99,8 @@ message("cmake_home = ${CMAKE_HOME_DIRECTORY}\n")
 find_package(ament_cmake REQUIRED)
 # ! find_package(behaviortree_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_action REQUIRED) # ros2 action
+find_package(rclcpp_components REQUIRED) # ros2 component
 find_package(std_msgs REQUIRED)
 find_package(example_interfaces REQUIRED)
 find_package(kios_interface REQUIRED)

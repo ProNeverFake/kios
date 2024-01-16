@@ -1,0 +1,21 @@
+action_nodes:
+- open_gripper
+- close_gripper
+- approach BlueBox
+- approach 0.0 -0.001 0.338 YellowBox
+- pick0 BlueBox
+- place0 BlueBox 0.0 -0.001 0.338 0.012 YellowBox
+condition_nodes:
+- gripper_state open
+- gripper_state closed
+- in_gripper none
+- reachable BlueBox
+- reachable 0.0 -0.001 0.338 YellowBox
+- in_gripper BlueBox
+- object_roughly_at BlueBox 0.0 -0.001 0.338 0.012 YellowBox
+fallback_nodes:
+- f(
+sequence_nodes:
+- s(
+up_node:
+- )

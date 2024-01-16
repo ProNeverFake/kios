@@ -514,7 +514,8 @@ void BTMessenger::register_udp(int &port, nlohmann::json &sub_list)
     payload["subscribe"] = sub_list;
     if (is_connected())
     {
-        if (send_and_check("subscribe_telemetry", payload))
+        auto result_bool = get_result(send_and_check("subscribe_telemetry", payload));
+        if (result_bool)
         {
             spdlog::info("Successfully registered the udp receiver!");
         }
@@ -523,6 +524,28 @@ void BTMessenger::register_udp(int &port, nlohmann::json &sub_list)
             spdlog::error("Failed when registering the udp receiver!");
         }
         // send_and_wait("subscribe_telemetry", payload);
+    }
+}
+
+bool BTMessenger::get_result(std::optional<nlohmann::json> result_opt)
+{
+    if (result_opt.has_value())
+    {
+        auto result = std::move(result_opt.value());
+        if (static_cast<bool>(result["result"]["result"]) == true)
+        {
+            return true;
+        }
+        else if (static_cast<bool>(result["result"]["result"]) == false)
+        {
+            spdlog::error("Error message: {}", result["result"]["error"].dump());
+            return false;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -589,7 +612,7 @@ void BTMessenger::stop_task_command()
  * @brief stop the current task. return the response
  *
  */
-bool BTMessenger::stop_task_request()
+std::optional<nlohmann::json> BTMessenger::stop_task_request()
 {
     nlohmann::json payload =
         {{"raise_exception", false},
@@ -602,7 +625,8 @@ bool BTMessenger::stop_task_request()
     }
     else
     {
-        return false;
+        spdlog::error("stop_task_request: connection is down.");
+        return std::nullopt;
     }
 }
 
@@ -611,7 +635,7 @@ bool BTMessenger::stop_task_request()
  *
  * @param skill_context
  */
-bool BTMessenger::start_task_request(nlohmann::json skill_context, std::string skill_type)
+std::optional<nlohmann::json> BTMessenger::start_task_request(nlohmann::json skill_context, std::string skill_type)
 {
     // TODO
     std::vector<std::string> skill_names;
@@ -619,7 +643,7 @@ bool BTMessenger::start_task_request(nlohmann::json skill_context, std::string s
     std::unordered_map<std::string, nlohmann::json> skill_contexts;
 
     skill_names.push_back("BBSkill");
-    skill_types.push_back(skill_type); // ! CHANGED
+    skill_types.push_back(skill_type);
     skill_contexts["BBSkill"] = skill_context;
 
     nlohmann::json task_context =
@@ -643,7 +667,133 @@ bool BTMessenger::start_task_request(nlohmann::json skill_context, std::string s
     }
     else
     {
-        return false;
+        return std::nullopt;
+    }
+}
+
+void BTMessenger::start_and_monitor(const nlohmann::json &skill_context, std::string skill_type, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted)
+{
+    // TODO
+    std::vector<std::string> skill_names;
+    std::vector<std::string> skill_types;
+    std::unordered_map<std::string, nlohmann::json> skill_contexts;
+
+    skill_names.push_back("BBSkill");
+    skill_types.push_back(skill_type);
+    skill_contexts["BBSkill"] = skill_context;
+
+    nlohmann::json task_context =
+        {{"parameters",
+          {{"skill_names", skill_names},
+           {"skill_types", skill_types},
+           {"as_queue", false}}},
+         {"skills", skill_contexts}};
+    nlohmann::json call_context =
+        {{"task", "GenericTask"},
+         {"parameters", task_context},
+         {"queue", true}};
+
+    // ! CHECK CONTEXT HERE
+    spdlog::warn("BB: THE CONEXT IS: {}", call_context.dump());
+
+    // ! test
+    if (is_connected())
+    {
+        m_ws_endpoint.get_message_queue().reset();
+        send("start_and_monitor", call_context);
+
+        std::optional<std::string> response_opt;
+
+        while (!response_opt.has_value())
+        {
+            if (isInterrupted.load()) // * if interrupted, return
+            {
+                spdlog::warn("wait_for_task_result: interrupted.");
+                task_promise.set_value(std::nullopt);
+                return;
+            }
+            // * try to get the value again
+            response_opt = m_ws_endpoint.get_message_queue().pop();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        try
+        {
+            nlohmann::json result = std::move(nlohmann::json::parse(response_opt.value()));
+            // The parsing succeeded, the data is JSON.
+            spdlog::info("Call method wait_for_task get response if_success: {}", result["result"]["result"].dump());
+            task_promise.set_value(result);
+            return;
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            spdlog::error("JSON parsing failed: ", e.what());
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+        catch (...)
+        {
+            spdlog::error("wait for task: UNDEFINED ERROR!");
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+    }
+    else
+    {
+        task_promise.set_value(std::nullopt);
+        return;
+    }
+}
+
+// done
+void BTMessenger::wait_for_task_result(int task_uuid, std::promise<std::optional<nlohmann::json>> &task_promise, std::atomic_bool &isInterrupted)
+{
+    // ! test
+    if (is_connected())
+    {
+        m_ws_endpoint.get_message_queue().reset();
+
+        // ? implicit transform?
+        send("wait_for_task", task_uuid);
+
+        std::optional<std::string> response_opt;
+
+        while (!response_opt.has_value())
+        {
+            if (isInterrupted) // * if interrupted, return
+            {
+                spdlog::warn("wait_for_task_result: interrupted.");
+                task_promise.set_value(std::nullopt);
+                return;
+            }
+            // * try to get the value again
+            response_opt = m_ws_endpoint.get_message_queue().pop();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        try
+        {
+            nlohmann::json result = std::move(nlohmann::json::parse(response_opt.value()));
+            // The parsing succeeded, the data is JSON.
+            spdlog::info("Call method wait_for_task get response if_success: {}", result["result"]["result"].dump());
+            task_promise.set_value(result);
+            return;
+        }
+        catch (nlohmann::json::parse_error &e)
+        {
+            spdlog::error("JSON parsing failed: ", e.what());
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+        catch (...)
+        {
+            spdlog::error("wait for task: UNDEFINED ERROR!");
+            task_promise.set_value(std::nullopt);
+            return;
+        }
+    }
+    else
+    {
+        task_promise.set_value(std::nullopt);
+        return;
     }
 }
 
@@ -690,7 +840,7 @@ void BTMessenger::send_and_wait(const std::string &method, nlohmann::json payloa
  * @param timeout
  * @param silent
  */
-bool BTMessenger::send_and_check(const std::string &method, nlohmann::json payload, int timeout, bool silent)
+std::optional<nlohmann::json> BTMessenger::send_and_check(const std::string &method, nlohmann::json payload, int timeout, bool silent)
 {
     m_ws_endpoint.get_message_queue().reset();
     send(method, payload);
@@ -702,33 +852,34 @@ bool BTMessenger::send_and_check(const std::string &method, nlohmann::json paylo
         try
         {
             nlohmann::json result = nlohmann::json::parse(response_opt.value());
+            return result;
             // The parsing succeeded, the data is JSON.
-            spdlog::info("Call method ", method, " get response if_success: {}", result["result"]["result"].dump());
-            if (static_cast<bool>(result["result"]["result"]) == true)
-            {
-                return true;
-            }
-            else if (static_cast<bool>(result["result"]["result"]) == false)
-            {
-                spdlog::error("Error message: {}", result["result"]["error"].dump());
-                return false;
-            }
+            // spdlog::info("Call method ", method, " get response if_success: {}", result["result"]["result"].dump());
+            // if (static_cast<bool>(result["result"]["result"]) == true)
+            // {
+            //     return true;
+            // }
+            // else if (static_cast<bool>(result["result"]["result"]) == false)
+            // {
+            //     spdlog::error("Error message: {}", result["result"]["error"].dump());
+            //     return false;
+            // }
         }
         catch (nlohmann::json::parse_error &e)
         {
             spdlog::error("JSON parsing failed: ", e.what());
-            return false;
+            return std::nullopt;
         }
         catch (...)
         {
             spdlog::error("SEND_AND_WAIT: UNDEFINED ERROR!");
-            return false;
+            return std::nullopt;
         }
     }
     else
     {
         spdlog::error("Response timed out, waiting skipped.");
-        return false;
+        return std::nullopt;
     }
 }
 

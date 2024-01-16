@@ -116,7 +116,7 @@ class MiosReader(Node):
                 self.udpOn = False
             else:
                 pass
-            self.get_logger().error("Power off, timer pass ...")
+            self.get_logger().error_once("Power off, timer pass ...")
 
     def check_power(self):
         if self.has_parameter("power"):

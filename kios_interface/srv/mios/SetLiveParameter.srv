@@ -1,5 +1,0 @@
-string key
-string value
----
-bool result
-string error_message

@@ -1,0 +1,32 @@
+# Stack
+YellowBox:
+  pose: [0.0, 0.0, 0.052]
+  reference: 'KittingBox'
+GreenBox:
+  pose: [0.0, 0.0, 0.1]
+  reference: 'YellowBox'
+BlueBox:
+  pose: [0.0, 0.0, 0.1]
+  reference: 'GreenBox'
+
+# Sort
+# YellowBox:
+#   pose: [-0.133, 0.0, 0.052]
+#   reference: 'KittingBox'
+# BlueBox:
+#   pose: [0.0, 0.0, 0.052]
+#   reference: 'KittingBox'
+# GreenBox:
+#   pose: [0.133, 0.0, 0.052]
+#   reference: 'KittingBox'
+
+# Pyramid
+# YellowBox:
+#   pose: [-0.133, 0.0, 0.052]
+#   reference: 'KittingBox'
+# BlueBox:
+#   pose: [0.0, 0.0, 0.052]
+#   reference: 'KittingBox'
+# GreenBox:
+#   pose: [-0.065, 0.0, 0.152]
+#   reference: 'KittingBox'

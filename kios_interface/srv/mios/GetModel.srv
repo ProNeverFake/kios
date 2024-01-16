@@ -1,8 +1,0 @@
----
-bool result
-string error_message
-float32[] mass_matrix
-float32[] coli
-float32[] gravity
-float32[] b_j_o
-float32[] b_j_ee

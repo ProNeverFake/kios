@@ -1,5 +1,5 @@
 string current_state
 ---
 string plan
-bool is_accepted
+bool is_success
 string error_message

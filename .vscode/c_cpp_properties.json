@@ -6,7 +6,10 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "/usr/include/**",
+        "/usr/local/include/**",
+        "/opt/ros/fox/include/**",
       ],
       "name": "linux-gcc-x64",
       "intelliSenseMode": "linux-gcc-x64",

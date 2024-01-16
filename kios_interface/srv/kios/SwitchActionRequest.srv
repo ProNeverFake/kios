@@ -1,3 +1,4 @@
+# ! will be deprecated soon
 # ActionPhase
 int32 FINISH=999
 int32 ERROR=-1

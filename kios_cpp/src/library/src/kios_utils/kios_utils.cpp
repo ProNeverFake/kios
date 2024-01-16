@@ -34,7 +34,6 @@ namespace kios
 
     /**
      * @brief method to switch tree state.
-     * ! NOT USED YET.
      *
      * @param phase
      * @return true

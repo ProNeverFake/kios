@@ -1,0 +1,15 @@
+# Stack
+KittingBox:
+  pose: [0.0, 0.0, 0.377]
+  reference: 'Table3'
+YellowBox:
+  pose: [0.0, 0.0, 0.425]
+  reference: 'Table1'
+BlueBox:
+  pose: [0.0, 0.0, 0.1]
+  reference: 'YellowBox'
+GreenBox:
+  pose: [0.0, 0.0, 0.1]
+  reference: 'BlueBox'
+
+

@@ -33,22 +33,6 @@ namespace kios
     }
 
     /**
-     * @brief
-     * !!! THIS IS ONLY FOR BAD_ALLOC TEST. DISCARDED!
-     */
-    void ContextClerk::initialize()
-    {
-        try
-        {
-            default_context_dictionary_ptr_ = std::make_unique<DefaultActionContext>();
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << e.what() << '\n';
-        }
-    }
-
-    /**
      * @brief archive the action node and its context. if its archive already exists, skip. if not, fetch the default context for it.
      *
      * @param action_achive 1: group,  2: id,  3: description,  4. action_phase
@@ -217,6 +201,12 @@ namespace kios
         return true;
     }
 
+    /**
+     * @brief get the json skill context of the current skill
+     * 
+     * @param archive 
+     * @return nlohmann::json 
+     */
     nlohmann::json ContextClerk::get_context(const NodeArchive &archive) const
     {
         if (action_ground_dictionary_.find(archive.action_group) != action_ground_dictionary_.end())

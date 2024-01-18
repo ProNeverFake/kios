@@ -1,48 +1,21 @@
-"""
-a robot interface for robot behavior control.
-some functionaltiy is tailored for mios.
-"""
-
 from kios_utils.task import *
 import numpy as np
 
-from kios_robot.robot_proprioceptor import RobotProprioceptor
-from kios_robot.robot_skill_engine import RobotSkillEngine
-from kios_robot.robot_actuator import RobotActuator
 
-
-# # * use localhost when running mios locally.
-# MIOS = "127.0.0.1"
-# # * use docker ip when running mios in docker.
-# MIOS_DOCKER = "10.157.175.17"
-
-
-class RobotInterface:
+class RobotProprioceptor:
     robot_address: str = None
     robot_port: int = None
 
-    proprioceptor: RobotProprioceptor = None
-    skill_engine: RobotSkillEngine = None
-    actuator: RobotActuator = None
-
-    def __init__(self, robot_address: str = None, robot_port: int = None):
+    def __init__(self, robot_address: str, robot_port: int):
         if robot_address is not None:
             self.robot_address = robot_address
         else:
-            self.robot_address = "127.0.0.1"
+            raise Exception("robot_address is not set")
 
         if robot_port is not None:
             self.robot_port = robot_port
         else:
-            self.robot_port = 12000
-
-        self.initialize()
-
-    def initialize(self):
-        self.proprioceptor = RobotProprioceptor(self.robot_address, self.robot_port)
-        self.actuator = RobotActuator(self.robot_address, self.robot_port)
-
-        self.skill_engine = RobotSkillEngine(self.actuator)
+            raise Exception("robot_port is not set")
 
     def test_connection(self):
         return call_method(self.robot_address, self.robot_port, "test_connection")
@@ -64,7 +37,7 @@ class RobotInterface:
     def get_robot_pose_T(self):
         return self.get_robot_O_T_EE()[0:3, 3]
 
-    def modify_object_position(self, name: str, DeltaT: np.ndarray):
+    def modify_object_position(self, object_name: str, DeltaT: np.ndarray):
         position = self.get_robot_pose_T()
         new_x = position[0] + DeltaT[0]
         new_y = position[1] + DeltaT[1]
@@ -73,7 +46,7 @@ class RobotInterface:
         R = self.get_robot_pose_R().T.flatten().tolist()
 
         payload = {
-            "object": name,
+            "object": object_name,
             "data": {
                 "x": new_x,
                 "y": new_y,

@@ -1,0 +1,7 @@
+py_trees==2.2.3
+unified-planning==1.0.0
+tockenizer==0.15.0
+networkx
+neo4j
+openai
+numpy

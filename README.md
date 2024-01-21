@@ -32,8 +32,8 @@ The usecases are from the siemens robot assembly challenge and the furniture-ben
 * [Getting started](#getting-started)
   * [Requirements](#requirements)
   * [Install](#install)
+  * [Packages](#packages)
   * [Usage](#usage)
-  * [Used Technologies](#used-technologies)
   * [System Structure](#system-structure)
   * [Running Process](#running-process)
   * [Testing](#testing)
@@ -68,51 +68,58 @@ conda activate kios
 
 ```
 
-1. Install pytrees.
+1. Install python packages.
 
 ```bash
-
-pip install py_trees
-
+pip install -r requirements.txt
 ```
 
-2. Install unified-planning.
-
-```bash
-
-pip install unified-planning
-
-```
-
-3. (Skip this if you do not need visualization) install neo4j.
+2. (Skip this if you do not need visualization) install neo4j.
 
 The application can be downloaded from [here](https://github.com/neo4j/neo4j-python-driver).
 
 After setting up the neo4j server, please change in the neo4j interface in `kios_bt_planning/kios_world` to your pw.
 
-You also need to install the neo4j driver for python.
 
-```bash
-
-pip install neo4j
-
-```
-
-4. Install networkx.
-
-```bash
-
-pip install networkx
-
-```
-
-5. Set up the mios (branch = kios) and the robot.
+3. Set up the mios (branch = kios) and the robot.
 
 > BB: Go to check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. GL.
 
-6. clone the project.
 
 > BB: The project is still under development. Please feel free to start an issue if you have any question or suggestion. 
+
+### Packages
+
+- kios_bt_planning
+  - kios_agent: the agents for task planning and behavior tree generating
+    - kios_llm_bt: prompt engineering files for end-to-end behavior tree generating
+  - kios_bt: modules for basic behavior tree functionality.
+    - Behavior nodes (actions and conditions)
+    - The factory class for generating behavior trees
+    - Behavior tree json interface
+    - Mios asynchronization module
+    - ...
+  - kios_domain: domain knowledge written in pddl with unified-planning
+    - pddl python interfaces.
+    - domain knowledge definitions.
+    - ...
+  - kios_planner: discarded now
+  - kios_robot: robot modules for real-world robot manipulation
+    - robot_interface: interface methods to execute the actions in behavior trees.
+    - robot_proprioceptor: class for getting robot states
+    - robot_status: class for keeping the robot status.
+    - robot_actuator: primitive actions for robot manipulation.
+    - robot_skill_engine: compound actions for robot manipulation.
+  - kios_world: modules for the world model
+    - world_interface: interfaces for query/update the world state.
+    - graph_interface: interfaces for interacting with inner world graph.
+    - neo4j_interface: interfaces for neo4j database.
+  - kios_utils: utility modules
+  - tests: test files for the modules above.
+(old version packages)
+- kios_cpp: the behavior tree executor implemented in c++. discarded now.
+- kios_py: the behavior tree executor implemented in python. discarded now.
+- kios_cli: the command line interface for the project. discarded now.
 
 ### Usage
 
@@ -147,6 +154,7 @@ The project is still under development. You are welcome to contribute to the pro
 MIT License
 
 ## Sources
+
 [ChatGPT-Robot-Manipulation-Prompts](https://github.com/microsoft/ChatGPT-Robot-Manipulation-Prompts)
 
 [furniture-bench](https://github.com/clvrai/furniture-bench)

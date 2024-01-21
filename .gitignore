@@ -1,0 +1,8 @@
+# secrets.json
+secrets.json
+# python files
+*.pyc
+__pycache__/
+# cpp build files
+*.o
+*.out

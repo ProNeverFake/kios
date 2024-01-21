@@ -6,3 +6,10 @@ __pycache__/
 # cpp build files
 *.o
 *.out
+# folders
+build/
+install/ 
+log/
+logs/
+# .vscode
+.vscode/

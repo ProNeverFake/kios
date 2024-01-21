@@ -10,7 +10,9 @@ import sys
 enc = tiktoken.get_encoding("cl100k_base")
 
 script_dir = os.path.dirname(__file__)
-secret_path = os.path.join(script_dir, "secrets.json")
+upper_level = os.path.dirname(os.path.dirname(script_dir))
+
+secret_path = os.path.join(upper_level, "secrets.json")
 
 # with open("../../secrets.json") as f:
 with open(secret_path) as f:

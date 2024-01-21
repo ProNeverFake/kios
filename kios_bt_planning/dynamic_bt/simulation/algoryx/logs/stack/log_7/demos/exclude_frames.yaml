@@ -1,7 +1,0 @@
-drop: []
-move:
-- base_link
-pick:
-- base_link
-- base_link
-place: []

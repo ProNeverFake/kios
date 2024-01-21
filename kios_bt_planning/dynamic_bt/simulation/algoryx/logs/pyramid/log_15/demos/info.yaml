@@ -1,8 +1,0 @@
-default_frame: base_link
-frames:
-- KittingBox
-- YellowBox
-- GreenBox
-- BlueBox
-- base_link
-robot: base_link

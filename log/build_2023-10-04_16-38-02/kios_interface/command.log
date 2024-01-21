@@ -1,2 +1,0 @@
-Invoking command in '/home/blackbird/ros_workspace/src/kios/build/kios_interface': /usr/bin/cmake /home/blackbird/ros_workspace/src/kios/kios_interface -DCMAKE_INSTALL_PREFIX=/home/blackbird/ros_workspace/src/kios/install/kios_interface
-Invoked command in '/home/blackbird/ros_workspace/src/kios/build/kios_interface' returned '1': /usr/bin/cmake /home/blackbird/ros_workspace/src/kios/kios_interface -DCMAKE_INSTALL_PREFIX=/home/blackbird/ros_workspace/src/kios/install/kios_interface

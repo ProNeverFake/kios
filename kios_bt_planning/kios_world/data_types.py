@@ -22,7 +22,8 @@ class WorldNode:  # discard this class
         return prop in self.properties
 
     def __repr__(self):
-        return f"{self.name}: {', '.join(self.properties)}"
+        # return f"{self.name}: {', '.join(self.properties)}"
+        return f"{', '.join(self.properties)}"
 
 
 class Relationship:  # discard this class

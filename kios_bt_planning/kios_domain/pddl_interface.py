@@ -5,6 +5,7 @@ from unified_planning.shortcuts import *
 
 import os
 import os.path
+import re
 
 
 class PddlInterface:
@@ -13,6 +14,9 @@ class PddlInterface:
     problem: Problem = None
     default_domain_path: str = None
     default_problem_path: str = None
+
+    pddl_domain_file_name: str = "domain_001.pddl"
+    pddl_problem_file_name: str = "problem_001.pddl"
 
     def __init__(
         self,
@@ -46,6 +50,10 @@ class PddlInterface:
         )
         print("\033[0m")  # Reset color to default
 
+    def set_pddl_names(self, domain_name: str, problem_name: str):
+        self.pddl_domain_file_name = domain_name
+        self.pddl_problem_file_name = problem_name
+
     def update_problem(self):
         pass
 
@@ -56,6 +64,8 @@ class PddlInterface:
 
     def setup_from_pddl(
         self,
+        domain_file_name: str,
+        problem_file_name: str,
         domain_path: str = None,
         problem_path: str = None,
     ):
@@ -64,11 +74,14 @@ class PddlInterface:
         if problem_path is None:
             problem_path = self.default_problem_path
 
+        if domain_file_name is None or problem_file_name is None:
+            raise Exception("YOU MUST SPECIFY THE DOMAIN AND PROBLEM FILE NAME")
+
         self.pddl_reader = PDDLReader()
 
         self.problem = self.pddl_reader.parse_problem(
-            os.path.join(domain_path, "domain.pddl"),
-            os.path.join(problem_path, "problem.pddl"),
+            os.path.join(domain_path, self.pddl_domain_file_name),
+            os.path.join(problem_path, self.pddl_problem_file_name),
         )
         self.pddl_writer = PDDLWriter(self.problem)
 
@@ -87,8 +100,46 @@ class PddlInterface:
 
         self.update_problem()
         self.pddl_writer = PDDLWriter(self.problem)
-        self.pddl_writer.write_domain(os.path.join(domain_path, "domain.pddl"))
-        self.pddl_writer.write_problem(os.path.join(problem_path, "problem.pddl"))
+
+        domain_file_path = os.path.join(domain_path, self.pddl_domain_file_name)
+        problem_file_path = os.path.join(problem_path, self.pddl_problem_file_name)
+
+        # Check if the domain and problem files already exist, if so,
+        # modify the file name using regular expressions
+        if os.path.exists(domain_file_path):
+            # Modify the domain file name using regular expressions
+            domain_file_name = self.pddl_domain_file_name
+            match = re.match(r"domain_(\d+)\.pddl", domain_file_name)
+            if match:
+                file_number = int(match.group(1))
+                while os.path.exists(
+                    os.path.join(domain_path, f"domain_{file_number:03}.pddl")
+                ):
+                    file_number += 1
+                domain_file_name = f"domain_{file_number:03}.pddl"
+            else:
+                domain_file_name = "domain_001.pddl"
+
+            domain_file_path = os.path.join(domain_path, domain_file_name)
+
+        if os.path.exists(problem_file_path):
+            # Modify the problem file name using regular expressions
+            problem_file_name = self.pddl_problem_file_name
+            match = re.match(r"problem_(\d+)\.pddl", problem_file_name)
+            if match:
+                file_number = int(match.group(1))
+                while os.path.exists(
+                    os.path.join(problem_path, f"problem_{file_number:03}.pddl")
+                ):
+                    file_number += 1
+                problem_file_name = f"problem_{file_number:03}.pddl"
+            else:
+                problem_file_name = "problem_001.pddl"
+
+            problem_file_path = os.path.join(problem_path, problem_file_name)
+
+        self.pddl_writer.write_domain(domain_file_path)
+        self.pddl_writer.write_problem(problem_file_path)
 
     def get_pddl_string(self) -> [str, str]:
         if self.problem is None:

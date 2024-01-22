@@ -29,11 +29,11 @@ class BehaviorTreeFactory:
         initialize the subtree factory with lists of preconditions,
           actions, and effects that are available to the factory
         """
-        if bt_templates is None:
-            self.bt_templates = BehaviorTreeTemplates()
-            self.bt_templates.initialize()
-        else:
-            self.bt_templates = bt_templates
+        # if bt_templates is None:
+        #     self.bt_templates = BehaviorTreeTemplates()
+        #     self.bt_templates.initialize()
+        # else:
+        #     self.bt_templates = bt_templates
 
         if world_interface is None:
             self.world_interface = WorldInterface()

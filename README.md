@@ -72,6 +72,12 @@ conda activate kios
 
 ```bash
 pip install -r requirements.txt
+
+sudo apt-get install graphviz
+
+# install the package kios_bt_planning
+cd kios_bt_planning
+pip install -e .
 ```
 
 2. (Skip this if you do not need visualization) install neo4j.

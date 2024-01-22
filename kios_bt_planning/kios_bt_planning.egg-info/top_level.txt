@@ -1,4 +1,9 @@
+dynamic_bt
+kios_agent
 kios_bt
+kios_domain
+kios_planner
+kios_robot
 kios_utils
-planner
+kios_world
 tests

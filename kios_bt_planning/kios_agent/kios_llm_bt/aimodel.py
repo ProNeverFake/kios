@@ -17,7 +17,8 @@ secret_path = os.path.join(upper_level, "secrets.json")
 # with open("../../secrets.json") as f:
 with open(secret_path) as f:
     credentials = json.load(f)
-    print(credentials)
+    # print(credentials)
+
 
 # dir_system = "./system"
 dir_system = os.path.join(script_dir, "system")
@@ -91,8 +92,8 @@ class ChatGPT:
 
         self.credentials = credentials
         self.messages = []
-        self.max_token_length = 15000
-        self.max_completion_length = 2000
+        self.max_token_length = 25000
+        self.max_completion_length = 4000
         self.last_response = None
         self.query = ""
         self.instruction = ""
@@ -294,54 +295,21 @@ class ChatGPT:
             # finally, add the text_base to the user query message
             self.messages.append({"sender": "user", "text": text_base})
 
-        if self.use_azure and openai.api_version == "2022-12-01":
-            # Remove unsafe user inputs. May need further refinement in the
-            # future.
-            if runtime_instruction.find("<|im_start|>") != -1:
-                runtime_instruction = runtime_instruction.replace("<|im_start|>", "")
-            if runtime_instruction.find("<|im_end|>") != -1:
-                runtime_instruction = runtime_instruction.replace("<|im_end|>", "")
-            deployment_name = self.credentials["azureopenai"][
-                "AZURE_OPENAI_DEPLOYMENT_NAME_CHATGPT"
-            ]
-            response = openai.Completion.create(
-                engine=deployment_name,
-                prompt=self.create_prompt(),
-                temperature=0.1,
-                max_tokens=self.max_completion_length,
-                top_p=0.5,
-                frequency_penalty=0.0,
-                presence_penalty=0.0,
-                stop=["<|im_end|>"],
-            )
-            text = response["choices"][0]["text"]
-        elif self.use_azure and openai.api_version == "2023-05-15":
-            deployment_name = self.credentials["azureopenai"][
-                "AZURE_OPENAI_DEPLOYMENT_NAME_CHATGPT"
-            ]
-            response = openai.ChatCompletion.create(
-                engine=deployment_name,
-                messages=self.create_prompt(),
-                temperature=0.1,
-                max_tokens=self.max_completion_length,
-                top_p=0.5,
-                frequency_penalty=0.0,
-                presence_penalty=0.0,
-            )
-            text = response["choices"][0]["message"]["content"]
-        else:
-            # * request the gpt to response
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-16k",
-                # "gpt-4" is available, too. Check the available models in https://platform.openai.com/docs/models/
-                messages=self.create_prompt(),
-                temperature=0.1,
-                max_tokens=self.max_completion_length,
-                top_p=0.5,
-                frequency_penalty=0.0,
-                presence_penalty=0.0,
-            )
-            text = response["choices"][0].message.content
+        # * request the gpt to response
+        response = openai.chat.completions.create(
+            # model="gpt-3.5-turbo-16k-0613",
+            # model="gpt-4-0613", # not this
+            model="gpt-4-1106-preview",
+            # "gpt-4" is available, too. Check the available models in https://platform.openai.com/docs/models/
+            messages=self.create_prompt(),
+            temperature=0.1,
+            max_tokens=self.max_completion_length,
+            top_p=0.5,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+        )
+        text = response.choices[0].message.content
+
         print(text)
         self.last_response = text
         self.last_response = self.extract_json_part(self.last_response)
@@ -349,15 +317,18 @@ class ChatGPT:
         # dump to a text file
         with open("last_response.txt", "w") as f:
             f.write(self.last_response)
-        try:
-            self.json_dict = json.loads(self.last_response, strict=False)
-            # update the environment after the execution of the action
-            self.environment = self.json_dict["environment_after"]
-        except BaseException:
-            self.json_dict = None
-            import pdb
+            try:
+                self.json_dict = json.loads(self.last_response, strict=False)
+                # update the environment after the execution of the action
+                self.environment = self.json_dict["environment_after"]
+            except json.JSONDecodeError as e:
+                print("Error decoding JSON:", e)
+                print("Problematic part:", self.last_response[e.pos - 10 : e.pos + 10])
 
-            pdb.set_trace()
+        # self.json_dict = None
+        # import pdb
+
+        # pdb.set_trace()
 
         # * use the last response as the assistant prompt for the next round
         if len(self.messages) > 0 and self.last_response is not None:

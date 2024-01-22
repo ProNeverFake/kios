@@ -52,20 +52,87 @@ Example 1:
             "type_name": "sequence",
             "children": [
                 {
-                    "summary": "check if left hand holds parallel_box1",
-                    "name": "check left_hand hold parallel_box1",
-                    "identifier": 16,
-                    "type_name": "condition",
-                    "conditions": [
+                    "name": "load_tool selector",
+                    "identifier": 0,
+                    "type_name": "selector",
+                    "children": [
                         {
-                            "object_name": "left_hand",
-                            "property_name": "hold",
-                            "property_value": "parallel_box1",
-                            "status": True,
-                        }
+                            "summary": "check if parallel_box1 is hold",
+                            "name": "check left_hand hold parallel_box1",
+                            "identifier": 1,
+                            "type_name": "condition",
+                            "conditions": [
+                                {
+                                    "object_name": "left_hand",
+                                    "property_name": "hold",
+                                    "property_value": "parallel_box1",
+                                    "status": True,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "load_tool Sequence",
+                            "identifier": 2,
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is equippable",
+                                    "name": "check parallel_box1 is_equippable",
+                                    "identifier": 3,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_equippable",
+                                            "property_value": None,
+                                            "status": True,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "check if left hand is free",
+                                    "name": "check left_hand is_free",
+                                    "identifier": 4,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "left_hand",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": True,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "equip parallel_box1 to left hand",
+                                    "name": "load_tool(left_hand, parallel_box1)",
+                                    "identifier": 5,
+                                    "type_name": "action",
+                                    "effects": [
+                                        {
+                                            "object_name": "hand",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": False,
+                                        },
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_equippable",
+                                            "property_value": None,
+                                            "status": False,
+                                        },
+                                        {
+                                            "object_name": "hand",
+                                            "property_name": "hold",
+                                            "property_value": "parallel_box1",
+                                            "status": True,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
                     ],
                 },
-                ################
                 {
                     "name": "pick_up selector",
                     "identifier": 6,
@@ -104,94 +171,10 @@ Example 1:
                                         }
                                     ],
                                 },
-                                ################
                                 {
-                                    "name": "load_tool selector",
-                                    "identifier": 0,
-                                    "type_name": "selector",
-                                    "children": [
-                                        {
-                                            "summary": "check if parallel_box1 is hold",
-                                            "name": "check left_hand hold parallel_box1",
-                                            "identifier": 1,
-                                            "type_name": "condition",
-                                            "conditions": [
-                                                {
-                                                    "object_name": "left_hand",
-                                                    "property_name": "hold",
-                                                    "property_value": "parallel_box1",
-                                                    "status": True,
-                                                }
-                                            ],
-                                        },
-                                        {
-                                            "name": "load_tool Sequence",
-                                            "identifier": 2,
-                                            "type_name": "sequence",
-                                            "children": [
-                                                {
-                                                    "summary": "check if parallel_box1 is equippable",
-                                                    "name": "check parallel_box1 is_equippable",
-                                                    "identifier": 3,
-                                                    "type_name": "condition",
-                                                    "conditions": [
-                                                        {
-                                                            "object_name": "parallel_box1",
-                                                            "property_name": "is_equippable",
-                                                            "property_value": None,
-                                                            "status": True,
-                                                        }
-                                                    ],
-                                                },
-                                                {
-                                                    "summary": "check if left hand is free",
-                                                    "name": "check left_hand is_free",
-                                                    "identifier": 4,
-                                                    "type_name": "condition",
-                                                    "conditions": [
-                                                        {
-                                                            "object_name": "left_hand",
-                                                            "property_name": "is_free",
-                                                            "property_value": None,
-                                                            "status": True,
-                                                        }
-                                                    ],
-                                                },
-                                                {
-                                                    "summary": "equip parallel_box1 to left hand",
-                                                    "name": "load_tool(left_hand, parallel_box1)",
-                                                    "identifier": 5,
-                                                    "type_name": "action",
-                                                    "effects": [
-                                                        {
-                                                            "object_name": "hand",
-                                                            "property_name": "is_free",
-                                                            "property_value": None,
-                                                            "status": False,
-                                                        },
-                                                        {
-                                                            "object_name": "parallel_box1",
-                                                            "property_name": "is_equippable",
-                                                            "property_value": None,
-                                                            "status": False,
-                                                        },
-                                                        {
-                                                            "object_name": "hand",
-                                                            "property_name": "hold",
-                                                            "property_value": "parallel_box1",
-                                                            "status": True,
-                                                        },
-                                                    ],
-                                                },
-                                            ],
-                                        },
-                                    ],
-                                },
-                                ################
-                                {
-                                    "summary": "check if parallel_box1 can manipulate gear1",
+                                    "summary": "check if left hand holds parallel_box1",
                                     "name": "check left_hand hold parallel_box1",
-                                    "identifier": 11,
+                                    "identifier": 16,
                                     "type_name": "condition",
                                     "conditions": [
                                         {
@@ -226,7 +209,6 @@ Example 1:
                         },
                     ],
                 },
-                ################
                 {
                     "summary": "check if gear1 can be inserted to shaft1",
                     "name": "check gear1 can_insert_to shaft1",
@@ -270,7 +252,7 @@ Example 1:
             ],
         },
     ],
-},
+}
 },
 "environment_before": {"objects": [
             {"name": "gear1", "properties": []},

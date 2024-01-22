@@ -104,11 +104,13 @@ The dictionary that you return should be formatted as python dictionary. Follow 
 6. The behavior tree is used to represent an action in the action sequence. Its basic structure is:
     - A selector as the root node.
     - (Usually one) (Goal-)Condition node as the first child of the selector. It should check the goal conditions the action intends to achieve. So if the goal condition is met, the selector will directly return success.
-    - A sequence node as the last child of the selector node. It should contain all the actions that are needed to achieve the goal conditions.
-    - (Usually more than one) (Pre-)Condition nodes as the front children of the sequence node. They should check the preconditions of the action, which is the last child node of the sequence node. So if any of the preconditions is not met, the sequence node will return failure.
+    - A sequence node as the last child of the selector node. The aim of the sequence is to achieve the goal conditions.
+    - (Pre-)Condition nodes as the front children of the sequence node. They should check the preconditions of the action, which is the last child node of the sequence node. So if any of the preconditions is not met, the sequence node will return failure.
     - Only one action node as the last child of the sequence node. Its preconditions are checked by the condition nodes in the front of it. Its effects are exerted after the execution of the action, and should be able to satisfy the goal condition(s), which is the first child of the selector node.
-    - When there is any (Pre-)condition node that is not satisfied, you can recursively construct a behavior tree based on the rules above, which has the unsatisfied (Pre-)condition as the (Goal-)condition and includes the action to satisfy this. 
-7. The behavior tree should be constructed based on the action sequence you planned and the action definitions from the domain knowledge.
+7. When there is any (Pre-)condition node that is not satisfied, a behavior tree can be constructed according to the rules above, which replaces the unsatisfied (Pre-)condition, takes that (Pre-)condition as the (Goal-)condition to achieve and includes the action to achieve it. 
+8. The selector can have multiple (goal-)condition nodes as children, but must have only and no more than one sequence node as the last child.
+9. The sequence node can have multiple (pre-)condition nodes (or selectors) as children, but must have only and no more than one action node as the last child.
+10. The behavior tree should be constructed based on the action sequence you planned and the action definitions from the domain knowledge.
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]

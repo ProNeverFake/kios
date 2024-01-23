@@ -170,5 +170,6 @@ tests/pddl_interface_test.py
 tests/primitive_skill_test.py
 tests/pytree_mod_test.py
 tests/pytrees_blackboard_test.py
+tests/robot_interface_test.py
 tests/subtree_test.py
 tests/xml_test.py

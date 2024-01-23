@@ -1,0 +1,117 @@
+[user]
+The behavior tree should be in python dictionary and should have the following structure:
+"""
+{
+    "name": "Pick Up Apple",
+    "identifier": 0,
+    "type_name": "selector",
+    "children": [
+        {
+            "summary": "check if the apple is in hand",
+            "name": "check apple in hand",
+            "identifier": 1,
+            "type_name": "condition",
+            "conditions": [
+                {
+                    "object_name": "apple",
+                    "property_name": "in",
+                    "property_value": "hand",
+                    "status": True,
+                }
+            ],
+        },
+        {
+            "name": "Pick Up Sequence",
+            "identifier": 2,
+            "type_name": "sequence",
+            "children": [
+                {
+                    "summary": "check if the apple is on the ground",
+                    "name": "check apple on the ground",
+                    "identifier": 3,
+                    "type_name": "condition",
+                    "conditions": [
+                        {
+                            "object_name": "apple",
+                            "property_name": "on_the_ground",
+                            "property_value": None,
+                            "status": True,
+                        }
+                    ],
+                },
+                {
+                    "summary": "check if the hand is free",
+                    "name": "check hand free",
+                    "identifier": 4,
+                    "type_name": "condition",
+                    "conditions": [
+                        {
+                            "object_name": "hand",
+                            "property_name": "free",
+                            "property_value": None,
+                            "status": True,
+                        }
+                    ],
+                },
+                {
+                    "summary": "pick up the apple",
+                    "name": "pick_up",
+                    "identifier": 5,
+                    "type_name": "action",
+                    "effects": [
+                        {
+                            "object_name": "apple",
+                            "property_name": "on_the_ground",
+                            "property_value": None,
+                            "status": False,
+                        },
+                        {
+                            "object_name": "apple",
+                            "property_name": "in",
+                            "property_value": "hand",
+                            "status": True,
+                        },
+                        {
+                            "object_name": "hand",
+                            "property_name": "free",
+                            "property_value": None,
+                            "status": False,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}
+"""
+The dictionary that you return should be formatted as python dictionary. Follow these rules:
+1. Every node should have three basic keys:
+    - "name": the name of the node
+    - "identifier": the identifier of the node, which should be unique
+    - "type_name": the type of the node, its value can be: "selector", "sequence", "condition", "action"
+2. The "selector" and "sequence" nodes can (and should) have a key "children" with a list of children nodes.
+3. The "action" and "condition" nodes should have a key "summary" with a short description of the action/condition.
+4. The "condition" nodes should have a key "conditions" with a list of conditions to be checked. Each condition should have the following keys:
+    - "object_name": the object to check
+    - "property_name": the property/relation of the object to be checked
+    - "property_value": this should be the other object if this is a relation. For property it should be None
+    - "status": the boolean status of the property/relation the condition expects, True if the property/relation should be True, False if the property/relation should be False
+5. The "action" nodes should have a key "effects" with a list of effects to be exerted after the execution of the action. Each effect should have the following keys:
+    - "object_name": the object to be affected
+    - "property_name": the property/relation of the object to be affected
+    - "property_value": this should be the other object if this is a relation. For property it should be None
+    - "status": True if the effect is to add this property/relation. False if is to remove.
+6. The behavior tree is used to represent an action in the action sequence. Its basic structure is:
+    - A selector as the root node.
+    - (Usually one) (Goal-)Condition node as the first child of the selector. It should check the goal conditions the action intends to achieve. So if the goal condition is met, the selector will directly return success.
+    - A sequence node as the last child of the selector node. The aim of the sequence is to achieve the goal conditions.
+    - (Pre-)Condition nodes as the front children of the sequence node. They should check the preconditions of the action, which is the last child node of the sequence node. So if any of the preconditions is not met, the sequence node will return failure.
+    - Only one action node as the last child of the sequence node. Its preconditions are checked by the condition nodes in the front of it. Its effects are exerted after the execution of the action, and should be able to satisfy the goal condition(s), which is the first child of the selector node.
+7. When there is any (Pre-)condition node that is not satisfied, a behavior tree can be constructed according to the rules above, which replaces the unsatisfied (Pre-)condition, takes that (Pre-)condition as the (Goal-)condition to achieve and includes the action to achieve it. 
+8. The selector can have multiple (goal-)condition nodes as children, but must have only and no more than one sequence node as the last child.
+9. The sequence node can have multiple (pre-)condition nodes (or selectors) as children, but must have only and no more than one action node as the last child.
+10. The behavior tree should be constructed based on the action sequence you planned and the action definitions from the domain knowledge.
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. I will wait for further instructions before starting to work.

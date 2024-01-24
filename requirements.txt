@@ -7,4 +7,5 @@ tiktoken
 numpy
 websockets
 graphviz
+roboticstoolbox-python
 

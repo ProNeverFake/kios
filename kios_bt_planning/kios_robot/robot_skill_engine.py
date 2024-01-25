@@ -1,5 +1,6 @@
 from kios_robot.robot_actuator import RobotActuator
 
+# ! DISCARD THIS
 """
 here to implement the real "skill" --- mp sequence
 also the functionality to connect the planned actions to the real movements of the robot
@@ -24,3 +25,8 @@ class RobotSkillEngine:
         print("todo: change robot status TCP")
 
     # def cartesian_move()
+
+    def pick(self, object_name: str):
+        # move onto the object
+        self.robot_actuator.cartesian_move()
+        #

@@ -1,8 +1,123 @@
 from dataclasses import dataclass
-from typing import List, Optional, Dist, Any
+from typing import List, Optional, Dict, Any
+import numpy as np
+
+from kios_utils.math_utils import *
 
 
 @dataclass
 class MiosResponse:
     result: dict
     error: Optional[str]
+
+
+@dataclass
+class MiosObject:
+    name: str
+    joint_pose: List[float]
+    O_T_EE: np.ndarray
+    reference_object: None
+
+    def __init__(
+        self,
+        name: str,
+        joint_pose: List[float],
+        O_T_EE: np.ndarray,
+        reference_object: None = None,
+    ):
+        if name is not None:
+            self.name = name
+        else:
+            raise Exception("name is not set!")
+
+        if joint_pose is not None:
+            self.joint_pose = joint_pose
+
+        if O_T_EE is not None:
+            self.O_T_EE = O_T_EE
+        else:
+            raise Exception("O_T_EE is not set!")
+
+        if reference_object is not None:
+            self.reference_object = reference_object
+
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "MiosObject":
+        return MiosObject(
+            name=json["name"],
+            joint_pose=json["joint_pose"],
+            O_T_EE=json["O_T_EE"],
+            reference_object=json["reference_object"],
+        )
+
+    @staticmethod
+    def from_relation(name: str, relation: "ReferenceRelation") -> "MiosObject":
+        if relation.relative_joint_pose is None:
+            joint_pose = None
+        else:
+            joint_pose = (
+                relation.reference_object.joint_pose + relation.relative_joint_pose
+            )
+
+        O_T_EE = relation.reference_object.O_T_EE.dot(relation.relative_HT)
+
+        return MiosObject(
+            name=name,
+            joint_pose=joint_pose,
+            O_T_EE=O_T_EE,
+            reference_object=relation.reference_object,
+        )
+
+
+# ! BBWORK suspend here. need to figure out if using MiosObject is a good idea.
+@dataclass
+class ReferenceRelation:
+    reference_object: MiosObject
+    relative_joint_pose: List[
+        float
+    ]  # from reference object to this object, the incremental joint pose
+    relative_HT: np.ndarray  # from reference object to this object
+
+    def __init__(
+        self,
+        reference_object: MiosObject,
+        relative_joint_pose: List[float] = None,
+        relative_cartesian_pose: np.ndarray = None,
+        relative_HT: np.ndarray = None,
+    ):
+        if reference_object.isinstance(MiosObject):
+            self.reference_object = reference_object
+        else:
+            raise Exception("reference_object is not a MiosObject!")
+
+        self.relative_joint_pose = relative_joint_pose
+
+        if relative_HT is not None:
+            self.relative_HT = relative_HT
+        elif relative_cartesian_pose is not None:
+            self.relative_HT = HT_from_xyzrpy(relative_cartesian_pose)
+        else:
+            raise Exception(
+                "relative_HT and relative_cartesian_pose are both None! At least one of them should be set!"
+            )
+
+    @staticmethod  # * not sure necessary
+    def from_json(json: Dict[str, Any]) -> "ReferenceRelation":
+        return ReferenceRelation(
+            reference_object=json[
+                "reference_object"
+            ],  # ! BUG, should be an object instead of a string.
+            relative_joint_pose=json["relative_joint_pose"],
+            relative_HT=json["relative_HT"],
+            relative_cartesian_pose=json["relative_cartesian_pose"],
+        )
+
+
+class TaskScene:
+    object_map: Dict[str, MiosObject]
+    reference_map: Dict[str, ReferenceRelation]
+
+    def __init__(self):
+        self.object_map = {}
+        self.reference_map = {}
+

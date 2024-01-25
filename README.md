@@ -68,7 +68,7 @@ conda activate kios
 
 ```
 
-1. Install python packages.
+1. Install dependency packages.
 
 ```bash
 pip install -r requirements.txt
@@ -79,6 +79,10 @@ sudo apt-get install graphviz
 cd kios_bt_planning
 pip install -e .
 ```
+
+If you use llama, setup the environment following the instructions [here](https://github.com/facebookresearch/llama).
+
+Don't forget to install the packages in the local environment your created above.
 
 2. (Skip this if you do not need visualization) install neo4j.
 

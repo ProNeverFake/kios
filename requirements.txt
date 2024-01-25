@@ -8,4 +8,7 @@ numpy
 websockets
 graphviz
 roboticstoolbox-python
-
+torch
+fairscale
+fire
+sentencepiece

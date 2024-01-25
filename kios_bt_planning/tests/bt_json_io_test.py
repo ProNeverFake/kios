@@ -745,7 +745,7 @@ result_bt_json = {
                     "type_name": "selector",
                     "children": [
                         {
-                            "summary": "check if inward_claw holds gear3",
+                            "summary": "check if gear3 is held by inward_claw",
                             "name": "check inward_claw hold gear3",
                             "identifier": 10,
                             "type_name": "condition",
@@ -764,13 +764,13 @@ result_bt_json = {
                             "type_name": "sequence",
                             "children": [
                                 {
-                                    "summary": "check if inward_claw is free",
-                                    "name": "check inward_claw is_free",
+                                    "summary": "check if gear3 is free",
+                                    "name": "check gear3 is_free",
                                     "identifier": 12,
                                     "type_name": "condition",
                                     "conditions": [
                                         {
-                                            "object_name": "inward_claw",
+                                            "object_name": "gear3",
                                             "property_name": "is_free",
                                             "property_value": None,
                                             "status": True,
@@ -778,23 +778,9 @@ result_bt_json = {
                                     ],
                                 },
                                 {
-                                    "summary": "check if inward_claw can manipulate gear3",
-                                    "name": "check inward_claw can_manipulate gear3",
-                                    "identifier": 13,
-                                    "type_name": "condition",
-                                    "conditions": [
-                                        {
-                                            "object_name": "inward_claw",
-                                            "property_name": "can_manipulate",
-                                            "property_value": "gear3",
-                                            "status": True,
-                                        }
-                                    ],
-                                },
-                                {
                                     "summary": "pick up gear3 using inward_claw",
                                     "name": "pickup(left_hand, gear3, inward_claw)",
-                                    "identifier": 14,
+                                    "identifier": 13,
                                     "type_name": "action",
                                     "effects": [
                                         {
@@ -818,7 +804,7 @@ result_bt_json = {
                 {
                     "summary": "check if gear3 can be inserted to shaft2",
                     "name": "check gear3 can_insert_to shaft2",
-                    "identifier": 15,
+                    "identifier": 14,
                     "type_name": "condition",
                     "conditions": [
                         {
@@ -830,9 +816,9 @@ result_bt_json = {
                     ],
                 },
                 {
-                    "summary": "insert gear3 to shaft2",
+                    "summary": "insert gear3 into shaft2",
                     "name": "insert(left_hand, inward_claw, gear3, shaft2)",
-                    "identifier": 16,
+                    "identifier": 15,
                     "type_name": "action",
                     "effects": [
                         {

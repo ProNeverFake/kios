@@ -83,5 +83,5 @@ class RobotProprioceptor:
             self.robot_address, self.robot_port, "set_partial_object_data", payload
         )
 
-    def teach_object(robot: str, object_name: str):
-        call_method(robot, 12000, "teach_object", {"object": object_name})
+    def teach_object(self, object_name: str):
+        call_method(self.robot_address, self.robot_port, "teach_object", {"object": object_name})

@@ -9,6 +9,7 @@ import numpy as np
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.robot_skill_engine import RobotSkillEngine
 from kios_robot.robot_actuator import RobotActuator
+from kios_robot.data_types import TaskScene
 
 
 # # * use localhost when running mios locally.
@@ -24,6 +25,8 @@ class RobotInterface:
     proprioceptor: RobotProprioceptor = None
     skill_engine: RobotSkillEngine = None
     actuator: RobotActuator = None
+
+    task_scene: TaskScene = None
 
     def __init__(self, robot_address: str = None, robot_port: int = None):
         if robot_address is not None:
@@ -43,6 +46,10 @@ class RobotInterface:
         self.actuator = RobotActuator(self.robot_address, self.robot_port)
 
         self.skill_engine = RobotSkillEngine(self.actuator)
+
+    def setup_scene(self, task_scene: TaskScene):
+        self.task_scene = task_scene
+        # teach the scene to mios
 
     def test_connection(self):
         return call_method(self.robot_address, self.robot_port, "test_connection")

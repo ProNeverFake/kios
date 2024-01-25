@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Dist, Any
+from typing import List, Optional, Dict, Any
 import numpy as np
 
 from kios_utils.math_utils import *
@@ -25,10 +25,30 @@ class MiosObject:
         O_T_EE: np.ndarray,
         reference_object: None = None,
     ):
-        self.name = name
-        self.joint_pose = joint_pose
-        self.O_T_EE = O_T_EE
-        self.reference_object = reference_object
+        if name is not None:
+            self.name = name
+        else:
+            raise Exception("name is not set!")
+
+        if joint_pose is not None:
+            self.joint_pose = joint_pose
+
+        if O_T_EE is not None:
+            self.O_T_EE = O_T_EE
+        else:
+            raise Exception("O_T_EE is not set!")
+
+        if reference_object is not None:
+            self.reference_object = reference_object
+
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "MiosObject":
+        return MiosObject(
+            name=json["name"],
+            joint_pose=json["joint_pose"],
+            O_T_EE=json["O_T_EE"],
+            reference_object=json["reference_object"],
+        )
 
     @staticmethod
     def from_relation(name: str, relation: "ReferenceRelation") -> "MiosObject":
@@ -41,9 +61,15 @@ class MiosObject:
 
         O_T_EE = relation.reference_object.O_T_EE.dot(relation.relative_HT)
 
-        MiosObject(name, joint_pose, O_T_EE)
+        return MiosObject(
+            name=name,
+            joint_pose=joint_pose,
+            O_T_EE=O_T_EE,
+            reference_object=relation.reference_object,
+        )
 
 
+# ! BBWORK suspend here. need to figure out if using MiosObject is a good idea.
 @dataclass
 class ReferenceRelation:
     reference_object: MiosObject
@@ -74,3 +100,24 @@ class ReferenceRelation:
             raise Exception(
                 "relative_HT and relative_cartesian_pose are both None! At least one of them should be set!"
             )
+
+    @staticmethod  # * not sure necessary
+    def from_json(json: Dict[str, Any]) -> "ReferenceRelation":
+        return ReferenceRelation(
+            reference_object=json[
+                "reference_object"
+            ],  # ! BUG, should be an object instead of a string.
+            relative_joint_pose=json["relative_joint_pose"],
+            relative_HT=json["relative_HT"],
+            relative_cartesian_pose=json["relative_cartesian_pose"],
+        )
+
+
+class TaskScene:
+    object_map: Dict[str, MiosObject]
+    reference_map: Dict[str, ReferenceRelation]
+
+    def __init__(self):
+        self.object_map = {}
+        self.reference_map = {}
+

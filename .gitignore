@@ -1,5 +1,7 @@
 # secrets.json
 secrets.json
+# llama2 code with secrets
+llama2_eval.py
 # python files
 *.pyc
 __pycache__/

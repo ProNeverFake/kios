@@ -5,6 +5,7 @@ some functionaltiy is tailored for mios.
 
 from kios_utils.task import *
 import numpy as np
+from typing import Any, List, Dict
 
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.robot_skill_engine import RobotSkillEngine
@@ -47,6 +48,16 @@ class RobotInterface:
     def test_connection(self):
         return call_method(self.robot_address, self.robot_port, "test_connection")
 
+    def map_action(self, action: Any):
+        '''
+        map the bt action to an corresponding robot action in the skill engine.
+        '''
+        raise NotImplementedError
+
+
+
+    ###################################################################################
+    # TODO the following functions should be sorted out later. most of them should be moved to proprioceptor.
     def get_robot_state(self):
         return call_method(self.robot_address, self.robot_port, "get_state")
 

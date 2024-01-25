@@ -1,3 +1,8 @@
+'''
+prototype of the bt json interface.
+'''
+# ! discarded. BBREMOVE
+
 from kios_bt.data_types import Action, Condition, ObjectProperty
 
 from typing import List, Dict, Any

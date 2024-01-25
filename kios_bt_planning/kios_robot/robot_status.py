@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from enum import Enum
+import numpy as np
 
 """
 robot status class, tailored for mios interface.
@@ -7,12 +9,22 @@ for example, whether the robot is holding a tool or not can affects the TCP of t
 """
 
 
-class Tool(Enum):
-    NoTool = 0
-    ParallelTool1 = 1
-    InwardCrawer = 2
-    OutwardCrawer = 3
-    ParallelTool2 = 4
+@dataclass
+class Toolbox:
+    name: str
+    # * for future you should consider using these parameters to invoke the gripper-related skills
+    load_width: float = 0.042  # the width the hand to reach in order to load this tool
+    unload_width: float = (
+        0.08  # the width the hand to reach in order to unload this tool
+    )
+    grasp_force: float = (
+        70  # the force the hand to exert to fully grasp this tool to the end
+    )
+    grasp_speed: float = 0.5  # not used yet
+    grasp_eps_in: float = 0.005
+    grasp_eps_out: float = 0.005
+    # kinematics parameters
+    EE_O_TCP
 
 
 class RobotStatus:

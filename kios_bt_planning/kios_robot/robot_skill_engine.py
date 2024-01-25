@@ -14,3 +14,13 @@ class RobotSkillEngine:
             self.robot_actuator = robot_actuator
         else:
             raise Exception("robot_actuator is not set")
+
+    def load_tool(self, tool_name: str):
+        self.robot_actuator.load_tool(tool_name=tool_name)
+        print("todo: change robot status TCP")
+
+    def unload_tool(self, tool_name: str):
+        self.robot_actuator.unload_tool(tool_name=tool_name)
+        print("todo: change robot status TCP")
+
+    # def cartesian_move()

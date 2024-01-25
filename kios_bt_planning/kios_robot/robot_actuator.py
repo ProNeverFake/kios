@@ -18,13 +18,6 @@ class RobotActuator:
         else:
             raise Exception("robot_port is not set")
 
-    def gripper_move(self, width: float, speed: float = 0.05):
-        payload = {
-            "width": width,
-            "speed": speed,
-        }
-        return call_method(self.robot_address, self.robot_port, "move_gripper", payload)
-
     # move to pose cartesian
     def cartesian_move(self, object: str):
         context = {
@@ -69,7 +62,9 @@ class RobotActuator:
         result = t.wait()
         print("Result: " + str(result))
 
-    def gripper_grasp(self, force=20):
+    def gripper_grasp(
+        self, width=0.01, speed=0.05, force=50, epsilon_inner=0.05, epsilon_outer=0.05
+    ):
         payload = {
             "width": 0.01,
             "speed": 0.01,
@@ -79,62 +74,58 @@ class RobotActuator:
         }
         return call_method(self.robot_address, self.robot_port, "grasp", payload)
 
-    # ? how should we make use of the object in the system?
-    def gripper_grasp_object(self, force=60):
+    def gripper_move(self, width: float, speed: float = 0.05):
         payload = {
-            "object": "NoneObject",
-            "width": 0.0,
-            "speed": 0.05,
-            "force": force,
-            "check_widtch": False,
+            "width": width,
+            "speed": speed,
         }
-        return call_method(self.robot_address, self.robot_port, "grasp_object", payload)
+        return call_method(self.robot_address, self.robot_port, "move_gripper", payload)
 
-    def home_gripper(self):
+    # # ? how should we make use of the object in the system?
+    # def gripper_grasp_object(self, force=60):
+    #     payload = {
+    #         "object": "NoneObject",
+    #         "width": 0.0,
+    #         "speed": 0.05,
+    #         "force": force,
+    #         "check_widtch": False,
+    #     }
+    #     return call_method(self.robot_address, self.robot_port, "grasp_object", payload)
+
+    def gripper_home(self):
         payload = {}
         return call_method(self.robot_address, self.robot_port, "home_gripper", payload)
 
-    def move_gripper(self, width):
-        payload = {
-            "width": width,
-            "speed": 0.05,
-        }
-        return call_method(self.robot_address, self.robot_port, "move_gripper", payload)
+    # preserved for future use
+    def equip_tool(self):
+        # move finger to the right position
+        self.gripper_move(0.042)
 
-    def grasp_tool(self):
-        payload = {
-            "width": 0.04,
-            "speed": 0.05,
-        }
-        return call_method(self.robot_address, self.robot_port, "move_gripper", payload)
+    # preserved for future use
+    def lift_tool(self):
+        # move finger to the right position
+        self.gripper_move(0.08)
 
-    def release_tool(self):
-        payload = {
-            "width": 0.08,
-            "speed": 0.05,
-        }
-        return call_method(self.robot_address, self.robot_port, "move_gripper", payload)
+    # # ! don't use this.
+    # def moveJ(self, q_g):
+    #     """
+    #     call mios for moving the lefthand to desired joint position
 
-    # ! don't use this.
-    def moveJ(self, q_g):
-        """
-        call mios for moving the lefthand to desired joint position
-
-        Paramter
-        --------
-        q_g: list, len(7)
-        """
-        parameters = {
-            "parameters": {
-                "pose": "NoneObject",
-                "q_g": q_g,
-                "speed": 0.5,
-                "acc": 0.7,
-            }
-        }
-        return start_task_and_wait(
-            self.robot_address, "MoveToJointPose", parameters, False
-        )
+    #     Paramter
+    #     --------
+    #     q_g: list, len(7)
+    #     """
+    #     parameters = {
+    #         "parameters": {
+    #             "pose": "NoneObject",
+    #             "q_g": q_g,
+    #             "speed": 0.5,
+    #             "acc": 0.7,
+    #         }
+    #     }
+    #     return start_task_and_wait(
+    #         self.robot_address, "MoveToJointPose", parameters, False
+    #     )
 
     # * modify this later
     def insertion(self):
@@ -199,6 +190,114 @@ class RobotActuator:
         }
         t = Task(self.robot_address)
         t.add_skill("insertion", "TaxInsertion", content)
+        t.start()
+        time.sleep(0.5)
+        result = t.wait()
+        print("Result: " + str(result))
+
+    def load_tool(self, tool_name: str):
+        if tool_name is None:
+            raise Exception("tool_name is not set!")
+
+        # you should also check if this exists in the scene
+
+        payload = {
+            "skill": {
+                "objects": {
+                    "Tool": tool_name,
+                },
+                "time_max": 30,
+                "MoveAbove": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.2, 0.2],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "MoveIn": {
+                    "dX_d": [0.4, 0.4],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "GripperMove": {
+                    "width": 0.042,
+                    "speed": 0.1,
+                    "force": 70,
+                    "K_x": [1500, 1500, 1500, 100, 100, 100],
+                    "eps_in": 0.05,
+                    "eps_out": 0.05,
+                },
+                "Retreat": {
+                    "dX_d": [0.4, 0.4],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+            },
+            "control": {"control_mode": 0},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                "F_ext_contact": [3.0, 2.0],
+            },
+        }
+
+        t = Task(self.robot_address)
+        t.add_skill("load_tool", "KiosLoadTool", payload)
+        t.start()
+        time.sleep(0.5)
+        result = t.wait()
+        print("Result: " + str(result))
+
+    def unload_tool(self, tool_name: str):
+        if tool_name is None:
+            raise Exception("tool_name is not set!")
+
+        # you should also check if this exists in the scene
+
+        payload = {
+            "skill": {
+                "objects": {
+                    "Tool": tool_name,
+                },
+                "time_max": 30,
+                "MoveAbove": {
+                    "dX_d": [0.2, 0.2],
+                    "ddX_d": [0.2, 0.2],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "MoveIn": {
+                    "dX_d": [0.4, 0.4],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "GripperMove": {
+                    "width": 0.08,
+                    "speed": 0.1,
+                    "force": 70,
+                    "K_x": [1500, 1500, 1500, 100, 100, 100],
+                    "eps_in": 0.05,
+                    "eps_out": 0.05,
+                },
+                "Retreat": {
+                    "dX_d": [0.4, 0.4],
+                    "ddX_d": [0.1, 0.1],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+            },
+            "control": {"control_mode": 0},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                "F_ext_contact": [3.0, 2.0],
+            },
+        }
+
+        t = Task(self.robot_address)
+        t.add_skill("unload_tool", "KiosLoadTool", payload)
         t.start()
         time.sleep(0.5)
         result = t.wait()

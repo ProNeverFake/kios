@@ -2,7 +2,7 @@
 BT in/out in various formats
 
 """
-# ! Discarded
+# ! Discarded, BBREMOVE
 
 import xml.etree.ElementTree as ET
 

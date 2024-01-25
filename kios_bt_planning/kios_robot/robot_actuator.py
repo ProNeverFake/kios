@@ -2,6 +2,8 @@ from kios_utils.task import *
 import time
 import json
 
+from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
+
 
 class RobotActuator:
     robot_address: str = None
@@ -29,13 +31,17 @@ class RobotActuator:
                 },
                 "objects": {"GoalPose": object},
             },
-            "control": {"control_mode": 2},
+            "control": {"control_mode": 0},
         }
         t = Task(self.robot_address)
         t.add_skill("move", "TaxMove", context)
         t.start()
         result = t.wait()
-        print("Result: " + str(result))
+        mios_response = MiosInterfaceResponse.from_json(result["result"])
+        # print("Result: " + str(result))
+        print("\033[92mMios replied: ")
+        print(mios_response)
+        print("\033[0m")  # Reset color to default
 
     # move to pose joint
     def joint_move(self, joint_location: str):
@@ -60,7 +66,11 @@ class RobotActuator:
         t.add_skill("move", "MoveToPoseJoint", context)
         t.start()
         result = t.wait()
-        print("Result: " + str(result))
+        mios_response = MiosInterfaceResponse.from_json(result["result"])
+        # print("Result: " + str(result))
+        print("\033[92mMios replied: ")
+        print(mios_response)
+        print("\033[0m")  # Reset color to default
 
     def gripper_grasp(
         self, width=0.01, speed=0.05, force=50, epsilon_inner=0.05, epsilon_outer=0.05
@@ -220,7 +230,7 @@ class RobotActuator:
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
                 },
                 "GripperMove": {
-                    "width": 0.042,
+                    "width": 0.043,
                     "speed": 0.1,
                     "force": 70,
                     "K_x": [1500, 1500, 1500, 100, 100, 100],
@@ -247,7 +257,11 @@ class RobotActuator:
         t.start()
         time.sleep(0.5)
         result = t.wait()
-        print("Result: " + str(result))
+        mios_response = MiosInterfaceResponse.from_json(result["result"])
+        # print("Result: " + str(result))
+        print("\033[92mMios replied: ")
+        print(mios_response)
+        print("\033[0m")  # Reset color to default
 
     def unload_tool(self, tool_name: str):
         if tool_name is None:
@@ -301,4 +315,8 @@ class RobotActuator:
         t.start()
         time.sleep(0.5)
         result = t.wait()
-        print("Result: " + str(result))
+        mios_response = MiosInterfaceResponse.from_json(result["result"])
+        # print("Result: " + str(result))
+        print("\033[92mMios replied: ")
+        print(mios_response)
+        print("\033[0m")  # Reset color to default

@@ -111,6 +111,7 @@ dynamic_bt/user_interface/lfd_gui.py
 dynamic_bt/user_interface/lfd_gui_actions.py
 dynamic_bt/user_interface/simple_gui.py
 kios_agent/__init__.py
+kios_agent/llama_deploy.py
 kios_bt/__init__.py
 kios_bt/action_nodes.py
 kios_bt/behavior_nodes.py
@@ -145,6 +146,8 @@ kios_robot/robot_interface.py
 kios_robot/robot_proprioceptor.py
 kios_robot/robot_skill_engine.py
 kios_robot/robot_status.py
+kios_robot/scene_factory.py
+kios_robot/kios_vision/__init__.py
 kios_utils/__init__.py
 kios_utils/kios_utils.py
 kios_utils/math_utils.py
@@ -171,5 +174,6 @@ tests/primitive_skill_test.py
 tests/pytree_mod_test.py
 tests/pytrees_blackboard_test.py
 tests/robot_interface_test.py
+tests/scene_test.py
 tests/subtree_test.py
 tests/xml_test.py

@@ -53,6 +53,8 @@ class Task:
         response = start_task(self.robot, "GenericTask", parameters)
         self.task_start_response = response
 
+        # ! bbtodo YOU SHOULD CHECK THE RESPONSE HERE
+
         self.task_uuid = response["result"]["task_uuid"]
 
     def wait(self):

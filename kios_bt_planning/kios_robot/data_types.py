@@ -1,14 +1,76 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any
 import numpy as np
 
 from kios_utils.math_utils import *
+from tabulate import tabulate
 
 
 @dataclass
-class MiosResponse:
-    result: dict
-    error: Optional[str]
+class MiosInterfaceResponse:
+    has_finished: bool  # * whether the task is fully conducted or not (has exception or not)
+    error_message: Optional[str]
+    task_result: "MiosTaskResult" = field(default=None)
+
+    @staticmethod
+    def from_json(json_response: Dict[str, Any]) -> "MiosInterfaceResponse":
+        """
+        BB: the json should be response["result"] !!!
+        """
+        # intantiate the task result first
+        if json_response["task_result"] is not None:
+            task_result = MiosTaskResult.from_json(json_response["task_result"])
+        else:
+            task_result = None
+
+        # instantiate the response
+        return MiosInterfaceResponse(
+            has_finished=json_response["result"],
+            error_message=json_response["error"],
+            task_result=task_result,
+        )
+
+    def __str__(self) -> str:
+        table = [
+            ["has_finished", self.has_finished],
+            ["error_message", self.error_message],
+            ["task_result", self.task_result],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
+
+@dataclass
+class MiosTaskResult:
+    has_exception: bool
+    has_external_stop: bool
+    has_succeeded: bool
+    error_reasons: List[str] = field(
+        default_factory=[]
+    )  # ? what is this? usually user stop can invoke this
+    custom_results: Dict[str, Any] = field(default=None)
+    skill_results: Dict[str, Any] = field(default=None)
+
+    @staticmethod
+    def from_json(json_task_result: Dict[str, Any]) -> "MiosTaskResult":
+        return MiosTaskResult(
+            error_reasons=json_task_result["error"],
+            has_exception=json_task_result["exception"],
+            has_external_stop=json_task_result["external_stop"],
+            has_succeeded=json_task_result["success"],
+            custom_results=json_task_result["results"],
+            # skill_results=json_task_result["skill_results"],
+        )
+
+    def __str__(self) -> str:
+        table = [
+            ["has_exception", self.has_exception],
+            ["has_external_stop", self.has_external_stop],
+            ["has_succeeded", self.has_succeeded],
+            ["error_reasons", self.error_reasons],
+            ["custom_results", self.custom_results],
+            ["skill_results", self.skill_results],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
 
 @dataclass
@@ -120,4 +182,3 @@ class TaskScene:
     def __init__(self):
         self.object_map = {}
         self.reference_map = {}
-

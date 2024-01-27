@@ -13,7 +13,7 @@ class RobotCommand:
     robot_port: int = None
     task_scene: TaskScene = None
 
-    task_list: List[MiosSkill or MiosCall] = None
+    task_list: List[MiosSkill or MiosCall] = []
 
     def __init__(self, robot_address: str, robot_port: int, robot_scene: TaskScene):
         if robot_address is not None:
@@ -29,9 +29,10 @@ class RobotCommand:
         if robot_scene is not None:
             self.task_scene = robot_scene
         else:
-            raise Exception("robot_scene is not set")
+            # raise Exception("robot_scene is not set")
+            pass
 
-    def start_task_list_sync(self):
+    def execute_task_list_sync(self):
         for task_item in self.task_list:
             if isinstance(task_item, MiosSkill):  # * use general task
                 mios_task = Task(self.robot_address)

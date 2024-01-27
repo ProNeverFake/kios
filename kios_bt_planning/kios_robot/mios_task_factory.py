@@ -1,4 +1,4 @@
-from kios_robot.data_types import MiosCall, MiosSkill
+from kios_robot.data_types import MiosCall, MiosSkill, Toolbox
 
 
 class MiosTaskFactory:
@@ -25,7 +25,7 @@ class MiosTaskFactory:
             skill_parameters=context,
         )
 
-    def generate_cartesian_move_HT(self, object: str) -> MiosSkill:
+    def generate_cartesian_move_HT(self, object: str, tool: Toolbox) -> MiosSkill:
         context = {
             "skill": {
                 "p0": {
@@ -33,15 +33,21 @@ class MiosTaskFactory:
                     "ddX_d": [0.5, 1],
                     "K_x": [1500, 1500, 1500, 150, 150, 150],
                 },
+                "time_max": 15,
                 "objects": {"GoalPose": object},
+                "tool": {
+                    "EE_HT_TCP": tool.EE_HT_TCP.T.flatten().tolist(),
+                },
             },
             "control": {"control_mode": 0},
+            "frames": {
+                "EE_T_TCP": tool.EE_HT_TCP.T.flatten().tolist(),
+            },
         }
 
         return MiosSkill(
-            is_general_skill=True,
             skill_name="cartesian_move",
-            skill_type="TaxMove",
+            skill_type="KiosCartesianMove",
             skill_parameters=context,
         )
 

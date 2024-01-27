@@ -51,6 +51,7 @@ class RobotInterface:
 
     def mios_setup(self):
         dummy_object = self.proprioceptor.get_dummy_object()
+        # set the tool objects
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene

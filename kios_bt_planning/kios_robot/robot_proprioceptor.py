@@ -1,6 +1,8 @@
 from kios_utils.task import *
 import numpy as np
 
+from kios_robot.data_types import MiosObject, MiosInterfaceResponse
+
 
 class RobotProprioceptor:
     robot_address: str = None
@@ -84,8 +86,19 @@ class RobotProprioceptor:
         )
 
     def teach_object(self, object_name: str):
-        call_method(
+        return call_method(
             self.robot_address, self.robot_port, "teach_object", {"object": object_name}
+        )
+
+    def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
+        payload = {
+            "EE_T_TCP": new_EE_T_TCP.T.flatten().tolist(),
+        }
+        return call_method(
+            self.robot_address,
+            self.robot_port,
+            "change_EE_T_TCP",
+            payload,
         )
 
     def get_object_O_T_OB(self, object_name: str):
@@ -101,14 +114,22 @@ class RobotProprioceptor:
 
         return np.reshape(np.array(response["result"]["O_T_OB"]), (4, 4)).T
 
-    def get_dummy_object(self) -> json:
+    def get_dummy_object(self) -> MiosObject or None:
         response = call_method(
             self.robot_address,
             self.robot_port,
             "get_object",
-            {"object": "NoneObject"},
+            {"object_name": "NoneObject"},
         )
-        return response["result"]
+
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        if mios_response.has_finished:
+            dummy_object = MiosObject.from_json(response["result"])
+            print(dummy_object)
+            return dummy_object
+        else:
+            return None
 
     def set_object(self, name: str, HT: np.ndarray):
         payload = {

@@ -151,6 +151,12 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
 
 For module testing please check the test folder in `kios_bt_planning`.
 
+To use ipython for debug, install ipython in your environment (otherwise will use the system-wide interpreter):
+
+```bash
+conda install ipython
+```
+
 ### Development Log
 
 For the old version see [old_dev_log.md](old_dev_log.md)

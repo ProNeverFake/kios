@@ -56,6 +56,7 @@ class Task:
         # ! bbtodo YOU SHOULD CHECK THE RESPONSE HERE
 
         self.task_uuid = response["result"]["task_uuid"]
+        return response
 
     def wait(self):
         result = wait_for_task(self.robot, self.task_uuid)

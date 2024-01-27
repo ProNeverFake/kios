@@ -7,6 +7,26 @@ from tabulate import tabulate
 
 
 @dataclass
+class MiosSkill:
+    skill_name: str
+    skill_type: str
+    skill_parameters: Dict[str, Any]
+
+
+@dataclass
+class MiosCall:
+    method_name: str
+    method_payload: Dict[str, Any]
+
+
+@dataclass
+class MiosObject:
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "MiosObject":
+        raise NotImplementedError
+
+
+@dataclass
 class MiosInterfaceResponse:
     has_finished: bool  # * whether the task is fully conducted or not (has exception or not)
     error_message: Optional[str]

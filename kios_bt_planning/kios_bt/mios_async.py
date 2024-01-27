@@ -11,6 +11,9 @@ import multiprocessing
 import multiprocessing.connection
 import time
 
+# ! BBDEV: this should be discarded later.
+# * new func: in robot.skill_engine.
+
 
 def mios_monitor(
     task: Task, pipe_connection: multiprocessing.connection.Connection
@@ -86,3 +89,7 @@ def fake_monitor(
 
     except KeyboardInterrupt:
         pass
+
+
+def kios_skill_async():
+    raise NotImplementedError

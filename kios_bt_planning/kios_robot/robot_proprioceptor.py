@@ -84,4 +84,42 @@ class RobotProprioceptor:
         )
 
     def teach_object(self, object_name: str):
-        call_method(self.robot_address, self.robot_port, "teach_object", {"object": object_name})
+        call_method(
+            self.robot_address, self.robot_port, "teach_object", {"object": object_name}
+        )
+
+    def get_object_O_T_OB(self, object_name: str):
+        """
+        based on the investigation, O_T_OB = O_T_EE, EE_T_OB = I
+        """
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "get_object",
+            {"object": object_name},
+        )
+
+        return np.reshape(np.array(response["result"]["O_T_OB"]), (4, 4)).T
+
+    def get_dummy_object(self) -> json:
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "get_object",
+            {"object": "NoneObject"},
+        )
+        return response["result"]
+
+    def set_object(self, name: str, HT: np.ndarray):
+        payload = {
+            "object": name,
+            "data": {
+                "x": HT[0, 3],
+                "y": HT[1, 3],
+                "z": HT[2, 3],
+                "R": HT[0:3, 0:3].T.flatten().tolist(),
+            },
+        }
+        return call_method(
+            self.robot_address, self.robot_port, "set_partial_object_data", payload
+        )

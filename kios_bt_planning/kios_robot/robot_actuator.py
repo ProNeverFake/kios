@@ -4,6 +4,8 @@ import json
 
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
 
+# ! discarded
+
 
 class RobotActuator:
     robot_address: str = None
@@ -43,7 +45,7 @@ class RobotActuator:
         print(mios_response)
         print("\033[0m")  # Reset color to default
 
-    # move to pose joint
+    # ! NOT IN USE YET
     def joint_move(self, joint_location: str):
         """
             * available. debug: task context error, "skill", "control" and "user" are on the same level.

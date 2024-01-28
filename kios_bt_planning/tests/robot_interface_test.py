@@ -49,16 +49,16 @@ def transformation_test():
 
 
 def tool_test():
-    ee_t_tcp = np.array(
-        [
-            [1, 0, 0, 0.0],
-            [0, 1, 0, 0.0],
-            [0, 0, 1, 0.1],
-            [0, 0, 0, 1],
-        ]
-    )
+    # ee_t_tcp = np.array(
+    #     [
+    #         [1, 0, 0, 0.0],
+    #         [0, 1, 0, 0.0],
+    #         [0, 0, 1, 0.1],
+    #         [0, 0, 0, 1],
+    #     ]
+    # )
 
-    ri.proprioceptor.change_EE_T_TCP(new_EE_T_TCP=ee_t_tcp)
+    # ri.proprioceptor.change_EE_T_TCP(new_EE_T_TCP=ee_t_tcp)
 
     toolbox = Toolbox(
         name="parallel_box1",
@@ -84,6 +84,36 @@ def tool_test():
 
     robot_command.add_mios_task(
         MiosTaskFactory().generate_cartesian_move_HT("test_location", toolbox)
+    )
+
+    robot_command.execute_task_list_sync()
+
+
+def tool_test1():
+    toolbox = Toolbox(
+        name="parallel_box1",
+        EE_HT_TCP=np.array(
+            [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1],
+            ]
+        ),
+    )
+
+    # print(toolbox.EE_HT_TCP)
+    # print(toolbox.EE_HT_TCP.flatten().tolist())
+    # return
+
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        robot_scene=None,
+    )
+
+    robot_command.add_mios_task(
+        MiosTaskFactory().generate_cartesian_move_HT("test_location1", toolbox)
     )
 
     robot_command.execute_task_list_sync()

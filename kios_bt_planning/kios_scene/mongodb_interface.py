@@ -15,8 +15,57 @@ class MongoDBInterface:
 
         self.mios_database = self.client["miosL"]
         self.mios_environment_collection = self.mios_database["environment"]
-        # self.database_dict["miosR"] = self.client["miosR"]
         self.kios_database = self.client["kios"]
+        self.setup_defaults()
+
+    def setup_defaults(self):
+        # if tools collection does not exist, create it. add the default tools.
+        if "tools" not in self.kios_database.list_collection_names():
+            self.kios_database.create_collection("tools")
+            self.kios_database["tools"].insert_one(
+                {
+                    "name": "parallel_box1",
+                    "EE_HT_TCP": [
+                        [1, 0, 0, 0.0],
+                        [0, 1, 0, 0.0],
+                        [0, 0, 1, 0.1],
+                        [0, 0, 0, 1],
+                    ],
+                }
+            )
+            self.kios_database["tools"].insert_one(
+                {
+                    "name": "parallel_box2",
+                    "EE_HT_TCP": [
+                        [1, 0, 0, 0.0],
+                        [0, 1, 0, 0.0],
+                        [0, 0, 1, 0.1],
+                        [0, 0, 0, 1],
+                    ],
+                }
+            )
+            self.kios_database["tools"].insert_one(
+                {
+                    "name": "inward_claw",
+                    "EE_HT_TCP": [
+                        [1, 0, 0, 0.0],
+                        [0, 1, 0, 0.0],
+                        [0, 0, 1, 0.1],
+                        [0, 0, 0, 1],
+                    ],
+                }
+            )
+            self.kios_database["tools"].insert_one(
+                {
+                    "name": "outward_claw",
+                    "EE_HT_TCP": [
+                        [1, 0, 0, 0.0],
+                        [0, 1, 0, 0.0],
+                        [0, 0, 1, 0.1],
+                        [0, 0, 0, 1],
+                    ],
+                }
+            )
 
     def query_mios_object(self, object_name: str) -> MiosObject:
         """
@@ -45,4 +94,5 @@ def test_query():
     print(result)
 
 
-test_query()
+if __name__ == "__main__":
+    test_query()

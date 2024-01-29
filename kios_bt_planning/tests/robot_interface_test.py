@@ -4,7 +4,7 @@ from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.robot_command import RobotCommand
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import Toolbox
-from kios_robot.scene_factory import SceneFactory
+from kios_scene.scene_factory import SceneFactory
 
 ri = RobotInterface()
 

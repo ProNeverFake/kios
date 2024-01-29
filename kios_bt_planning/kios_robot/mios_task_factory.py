@@ -61,6 +61,8 @@ class MiosTaskFactory:
             return self.generate_unload_tool(parsed_action)
         if parsed_action["name"] == "pick_up":
             return self.generate_pick_up(parsed_action)
+        if parsed_action["name"] == "insert":
+            return self.generate_insert()
 
         # raise NotImplementedError
 
@@ -219,73 +221,68 @@ class MiosTaskFactory:
     ###################################################################
     # * methods to generate a sequence of mios tasks
 
-    # # * modify this later
-    # def insertion(self):
-    #     call_method(
-    #         self.robot_address,
-    #         self.robot_port,
-    #         "set_grasped_object",
-    #         {"object": "ring"},
-    #     )
-    #     content = {
-    #         "skill": {
-    #             "objects": {
-    #                 "Container": "housing",
-    #                 "Approach": "app1",
-    #                 "Insertable": "ring",
-    #             },
-    #             "time_max": 17,
-    #             "p0": {
-    #                 "dX_d": [0.1, 1],
-    #                 "ddX_d": [0.5, 4],
-    #                 "DeltaX": [0, 0, 0, 0, 0, 0],
-    #                 "K_x": [1500, 1500, 1500, 600, 600, 600],
-    #             },
-    #             "p1": {
-    #                 "dX_d": [0.03, 0.1],
-    #                 "ddX_d": [0.5, 0.1],
-    #                 "K_x": [500, 500, 500, 600, 600, 600],
-    #             },
-    #             "p2": {
-    #                 # "search_a": [10, 10, 0, 2, 2, 0],
-    #                 # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-    #                 "search_a": [5, 5, 0, 2, 2, 0],
-    #                 "search_f": [1, 1, 0, 1.2, 1.2, 0],
-    #                 "search_phi": [
-    #                     0,
-    #                     3.14159265358979323846 / 2,
-    #                     0,
-    #                     3.14159265358979323846 / 2,
-    #                     0,
-    #                     0,
-    #                 ],
-    #                 "K_x": [500, 500, 500, 800, 800, 800],
-    #                 "f_push": [0, 0, 7, 0, 0, 0],
-    #                 # "dX_d": [0.1, 0.5],
-    #                 # "ddX_d": [0.5, 1],
-    #                 "dX_d": [0.08, 0.5],
-    #                 "ddX_d": [0.3, 1],
-    #             },
-    #             "p3": {
-    #                 "dX_d": [0.1, 0.5],
-    #                 "ddX_d": [0.5, 1],
-    #                 "f_push": 7,
-    #                 "K_x": [500, 500, 0, 800, 800, 800],
-    #             },
-    #         },
-    #         "control": {"control_mode": 0},
-    #         "user": {
-    #             "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-    #             "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-    #             "F_ext_contact": [3.0, 2.0],
-    #         },
-    #     }
-    #     t = Task(self.robot_address)
-    #     t.add_skill("insertion", "TaxInsertion", content)
-    #     t.start()
-    #     time.sleep(0.5)
-    #     result = t.wait()
-    #     print("Result: " + str(result))
+    # * modify this later
+    def insertion(self):
+        payload = {
+            "skill": {
+                "objects": {
+                    "Container": "housing",
+                    "Approach": "app1",
+                    "Insertable": "ring",
+                },
+                "time_max": 17,
+                "p0": {
+                    "dX_d": [0.1, 1],
+                    "ddX_d": [0.5, 4],
+                    "DeltaX": [0, 0, 0, 0, 0, 0],
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                },
+                "p1": {
+                    "dX_d": [0.03, 0.1],
+                    "ddX_d": [0.5, 0.1],
+                    "K_x": [500, 500, 500, 600, 600, 600],
+                },
+                "p2": {
+                    # "search_a": [10, 10, 0, 2, 2, 0],
+                    # "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                    "search_a": [5, 5, 0, 2, 2, 0],
+                    "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                    "search_phi": [
+                        0,
+                        3.14159265358979323846 / 2,
+                        0,
+                        3.14159265358979323846 / 2,
+                        0,
+                        0,
+                    ],
+                    "K_x": [500, 500, 500, 800, 800, 800],
+                    "f_push": [0, 0, 7, 0, 0, 0],
+                    # "dX_d": [0.1, 0.5],
+                    # "ddX_d": [0.5, 1],
+                    "dX_d": [0.08, 0.5],
+                    "ddX_d": [0.3, 1],
+                },
+                "p3": {
+                    "dX_d": [0.1, 0.5],
+                    "ddX_d": [0.5, 1],
+                    "f_push": 7,
+                    "K_x": [500, 500, 0, 800, 800, 800],
+                },
+            },
+            "control": {"control_mode": 0},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                "F_ext_contact": [3.0, 2.0],
+            },
+        }
+        return [
+            MiosSkill(
+                skill_name="insert",
+                skill_type="KiosInsert",
+                skill_parameters=payload,
+            )
+        ]
 
     def generate_load_tool(
         self, parsed_action: Dict[str, Any]

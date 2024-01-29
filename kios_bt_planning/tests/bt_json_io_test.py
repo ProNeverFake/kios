@@ -1103,4 +1103,5 @@ if __name__ == "__main__":
     # test_result_bt(result_bt_json)
     # test_result_bt(result_bt_json)
     # test_bt(prompt_example)
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
     test_bt(result_bt_json)

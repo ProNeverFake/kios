@@ -1,6 +1,8 @@
 """
 see kios_world module for the world interface
 """
+# ! DISCARDED
+# ! BBREMOVE
 
 from unified_planning.shortcuts import *
 

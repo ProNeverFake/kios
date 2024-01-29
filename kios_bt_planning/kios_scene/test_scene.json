@@ -1,0 +1,58 @@
+{
+    "reference_objects":
+    [
+        {
+            "object_name": "test_box1",
+            "source": "pre-defined",
+            "O_T_EE": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, -0.1],
+                [0, 0, 0, 1]
+            ]
+        },
+        {
+            "object_name": "TestObject1",
+            "source": "mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "parallel_box1",
+            "EE_HT_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ]
+        },
+        {
+            "tool_name": "parallel_box2",
+            "EE_HT_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ]
+        },
+        {
+            "tool_name": "inward_claw",
+            "EE_HT_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ]
+        },
+        {
+            "tool_name": "outward_claw",
+            "EE_HT_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ]
+        }
+    ]
+}

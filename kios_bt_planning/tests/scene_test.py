@@ -1,4 +1,4 @@
-from kios_robot.scene_factory import SceneFactory
+from kios_scene.scene_factory import SceneFactory
 
 
 def test_scene_factory():

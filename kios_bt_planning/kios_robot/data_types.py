@@ -154,32 +154,18 @@ class MiosTaskResult:
 @dataclass
 class KiosObject:
     name: str
-    joint_pose: List[float]
     O_T_EE: np.ndarray
-    reference_object: None
+    joint_pose: List[float] = field(default=None)
+    reference_object: None = field(default=None)
 
-    def __init__(
-        self,
-        name: str,
-        joint_pose: List[float],
-        O_T_EE: np.ndarray,
-        reference_object: None = None,
-    ):
-        if name is not None:
-            self.name = name
-        else:
-            raise Exception("name is not set!")
-
-        if joint_pose is not None:
-            self.joint_pose = joint_pose
-
-        if O_T_EE is not None:
-            self.O_T_EE = O_T_EE
-        else:
-            raise Exception("O_T_EE is not set!")
-
-        if reference_object is not None:
-            self.reference_object = reference_object
+    @staticmethod
+    def from_mios_object(mios_object: MiosObject) -> "KiosObject":
+        return KiosObject(
+            name=mios_object.name,
+            joint_pose=mios_object.q,
+            O_T_EE=mios_object.O_T_OB,
+            reference_object=None,
+        )
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "KiosObject":
@@ -213,10 +199,10 @@ class KiosObject:
 @dataclass
 class ReferenceRelation:
     reference_object: KiosObject
-    relative_joint_pose: List[
-        float
-    ]  # from reference object to this object, the incremental joint pose
     relative_HT: np.ndarray  # from reference object to this object
+    relative_joint_pose: List[float] = field(
+        default=None
+    )  # from reference object to this object
 
     def __init__(
         self,
@@ -270,8 +256,35 @@ class Toolbox:
     # kinematics parameters
     EE_HT_TCP: np.ndarray = field(default=np.eye(4))
 
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "Toolbox":
+        return Toolbox(
+            name=json["name"],
+            load_width=json["load_width"],
+            unload_width=json["unload_width"],
+            grasp_force=json["grasp_force"],
+            grasp_speed=json["grasp_speed"],
+            grasp_eps_in=json["grasp_eps_in"],
+            grasp_eps_out=json["grasp_eps_out"],
+            EE_HT_TCP=np.reshape(np.array(json["EE_HT_TCP"]), (4, 4)).T,
+        )
 
+    @staticmethod
+    def to_json(toolbox: "Toolbox") -> Dict[str, Any]:
+        return {
+            "name": toolbox.name,
+            "load_width": toolbox.load_width,
+            "unload_width": toolbox.unload_width,
+            "grasp_force": toolbox.grasp_force,
+            "grasp_speed": toolbox.grasp_speed,
+            "grasp_eps_in": toolbox.grasp_eps_in,
+            "grasp_eps_out": toolbox.grasp_eps_out,
+            "EE_HT_TCP": toolbox.EE_HT_TCP.T.flatten().tolist(),
+        }
+
+
+@dataclass
 class TaskScene:
-    Tool_map: Dict[str, Toolbox]
+    tool_map: Dict[str, Toolbox] = field(default_factory=dict)
     object_map: Dict[str, KiosObject] = field(default_factory=dict)
     reference_map: Dict[str, ReferenceRelation] = field(default_factory=dict)

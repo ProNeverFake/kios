@@ -10,20 +10,25 @@ import py_trees
 from typing import List, Dict, Any
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
-import kios_bt.behavior_nodes
+# import kios_bt.behavior_nodes
 
 from kios_bt.pybt_io import BehaviorTreeTemplates
 
 from kios_world.world_interface import WorldInterface
+from kios_robot.robot_interface import RobotInterface
 
 
 class BehaviorTreeFactory:
     roster: Dict[int, Any] = {}
 
+    world_interface: WorldInterface = None
+    robot_interface: RobotInterface = None
+
     def __init__(
         self,
         bt_templates: BehaviorTreeTemplates = None,
         world_interface: WorldInterface = None,
+        robot_interface: RobotInterface = None,
     ):
         """
         initialize the subtree factory with lists of preconditions,
@@ -40,6 +45,12 @@ class BehaviorTreeFactory:
             self.world_interface.initialize()
         else:
             self.world_interface = world_interface
+
+        if robot_interface is None:
+            self.robot_interface = RobotInterface()
+            self.robot_interface.initialize()
+        else:
+            self.robot_interface = robot_interface
 
     def initialize(self):
         pass
@@ -96,7 +107,12 @@ class BehaviorTreeFactory:
             name=json_data["name"],
             effects=effects,
         )
-        action_node = ActionNodeTest(action, self.world_interface)
+        # ! BBCRITICAL: NOW THE TEST CLASS IS IN USE!!!
+        action_node = ActionNodeTest(
+            action,
+            self.world_interface,
+            self.robot_interface,
+        )
         self.roster[json_data["identifier"]] = action_node
         return action_node
 
@@ -119,12 +135,16 @@ class BehaviorTreeFactory:
             name=json_data["name"],
             conditions=conditions,
         )
-        condition_node = ConditionNode(condition, self.world_interface)
+        condition_node = ConditionNode(
+            condition,
+            self.world_interface,
+            self.robot_interface,
+        )
         self.roster[json_data["identifier"]] = condition_node
         return condition_node
 
     ##########################################################
-
+    # * FOLLOWING FUNCTIONS ARE NOT IN USE. SHOULD BE MODIFIED LATER FOR TREE MODIFICATION
     def generate_subtree(
         self,
         preconditions: List[ConditionNode],
@@ -203,15 +223,13 @@ class BehaviorTreeFactory:
         grounded_preconditions = grounded_action.ground_preconditions()
         precondition_nodes = []
         for precondition in grounded_preconditions:
-            node = kios_bt.behavior_nodes.ConditionNode(
-                precondition, self.world_interface
-            )
+            node = ConditionNode(precondition, self.world_interface)
             precondition_nodes.append(node)
 
         grounded_effects = grounded_action.ground_effects()
         effect_nodes = []
         for effect in grounded_effects:
-            node = kios_bt.behavior_nodes.ConditionNode(effect, self.world_interface)
+            node = ConditionNode(effect, self.world_interface)
             effect_nodes.append(node)
         # TODO: NOT condition
         return effect_nodes, precondition_nodes
@@ -223,9 +241,7 @@ class BehaviorTreeFactory:
         """
         generate an action node
         """
-        action_node = kios_bt.behavior_nodes.ActionNode(
-            grounded_action, self.world_interface
-        )
+        action_node = ActionNode(grounded_action, self.world_interface)
 
         return [action_node]
 

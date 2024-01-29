@@ -1,5 +1,5 @@
 from kios_utils.task import *
-from typing import List
+from typing import List, Any
 import time
 import json
 
@@ -11,11 +11,19 @@ from kios_robot.data_types import TaskScene
 class RobotCommand:
     robot_address: str = None
     robot_port: int = None
-    task_scene: TaskScene = None
+    shared_data: Any = None
+
+    task_scene: TaskScene = None  # currently not used
 
     task_list: List[MiosSkill or MiosCall] = []
 
-    def __init__(self, robot_address: str, robot_port: int, robot_scene: TaskScene):
+    def __init__(
+        self,
+        robot_address: str,
+        robot_port: int,
+        shared_data: Any,
+        robot_scene: TaskScene,
+    ):
         if robot_address is not None:
             self.robot_address = robot_address
         else:
@@ -26,13 +34,33 @@ class RobotCommand:
         else:
             raise Exception("robot_port is not set")
 
+        if shared_data is not None:
+            self.shared_data = shared_data
+        else:
+            print("warning: robot command shared_data is not set.")
+
         if robot_scene is not None:
             self.task_scene = robot_scene
         else:
             # raise Exception("robot_scene is not set")
             pass
 
-    def execute_task_list_sync(self):
+    def initialize(self):
+        pass
+        # self.task_list = [] ! dont do this. the task list should be kept.
+        # * currently the command response is just a boolean.
+        # * can be extended to a more complex data type.
+
+    def interrupt(self):
+        # dirty.
+        payload = {
+            "raise_exception": False,
+            "recover": False,
+            "empty_queue": False,
+        }
+        call_method(self.robot_address, self.robot_port, "stop_task", payload=payload)
+
+    def execute_task_list_sync(self) -> bool:
         for task_item in self.task_list:
             if isinstance(task_item, MiosSkill):  # * use general task
                 mios_task = Task(self.robot_address)

@@ -111,12 +111,12 @@ dynamic_bt/user_interface/lfd_gui.py
 dynamic_bt/user_interface/lfd_gui_actions.py
 dynamic_bt/user_interface/simple_gui.py
 kios_agent/__init__.py
+kios_agent/llama2_eval.py
 kios_agent/llama_deploy.py
 kios_bt/__init__.py
 kios_bt/action_nodes.py
 kios_bt/behavior_nodes.py
 kios_bt/bt_factory.py
-kios_bt/bt_io.py
 kios_bt/bt_stewardship.py
 kios_bt/condition_nodes.py
 kios_bt/control_nodes.py
@@ -141,7 +141,10 @@ kios_planner/planner.py
 kios_planner/world_interface.py
 kios_robot/__init__.py
 kios_robot/data_types.py
+kios_robot/mios_async.py
+kios_robot/mios_task_factory.py
 kios_robot/robot_actuator.py
+kios_robot/robot_command.py
 kios_robot/robot_interface.py
 kios_robot/robot_proprioceptor.py
 kios_robot/robot_skill_engine.py

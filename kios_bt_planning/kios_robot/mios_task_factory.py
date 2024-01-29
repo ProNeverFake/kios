@@ -1,9 +1,39 @@
+from typing import List, Any
+
 from kios_robot.data_types import MiosCall, MiosSkill, Toolbox
+from kios_bt.data_types import Action
 
 
 class MiosTaskFactory:
     def __init__(self):
         pass
+
+    # * BBCORE
+    def generate_mios_tasks(self, action: Action) -> List[MiosCall or MiosSkill]:
+        """core function.
+        generate mios tasks from a kios action and return them in a list.
+
+        Args:
+            action (Action): _description_
+
+        Returns:
+            List[MiosCall or MiosSkill]: _description_
+        """
+        
+        # raise NotImplementedError
+
+    def generate_fake_mios_tasks(self, action: Action) -> List[MiosCall or MiosSkill]:
+        """
+        test function.
+        """
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("generate_fake_mios_tasks, skipped for test.")
+        return [
+            MiosCall(
+                method_name="test_method",
+                method_payload={"test": "test"},
+            )
+        ]
 
     def generate_cartesian_move(self, object: str) -> MiosSkill:
         context = {

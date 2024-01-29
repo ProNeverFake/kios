@@ -14,7 +14,6 @@ from multiprocessing import Manager
 
 # for abstract class
 from abc import ABC, abstractmethod
-from typing import Any
 
 # for testing
 import time
@@ -35,7 +34,6 @@ from kios_bt.data_types import (
 )
 from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
-from kios_robot.robot_command import RobotCommand
 from kios_robot.mios_async import fake_robot_command_monitor, robot_command_monitor
 from kios_bt.mios_async import mios_monitor, fake_monitor
 
@@ -80,18 +78,6 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
 class ActionNode(BehaviorNode):
     """Demonstrates the at-a-distance style action behaviour."""
 
-    action: Action
-
-    world_interface: WorldInterface
-    robot_interface: RobotInterface
-
-    monitor: ...
-    shared_data: Any
-    robot_command: RobotCommand
-    multiprocessing_manager: Manager
-    parent_connection: multiprocessing.connection.Connection
-    child_connection: multiprocessing.connection.Connection
-
     def __init__(
         self,
         action: Action,
@@ -107,13 +93,10 @@ class ActionNode(BehaviorNode):
         self.monitor = None
 
         # * setup the task
-
         self.multiprocessing_manager = Manager()
-        self.shared_data = self.multiprocessing_manager.dict()
-        self.robot_command = self.robot_interface.generate_robot_command(
-            action, self.shared_data
-        )
-        self.robot_command.initialize()
+        shared_data = self.multiprocessing_manager.dict({"task_start_response": None})
+        self.task = Task(MIOS, shared_data=shared_data)
+        self.task.initialize()
 
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
@@ -124,20 +107,28 @@ class ActionNode(BehaviorNode):
         self.world_interface.take_effect(self.action)
 
     def setup(self, **kwargs: int) -> None:
-        # setup the task
-        # skipped. the task is setup in the __init__ function
+        # get the parameters from the parameter server
+        self.skill_type = self.grounded_action.mios_parameters["skill_type"]
+        self.skill_parameters = self.grounded_action.mios_parameters["skill_parameters"]
+
+        # * setup the task
+        self.task.initialize()
+        self.task.clear_skills()
+        self.task.add_skill(self.behavior_name, self.skill_type, self.skill_parameters)
+
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
 
     def initialise(self) -> None:
         # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
-        self.robot_command.interrupt()
+        # * reset the task
+        self.task.initialize()
         # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.monitor = multiprocessing.Process(
-            target=robot_command_monitor,
+            target=mios_monitor,
             args=(
-                self.robot_command,
+                self.task,
                 self.child_connection,
             ),
         )
@@ -149,26 +140,25 @@ class ActionNode(BehaviorNode):
         self.logger.debug("%s.update()" % (self.__class__.__name__))
         new_status = py_trees.common.Status.RUNNING
 
-        # ! BBREMOVE this part. now startup won't be checked anymore.
-        # # * check the result of the startup of the task
-        # task_start_response = self.task.shared_data["task_start_response"]
-        # print(task_start_response)
+        # * check the result of the startup of the task
+        task_start_response = self.task.shared_data["task_start_response"]
+        print(task_start_response)
 
-        # if task_start_response is not None:
-        #     if bool(task_start_response["result"]["result"]) == False:
-        #         self.logger.debug("Task startup failed")
-        #         new_status = py_trees.common.Status.FAILURE
-        #         return new_status
+        if task_start_response is not None:
+            if bool(task_start_response["result"]["result"]) == False:
+                self.logger.debug("Task startup failed")
+                new_status = py_trees.common.Status.FAILURE
+                return new_status
 
-        #     if bool(task_start_response["result"]["result"]) == True:
-        #         print("Task startup succeeded")
+            if bool(task_start_response["result"]["result"]) == True:
+                print("Task startup succeeded")
 
-        # else:
-        #     # ! this should never happen
-        #     self.logger.debug("Task startup in progress")
-        #     self.logger.debug("ERRRRRRRRRRRRRRRRRRRRRRRORRR")
-        #     new_status = py_trees.common.Status.RUNNING
-        #     return new_status
+        else:
+            # ! this should never happen
+            self.logger.debug("Task startup in progress")
+            self.logger.debug("ERRRRRRRRRRRRRRRRRRRRRRRORRR")
+            new_status = py_trees.common.Status.RUNNING
+            return new_status
 
         # * check if the task is finished
         if self.parent_connection.poll():
@@ -181,7 +171,6 @@ class ActionNode(BehaviorNode):
             else:
                 self.logger.debug("Task finished with error")
                 new_status = py_trees.common.Status.FAILURE
-
         return new_status
 
 
@@ -208,20 +197,20 @@ class ConditionNode(BehaviorNode):
 
     def setup(self, **kwargs: int) -> None:
         # register the predicates on the blackboard here
-        # self.register_predicates()
-        # self.logger.debug(
-        #     "%s.setup()->register the predicates" % (self.__class__.__name__)
-        # )
-        pass
+        self.register_predicates()
+        self.logger.debug(
+            "%s.setup()->register the predicates" % (self.__class__.__name__)
+        )
 
     def initialise(self) -> None:
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
-        # may implement some observing actions here
+        # * may implement some observing actions here
+        # nothing to do here
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
-        new_status = py_trees.common.Status.FAILURE
+        new_status = py_trees.common.Status.SUCCESS
 
         result = self.world_interface.check_condition(self.condition)
 
@@ -246,18 +235,24 @@ class ActionNodeTest(ActionNode):
         pass
 
     def setup(self, **kwargs: int) -> None:
+        # * setup the task
+        self.task.initialize()
+        self.task.clear_skills()
+        self.task.add_skill(self.behavior_name, "test", "test")
+
         self.logger.debug("%s.setup()" % (self.__class__.__name__))
 
     def initialise(self) -> None:
         # else, reset the task and start the external process
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
-        self.robot_command.interrupt()
+        # * reset the task
+        self.task.initialize()
         # * launch the subprocess, start the mios skill execution
         self.parent_connection, self.child_connection = multiprocessing.Pipe()
         self.monitor = multiprocessing.Process(
             target=fake_robot_command_monitor,
             args=(
-                self.robot_command,
+                self.task,
                 self.child_connection,
             ),
         )
@@ -268,6 +263,20 @@ class ActionNodeTest(ActionNode):
         """Increment the counter, monitor and decide on a new status."""
         self.logger.debug("%s.update()" % (self.__class__.__name__))
         new_status = py_trees.common.Status.RUNNING
+
+        # ! BBREMOVE this part. now startup won't be checked anymore.
+        # # * check the result of the startup of the task
+        # if self.task.task_start_response is not None:
+        #     if bool(self.task.task_start_response["result"]["result"]) == False:
+        #         self.logger.debug("Task startup failed")
+        #         new_status = py_trees.common.Status.FAILURE
+        #         return new_status
+        # else:
+        #     # ! this should never happen
+        #     self.logger.debug("Task startup is still being processed.")
+        #     self.logger.error("Lag in task startup process. pls check.")
+        #     new_status = py_trees.common.Status.RUNNING
+        #     return new_status
 
         # * check if the task is finished
         if self.parent_connection.poll():

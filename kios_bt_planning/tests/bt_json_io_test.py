@@ -428,7 +428,7 @@ this_example_json_data = {
                                                     "type_name": "action",
                                                     "effects": [
                                                         {
-                                                            "object_name": "hand",
+                                                            "object_name": "left_hand",
                                                             "property_name": "is_free",
                                                             "property_value": None,
                                                             "status": False,
@@ -440,7 +440,7 @@ this_example_json_data = {
                                                             "status": False,
                                                         },
                                                         {
-                                                            "object_name": "hand",
+                                                            "object_name": "left_hand",
                                                             "property_name": "hold",
                                                             "property_value": "parallel_box1",
                                                             "status": True,

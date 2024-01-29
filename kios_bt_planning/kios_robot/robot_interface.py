@@ -7,6 +7,8 @@ from kios_utils.task import *
 import numpy as np
 from typing import Any, List, Dict
 
+from kios_bt.data_types import Action
+
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
 
@@ -59,6 +61,32 @@ class RobotInterface:
 
     def test_connection(self):
         return call_method(self.robot_address, self.robot_port, "test_connection")
+
+    # * BBCORE
+    def generate_robot_command(self, action: Action, shared_data: Any) -> RobotCommand:
+        robot_command = RobotCommand(
+            robot_address=self.robot_address,
+            robot_port=self.robot_port,
+            shared_data=shared_data,
+            robot_scene=self.task_scene,
+        )
+        """core method. 
+        generate a robot command from an action. load the shared data into the command for possible use.
+
+        Raises:
+            Exception: ...
+
+        Returns:
+            RobotCommand: the robot command for the action node to execute.
+        """
+        tasks = self.mios_task_factory.generate_mios_tasks(action=action)
+        if tasks is not None:
+            for task in tasks:
+                robot_command.add_mios_task(task)
+        else:
+            raise Exception("Action to robot command: None task is generated!")
+
+        return robot_command
 
     def create_guidance_pose(self, object_name: str, DeltaHT: np.ndarray):
         # get the object pose

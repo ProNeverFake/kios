@@ -1,7 +1,7 @@
 """
 old version for testing
 """
-# ! discarded
+# ! Discarded
 
 import atexit
 import multiprocessing

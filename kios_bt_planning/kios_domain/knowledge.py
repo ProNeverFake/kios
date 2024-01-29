@@ -20,8 +20,8 @@ problem.add_fluent(is_placed_to, default_initial_value=False)
 
 # * action
 
-problem.add_action(pickup)
-problem.add_action(putdown)
+problem.add_action(pick_up)
+problem.add_action(put_down)
 problem.add_action(place)
 problem.add_action(detach)
 problem.add_action(insert)

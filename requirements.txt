@@ -1,8 +1,10 @@
 py_trees==2.2.3
-unified-planning==1.0.0
+unified-planning
+unified-planning[engines] # for solving the pddl problems
 networkx
 neo4j
-openai
+openai # you may need to upgrade this after installing it
+# * see openai api change log for more info 
 tiktoken
 numpy
 websockets
@@ -12,3 +14,5 @@ torch
 fairscale
 fire
 sentencepiece
+# scene
+pymongo

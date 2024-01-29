@@ -20,6 +20,9 @@ class MiosCall:
     method_payload: Dict[str, Any]
 
 
+# @dataclass
+
+
 @dataclass
 class MiosObject:
     name: str
@@ -144,7 +147,9 @@ class MiosTaskResult:
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
+
 #####################################################################################
+
 
 @dataclass
 class KiosObject:

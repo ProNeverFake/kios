@@ -58,42 +58,42 @@ unload_tool.add_effect(is_free(hand), True)
 unload_tool.add_effect(is_equippable(tool), True)
 unload_tool.add_effect(hold(hand, tool), False)
 
-# * pickup
-pickup = unified_planning.model.InstantaneousAction(
-    "pickup",
-    hand=Hand,
-    part=Part,
-    tool=Tool,
-)
-
-part = pickup.parameter("part")
-tool = pickup.parameter("tool")
-hand = pickup.parameter("hand")
-
-pickup.add_precondition(is_free(tool))
-pickup.add_precondition(hold(hand, tool))
-pickup.add_precondition(can_manipulate(tool, part))
-
-pickup.add_effect(hold(tool, part), True)
-pickup.add_effect(is_free(tool), False)
-
-# * putdown
-putdown = unified_planning.model.InstantaneousAction(
-    "putdown",
+# * pick_up
+pick_up = unified_planning.model.InstantaneousAction(
+    "pick_up",
     hand=Hand,
     tool=Tool,
     part=Part,
 )
 
-part = putdown.parameter("part")
-tool = putdown.parameter("tool")
-hand = putdown.parameter("hand")
+part = pick_up.parameter("part")
+tool = pick_up.parameter("tool")
+hand = pick_up.parameter("hand")
 
-putdown.add_precondition(hold(tool, part))
-putdown.add_precondition(hold(hand, tool))
+pick_up.add_precondition(is_free(tool))
+pick_up.add_precondition(hold(hand, tool))
+pick_up.add_precondition(can_manipulate(tool, part))
 
-putdown.add_effect(hold(hand, part), False)
-putdown.add_effect(is_free(tool), True)
+pick_up.add_effect(hold(tool, part), True)
+pick_up.add_effect(is_free(tool), False)
+
+# * put_down
+put_down = unified_planning.model.InstantaneousAction(
+    "put_down",
+    hand=Hand,
+    tool=Tool,
+    part=Part,
+)
+
+part = put_down.parameter("part")
+tool = put_down.parameter("tool")
+hand = put_down.parameter("hand")
+
+put_down.add_precondition(hold(tool, part))
+put_down.add_precondition(hold(hand, tool))
+
+put_down.add_effect(hold(hand, part), False)
+put_down.add_effect(is_free(tool), True)
 
 
 # * place
@@ -256,8 +256,8 @@ unscrew.add_effect(is_screwed_to(part1, part2), False)
 
 # # * action
 
-# problem.add_action(pickup)
-# problem.add_action(putdown)
+# problem.add_action(pick_up)
+# problem.add_action(put_down)
 # problem.add_action(place)
 # problem.add_action(detach)
 # problem.add_action(insert)

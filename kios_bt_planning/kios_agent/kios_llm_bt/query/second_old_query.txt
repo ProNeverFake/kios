@@ -12,4 +12,5 @@ The dictionary that you return should be formatted as python dictionary. Follow 
 7. All keys of the dictionary should be double-quoted.
 8. Insert ``` at the beginning and the end of the dictionary to separate it from the rest of your response.
 9. Make sure that you output a consistent manipultation as a single arm robot. For example, grasping an object should not occur in successive steps.
+10. For boolean values don't use capital letters. Use "true" or "false" instead of "True" or "False".
 Adhere to the output format I defined above. Follow the rules above. Think step by step.

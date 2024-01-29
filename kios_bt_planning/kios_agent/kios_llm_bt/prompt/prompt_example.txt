@@ -18,7 +18,7 @@ Example 1:
 {"task_cohesion": {
     "action_sequence": [
         "load_tool(left_hand, parallel_box1)",
-        "pickup(left_hand, gear1, parallel_box1)",
+        "pick_up(left_hand, parallel_box1, gear1)",
         "insert(left_hand, parallel_box1, gear1, shaft1)"
     ],
     "step_instructions": [

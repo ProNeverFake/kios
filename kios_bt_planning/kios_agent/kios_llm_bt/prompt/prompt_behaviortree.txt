@@ -1,5 +1,5 @@
 [user]
-The behavior tree should be in python dictionary and should have the following structure:
+The behavior tree should be in python dictionary and should have a structure like the following example:
 """
 {
     "name": "Pick Up Apple",
@@ -110,7 +110,7 @@ The dictionary that you return should be formatted as python dictionary. Follow 
 7. When there is any (Pre-)condition node that is not satisfied, a behavior tree can be constructed according to the rules above, which replaces the unsatisfied (Pre-)condition, takes that (Pre-)condition as the (Goal-)condition to achieve and includes the action to achieve it. 
 8. The selector can have multiple (goal-)condition nodes as children, but must have only and no more than one sequence node as the last child.
 9. The sequence node can have multiple (pre-)condition nodes (or selectors) as children, but must have only and no more than one action node as the last child.
-10. The behavior tree should be constructed based on the action sequence you planned and the action definitions from the domain knowledge.
+10. The behavior tree should be constructed based on the action sequence you planned and the action definitions from the domain knowledge. The depth of the behavior tree is not limited, and when being expanded, it should expanded in a vertical way instead of inserting new actions into the old sequence.
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]

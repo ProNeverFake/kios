@@ -11,11 +11,11 @@ Following is the domain knowledge you need, given as a pddl domain file, which i
     tool part hand - thing
  )
  (:predicates (is_free ?p - thing) (is_equippable ?tool - tool) (can_manipulate ?tool - tool ?part - part) (can_insert_to ?part1 - part ?part2 - part) (can_screw_to ?part1 - part ?part2 - part) (can_place_to ?part1 - part ?part2 - part) (hold ?thing1 - thing ?thing2 - thing) (is_inserted_to ?part1 - part ?part2 - part) (is_screwed_to ?part1 - part ?part2 - part) (is_placed_to ?part1 - part ?part2 - part))
- (:action pickup
-  :parameters ( ?hand - hand ?part - part ?tool - tool)
+ (:action pick_up
+  :parameters ( ?hand - hand ?tool - tool ?part - part)
   :precondition (and (is_free ?tool) (hold ?hand ?tool) (can_manipulate ?tool ?part))
   :effect (and (hold ?tool ?part) (not (is_free ?tool))))
- (:action putdown
+ (:action put_down
   :parameters ( ?hand - hand ?tool - tool ?part - part)
   :precondition (and (hold ?tool ?part) (hold ?hand ?tool))
   :effect (and (not (hold ?hand ?part)) (is_free ?tool)))
@@ -71,8 +71,8 @@ The precidates are explained as follows:
 The actions are explained as follows:
 """
 "ROBOT_ACTION_LIST"
-- pickup(<hand>, <part>, <tool>): <hand> use <tool> to pickup <part>
-- putdown(<hand>, <tool>, <part>): <hand> use <tool> to putdown <part>
+- pick_up(<hand>, <tool>, <part>): <hand> use <tool> to pick up <part>
+- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>
 - place(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to place <part1> to <part2> (to satisfy the placement assembly constraint)
 - detach(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to detach <part1> from <part2> (to lift the existing placement assembly constraint)
 - insert(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to insert <part1> into <part2> (to satisfy the insertion assembly constraint)

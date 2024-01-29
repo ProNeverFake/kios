@@ -48,7 +48,7 @@ class RobotInterface:
 
     def initialize(self):
         self.proprioceptor = RobotProprioceptor(self.robot_address, self.robot_port)
-        self.mios_task_factory = MiosTaskFactory()
+        self.mios_task_factory = MiosTaskFactory(self.task_scene)
         # self.actuator = RobotActuator(self.robot_address, self.robot_port)
 
     def mios_setup(self):
@@ -57,6 +57,7 @@ class RobotInterface:
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
+        self.mios_task_factory.setup_scene(task_scene)
         # teach the scene to mios
 
     def test_connection(self):
@@ -79,7 +80,8 @@ class RobotInterface:
         Returns:
             RobotCommand: the robot command for the action node to execute.
         """
-        tasks = self.mios_task_factory.generate_mios_tasks(action=action)
+        # ! hack
+        tasks = self.mios_task_factory.generate_fake_mios_tasks(action=action)
         if tasks is not None:
             for task in tasks:
                 robot_command.add_mios_task(task)

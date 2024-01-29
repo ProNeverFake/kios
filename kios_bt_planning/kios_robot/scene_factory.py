@@ -55,7 +55,46 @@ class SceneFactory:
                 ]
             ),
         )
-        tool_map["parallel_box1"] = tool
+        tool_map[tool.name] = tool
+
+        tool = Toolbox(
+            name="parallel_box2",
+            EE_HT_TCP=np.array(
+                [
+                    [1, 0, 0, 0.0],
+                    [0, 1, 0, 0.0],
+                    [0, 0, 1, 0.1],
+                    [0, 0, 0, 1],
+                ]
+            ),
+        )
+        tool_map[tool.name] = tool
+
+        tool = Toolbox(
+            name="inward_claw",
+            EE_HT_TCP=np.array(
+                [
+                    [1, 0, 0, 0.0],
+                    [0, 1, 0, 0.0],
+                    [0, 0, 1, 0.1],
+                    [0, 0, 0, 1],
+                ]
+            ),
+        )
+        tool_map[tool.name] = tool
+
+        tool = Toolbox(
+            name="outward_claw",
+            EE_HT_TCP=np.array(
+                [
+                    [1, 0, 0, 0.0],
+                    [0, 1, 0, 0.0],
+                    [0, 0, 1, 0.1],
+                    [0, 0, 0, 1],
+                ]
+            ),
+        )
+        tool_map[tool.name] = tool
 
         # create the scene
         self.task_scene = TaskScene(

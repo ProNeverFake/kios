@@ -102,6 +102,7 @@ class RobotCommand:
                     task_item.method_name,
                     task_item.method_payload,
                 )
+                print(result)
                 mios_response = MiosInterfaceResponse.from_json(result["result"])
                 # print("Result: " + str(result))
                 print("\033[92mMios replied: ")

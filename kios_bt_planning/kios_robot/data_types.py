@@ -158,6 +158,15 @@ class KiosObject:
     joint_pose: List[float] = field(default=None)
     reference_object: None = field(default=None)
 
+    def __str__(self) -> str:
+        table = [
+            ["name", self.name],
+            ["joint_pose", self.joint_pose],
+            ["O_T_EE", self.O_T_EE.tolist()],
+            ["reference_object", self.reference_object],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
     @staticmethod
     def from_mios_object(mios_object: MiosObject) -> "KiosObject":
         return KiosObject(
@@ -256,6 +265,19 @@ class Toolbox:
     # kinematics parameters
     EE_T_TCP: np.ndarray = field(default=np.eye(4))
 
+    def __str__(self):
+        table = [
+            ["name", self.name],
+            ["load_width", self.load_width],
+            ["unload_width", self.unload_width],
+            ["grasp_force", self.grasp_force],
+            ["grasp_speed", self.grasp_speed],
+            ["grasp_eps_in", self.grasp_eps_in],
+            ["grasp_eps_out", self.grasp_eps_out],
+            ["EE_T_TCP", self.EE_T_TCP.tolist()],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "Toolbox":
         return Toolbox(
@@ -289,11 +311,19 @@ class TaskScene:
     object_map: Dict[str, KiosObject] = field(default_factory=dict)
     reference_map: Dict[str, ReferenceRelation] = field(default_factory=dict)
 
+    def __str__(self) -> str:
+        table = [
+            ["tools", self.tool_map],
+            ["objects", self.object_map],
+            ["references", self.reference_map],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
     def get_object(self, object_name: str) -> Optional[KiosObject]:
-        return self.object_map.get(object_name, default=None)
+        return self.object_map.get(object_name)
 
     def get_tool(self, tool_name: str) -> Optional[Toolbox]:
         if self.tool_map.get(tool_name) is None:
             print(f"Tool {tool_name} is not in the scene!")
             return Toolbox(name="default_tool")
-        return self.tool_map.get(tool_name, default=None)
+        return self.tool_map.get(tool_name)

@@ -12,7 +12,7 @@ from kios_bt.data_types import Action
 
 class MiosTaskFactory:
     task_scene: TaskScene
-    robot_proprioceptor: RobotProprioceptor
+    # robot_proprioceptor: RobotProprioceptor
 
     def __init__(
         self,
@@ -29,6 +29,17 @@ class MiosTaskFactory:
         self.task_scene = task_scene
 
     def parse_action(self, action: Action) -> Dict[str, Any]:
+        """parse the action string to get the action name and arguments.
+
+        Args:
+            action (Action): _description_
+
+        Raises:
+            Exception: _description_
+
+        Returns:
+            Dict[str, Any]: action_name: str, args: List[str]
+        """
         # use re to parse the action
         pattern = r"(\w+)\(([\w\s,]+)\)"
         action_string = action.name
@@ -106,7 +117,7 @@ class MiosTaskFactory:
         )
 
         # generate the cartesian move
-        return self.generate_cartesian_move_mp(O_T_EE=above_O_T_EE)
+        return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_EE)
 
     def generate_cartesian_move_mp(
         self, object_name: str = None, O_T_TCP: np.ndarray = None
@@ -152,13 +163,12 @@ class MiosTaskFactory:
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),
                     },
-                    "objects": {},
+                    "objects": {"GoalPose": "NullObject"},
                 },
                 "control": {"control_mode": 0},
             }
 
         return MiosSkill(
-            is_general_skill=True,
             skill_name="cartesian_move",
             skill_type="KiosCartesianMove",
             skill_parameters=context,
@@ -281,8 +291,9 @@ class MiosTaskFactory:
             tool = self.task_scene.get_tool(tool_name)
         # get the EE_T_TCP
         EE_T_TCP = tool.EE_T_TCP
+        assert isinstance(EE_T_TCP, np.ndarray)
         payload = {"EE_T_TCP": EE_T_TCP.T.flatten().tolist()}
-        return MiosCall(method_name="update_tool", method_payload=payload)
+        return MiosCall(method_name="change_tool_EE_T_TCP", method_payload=payload)
 
     ###################################################################
 
@@ -412,9 +423,9 @@ class MiosTaskFactory:
     def generate_pick_up_skill(
         self, parsed_action: Dict[str, Any]
     ) -> List[MiosCall or MiosSkill]:
-        tool_name = parsed_action["args"][1]
-        if tool_name is None:
-            raise Exception("tool_name is not set!")
+        # tool_name = parsed_action["args"][1]
+        # if tool_name is None:
+        #     raise Exception("tool_name is not set!")
         object_name = parsed_action["args"][2]
         if object_name is None:
             raise Exception("object_name is not set!")

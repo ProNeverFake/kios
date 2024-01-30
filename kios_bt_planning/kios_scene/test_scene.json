@@ -14,6 +14,10 @@
         {
             "object_name": "TestObject1",
             "source": "mios"
+        },
+        {
+            "object_name": "test_object",
+            "source": "mios"
         }
     ],
     "tools": 

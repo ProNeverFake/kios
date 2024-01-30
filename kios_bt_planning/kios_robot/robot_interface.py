@@ -11,10 +11,10 @@ from kios_bt.data_types import Action
 
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
-
-# from kios_robot.robot_actuator import RobotActuator
 from kios_robot.robot_command import RobotCommand
-from kios_robot.data_types import TaskScene
+from kios_robot.data_types import TaskScene, MiosInterfaceResponse
+
+# from kios_robot.robot_status import RobotStatus
 
 
 # # * use localhost when running mios locally.
@@ -31,6 +31,7 @@ class RobotInterface:
     mios_task_factory: MiosTaskFactory = None
     # actuator: RobotActuator = None
 
+    # robot_status: RobotStatus = None
     task_scene: TaskScene = None
 
     def __init__(self, robot_address: str = None, robot_port: int = None):
@@ -44,27 +45,36 @@ class RobotInterface:
         else:
             self.robot_port = 12000
 
+        assert self.test_connection() == True
+
         self.initialize()
 
     def initialize(self):
         self.proprioceptor = RobotProprioceptor(self.robot_address, self.robot_port)
-        self.mios_task_factory = MiosTaskFactory(self.task_scene)
-        # self.actuator = RobotActuator(self.robot_address, self.robot_port)
+        self.mios_task_factory = MiosTaskFactory(
+            self.task_scene, robot_proprioceptor=self.proprioceptor
+        )
 
-    def mios_setup(self):
-        dummy_object = self.proprioceptor.get_dummy_object()
-        # set the tool objects
+    # def mios_setup(self):
+    #     dummy_object = self.proprioceptor.get_dummy_object()
+    #     # set the tool objects
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
         self.mios_task_factory.setup_scene(task_scene)
         # teach the scene to mios
 
-    def test_connection(self):
-        return call_method(self.robot_address, self.robot_port, "test_connection")
+    def test_connection(self) -> bool:
+        response = call_method(self.robot_address, self.robot_port, "test_connection")
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        return mios_response.has_finished
 
     # * BBCORE
     def generate_robot_command(self, action: Action, shared_data: Any) -> RobotCommand:
+        """
+        shard data is shared between the action node and the robot command thread.
+        """
         robot_command = RobotCommand(
             robot_address=self.robot_address,
             robot_port=self.robot_port,
@@ -90,10 +100,11 @@ class RobotInterface:
 
         return robot_command
 
-    def create_guidance_pose(self, object_name: str, DeltaHT: np.ndarray):
-        # get the object pose
-        pass
+    # def create_guidance_pose(self, object_name: str, DeltaHT: np.ndarray):
+    #     # get the object pose
+    #     pass
 
+    # * robot command tests
     def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
         print("todo: check the tool in the scene.")
         robot_command = RobotCommand(

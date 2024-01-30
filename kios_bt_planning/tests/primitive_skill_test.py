@@ -1,6 +1,6 @@
 
 from kios_robot.robot_proprioceptor import *
-from kios_robot.robot_actuator import *
+from backups.robot_actuator import *
 from kios_robot.robot_interface import *
 
 def test_6d_cartesian_move():

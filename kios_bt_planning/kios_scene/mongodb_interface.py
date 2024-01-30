@@ -25,7 +25,7 @@ class MongoDBInterface:
             self.kios_database["tools"].insert_one(
                 {
                     "name": "parallel_box1",
-                    "EE_HT_TCP": [
+                    "EE_T_TCP": [
                         [1, 0, 0, 0.0],
                         [0, 1, 0, 0.0],
                         [0, 0, 1, 0.1],
@@ -36,7 +36,7 @@ class MongoDBInterface:
             self.kios_database["tools"].insert_one(
                 {
                     "name": "parallel_box2",
-                    "EE_HT_TCP": [
+                    "EE_T_TCP": [
                         [1, 0, 0, 0.0],
                         [0, 1, 0, 0.0],
                         [0, 0, 1, 0.1],
@@ -47,7 +47,7 @@ class MongoDBInterface:
             self.kios_database["tools"].insert_one(
                 {
                     "name": "inward_claw",
-                    "EE_HT_TCP": [
+                    "EE_T_TCP": [
                         [1, 0, 0, 0.0],
                         [0, 1, 0, 0.0],
                         [0, 0, 1, 0.1],
@@ -58,7 +58,7 @@ class MongoDBInterface:
             self.kios_database["tools"].insert_one(
                 {
                     "name": "outward_claw",
-                    "EE_HT_TCP": [
+                    "EE_T_TCP": [
                         [1, 0, 0, 0.0],
                         [0, 1, 0, 0.0],
                         [0, 0, 1, 0.1],

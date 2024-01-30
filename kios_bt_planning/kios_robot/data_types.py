@@ -254,7 +254,7 @@ class Toolbox:
     grasp_eps_in: float = field(default=0.005)  # not used yet
     grasp_eps_out: float = field(default=0.005)
     # kinematics parameters
-    EE_HT_TCP: np.ndarray = field(default=np.eye(4))
+    EE_T_TCP: np.ndarray = field(default=np.eye(4))
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "Toolbox":
@@ -266,7 +266,7 @@ class Toolbox:
             grasp_speed=json["grasp_speed"],
             grasp_eps_in=json["grasp_eps_in"],
             grasp_eps_out=json["grasp_eps_out"],
-            EE_HT_TCP=np.reshape(np.array(json["EE_HT_TCP"]), (4, 4)).T,
+            EE_T_TCP=np.reshape(np.array(json["EE_T_TCP"]), (4, 4)).T,
         )
 
     @staticmethod
@@ -279,7 +279,7 @@ class Toolbox:
             "grasp_speed": toolbox.grasp_speed,
             "grasp_eps_in": toolbox.grasp_eps_in,
             "grasp_eps_out": toolbox.grasp_eps_out,
-            "EE_HT_TCP": toolbox.EE_HT_TCP.T.flatten().tolist(),
+            "EE_T_TCP": toolbox.EE_T_TCP.T.flatten().tolist(),
         }
 
 
@@ -288,3 +288,12 @@ class TaskScene:
     tool_map: Dict[str, Toolbox] = field(default_factory=dict)
     object_map: Dict[str, KiosObject] = field(default_factory=dict)
     reference_map: Dict[str, ReferenceRelation] = field(default_factory=dict)
+
+    def get_object(self, object_name: str) -> Optional[KiosObject]:
+        return self.object_map.get(object_name, default=None)
+
+    def get_tool(self, tool_name: str) -> Optional[Toolbox]:
+        if self.tool_map.get(tool_name) is None:
+            print(f"Tool {tool_name} is not in the scene!")
+            return Toolbox(name="default_tool")
+        return self.tool_map.get(tool_name, default=None)

@@ -1,12 +1,17 @@
 from kios_utils.task import *
 import numpy as np
+from typing import Any, List, Dict
 
 from kios_robot.data_types import MiosObject, MiosInterfaceResponse
+
+# from kios_robot.robot_status import RobotStatus
 
 
 class RobotProprioceptor:
     robot_address: str = None
     robot_port: int = None
+
+    # robot_status: RobotStatus = None
 
     def __init__(self, robot_address: str, robot_port: int):
         if robot_address is not None:
@@ -19,17 +24,31 @@ class RobotProprioceptor:
         else:
             raise Exception("robot_port is not set")
 
+        self.initialize()
+
+    def initialize(self):
+        pass
+        # self.robot_status = RobotStatus()
+        # self.refresh_robot_status()
+
     def test_connection(self):
         return call_method(self.robot_address, self.robot_port, "test_connection")
+
+    # def get_robot_status(self):
+    #     return self.robot_status
+
+    # def refresh_robot_status(self):
+    #     self.robot_status.O_T_EE = self.get_robot_O_T_EE()
+    #     self.robot_status.q = self.get_robot_q()
 
     def get_robot_state(self):
         return call_method(self.robot_address, self.robot_port, "get_state")
 
-    def get_robot_q(self):
+    def get_robot_q(self) -> List[float]:
         robot_state = self.get_robot_state()
         return robot_state["result"]["q"]
 
-    def get_robot_O_T_EE(self):
+    def get_robot_O_T_EE(self) -> np.ndarray:
         robot_state = self.get_robot_state()
         return np.reshape(np.array(robot_state["result"]["O_T_EE"]), (4, 4)).T
 
@@ -90,6 +109,7 @@ class RobotProprioceptor:
             self.robot_address, self.robot_port, "teach_object", {"object": object_name}
         )
 
+    # ! this will lead to a jerk in the robot. dont use it.
     def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
         payload = {
             "EE_T_TCP": new_EE_T_TCP.T.flatten().tolist(),

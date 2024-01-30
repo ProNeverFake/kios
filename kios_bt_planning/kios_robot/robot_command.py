@@ -22,7 +22,7 @@ class RobotCommand:
         robot_address: str,
         robot_port: int,
         shared_data: Any,
-        robot_scene: TaskScene,
+        task_scene: TaskScene,
     ):
         if robot_address is not None:
             self.robot_address = robot_address
@@ -39,8 +39,8 @@ class RobotCommand:
         else:
             print("warning: robot command shared_data is not set.")
 
-        if robot_scene is not None:
-            self.task_scene = robot_scene
+        if task_scene is not None:
+            self.task_scene = task_scene
         else:
             # raise Exception("robot_scene is not set")
             pass

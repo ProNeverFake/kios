@@ -30,6 +30,12 @@ class WorldInterface:
     def initialize(self):
         pass
 
+    def load_world_from_json(self, json_data: dict):
+        """
+        load the world from a json file, but you need to parse it first
+        """
+        self.graph_interface.load_world_from_json(json_data)
+
     # for action node
     def take_effect(self, action: Action):
         # to add/update
@@ -49,15 +55,15 @@ class WorldInterface:
                     item.status,
                 )
 
-    def register_predicates(self, predicates: dict) -> None:  # ! discard
-        """
-        add this predicate to the world. do nothing if the predicate already exists
-        """
-        if predicates is not None:
-            for key, _ in predicates.items():
-                self.blackboard.register_key(
-                    key=key, access=py_trees.common.Access.WRITE
-                )
+    # def register_predicates(self, predicates: dict) -> None:  # ! discard
+    #     """
+    #     add this predicate to the world. do nothing if the predicate already exists
+    #     """
+    #     if predicates is not None:
+    #         for key, _ in predicates.items():
+    #             self.blackboard.register_key(
+    #                 key=key, access=py_trees.common.Access.WRITE
+    #             )
 
     def get_object(self, object_name: str) -> Any:
         raise NotImplementedError

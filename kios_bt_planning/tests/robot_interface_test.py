@@ -62,7 +62,7 @@ def tool_test():
 
     toolbox = Toolbox(
         name="parallel_box1",
-        EE_HT_TCP=np.array(
+        EE_T_TCP=np.array(
             [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -72,8 +72,8 @@ def tool_test():
         ),
     )
 
-    # print(toolbox.EE_HT_TCP)
-    # print(toolbox.EE_HT_TCP.flatten().tolist())
+    # print(toolbox.EE_T_TCP)
+    # print(toolbox.EE_T_TCP.flatten().tolist())
     # return
 
     robot_command = RobotCommand(
@@ -92,7 +92,7 @@ def tool_test():
 def tool_test1():
     toolbox = Toolbox(
         name="parallel_box1",
-        EE_HT_TCP=np.array(
+        EE_T_TCP=np.array(
             [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -102,8 +102,8 @@ def tool_test1():
         ),
     )
 
-    # print(toolbox.EE_HT_TCP)
-    # print(toolbox.EE_HT_TCP.flatten().tolist())
+    # print(toolbox.EE_T_TCP)
+    # print(toolbox.EE_T_TCP.flatten().tolist())
     # return
 
     robot_command = RobotCommand(

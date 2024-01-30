@@ -59,7 +59,7 @@ class BehaviorTreeFactory:
     # * json to bt
     def from_json_to_bt(self, json_data: dict):
         """
-        generate a behavior tree from a json file
+        generate a behavior tree from a json file (but you need to parse it first)
         """
         if json_data["type_name"] == "selector":
             control_flow_node = py_trees.composites.Selector(
@@ -88,7 +88,7 @@ class BehaviorTreeFactory:
         elif json_data["type_name"] == "action":
             return self.from_json_to_action_node(json_data)
 
-    def from_json_to_action_node(self, json_data: dict) -> ActionNode:
+    def from_json_to_action_node(self, json_data: Dict[str, Any]) -> ActionNode:
         """
         from json to action node, and add it to the roster
         """
@@ -144,7 +144,7 @@ class BehaviorTreeFactory:
         return condition_node
 
     ##########################################################
-    # * FOLLOWING FUNCTIONS ARE NOT IN USE. SHOULD BE MODIFIED LATER FOR TREE MODIFICATION
+    # ! FOLLOWING FUNCTIONS ARE NOT IN USE. SHOULD BE MODIFIED LATER FOR TREE MODIFICATION
     def generate_subtree(
         self,
         preconditions: List[ConditionNode],

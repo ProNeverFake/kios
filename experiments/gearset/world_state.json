@@ -1,0 +1,14 @@
+{
+    "objects": [
+        {"name": "gear3", "properties": ["is_free"]},
+        {"name": "shaft2", "properties": ["is_free"]},
+        {"name": "inward_claw", "properties": ["is_equippable", "is_free"]},
+        {"name": "left_hand", "properties": ["is_free"]}
+    ],
+    "constraints": [
+        {"source": "gear3", "name": "can_insert_to", "target": "shaft2"},
+        {"source": "inward_claw", "name": "can_manipulate", "target": "gear3"}
+    ],
+    "relations": []
+}
+

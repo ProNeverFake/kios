@@ -120,6 +120,12 @@ class GraphInterface:
             self.add_node(node["name"])
             self.add_properties(node["name"], node["properties"])
 
+        # * add constraints (unchangeable relations)
+        for constraint in json_data["constraints"]:
+            self.add_relation(
+                constraint["source"], constraint["name"], constraint["target"]
+            )
+
         # * add relations
         for relation in json_data["relations"]:
             self.add_relation(relation["source"], relation["name"], relation["target"])

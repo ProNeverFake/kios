@@ -55,7 +55,7 @@ class SceneFactory:
         for tool_json in scene_json["tools"]:
             tool = Toolbox(
                 name=tool_json["tool_name"],
-                EE_HT_TCP=tool_json["EE_HT_TCP"],
+                EE_T_TCP=tool_json["EE_T_TCP"],
             )
             self.task_scene.tool_map[tool.name] = tool
 
@@ -96,7 +96,7 @@ class SceneFactory:
         tool_map = {}
         tool = Toolbox(
             name="parallel_box1",
-            EE_HT_TCP=np.array(
+            EE_T_TCP=np.array(
                 [
                     [1, 0, 0, 0.0],
                     [0, 1, 0, 0.0],
@@ -109,7 +109,7 @@ class SceneFactory:
 
         tool = Toolbox(
             name="parallel_box2",
-            EE_HT_TCP=np.array(
+            EE_T_TCP=np.array(
                 [
                     [1, 0, 0, 0.0],
                     [0, 1, 0, 0.0],
@@ -122,7 +122,7 @@ class SceneFactory:
 
         tool = Toolbox(
             name="inward_claw",
-            EE_HT_TCP=np.array(
+            EE_T_TCP=np.array(
                 [
                     [1, 0, 0, 0.0],
                     [0, 1, 0, 0.0],
@@ -135,7 +135,7 @@ class SceneFactory:
 
         tool = Toolbox(
             name="outward_claw",
-            EE_HT_TCP=np.array(
+            EE_T_TCP=np.array(
                 [
                     [1, 0, 0, 0.0],
                     [0, 1, 0, 0.0],

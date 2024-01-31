@@ -2,7 +2,15 @@ from kios_utils.task import *
 import numpy as np
 from typing import Any, List, Dict
 
-from kios_robot.data_types import MiosObject, MiosInterfaceResponse
+from kios_robot.data_types import (
+    MiosObject,
+    MiosInterfaceResponse,
+    RobotState,
+    TaskScene,
+)
+
+from kios_scene.mongodb_interface import MongoDBInterface
+
 
 # from kios_robot.robot_status import RobotStatus
 
@@ -11,6 +19,7 @@ class RobotProprioceptor:
     robot_address: str = None
     robot_port: int = None
 
+    mongodb_interface: MongoDBInterface = None
     # robot_status: RobotStatus = None
 
     def __init__(self, robot_address: str, robot_port: int):
@@ -28,81 +37,48 @@ class RobotProprioceptor:
 
     def initialize(self):
         pass
+        self.mongodb_interface = MongoDBInterface()
         # self.robot_status = RobotStatus()
         # self.refresh_robot_status()
 
-    def test_connection(self):
-        return call_method(self.robot_address, self.robot_port, "test_connection")
+    def test_connection(self) -> bool:
+        response = call_method(self.robot_address, self.robot_port, "test_connection")
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        return mios_response.has_finished
 
-    # def get_robot_status(self):
-    #     return self.robot_status
+    def get_robot_state(self) -> RobotState:
+        response = call_method(self.robot_address, self.robot_port, "get_state")
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        if mios_response.has_finished:
+            return RobotState.from_json(response["result"])
+        else:
+            raise Exception("Robot state is not ready yet.")
 
-    # def refresh_robot_status(self):
-    #     self.robot_status.O_T_EE = self.get_robot_O_T_EE()
-    #     self.robot_status.q = self.get_robot_q()
-
-    def get_robot_state(self):
-        return call_method(self.robot_address, self.robot_port, "get_state")
-
-    def get_robot_q(self) -> List[float]:
-        robot_state = self.get_robot_state()
-        return robot_state["result"]["q"]
-
-    def get_robot_O_T_EE(self) -> np.ndarray:
-        robot_state = self.get_robot_state()
-        return np.reshape(np.array(robot_state["result"]["O_T_EE"]), (4, 4)).T
-
-    def get_robot_pose_R(self):
-        return self.get_robot_O_T_EE()[0:3, 0:3]
-
-    def get_robot_pose_T(self):
-        return self.get_robot_O_T_EE()[0:3, 3]
-
-    def modify_object_position(self, object_name: str, DeltaT: np.ndarray):
-        position = self.get_robot_pose_T()
-        new_x = position[0] + DeltaT[0]
-        new_y = position[1] + DeltaT[1]
-        new_z = position[2] + DeltaT[2]
-
-        R = self.get_robot_pose_R().T.flatten().tolist()
-
-        payload = {
-            "object": object_name,
-            "data": {
-                "x": new_x,
-                "y": new_y,
-                "z": new_z,
-                "R": R,
-            },
-        }
-        return call_method(
-            self.robot_address, self.robot_port, "set_partial_object_data", payload
+    def update_scene_object_from_mios(self, scene: TaskScene, object_name: str):
+        mios_object = self.mongodb_interface.query_mios_object(object_name)
+        scene.object_map[object_name] = scene.object_map[object_name].from_mios_object(
+            mios_object
         )
 
-    def get_robot_state(self):
-        return call_method(self.robot_address, self.robot_port, "get_state")
+    def update_scene(self, scene: TaskScene):
+        # * tool map does not need to be updated
+        # * check the obejct map first
+        for object_name, kios_object in scene.object_map.items():
+            if kios_object.source == "mios":
+                mios_object = self.mongodb_interface.query_mios_object(object_name)
+                kios_object = kios_object.from_mios_object(mios_object)
+            elif kios_object.source == "pre-defined":
+                pass
+            elif kios_object.source == "tag_detection":
+                raise NotImplementedError
+            elif kios_object.source == "segmentation":
+                raise NotImplementedError
+            else:
+                raise Exception("Undefined source!")
 
-    def get_robot_q(self):
-        robot_state = self.get_robot_state()
-        return robot_state["result"]["q"]
-
-    def get_robot_O_T_EE(self):
-        robot_state = self.get_robot_state()
-        return np.reshape(np.array(robot_state["result"]["O_T_EE"]), (4, 4)).T
-
-    def modify_object(self, name: str, HT: np.ndarray):
-        payload = {
-            "object": name,
-            "data": {
-                "x": HT[0, 3],
-                "y": HT[1, 3],
-                "z": HT[2, 3],
-                "R": HT[0:3, 0:3].T.flatten().tolist(),
-            },
-        }
-        return call_method(
-            self.robot_address, self.robot_port, "set_partial_object_data", payload
-        )
+        # * then the relation object map. the strategy is to generate them again
+        pass
 
     def teach_object(self, object_name: str):
         return call_method(

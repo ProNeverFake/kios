@@ -31,8 +31,9 @@ class SceneFactory:
                     reference_object_json["object_name"]
                 ] = KiosObject(
                     name=reference_object_json["object_name"],
+                    source=reference_object_json["source"],
                     # joint_pose=reference_object_json["joint_pose"],
-                    O_T_EE=reference_object_json["O_T_EE"],
+                    O_T_EE=reference_object_json["O_T_TCP"],
                 )
             elif reference_object_json["source"] == "mios":
                 mios_object = mongodb_interface.query_mios_object(
@@ -40,7 +41,9 @@ class SceneFactory:
                 )
                 kios_object = KiosObject.from_mios_object(mios_object)
                 self.task_scene.object_map[kios_object.name] = kios_object
-            elif reference_object_json["source"] == "vision":
+            elif reference_object_json["source"] == "tag_detection":
+                raise NotImplementedError
+            elif reference_object_json["source"] == "segmentation":
                 raise NotImplementedError
             else:
                 raise Exception("Undefined source!")

@@ -79,7 +79,7 @@ class MiosTaskFactory:
         if parsed_action["name"] == "pick_up":
             return self.generate_pick_up_skill(parsed_action)
         if parsed_action["name"] == "insert":
-            return self.generate_insert_skill()
+            return self.generate_insert_skill(parsed_action)
 
         # raise NotImplementedError
 
@@ -275,6 +275,12 @@ class MiosTaskFactory:
         # move finger to the right position
         return self.generate_gripper_move(0.08)
 
+    def generate_teach_object_call(self, object_name: str) -> MiosCall:
+        payload = {
+            "object": object_name,
+        }
+        return MiosCall(method_name="teach_object", method_payload=payload)
+
     def generate_update_tool_call(self, tool_name: str = None) -> MiosCall:
         """let mios know the tool is loaded and it need to change EE_T_TCP.
 
@@ -447,63 +453,129 @@ class MiosTaskFactory:
         return task_list
 
     # ! NOCH FALSCH
-    def generate_insert_skill(self) -> List[MiosCall or MiosSkill]:
-        payload = {
-            "skill": {
-                "objects": {
-                    "Container": "housing",
-                    "Approach": "app1",
+    def generate_insert_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> List[MiosCall or MiosSkill]:
+        container = parsed_action["args"][3]
+        if container is None:
+            raise Exception("container is not set!")
+
+        # get the container from the scene
+        kios_object = self.task_scene.get_object(container)
+        if kios_object is not None:
+            O_T_TCP = kios_object.O_T_TCP
+            payload = {
+                "skill": {
+                    "objects": {
+                        # "Container": container,
+                    },
+                    "time_max": 20,
+                    "p0": {  # ! approach should be move above in mios skill. mod it
+                        "O_T_TCP": O_T_TCP.T.flatten().tolist(),
+                        "dX_d": [0.1, 1],
+                        "ddX_d": [0.5, 4],
+                        "DeltaX": [0, 0, 0, 0, 0, 0],
+                        "K_x": [1500, 1500, 1500, 600, 600, 600],
+                    },
+                    "p1": {
+                        "dX_d": [0.03, 0.1],
+                        "ddX_d": [0.5, 0.1],
+                        "K_x": [500, 500, 500, 600, 600, 600],
+                    },
+                    "p2": {
+                        # "search_a": [10, 10, 0, 2, 2, 0],
+                        # "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_a": [5, 5, 0, 2, 2, 0],
+                        "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_phi": [
+                            0,
+                            3.14159265358979323846 / 2,
+                            0,
+                            3.14159265358979323846 / 2,
+                            0,
+                            0,
+                        ],
+                        "K_x": [500, 500, 500, 800, 800, 800],
+                        "f_push": [0, 0, 7, 0, 0, 0],
+                        # "dX_d": [0.1, 0.5],
+                        # "ddX_d": [0.5, 1],
+                        "dX_d": [0.08, 0.5],
+                        "ddX_d": [0.3, 1],
+                    },
+                    "p3": {
+                        "dX_d": [0.1, 0.5],
+                        "ddX_d": [0.5, 1],
+                        "f_push": 7,
+                        "K_x": [500, 500, 0, 800, 800, 800],
+                    },
                 },
-                "time_max": 17,
-                "p0": {  # ! approach should be move above in mios skill. mod it
-                    "dX_d": [0.1, 1],
-                    "ddX_d": [0.5, 4],
-                    "DeltaX": [0, 0, 0, 0, 0, 0],
-                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                "control": {"control_mode": 0},
+                "user": {
+                    "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                    "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                    "F_ext_contact": [3.0, 2.0],
                 },
-                "p1": {
-                    "dX_d": [0.03, 0.1],
-                    "ddX_d": [0.5, 0.1],
-                    "K_x": [500, 500, 500, 600, 600, 600],
+            }
+        else:
+            payload = {
+                "skill": {
+                    "objects": {
+                        "Container": container,
+                    },
+                    "time_max": 20,
+                    "p0": {  # ! approach should be move above in mios skill. mod it
+                        "dX_d": [0.1, 1],
+                        "ddX_d": [0.5, 4],
+                        "DeltaX": [0, 0, 0, 0, 0, 0],
+                        "K_x": [1500, 1500, 1500, 600, 600, 600],
+                    },
+                    "p1": {
+                        "dX_d": [0.03, 0.1],
+                        "ddX_d": [0.5, 0.1],
+                        "K_x": [500, 500, 500, 600, 600, 600],
+                    },
+                    "p2": {
+                        # "search_a": [10, 10, 0, 2, 2, 0],
+                        # "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_a": [5, 5, 0, 2, 2, 0],
+                        "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_phi": [
+                            0,
+                            3.14159265358979323846 / 2,
+                            0,
+                            3.14159265358979323846 / 2,
+                            0,
+                            0,
+                        ],
+                        "K_x": [500, 500, 500, 800, 800, 800],
+                        "f_push": [0, 0, 7, 0, 0, 0],
+                        # "dX_d": [0.1, 0.5],
+                        # "ddX_d": [0.5, 1],
+                        "dX_d": [0.08, 0.5],
+                        "ddX_d": [0.3, 1],
+                    },
+                    "p3": {
+                        "dX_d": [0.1, 0.5],
+                        "ddX_d": [0.5, 1],
+                        "f_push": 7,
+                        "K_x": [500, 500, 0, 800, 800, 800],
+                    },
                 },
-                "p2": {
-                    # "search_a": [10, 10, 0, 2, 2, 0],
-                    # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                    "search_a": [5, 5, 0, 2, 2, 0],
-                    "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                    "search_phi": [
-                        0,
-                        3.14159265358979323846 / 2,
-                        0,
-                        3.14159265358979323846 / 2,
-                        0,
-                        0,
-                    ],
-                    "K_x": [500, 500, 500, 800, 800, 800],
-                    "f_push": [0, 0, 7, 0, 0, 0],
-                    # "dX_d": [0.1, 0.5],
-                    # "ddX_d": [0.5, 1],
-                    "dX_d": [0.08, 0.5],
-                    "ddX_d": [0.3, 1],
+                "control": {"control_mode": 0},
+                "user": {
+                    "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                    "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                    "F_ext_contact": [3.0, 2.0],
                 },
-                "p3": {
-                    "dX_d": [0.1, 0.5],
-                    "ddX_d": [0.5, 1],
-                    "f_push": 7,
-                    "K_x": [500, 500, 0, 800, 800, 800],
-                },
-            },
-            "control": {"control_mode": 0},
-            "user": {
-                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                "F_ext_contact": [3.0, 2.0],
-            },
-        }
+            }
+        insert = MiosSkill(
+            skill_name="insert",
+            skill_type="KiosInsertion",
+            skill_parameters=payload,
+        )
+        update_object_in_mios = self.generate_teach_object_call(container)
+
         return [
-            MiosSkill(
-                skill_name="insert",
-                skill_type="KiosInsert",
-                skill_parameters=payload,
-            )
+            insert,
+            update_object_in_mios,
         ]

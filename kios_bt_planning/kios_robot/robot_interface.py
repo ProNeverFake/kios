@@ -80,6 +80,7 @@ class RobotInterface:
             robot_port=self.robot_port,
             shared_data=shared_data,
             robot_scene=self.task_scene,
+            robot_interface=self,  # ! LET'S HACK!
         )
         """core method. 
         generate a robot command from an action. load the shared data into the command for possible use.

@@ -9,11 +9,6 @@ from kios_scene.scene_factory import SceneFactory
 ri = RobotInterface()
 
 
-def test_robot_interface():
-    print(ri.test_connection())
-    ri.proprioceptor.teach_object("Grab")
-
-
 def test_kios_load_and_unload_tool():
     print(
         "please make sure your has taught the tool position in mios! press enter to continue."

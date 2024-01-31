@@ -4,7 +4,7 @@
         {
             "object_name": "test_box1",
             "source": "pre-defined",
-            "O_T_EE": [
+            "O_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
                 [0, 0, 1, -0.1],

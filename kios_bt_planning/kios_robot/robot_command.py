@@ -3,6 +3,7 @@ from typing import List, Any
 import time
 import json
 
+from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
 from kios_robot.data_types import MiosSkill, MiosCall
 from kios_robot.data_types import TaskScene
@@ -13,7 +14,7 @@ class RobotCommand:
     robot_port: int = None
     shared_data: Any = None
 
-    task_scene: TaskScene = None  # currently not used
+    task_scene: TaskScene = None
 
     task_list: List[MiosSkill or MiosCall] = []
 
@@ -23,6 +24,7 @@ class RobotCommand:
         robot_port: int,
         shared_data: Any,
         task_scene: TaskScene,
+        robot_interface: RobotInterface,
     ):
         if robot_address is not None:
             self.robot_address = robot_address
@@ -42,8 +44,7 @@ class RobotCommand:
         if task_scene is not None:
             self.task_scene = task_scene
         else:
-            # raise Exception("robot_scene is not set")
-            pass
+            raise Exception("robot_scene is not set")
 
     def initialize(self):
         pass

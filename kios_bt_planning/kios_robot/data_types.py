@@ -154,15 +154,17 @@ class MiosTaskResult:
 @dataclass
 class KiosObject:
     name: str
-    O_T_EE: np.ndarray
+    source: str
+    O_T_TCP: np.ndarray
     joint_pose: List[float] = field(default=None)
     reference_object: None = field(default=None)
 
     def __str__(self) -> str:
         table = [
             ["name", self.name],
+            ["source", self.source],
             ["joint_pose", self.joint_pose],
-            ["O_T_EE", self.O_T_EE.tolist()],
+            ["O_T_TCP", self.O_T_TCP.tolist()],
             ["reference_object", self.reference_object],
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
@@ -171,8 +173,9 @@ class KiosObject:
     def from_mios_object(mios_object: MiosObject) -> "KiosObject":
         return KiosObject(
             name=mios_object.name,
+            source="mios",
             joint_pose=mios_object.q,
-            O_T_EE=mios_object.O_T_OB,
+            O_T_TCP=mios_object.O_T_OB,
             reference_object=None,
         )
 
@@ -180,8 +183,9 @@ class KiosObject:
     def from_json(json: Dict[str, Any]) -> "KiosObject":
         return KiosObject(
             name=json["name"],
+            source=json["source"],
             joint_pose=json["joint_pose"],
-            O_T_EE=json["O_T_EE"],
+            O_T_TCP=json["O_T_TCP"],
             reference_object=json["reference_object"],
         )
 
@@ -194,12 +198,13 @@ class KiosObject:
                 relation.reference_object.joint_pose + relation.relative_joint_pose
             )
 
-        O_T_EE = relation.reference_object.O_T_EE.dot(relation.relative_HT)
+        O_T_TCP = relation.reference_object.O_T_TCP.dot(relation.relative_HT)
 
         return KiosObject(
             name=name,
+            source="relation",
             joint_pose=joint_pose,
-            O_T_EE=O_T_EE,
+            O_T_TCP=O_T_TCP,
             reference_object=relation.reference_object,
         )
 
@@ -207,6 +212,7 @@ class KiosObject:
 # ! BBWORK suspend here. need to figure out if using MiosObject is a good idea.
 @dataclass
 class ReferenceRelation:
+    name: str  # ! this is not unique!
     reference_object: KiosObject
     relative_HT: np.ndarray  # from reference object to this object
     relative_joint_pose: List[float] = field(
@@ -327,3 +333,58 @@ class TaskScene:
             print(f"Tool {tool_name} is not in the scene!")
             return Toolbox(name="default_tool")
         return self.tool_map.get(tool_name)
+
+
+@dataclass
+class RobotState:
+    joint_pose: List[float]
+    O_T_EE: np.ndarray
+    EE_T_TCP: np.ndarray
+    O_T_TCP: np.ndarray
+    status: str
+    current_task: str
+    gripper_width: float
+    q_d: List[float]
+    TF_T_EE_d: np.ndarray
+
+    def __str__(self) -> str:
+        table = [
+            ["joint_pose", self.joint_pose],
+            ["O_T_EE", self.O_T_EE.tolist()],
+            ["EE_T_TCP", self.EE_T_TCP.tolist()],
+            ["O_T_TCP", self.O_T_TCP.tolist()],
+            ["status", self.status],
+            ["current_task", self.current_task],
+            ["gripper_width", self.gripper_width],
+            ["q_d", self.q_d],
+            ["TF_T_EE_d", self.TF_T_EE_d.tolist()],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "RobotState":
+        return RobotState(
+            joint_pose=json["joint_pose"],
+            O_T_EE=np.reshape(np.array(json["O_T_EE"]), (4, 4)).T,
+            EE_T_TCP=np.reshape(np.array(json["EE_T_TCP"]), (4, 4)).T,
+            O_T_TCP=np.reshape(np.array(json["O_T_TCP"]), (4, 4)).T,
+            status=json["status"],
+            current_task=json["current_task"],
+            gripper_width=json["gripper_width"],
+            q_d=json["q_d"],
+            TF_T_EE_d=np.reshape(np.array(json["TF_T_EE_d"]), (4, 4)).T,
+        )
+
+    @staticmethod
+    def to_json(robot_state: "RobotState") -> Dict[str, Any]:
+        return {
+            "joint_pose": robot_state.joint_pose,
+            "O_T_EE": robot_state.O_T_EE.T.flatten().tolist(),
+            "EE_T_TCP": robot_state.EE_T_TCP.T.flatten().tolist(),
+            "O_T_TCP": robot_state.O_T_TCP.T.flatten().tolist(),
+            "status": robot_state.status,
+            "current_task": robot_state.current_task,
+            "gripper_width": robot_state.gripper_width,
+            "q_d": robot_state.q_d,
+            "TF_T_EE_d": robot_state.TF_T_EE_d.T.flatten().tolist(),
+        }

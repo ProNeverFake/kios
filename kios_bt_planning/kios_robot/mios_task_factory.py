@@ -3,24 +3,35 @@ import re
 import numpy as np
 
 from kios_scene.mongodb_interface import MongoDBInterface
-from kios_robot.robot_proprioceptor import RobotProprioceptor
-from kios_robot.data_types import MiosCall, MiosSkill, Toolbox, TaskScene, MiosObject
+
+# from kios_robot.robot_proprioceptor import RobotProprioceptor
+from kios_robot.data_types import (
+    MiosCall,
+    MiosSkill,
+    KiosCall,
+    Toolbox,
+    TaskScene,
+    MiosObject,
+)
 
 # from kios_robot.robot_status import RobotStatus
 from kios_bt.data_types import Action
 
 
 class MiosTaskFactory:
+    from kios_robot.robot_interface import RobotInterface
+
     task_scene: TaskScene
+    robot_interface: RobotInterface
     # robot_proprioceptor: RobotProprioceptor
 
     def __init__(
         self,
         task_scene: TaskScene = None,
-        robot_proprioceptor: RobotProprioceptor = None,
+        robot_interface: RobotInterface = None,
     ):
         self.task_scene = task_scene
-        self.robot_proprioceptor = robot_proprioceptor
+        self.robot_interface = robot_interface
 
     def initialize(self):
         pass
@@ -98,7 +109,23 @@ class MiosTaskFactory:
             )
         ]
 
-    ###################################################################3
+    ###################################################################
+    # * kios call methods
+    def generate_update_object_from_mios_call(self, object_name: str) -> KiosCall:
+        """update the object in kios from mios.
+
+        Args:
+            object_name (str): _description_
+
+        Returns:
+            KiosCall: _description_
+        """
+        return KiosCall(
+            method=self.robot_interface.proprioceptor.update_scene_object_from_mios,
+            method_args=[self.task_scene, object_name],
+        )
+
+    ###################################################################
     # * methods to generate one mios task
 
     def generate_move_above_mp(self, object_name: str) -> MiosSkill:
@@ -106,8 +133,8 @@ class MiosTaskFactory:
         # get the object from the scene
         kios_object = self.task_scene.get_object(object_name)
         # get the O_T_EE and modify it to be 15cm above the object
-        object_O_T_EE = kios_object.O_T_EE
-        above_O_T_EE = object_O_T_EE @ np.array(
+        object_O_T_TCP = kios_object.O_T_TCP
+        above_O_T_TCP = object_O_T_TCP @ np.array(
             [
                 [1, 0, 0, 0],
                 [0, 1, 0, 0],
@@ -117,7 +144,7 @@ class MiosTaskFactory:
         )
 
         # generate the cartesian move
-        return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_EE)
+        return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_TCP)
 
     def generate_cartesian_move_mp(
         self, object_name: str = None, O_T_TCP: np.ndarray = None
@@ -151,10 +178,6 @@ class MiosTaskFactory:
                 "control": {"control_mode": 0},
             }
         else:
-            # # calculate the O_T_TCP
-            # robot_status = self.robot_proprioceptor.get_robot_status()
-            # O_T_TCP = O_T_EE @ robot_status.EE_T_TCP
-
             context = {
                 "skill": {
                     "p0": {
@@ -163,7 +186,7 @@ class MiosTaskFactory:
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),
                     },
-                    "objects": {"GoalPose": "NullObject"},
+                    # "objects": {"GoalPose": "NullObject"},
                 },
                 "control": {"control_mode": 0},
             }
@@ -227,19 +250,27 @@ class MiosTaskFactory:
         )
 
     def generate_gripper_grasp_mp(
-        self, width=0.01, speed=0.05, force=50, epsilon_inner=0.05, epsilon_outer=0.05
+        self, width=0.01, speed=0.2, force=50, epsilon_inner=0.05, epsilon_outer=0.05
     ) -> MiosCall:
         payload = {
-            "width": 0.01,
-            "speed": 0.01,
+            "width": width,
+            "speed": speed,
             "force": force,
-            "epsilon_inner": 0.05,
-            "epsilon_outer": 0.05,
+            "epsilon_inner": epsilon_inner,
+            "epsilon_outer": epsilon_outer,
         }
         # return call_method(self.robot_address, self.robot_port, "grasp", payload)
         return MiosCall(method_name="grasp", method_payload=payload)
 
-    def generate_gripper_move(
+    def generate_gripper_release_mp(self, width=0.08, speed=0.2) -> MiosCall:
+        payload = {
+            "width": width,
+            "speed": speed,
+        }
+        # return call_method(self.robot_address, self.robot_port, "release", payload)
+        return self.generate_gripper_move_mp(width=width, speed=speed)
+
+    def generate_gripper_move_mp(
         self,
         width: float,
         speed: float = 0.05,
@@ -250,30 +281,19 @@ class MiosTaskFactory:
         }
         return MiosCall(method_name="move_gripper", method_payload=payload)
 
-    # # ? how should we make use of the object in the system?
-    # def gripper_grasp_object(self, force=60):
-    #     payload = {
-    #         "object": "NoneObject",
-    #         "width": 0.0,
-    #         "speed": 0.05,
-    #         "force": force,
-    #         "check_widtch": False,
-    #     }
-    #     return call_method(self.robot_address, self.robot_port, "grasp_object", payload)
-
-    def generate_gripper_home(self) -> MiosCall:
+    def generate_gripper_home_mp(self) -> MiosCall:
         payload = {}
         return MiosCall(method_name="home_gripper", method_payload=payload)
 
     # preserved for future use
     def generate_equip_tool(self) -> MiosCall:
         # move finger to the right position
-        return self.generate_gripper_move(0.042)
+        return self.generate_gripper_move_mp(0.042)
 
     # preserved for future use
     def generate_lift_tool(self) -> MiosCall:
         # move finger to the right position
-        return self.generate_gripper_move(0.08)
+        return self.generate_gripper_move_mp(0.08)
 
     def generate_teach_object_call(self, object_name: str) -> MiosCall:
         payload = {
@@ -449,13 +469,19 @@ class MiosTaskFactory:
         # retreat
         retreat = self.generate_move_above_mp(object_name)
         task_list.append(retreat)
+        # update object in mios
+        update_object_in_mios = self.generate_teach_object_call(object_name)
+        task_list.append(update_object_in_mios)
+        # update object in kios
+        update_object_in_kios = self.generate_update_object_from_mios_call(object_name)
+        task_list.append(update_object_in_kios)
 
         return task_list
 
-    # ! NOCH FALSCH
     def generate_insert_skill(
         self, parsed_action: Dict[str, Any]
     ) -> List[MiosCall or MiosSkill]:
+        insertable = parsed_action["args"][2]
         container = parsed_action["args"][3]
         if container is None:
             raise Exception("container is not set!")
@@ -573,9 +599,12 @@ class MiosTaskFactory:
             skill_type="KiosInsertion",
             skill_parameters=payload,
         )
-        update_object_in_mios = self.generate_teach_object_call(container)
+        update_object_in_mios = self.generate_teach_object_call(insertable)
+        update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
+        release = self.generate_gripper_release_mp(width=0.042)
 
         return [
             insert,
             update_object_in_mios,
+            update_object_in_kios,
         ]

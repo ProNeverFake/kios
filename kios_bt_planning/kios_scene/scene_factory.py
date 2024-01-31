@@ -33,7 +33,7 @@ class SceneFactory:
                     name=reference_object_json["object_name"],
                     source=reference_object_json["source"],
                     # joint_pose=reference_object_json["joint_pose"],
-                    O_T_EE=reference_object_json["O_T_TCP"],
+                    O_T_TCP=reference_object_json["O_T_TCP"],
                 )
             elif reference_object_json["source"] == "mios":
                 mios_object = mongodb_interface.query_mios_object(

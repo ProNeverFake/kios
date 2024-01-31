@@ -48,7 +48,8 @@ def tool_test():
         robot_address="127.0.0.1",
         robot_port=12000,
         shared_data=None,
-        task_scene=None,
+        task_scene=scene,
+        robot_interface=ri,
     )
 
     robot_command.add_mios_task(
@@ -79,11 +80,18 @@ def pick_test():
         robot_port=12000,
         shared_data=None,
         task_scene=scene,
+        robot_interface=ri,
     )
 
-    robot_command.task_list = ri.mios_task_factory.generate_pick_up_skill(
+    robot_command.add_mios_task(ri.mios_task_factory.generate_gripper_home_mp())
+
+    pick_up_tasks = ri.mios_task_factory.generate_pick_up_skill(
         parsed_action=parsed_action
     )
+    for task in pick_up_tasks:
+        robot_command.add_mios_task(task)
+
+    robot_command.task_list.append(ri.mios_task_factory.generate_gripper_release_mp())
 
     robot_command.execute_task_list_sync()
 

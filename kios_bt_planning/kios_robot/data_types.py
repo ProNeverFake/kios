@@ -20,6 +20,12 @@ class MiosCall:
     method_payload: Dict[str, Any]
 
 
+@dataclass
+class KiosCall:
+    method: object
+    args: List[Any]
+
+
 # @dataclass
 
 

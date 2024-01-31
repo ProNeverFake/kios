@@ -55,11 +55,20 @@ class RobotProprioceptor:
         else:
             raise Exception("Robot state is not ready yet.")
 
-    def update_scene_object_from_mios(self, scene: TaskScene, object_name: str):
-        mios_object = self.mongodb_interface.query_mios_object(object_name)
-        scene.object_map[object_name] = scene.object_map[object_name].from_mios_object(
-            mios_object
-        )
+    def update_scene_object_from_mios(self, scene: TaskScene, object_name: str) -> bool:
+        try:
+            mios_object = self.mongodb_interface.query_mios_object(object_name)
+            scene.object_map[object_name] = scene.object_map[
+                object_name
+            ].from_mios_object(mios_object)
+        except Exception as e:
+            print(e)
+            raise e
+
+        return True
+
+    def update_scene_from_vision(self, scene: TaskScene):
+        raise NotImplementedError
 
     def update_scene(self, scene: TaskScene):
         # * tool map does not need to be updated

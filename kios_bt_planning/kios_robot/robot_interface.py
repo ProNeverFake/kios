@@ -11,7 +11,6 @@ from kios_bt.data_types import Action
 
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
-from kios_robot.robot_command import RobotCommand
 from kios_robot.data_types import TaskScene, MiosInterfaceResponse
 
 # from kios_robot.robot_status import RobotStatus
@@ -71,10 +70,12 @@ class RobotInterface:
         return mios_response.has_finished
 
     # * BBCORE
-    def generate_robot_command(self, action: Action, shared_data: Any) -> RobotCommand:
+    def generate_robot_command(self, action: Action, shared_data: Any):
         """
         shard data is shared between the action node and the robot command thread.
         """
+        from kios_robot.robot_command import RobotCommand
+
         robot_command = RobotCommand(
             robot_address=self.robot_address,
             robot_port=self.robot_port,
@@ -101,45 +102,41 @@ class RobotInterface:
 
         return robot_command
 
-    # def create_guidance_pose(self, object_name: str, DeltaHT: np.ndarray):
-    #     # get the object pose
-    #     pass
+    # # * robot command tests
+    # def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
+    #     print("todo: check the tool in the scene.")
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(
+    #         self.mios_task_factory.generate_load_tool(tool_name)
+    #     )
+    #     print("todo: add change robot TCP")
+    #     return robot_command
 
-    # * robot command tests
-    def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
-        print("todo: check the tool in the scene.")
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(
-            self.mios_task_factory.generate_load_tool(tool_name)
-        )
-        print("todo: add change robot TCP")
-        return robot_command
+    # def unload_tool(self, robot: str, tool_name: str):
+    #     print("todo: check the tool in the scene.")
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(
+    #         self.mios_task_factory.generate_unload_tool(tool_name)
+    #     )
+    #     print("todo: change robot status TCP")
+    #     return robot_command
 
-    def unload_tool(self, robot: str, tool_name: str):
-        print("todo: check the tool in the scene.")
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(
-            self.mios_task_factory.generate_unload_tool(tool_name)
-        )
-        print("todo: change robot status TCP")
-        return robot_command
-
-    def pick(self, object_name: str):
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(self.mios_task_factory.generate_pick(object_name))
-        robot_command.add_mios_task(self.mios_task_factory.generate_move_to_object())
-        robot_command.add_mios_task(self.mios_task_factory.generate_gripper_grasp())
-        robot_command.add_mios_task(self.mios_task_factory.generate_())
-        return robot_command
+    # def pick(self, object_name: str):
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_pick(object_name))
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_move_to_object())
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_gripper_grasp())
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_())
+    #     return robot_command

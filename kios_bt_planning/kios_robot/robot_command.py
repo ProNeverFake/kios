@@ -5,7 +5,7 @@ import json
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
-from kios_robot.data_types import MiosSkill, MiosCall
+from kios_robot.data_types import MiosSkill, MiosCall, KiosCall
 from kios_robot.data_types import TaskScene
 
 
@@ -14,9 +14,11 @@ class RobotCommand:
     robot_port: int = None
     shared_data: Any = None
 
+    robot_interface: RobotInterface = None
+
     task_scene: TaskScene = None
 
-    task_list: List[MiosSkill or MiosCall] = []
+    task_list: List[MiosSkill or MiosCall or KiosCall] = []
 
     def __init__(
         self,
@@ -24,7 +26,7 @@ class RobotCommand:
         robot_port: int,
         shared_data: Any,
         task_scene: TaskScene,
-        robot_interface: RobotInterface,
+        robot_interface: RobotInterface,  # ! not used yet
     ):
         if robot_address is not None:
             self.robot_address = robot_address
@@ -45,6 +47,11 @@ class RobotCommand:
             self.task_scene = task_scene
         else:
             raise Exception("robot_scene is not set")
+
+        if robot_interface is not None:
+            self.robot_interface = robot_interface
+        else:
+            raise Exception("robot_interface is not set")
 
     def initialize(self):
         pass
@@ -110,6 +117,11 @@ class RobotCommand:
                 print(mios_response)
                 print("\033[0m")  # Reset color to default
                 if mios_response.has_finished == False:
+                    return False
+
+            if isinstance(task_item, KiosCall):  # * use general call
+                result_bool = task_item.method(task_item.args)
+                if result_bool != True:
                     return False
 
         return True

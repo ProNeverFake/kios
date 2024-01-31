@@ -8,7 +8,6 @@ import sys
 
 # ! code is still dirty. need to be cleaned up and wrapped into a class KiosAgent
 
-
 enc = tiktoken.get_encoding("cl100k_base")
 
 script_dir = os.path.dirname(__file__)

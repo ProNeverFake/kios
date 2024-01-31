@@ -46,7 +46,8 @@ class RobotCommand:
         if task_scene is not None:
             self.task_scene = task_scene
         else:
-            raise Exception("robot_scene is not set")
+            # raise Exception("robot_scene is not set")
+            print("warning: robot command task_scene is not set.")
 
         if robot_interface is not None:
             self.robot_interface = robot_interface

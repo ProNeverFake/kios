@@ -1,5 +1,6 @@
 import py_trees
 import functools
+import os
 
 
 def post_tick_handler(
@@ -51,7 +52,11 @@ def generate_bt_stewardship(bt) -> py_trees.trees.BehaviourTree:
 
 
 def render_dot_tree(bt: py_trees.trees.BehaviourTree):
-    py_trees.display.render_dot_tree(bt.root, with_blackboard_variables=False)
+    py_trees.display.render_dot_tree(
+        bt.root,
+        with_blackboard_variables=False,
+        # target_directory=os.path(__file__),
+    )
 
 
 def tick_loop_test(bt: py_trees.trees.BehaviourTree):

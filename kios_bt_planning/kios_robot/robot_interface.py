@@ -44,19 +44,18 @@ class RobotInterface:
         else:
             self.robot_port = 12000
 
-        assert self.test_connection() == True
+        # assert self.test_connection() == True
 
         self.initialize()
 
     def initialize(self):
         self.proprioceptor = RobotProprioceptor(self.robot_address, self.robot_port)
-        self.mios_task_factory = MiosTaskFactory(
-            self.task_scene, robot_proprioceptor=self.proprioceptor
-        )
+        self.mios_task_factory = MiosTaskFactory(self.task_scene, robot_interface=self)
 
-    # def mios_setup(self):
-    #     dummy_object = self.proprioceptor.get_dummy_object()
-    #     # set the tool objects
+    def mios_setup(self):
+        pass
+        # dummy_object = self.proprioceptor.get_dummy_object()
+        # set the tool objects
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
@@ -80,7 +79,7 @@ class RobotInterface:
             robot_address=self.robot_address,
             robot_port=self.robot_port,
             shared_data=shared_data,
-            robot_scene=self.task_scene,
+            task_scene=self.task_scene,
             robot_interface=self,  # ! LET'S HACK!
         )
         """core method. 

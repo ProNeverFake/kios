@@ -4,6 +4,9 @@ import numpy as np
 
 from kios_scene.mongodb_interface import MongoDBInterface
 
+# from kios_robot.robot_interface import RobotInterface
+# ! circular import
+
 # from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.data_types import (
     MiosCall,
@@ -19,16 +22,14 @@ from kios_bt.data_types import Action
 
 
 class MiosTaskFactory:
-    from kios_robot.robot_interface import RobotInterface
-
     task_scene: TaskScene
-    robot_interface: RobotInterface
+    robot_interface: Any
     # robot_proprioceptor: RobotProprioceptor
 
     def __init__(
         self,
         task_scene: TaskScene = None,
-        robot_interface: RobotInterface = None,
+        robot_interface: Any = None,
     ):
         self.task_scene = task_scene
         self.robot_interface = robot_interface

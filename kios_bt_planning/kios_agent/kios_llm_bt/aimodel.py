@@ -5,6 +5,7 @@ import os
 import re
 import argparse
 import sys
+import textwrap
 
 # ! code is still dirty. need to be cleaned up and wrapped into a class KiosAgent
 
@@ -307,9 +308,9 @@ class ChatGPT:
             messages=self.create_prompt(),
             temperature=0.1,
             max_tokens=self.max_completion_length,
-            top_p=0.5,
+            top_p=0.3,
             frequency_penalty=0.0,
-            presence_penalty=0.0,
+            presence_penalty=0.3,
         )
         text = response.choices[0].message.content
 
@@ -362,7 +363,7 @@ if __name__ == "__main__":
     scenario_name = args.scenario
 
     # ! CHEAT
-    scenario_name = "chair_assembly_bt"
+    scenario_name = "gearset_1"
     problem = None
 
     if scenario_name == "chair_assembly_bt":
@@ -377,7 +378,20 @@ if __name__ == "__main__":
                         (:goal (and (is_inserted_to gear3 shaft2)))\
                         )\
                         "
+    if scenario_name == "gearset_1":
+        problem = "(define (problem robot_assembly_problem-problem)\
+                        (:domain robot_assembly_problem-domain)\
+                        (:objects\
+                            parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
+                            gear1 gear2 gear3 shaft1 shaft2 base - part\
+                            left_hand - hand\
+                        )\
+                        (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft1 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_free gear1) (is_free gear2) (is_free gear3) (is_free shaft1) (is_free shaft2) (is_free base) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
+                        (:goal (and (is_inserted_to gear1 shaft1)))\
+                        )"  # ! CHEAT
 
+        # formatted_problem = textwrap.dedent(problem)
+        # print(formatted_problem)
     else:
         parser.error("Invalid scenario name:" + scenario_name)
 

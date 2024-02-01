@@ -1,10 +1,10 @@
 import json
 import os
 
-from kios_bt_planning.kios_scene.scene_factory import SceneFactory
-from kios_bt_planning.kios_bt.bt_factory import BehaviorTreeFactory
-from kios_bt_planning.kios_robot.robot_interface import RobotInterface
-from kios_bt_planning.kios_world.world_interface import WorldInterface
+from kios_scene.scene_factory import SceneFactory
+from kios_bt.bt_factory import BehaviorTreeFactory
+from kios_robot.robot_interface import RobotInterface
+from kios_world.world_interface import WorldInterface
 
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))

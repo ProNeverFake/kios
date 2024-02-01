@@ -20,6 +20,13 @@ from kios_robot.data_types import (
 # from kios_robot.robot_status import RobotStatus
 from kios_bt.data_types import Action
 
+"""
+BB knows this is not a good design to create generate method for each task/call. 
+A better implementation can be a common interface for generating mios tasks,
+which takes formatted node data as input. 
+Anyway, the current implementation is straightforward and easy to understand.
+"""
+
 
 class MiosTaskFactory:
     task_scene: TaskScene

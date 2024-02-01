@@ -107,8 +107,8 @@ class BehaviorTreeFactory:
             name=json_data["name"],
             effects=effects,
         )
-        # ! BBCRITICAL: NOW THE TEST CLASS IS IN USE!!!
-        action_node = ActionNodeTest(
+        # ! BBHACK
+        action_node = ActionNode(
             action,
             self.world_interface,
             self.robot_interface,

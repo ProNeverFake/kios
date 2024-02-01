@@ -7,20 +7,41 @@ from kios_robot.data_types import Toolbox
 from kios_scene.scene_factory import SceneFactory
 
 ri = RobotInterface()
+sf = SceneFactory()
+scene = sf.create_test_scene()
+ri.setup_scene(scene)
 
 
-def test_kios_load_and_unload_tool():
-    print(
-        "please make sure your has taught the tool position in mios! press enter to continue."
+def teach_object(object: str):
+    ri.proprioceptor.teach_object(object)
+
+
+def teach_object_TCP(object: str):
+    ri.proprioceptor.teach_object_TCP(object)
+
+
+def get_object(object: str):
+    ri.proprioceptor.get_object(object)
+
+
+def set_tool(toolbox_name: str):
+    if "robot_command" in locals():
+        print("robot command is set")
+        print(f"the robot command's tasks are {robot_command.task_list}")
+    else:
+        print("robot command is not set")
+
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
     )
-    input("Press enter to continue.")
-    ri.skill_engine.load_tool("parallel_box1")
-    ri.actuator.cartesian_move(object="middle_place")
-    ri.skill_engine.unload_tool("parallel_box1")
-
-
-def teach_location(location: str):
-    ri.proprioceptor.teach_object(location)
+    print(f"the number of tasks in the task list is {len(robot_command.task_list)}")
+    robot_command.add_task(ri.mios_task_factory.generate_update_tool_call(toolbox_name))
+    robot_command.execute_task_list_sync()
+    robot_command.clear_tasks()
 
 
 # def transformation_test():
@@ -40,10 +61,6 @@ def teach_location(location: str):
 
 
 def tool_test():
-    sf = SceneFactory()
-    scene = sf.create_test_scene()
-    ri.setup_scene(scene)
-
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
         robot_port=12000,
@@ -89,44 +106,42 @@ def pick_test():
         parsed_action=parsed_action
     )
     for task in pick_up_tasks:
-        robot_command.add_mios_task(task)
+        robot_command.add_task(task)
 
     robot_command.task_list.append(ri.mios_task_factory.generate_gripper_release_mp())
 
     robot_command.execute_task_list_sync()
 
 
-# def tool_test1():
-#     toolbox = Toolbox(
-#         name="parallel_box1",
-#         EE_T_TCP=np.array(
-#             [
-#                 [1, 0, 0, 0.0],
-#                 [0, 1, 0, 0.0],
-#                 [0, 0, 1, 0.1],
-#                 [0, 0, 0, 1],
-#             ]
-#         ),
-#     )
+def move_gripper(width: float):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
 
-#     # print(toolbox.EE_T_TCP)
-#     # print(toolbox.EE_T_TCP.flatten().tolist())
-#     # return
+    robot_command.add_task(ri.mios_task_factory.generate_gripper_move_mp(width=width))
 
-#     robot_command = RobotCommand(
-#         robot_address="127.0.0.1",
-#         robot_port=12000,
-#         robot_scene=None,
-#     )
+    robot_command.execute_task_list_sync()
 
-#     robot_command.add_mios_task(
-#         MiosTaskFactory().generate_cartesian_move_HT("test_location1", toolbox)
-#     )
 
-#     robot_command.execute_task_list_sync()
+def cartesian_move(object: str):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(ri.mios_task_factory.generate_cartesian_move_mp(object))
+
+    robot_command.execute_task_list_sync()
 
 
 if __name__ == "__main__":
     # tool_test()
-    pick_test()
+    # pick_test()
     pass

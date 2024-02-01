@@ -94,6 +94,23 @@ class RobotProprioceptor:
             self.robot_address, self.robot_port, "teach_object", {"object": object_name}
         )
 
+    def teach_object_TCP(self, object_name: str):
+        """
+        teach an mios object to mios mongodb, which has a O_T_TCP that is calcalated w.r.t. the equipped tool.
+        """
+        # if you teach the robot directly, the O_T_EE (base to hand) will be recorded under this object name.
+        # this method tell mios to take the equipped tool into account
+        # the O_T_TCP (base to tool) will be calculated and recorded under this object name.
+        # ! after that, don't forget to reset the tool to the default tool.
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "teach_object_TCP",
+            {"object": object_name},
+        )
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+
     # ! this will lead to a jerk in the robot. dont use it.
     def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
         payload = {
@@ -105,6 +122,17 @@ class RobotProprioceptor:
             "change_EE_T_TCP",
             payload,
         )
+
+    def get_object(self, object: str):
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "get_object",
+            {"object_name": object},
+        )
+        # mios_response = MiosInterfaceResponse.from_json(response["result"])
+        # print(mios_response)
+        print(response)
 
     def get_object_O_T_OB(self, object_name: str):
         """

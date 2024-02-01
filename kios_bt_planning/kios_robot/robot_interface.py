@@ -92,10 +92,11 @@ class RobotInterface:
             RobotCommand: the robot command for the action node to execute.
         """
         # ! hack
-        tasks = self.mios_task_factory.generate_fake_mios_tasks(action=action)
-        if tasks is not None:
-            for task in tasks:
-                robot_command.add_mios_task(task)
+        tasks = self.mios_task_factory.generate_tasks(
+            action=action, shared_data=shared_data
+        )
+        if tasks is not None and len(tasks) > 0:
+            robot_command.add_tasks(tasks)
         else:
             raise Exception("Action to robot command: None task is generated!")
 

@@ -34,7 +34,7 @@ class WorldInterface:
         """
         load the world from a json file, but you need to parse it first
         """
-        self.graph_interface.load_world_from_json(json_data)
+        self.graph_interface.from_json(json_data)
 
     # for action node
     def take_effect(self, action: Action):

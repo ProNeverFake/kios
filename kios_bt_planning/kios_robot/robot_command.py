@@ -53,6 +53,7 @@ class RobotCommand:
             self.robot_interface = robot_interface
         else:
             raise Exception("robot_interface is not set")
+        self.task_list = []
 
     def initialize(self):
         pass
@@ -70,6 +71,7 @@ class RobotCommand:
         call_method(self.robot_address, self.robot_port, "stop_task", payload=payload)
 
     def execute_task_list_sync(self) -> bool:
+        self.show_tasks()
         for task_item in self.task_list:
             if isinstance(task_item, MiosSkill):  # * use general task
                 mios_task = Task(self.robot_address)
@@ -121,11 +123,20 @@ class RobotCommand:
                     return False
 
             if isinstance(task_item, KiosCall):  # * use general call
-                result_bool = task_item.method(task_item.args)
+                result_bool = task_item.method(*task_item.args)
                 if result_bool != True:
                     return False
 
         return True
 
-    def add_mios_task(self, mios_task: MiosSkill or MiosCall):
-        self.task_list.append(mios_task)
+    def add_task(self, task: MiosSkill or MiosCall or KiosCall):
+        self.task_list.append(task)
+
+    def add_tasks(self, tasks: List[MiosSkill or MiosCall or KiosCall]):
+        self.task_list.extend(tasks)
+
+    def clear_tasks(self):
+        self.task_list = []
+
+    def show_tasks(self):
+        print(self.task_list)

@@ -16,7 +16,15 @@
             "source": "mios"
         },
         {
-            "object_name": "test_object",
+            "object_name": "test_object1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear3",
+            "source": "mios"
+        },
+        {
+            "object_name": "inward_claw",
             "source": "mios"
         }
     ],

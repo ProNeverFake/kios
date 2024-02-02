@@ -106,7 +106,7 @@ class RobotCommand:
                 if mios_response.task_result.has_succeeded == False:
                     return False
 
-            if isinstance(task_item, MiosCall):  # * use general call
+            elif isinstance(task_item, MiosCall):  # * use general call
                 result = call_method(
                     self.robot_address,
                     self.robot_port,
@@ -122,10 +122,14 @@ class RobotCommand:
                 if mios_response.has_finished == False:
                     return False
 
-            if isinstance(task_item, KiosCall):  # * use general call
+            elif isinstance(task_item, KiosCall):  # * use general call
                 result_bool = task_item.method(*task_item.args)
                 if result_bool != True:
                     return False
+
+            else:
+                raise Exception("Unknown task type: {}".format(task_item))
+                # raise Exception("Unknown task type: {}".format(task_item))
 
         return True
 
@@ -139,4 +143,5 @@ class RobotCommand:
         self.task_list = []
 
     def show_tasks(self):
-        print(self.task_list)
+        # print(self.task_list)
+        pass

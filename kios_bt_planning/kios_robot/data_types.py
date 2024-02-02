@@ -367,47 +367,68 @@ class RobotState:
     status: str
     current_task: str
     gripper_width: float
-    q_d: List[float]
-    TF_T_EE_d: np.ndarray
+    TF_T_EE_d: np.ndarray = field(default=None)
+    q_d: List[float] = field(default=None)
 
     def __str__(self) -> str:
         table = [
             ["joint_pose", self.joint_pose],
-            ["O_T_EE", self.O_T_EE.tolist()],
-            ["EE_T_TCP", self.EE_T_TCP.tolist()],
-            ["O_T_TCP", self.O_T_TCP.tolist()],
+            [
+                "O_T_EE",
+                "\n".join(["\t".join(map(str, row)) for row in self.O_T_EE.tolist()]),
+            ],
+            [
+                "EE_T_TCP",
+                "\n".join(["\t".join(map(str, row)) for row in self.EE_T_TCP.tolist()]),
+            ],
+            [
+                "O_T_TCP",
+                "\n".join(["\t".join(map(str, row)) for row in self.O_T_TCP.tolist()]),
+            ],
             ["status", self.status],
             ["current_task", self.current_task],
             ["gripper_width", self.gripper_width],
-            ["q_d", self.q_d],
-            ["TF_T_EE_d", self.TF_T_EE_d.tolist()],
+            # ["q_d", self.q_d],
+            # ["TF_T_EE_d", "\n".join(["\t".join(map(str, row)) for row in self.TF_T_EE_d.tolist()])],
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "RobotState":
         return RobotState(
-            joint_pose=json["joint_pose"],
+            joint_pose=json["q"],
             O_T_EE=np.reshape(np.array(json["O_T_EE"]), (4, 4)).T,
             EE_T_TCP=np.reshape(np.array(json["EE_T_TCP"]), (4, 4)).T,
             O_T_TCP=np.reshape(np.array(json["O_T_TCP"]), (4, 4)).T,
             status=json["status"],
             current_task=json["current_task"],
             gripper_width=json["gripper_width"],
-            q_d=json["q_d"],
-            TF_T_EE_d=np.reshape(np.array(json["TF_T_EE_d"]), (4, 4)).T,
+            # q_d=json["q_d"],
+            # TF_T_EE_d=np.reshape(np.array(json["TF_T_EE_d"]), (4, 4)).T,
         )
 
     @staticmethod
     def to_json(robot_state: "RobotState") -> Dict[str, Any]:
         return {
-            "joint_pose": robot_state.joint_pose,
+            "q": robot_state.joint_pose,
             "O_T_EE": robot_state.O_T_EE.T.flatten().tolist(),
             "EE_T_TCP": robot_state.EE_T_TCP.T.flatten().tolist(),
             "O_T_TCP": robot_state.O_T_TCP.T.flatten().tolist(),
             "status": robot_state.status,
             "current_task": robot_state.current_task,
             "gripper_width": robot_state.gripper_width,
-            "q_d": robot_state.q_d,
-            "TF_T_EE_d": robot_state.TF_T_EE_d.T.flatten().tolist(),
+            # "q_d": robot_state.q_d,
+            # "TF_T_EE_d": robot_state.TF_T_EE_d.T.flatten().tolist(),
         }
+
+
+@dataclass
+class ParsedAction:
+    action_name: str
+    args: List[str]
+
+    @staticmethod
+    def from_string(action_string: str) -> "ParsedAction":
+        # ! haven't tested yet
+        action_name, *args = action_string.split()
+        return ParsedAction(action_name, args)

@@ -150,6 +150,9 @@ class MiosTaskFactory:
         return MiosCall(method_name="teach_object", method_payload=payload)
 
     def generate_move_above_mp(self, object_name: str) -> MiosSkill:
+        """
+        move to 15cm above the object in the z axis of the object coordinate system.
+        """
         # default: 15cm above the object
         # get the object from the scene
         kios_object = self.task_scene.get_object(object_name)
@@ -513,16 +516,16 @@ class MiosTaskFactory:
                         # "Container": container,
                     },
                     "time_max": 20,
-                    "p0": {  # ! approach should be move above in mios skill. mod it
+                    "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.1, 1],
+                        "dX_d": [0.1, 0.3],
                         "ddX_d": [0.5, 4],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
                         "dX_d": [0.03, 0.1],
-                        "ddX_d": [0.5, 0.1],
+                        "ddX_d": [0.05, 0.05],
                         "K_x": [500, 500, 500, 600, 600, 600],
                     },
                     "p2": {
@@ -543,7 +546,7 @@ class MiosTaskFactory:
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
                         "dX_d": [0.08, 0.5],
-                        "ddX_d": [0.3, 1],
+                        "ddX_d": [0.3, 0.5],
                     },
                     "p3": {
                         "dX_d": [0.1, 0.5],
@@ -556,7 +559,7 @@ class MiosTaskFactory:
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                    "F_ext_contact": [3.0, 2.0],
+                    "F_ext_contact": [7.0, 2.0],
                 },
             }
         else:
@@ -567,7 +570,7 @@ class MiosTaskFactory:
                     },
                     "time_max": 20,
                     "p0": {  # ! approach should be move above in mios skill. mod it
-                        "dX_d": [0.1, 1],
+                        "dX_d": [0.1, 0.3],
                         "ddX_d": [0.5, 4],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
@@ -618,10 +621,15 @@ class MiosTaskFactory:
         )
         update_object_in_mios = self.generate_teach_object_call(insertable)
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
+
         release = self.generate_gripper_release_mp(width=0.042)
+
+        retreat = self.generate_move_above_mp(container)
 
         return [
             insert,
             update_object_in_mios,
             update_object_in_kios,
+            release,
+            retreat,
         ]

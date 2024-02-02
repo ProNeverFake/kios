@@ -12,12 +12,13 @@ scene = sf.create_test_scene()
 ri.setup_scene(scene)
 
 
-def teach_object(object: str):
-    ri.proprioceptor.teach_object(object)
+# def teach_object(object: str):
+#     ri.proprioceptor.teach_object(object)
 
 
-def teach_object_TCP(object: str):
-    ri.proprioceptor.teach_object_TCP(object)
+def teach_object_TCP(object_name: str):
+    ri.proprioceptor.teach_object_TCP(object_name)
+    ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
 
 
 def get_object(object: str):
@@ -137,6 +138,25 @@ def cartesian_move(object: str):
     )
 
     robot_command.add_task(ri.mios_task_factory.generate_cartesian_move_mp(object))
+
+    robot_command.execute_task_list_sync()
+
+
+def insert_test(object_name: str):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    insert_action = {
+        "action_name": "insert",
+        "args": [None, None, "gear3", object_name],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(insert_action))
 
     robot_command.execute_task_list_sync()
 

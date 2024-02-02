@@ -51,13 +51,19 @@ class RobotProprioceptor:
         response = call_method(self.robot_address, self.robot_port, "get_state")
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         if mios_response.has_finished:
-            return RobotState.from_json(response["result"])
+            robot_state = RobotState.from_json(response["result"])
+            print(robot_state)
+            return robot_state
         else:
             raise Exception("Robot state is not ready yet.")
 
     def update_scene_object_from_mios(self, scene: TaskScene, object_name: str) -> bool:
         try:
             mios_object = self.mongodb_interface.query_mios_object(object_name)
+
+            if scene.object_map.get(object_name) is None:
+                raise Exception("The object does not exist in the scene.")
+
             scene.object_map[object_name] = scene.object_map[
                 object_name
             ].from_mios_object(mios_object)
@@ -130,9 +136,11 @@ class RobotProprioceptor:
             "get_object",
             {"object_name": object},
         )
-        # mios_response = MiosInterfaceResponse.from_json(response["result"])
-        # print(mios_response)
-        print(response)
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        if mios_response.has_finished:
+            mios_object = MiosObject.from_json(response["result"])
+            print(mios_object)
 
     def get_object_O_T_OB(self, object_name: str):
         """

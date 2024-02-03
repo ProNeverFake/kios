@@ -223,57 +223,31 @@ class MiosTaskFactory:
             skill_parameters=context,
         )
 
-    # def generate_cartesian_move_mp_HT(self, object: str, tool: Toolbox) -> MiosSkill:
+    # # ! don't use this
+    # def generate_joint_move(self, joint_location: str) -> MiosSkill:
+    #     """
+    #         * available. debug: task context error, "skill", "control" and "user" are on the same level.
+    #         move to a joint position.
+    #     Args:
+    #         joint_location (str): the stored Taskframe_HomogeneousT_EE_goal in mongo DB
+    #     """
     #     context = {
     #         "skill": {
-    #             "p0": {
-    #                 "dX_d": [0.1, 0.5],
-    #                 "ddX_d": [0.5, 1],
-    #                 "K_x": [1500, 1500, 1500, 150, 150, 150],
-    #             },
-    #             "time_max": 15,
-    #             "objects": {"GoalPose": object},
-    #             "tool": {
-    #                 "EE_T_TCP": tool.EE_T_TCP.T.flatten().tolist(),
-    #             },
+    #             "speed": 0.5,
+    #             "acc": 1,
+    #             "q_g": [0, 0, 0, 0, 0, 0, 0],
+    #             "q_g_offset": [0, 0, 0, 0, 0, 0, 0],
+    #             "objects": {"goal_pose": joint_location},
     #         },
-    #         "control": {"control_mode": 0},
-    #         "frames": {
-    #             "EE_T_TCP": tool.EE_T_TCP.T.flatten().tolist(),
-    #         },
+    #         "control": {"control_mode": 3},
+    #         "user": {"env_X": [0.005, 0.005, 0.005, 0.0175, 0.0175, 0.0175]},
     #     }
 
     #     return MiosSkill(
-    #         skill_name="cartesian_move",
-    #         skill_type="KiosCartesianMove",
+    #         skill_name="joint_move",
+    #         skill_type="MoveToPoseJoint",
     #         skill_parameters=context,
     #     )
-
-    # ! don't use this
-    def generate_joint_move(self, joint_location: str) -> MiosSkill:
-        """
-            * available. debug: task context error, "skill", "control" and "user" are on the same level.
-            move to a joint position.
-        Args:
-            joint_location (str): the stored Taskframe_HomogeneousT_EE_goal in mongo DB
-        """
-        context = {
-            "skill": {
-                "speed": 0.5,
-                "acc": 1,
-                "q_g": [0, 0, 0, 0, 0, 0, 0],
-                "q_g_offset": [0, 0, 0, 0, 0, 0, 0],
-                "objects": {"goal_pose": joint_location},
-            },
-            "control": {"control_mode": 3},
-            "user": {"env_X": [0.005, 0.005, 0.005, 0.0175, 0.0175, 0.0175]},
-        }
-
-        return MiosSkill(
-            skill_name="joint_move",
-            skill_type="MoveToPoseJoint",
-            skill_parameters=context,
-        )
 
     def generate_gripper_grasp_mp(
         self, width=0.01, speed=0.2, force=50, epsilon_inner=0.05, epsilon_outer=0.05

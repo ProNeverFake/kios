@@ -264,6 +264,8 @@ class ReferenceRelation:
 class Toolbox:
     name: str
     # * for future you should consider using these parameters to invoke the gripper-related skills
+    EE_finger_width_max: float = field(default=0.08)
+    EE_finger_width_min: float = field(default=0.0)
     load_width: float = field(
         default=0.042
     )  # the width the hand to reach in order to load this tool
@@ -280,6 +282,8 @@ class Toolbox:
     def __str__(self):
         table = [
             ["name", self.name],
+            ["EE_finger_width_max", self.EE_finger_width_max],
+            ["EE_finger_width_min", self.EE_finger_width_min],
             ["load_width", self.load_width],
             ["unload_width", self.unload_width],
             ["grasp_force", self.grasp_force],
@@ -294,6 +298,8 @@ class Toolbox:
     def from_json(json: Dict[str, Any]) -> "Toolbox":
         return Toolbox(
             name=json["name"],
+            EE_finger_width_max=json["EE_finger_width_max"],
+            EE_finger_width_min=json["EE_finger_width_min"],
             load_width=json["load_width"],
             unload_width=json["unload_width"],
             grasp_force=json["grasp_force"],
@@ -307,6 +313,8 @@ class Toolbox:
     def to_json(toolbox: "Toolbox") -> Dict[str, Any]:
         return {
             "name": toolbox.name,
+            "EE_finger_width_max": toolbox.EE_finger_width_max,
+            "EE_finger_width_min": toolbox.EE_finger_width_min,
             "load_width": toolbox.load_width,
             "unload_width": toolbox.unload_width,
             "grasp_force": toolbox.grasp_force,

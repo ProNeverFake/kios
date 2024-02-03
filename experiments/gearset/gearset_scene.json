@@ -29,7 +29,11 @@
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.1],
                 [0, 0, 0, 1]
-            ]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
         },
         {
             "tool_name": "parallel_box2",
@@ -38,7 +42,11 @@
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.1],
                 [0, 0, 0, 1]
-            ]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
         },
         {
             "tool_name": "inward_claw",
@@ -47,7 +55,11 @@
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.1],
                 [0, 0, 0, 1]
-            ]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
         },
         {
             "tool_name": "outward_claw",
@@ -56,7 +68,11 @@
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.1],
                 [0, 0, 0, 1]
-            ]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
         },
         {
             "tool_name": "no_tool",
@@ -65,7 +81,11 @@
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.0],
                 [0, 0, 0, 1]
-            ]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
         }
     ]
 }

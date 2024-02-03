@@ -325,9 +325,15 @@ class MiosTaskFactory:
             tool = self.task_scene.get_tool(tool_name)
         # get the EE_T_TCP
         EE_T_TCP = tool.EE_T_TCP
+        EE_finger_width_max = tool.EE_finger_width_max
+        EE_finger_width_min = tool.EE_finger_width_min
         assert isinstance(EE_T_TCP, np.ndarray)
-        payload = {"EE_T_TCP": EE_T_TCP.T.flatten().tolist()}
-        return MiosCall(method_name="change_tool_EE_T_TCP", method_payload=payload)
+        payload = {
+            "EE_T_TCP": EE_T_TCP.T.flatten().tolist(),
+            "EE_finger_width_max": EE_finger_width_max,
+            "EE_finger_width_min": EE_finger_width_min,
+        }
+        return MiosCall(method_name="change_tool", method_payload=payload)
 
     ###################################################################
 

@@ -478,6 +478,60 @@ class MiosTaskFactory:
 
         return task_list
 
+    def generate_drive_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> List[MiosCall or MiosSkill or KiosCall]:
+        # ! YOU MAY NEED TO ADD INSERT?
+        # ! YOU MAY NEED THE OBJECT?
+        tool_name = parsed_action["args"][1]
+        drivable = parsed_action["args"][2]
+        container = parsed_action["args"][3]
+        if tool_name is None:
+            # raise Exception("tool_name is not set!")
+            pass
+
+        payload = {
+            "skill": {
+                "objects": {
+                    # "Container": container,
+                },
+                "time_max": 60,
+                "p0": {
+                    "K_x": [1500, 1500, 1500, 600, 600, 600],
+                    "dq_max": 0.5,
+                    "ddq_max": 0.6,
+                    "tighten_torque": 0.5,
+                },
+                "p1": {
+                    "K_x": [500, 500, 500, 600, 600, 600],
+                },
+                "p2": {
+                    "K_x": [500, 500, 500, 800, 800, 800],
+                    "dq_max": 0.6,
+                    "ddq_max": 1.0,
+                },
+                "p3": {
+                    "grasp_force": 20,
+                    "K_x": [500, 500, 0, 800, 800, 800],
+                },
+            },
+            "control": {"control_mode": 1},
+            "user": {
+                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+            },
+        }
+
+        drive = MiosSkill(
+            skill_name="drive",
+            skill_type="KiosDrive",
+            skill_parameters=payload,
+        )
+
+        return [
+            drive,
+        ]
+
     def generate_insert_skill(
         self, parsed_action: Dict[str, Any]
     ) -> List[MiosCall or MiosSkill]:

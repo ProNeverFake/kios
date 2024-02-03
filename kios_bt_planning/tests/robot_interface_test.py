@@ -161,6 +161,25 @@ def insert_test(object_name: str):
     robot_command.execute_task_list_sync()
 
 
+def drive_test():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    drive_action = {
+        "action_name": "drive",
+        "args": [None, None, None, None],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_drive_skill(drive_action))
+
+    robot_command.execute_task_list_sync()
+
+
 if __name__ == "__main__":
     # tool_test()
     # pick_test()

@@ -79,7 +79,9 @@ class MiosTaskFactory:
             # return {"action_name": None, "args": []}
 
     # * BBCORE
-    def generate_mios_tasks(self, action: Action) -> List[MiosCall or MiosSkill]:
+    def generate_tasks(
+        self, action: Action, shared_data: Any = None
+    ) -> List[MiosCall or MiosSkill]:
         """core function.
         generate mios tasks from a kios action and return them in a list.
 
@@ -93,14 +95,14 @@ class MiosTaskFactory:
 
         if parsed_action["name"] == "load_tool":
             return self.generate_load_tool_skill(parsed_action)
-        if parsed_action["name"] == "unload_tool":
+        elif parsed_action["name"] == "unload_tool":
             return self.generate_unload_tool_skill(parsed_action)
-        if parsed_action["name"] == "pick_up":
+        elif parsed_action["name"] == "pick_up":
             return self.generate_pick_up_skill(parsed_action)
-        if parsed_action["name"] == "insert":
+        elif parsed_action["name"] == "insert":
             return self.generate_insert_skill(parsed_action)
-
-        # raise NotImplementedError
+        else:
+            raise Exception(f"action {parsed_action['name']} is not supported yet.")
 
     def generate_fake_mios_tasks(self, action: Action) -> List[MiosCall or MiosSkill]:
         """
@@ -130,16 +132,32 @@ class MiosTaskFactory:
         """
         return KiosCall(
             method=self.robot_interface.proprioceptor.update_scene_object_from_mios,
-            method_args=[self.task_scene, object_name],
+            args=[self.task_scene, object_name],
         )
 
     ###################################################################
     # * methods to generate one mios task
+    def generate_teach_O_T_TCP_call(self, object_name: str) -> MiosCall:
+        payload = {
+            "object_name": object_name,
+        }
+        return MiosCall(method_name="teach_O_T_TCP", method_payload=payload)
+
+    def generate_teach_object_call(self, object_name: str) -> MiosCall:
+        payload = {
+            "object": object_name,
+        }
+        return MiosCall(method_name="teach_object", method_payload=payload)
 
     def generate_move_above_mp(self, object_name: str) -> MiosSkill:
+        """
+        move to 15cm above the object in the z axis of the object coordinate system.
+        """
         # default: 15cm above the object
         # get the object from the scene
         kios_object = self.task_scene.get_object(object_name)
+        if kios_object is None:
+            raise Exception(f'object "{object_name}" is not found in the scene!')
         # get the O_T_EE and modify it to be 15cm above the object
         object_O_T_TCP = kios_object.O_T_TCP
         above_O_T_TCP = object_O_T_TCP @ np.array(
@@ -303,12 +321,6 @@ class MiosTaskFactory:
         # move finger to the right position
         return self.generate_gripper_move_mp(0.08)
 
-    def generate_teach_object_call(self, object_name: str) -> MiosCall:
-        payload = {
-            "object": object_name,
-        }
-        return MiosCall(method_name="teach_object", method_payload=payload)
-
     def generate_update_tool_call(self, tool_name: str = None) -> MiosCall:
         """let mios know the tool is loaded and it need to change EE_T_TCP.
 
@@ -320,7 +332,7 @@ class MiosTaskFactory:
         """
         # get the tool from the scene
         if tool_name is None:
-            tool = self.task_scene.get_tool("no_tool")
+            tool = self.task_scene.get_tool("default_tool")
         else:
             tool = self.task_scene.get_tool(tool_name)
         # get the EE_T_TCP
@@ -354,13 +366,13 @@ class MiosTaskFactory:
                 },
                 "time_max": 30,
                 "MoveAbove": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.2, 0.2],
+                    "dX_d": [0.1, 0.4],
+                    "ddX_d": [0.1, 0.1],
                     "DeltaX": [0, 0, 0, 0, 0, 0],
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
                 },
                 "MoveIn": {
-                    "dX_d": [0.4, 0.4],
+                    "dX_d": [0.2, 0.4],
                     "ddX_d": [0.1, 0.1],
                     "DeltaX": [0, 0, 0, 0, 0, 0],
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
@@ -510,16 +522,16 @@ class MiosTaskFactory:
                         # "Container": container,
                     },
                     "time_max": 20,
-                    "p0": {  # ! approach should be move above in mios skill. mod it
+                    "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.1, 1],
+                        "dX_d": [0.1, 0.3],
                         "ddX_d": [0.5, 4],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
                         "dX_d": [0.03, 0.1],
-                        "ddX_d": [0.5, 0.1],
+                        "ddX_d": [0.05, 0.05],
                         "K_x": [500, 500, 500, 600, 600, 600],
                     },
                     "p2": {
@@ -540,7 +552,7 @@ class MiosTaskFactory:
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
                         "dX_d": [0.08, 0.5],
-                        "ddX_d": [0.3, 1],
+                        "ddX_d": [0.3, 0.5],
                     },
                     "p3": {
                         "dX_d": [0.1, 0.5],
@@ -553,7 +565,7 @@ class MiosTaskFactory:
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                    "F_ext_contact": [3.0, 2.0],
+                    "F_ext_contact": [7.0, 2.0],
                 },
             }
         else:
@@ -564,7 +576,7 @@ class MiosTaskFactory:
                     },
                     "time_max": 20,
                     "p0": {  # ! approach should be move above in mios skill. mod it
-                        "dX_d": [0.1, 1],
+                        "dX_d": [0.1, 0.3],
                         "ddX_d": [0.5, 4],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
@@ -615,10 +627,15 @@ class MiosTaskFactory:
         )
         update_object_in_mios = self.generate_teach_object_call(insertable)
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
+
         release = self.generate_gripper_release_mp(width=0.042)
+
+        retreat = self.generate_move_above_mp(container)
 
         return [
             insert,
             update_object_in_mios,
             update_object_in_kios,
+            release,
+            retreat,
         ]

@@ -18,6 +18,18 @@
         {
             "object_name": "test_object",
             "source": "mios"
+        },
+        {
+            "object_name": "inward_claw",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear3",
+            "source": "mios"
+        },
+        {
+            "object_name": "shaft2",
+            "source": "mios"
         }
     ],
     "tools": 

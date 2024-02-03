@@ -51,13 +51,19 @@ class RobotProprioceptor:
         response = call_method(self.robot_address, self.robot_port, "get_state")
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         if mios_response.has_finished:
-            return RobotState.from_json(response["result"])
+            robot_state = RobotState.from_json(response["result"])
+            print(robot_state)
+            return robot_state
         else:
             raise Exception("Robot state is not ready yet.")
 
     def update_scene_object_from_mios(self, scene: TaskScene, object_name: str) -> bool:
         try:
             mios_object = self.mongodb_interface.query_mios_object(object_name)
+
+            if scene.object_map.get(object_name) is None:
+                raise Exception("The object does not exist in the scene.")
+
             scene.object_map[object_name] = scene.object_map[
                 object_name
             ].from_mios_object(mios_object)
@@ -94,6 +100,23 @@ class RobotProprioceptor:
             self.robot_address, self.robot_port, "teach_object", {"object": object_name}
         )
 
+    def teach_object_TCP(self, object_name: str):
+        """
+        teach an mios object to mios mongodb, which has a O_T_TCP that is calcalated w.r.t. the equipped tool.
+        """
+        # if you teach the robot directly, the O_T_EE (base to hand) will be recorded under this object name.
+        # this method tell mios to take the equipped tool into account
+        # the O_T_TCP (base to tool) will be calculated and recorded under this object name.
+        # ! after that, don't forget to reset the tool to the default tool.
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "teach_object_TCP",
+            {"object": object_name},
+        )
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+
     # ! this will lead to a jerk in the robot. dont use it.
     def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
         payload = {
@@ -105,6 +128,19 @@ class RobotProprioceptor:
             "change_EE_T_TCP",
             payload,
         )
+
+    def get_object(self, object: str):
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "get_object",
+            {"object_name": object},
+        )
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        if mios_response.has_finished:
+            mios_object = MiosObject.from_json(response["result"])
+            print(mios_object)
 
     def get_object_O_T_OB(self, object_name: str):
         """

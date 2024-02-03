@@ -105,7 +105,7 @@
                     ]
                 },
                 {
-                    "name": "pickup selector",
+                    "name": "pick_up selector",
                     "identifier": 9,
                     "type_name": "selector",
                     "children": [
@@ -124,7 +124,7 @@
                             ]
                         },
                         {
-                            "name": "pickup sequence",
+                            "name": "pick_up sequence",
                             "identifier": 11,
                             "type_name": "sequence",
                             "children": [
@@ -144,7 +144,7 @@
                                 },
                                 {
                                     "summary": "pick up gear3 using inward_claw",
-                                    "name": "pickup(left_hand, gear3, inward_claw)",
+                                    "name": "pick_up(left_hand, inward_claw, gear3)",
                                     "identifier": 13,
                                     "type_name": "action",
                                     "effects": [

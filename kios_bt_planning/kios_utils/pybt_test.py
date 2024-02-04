@@ -1,6 +1,8 @@
 import py_trees
 import functools
 import os
+import time
+import sched
 
 
 def post_tick_handler(
@@ -69,6 +71,50 @@ def tick_loop_test(bt: py_trees.trees.BehaviourTree):
             break
 
     print("\n")
+
+
+def tick_1000HZ_test(bt: py_trees.trees.BehaviourTree):
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
+
+    def tick():
+        bt.tick()
+        scheduler.enter(1 / 1000, 1, tick)
+
+    scheduler = sched.scheduler(time.time, time.sleep)
+    scheduler.enter(0, 1, tick)
+    scheduler.run()
+
+
+def tick_frequency_test(bt: py_trees.trees.BehaviourTree):
+    py_trees.logging.level = py_trees.logging.Level.DEBUG
+
+    tick_count = 0
+    start_time = time.time()
+
+    def tick():
+        nonlocal tick_count
+        bt.tick()
+        tick_count += 1
+        if bt.root.status == py_trees.common.Status.SUCCESS:
+            print("\033[94mTree finished with success\033[0m")
+        elif bt.root.status == py_trees.common.Status.FAILURE:
+            print("\033[91mTree finished with failure\033[0m")
+        elif bt.root.status == py_trees.common.Status.RUNNING:
+            scheduler.enter(1 / 1000, 1, tick)
+        else:
+            raise Exception("Unknown status!")
+
+    scheduler = sched.scheduler(time.time, time.sleep)
+    scheduler.enter(0, 1, tick)
+    scheduler.run()
+
+    end_time = time.time()
+    run_time = end_time - start_time
+    frequency = tick_count / run_time
+
+    print(f"Tick count: {tick_count}")
+    print(f"Run time: {run_time} seconds")
+    print(f"Running frequency: {frequency} Hz")
 
 
 def tick_once_test(bt: py_trees.trees.BehaviourTree):

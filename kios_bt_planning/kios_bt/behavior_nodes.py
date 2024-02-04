@@ -68,7 +68,7 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
         # * stop the monitor process, regardless of the result
         if self.monitor is None:
             pass
-            # print(self.__class__.__name__ + ": monitor is None")
+            # self.debug(f'Node "{self.behavior_name}" has no monitor to terminate')
         else:
             self.monitor.terminate()
 
@@ -115,13 +115,13 @@ class ActionNode(BehaviorNode):
             action, self.shared_data
         )
         self.robot_command.initialize()
-
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def take_effect(self):
         """
         interact with the world interface to exert the effects
         """
+        self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
         self.world_interface.take_effect(self.action)
 
     def setup(self, **kwargs: int) -> None:
@@ -144,6 +144,7 @@ class ActionNode(BehaviorNode):
         )
         atexit.register(self.monitor.terminate)
         self.monitor.start()
+        self.logger.info(f"Action node {self.behavior_name} started.")
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
@@ -175,12 +176,12 @@ class ActionNode(BehaviorNode):
         if self.parent_connection.poll():
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
-                self.logger.debug("Task finished successfully")
+                self.logger.info(f'Action "{self.behavior_name}" finished successfully')
                 new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
             else:
-                self.logger.debug("Task finished with error")
+                self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE
 
         return new_status
@@ -227,8 +228,10 @@ class ConditionNode(BehaviorNode):
         result = self.world_interface.check_condition(self.condition)
 
         if result == True:
+            self.logger.info(f'Condition "{self.behavior_name}" is satisfied')
             new_status = py_trees.common.Status.SUCCESS
         else:
+            self.logger.info(f'Condition "{self.behavior_name}" is not satisfied')
             new_status = py_trees.common.Status.FAILURE
 
         return new_status
@@ -264,6 +267,7 @@ class ActionNodeTest(ActionNode):
         )
         atexit.register(self.monitor.terminate)
         self.monitor.start()
+        self.logger.info(f"Action node {self.behavior_name} started.")
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
@@ -274,12 +278,12 @@ class ActionNodeTest(ActionNode):
         if self.parent_connection.poll():
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
-                self.logger.debug("Task finished successfully")
+                self.logger.info(f'Action "{self.behavior_name}" finished successfully')
                 new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
             else:
-                self.logger.debug("Task finished with error")
+                self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE
 
         return new_status

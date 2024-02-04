@@ -113,7 +113,10 @@ class RobotCommand:
                     task_item.method_name,
                     task_item.method_payload,
                 )
-                print(result)
+                if result is None:
+                    raise Exception(
+                        "Mios call failed. Please check mios for more debug info."
+                    )
                 mios_response = MiosInterfaceResponse.from_json(result["result"])
                 # print("Result: " + str(result))
                 print("\033[92mMios replied: ")
@@ -131,6 +134,7 @@ class RobotCommand:
                 raise Exception("Unknown task type: {}".format(task_item))
                 # raise Exception("Unknown task type: {}".format(task_item))
 
+        print("\033[94mRobot command has successfully finished\033[0m")  # Print in blue
         return True
 
     def add_task(self, task: MiosSkill or MiosCall or KiosCall):

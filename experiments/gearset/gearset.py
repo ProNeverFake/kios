@@ -9,6 +9,8 @@ from kios_utils.pybt_test import (
     generate_bt_stewardship,
     render_dot_tree,
     tick_loop_test,
+    tick_1000HZ_test,
+    tick_frequency_test,
 )
 
 
@@ -55,7 +57,8 @@ def core_loop():
     ####################### run
     bt_steward = generate_bt_stewardship(behavior_tree)
     render_dot_tree(bt_steward)
-    tick_loop_test(bt_steward)
+    # tick_loop_test(bt_steward)
+    tick_frequency_test(bt_steward)
 
 
 if __name__ == "__main__":

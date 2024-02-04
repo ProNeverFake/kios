@@ -24,6 +24,10 @@
             "source": "mios"
         },
         {
+            "object_name": "shaft2",
+            "source": "mios"
+        },
+        {
             "object_name": "inward_claw",
             "source": "mios"
         }

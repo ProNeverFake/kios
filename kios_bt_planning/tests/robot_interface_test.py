@@ -6,14 +6,32 @@ from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import Toolbox
 from kios_scene.scene_factory import SceneFactory
 
+from kios_scene.mios_ltm_manipulator import LangTermMemoryManipulator
+
 ri = RobotInterface()
 sf = SceneFactory()
 scene = sf.create_test_scene()
 ri.setup_scene(scene)
 
+ltm_manipulator = LangTermMemoryManipulator()
+
 
 # def teach_object(object: str):
 #     ri.proprioceptor.teach_object(object)
+def backup_mios_environment(backup_name: str):
+    ltm_manipulator.backup_mios_environment(backup_name)
+
+
+def clear_mios_environment():
+    ltm_manipulator.clear_mios_environment()
+
+
+def show_backups():
+    ltm_manipulator.show_backups()
+
+
+def restore_to_mios_environment(backup_name: str):
+    ltm_manipulator.restore_to_mios_environment(backup_name)
 
 
 def teach_object_TCP(object_name: str):
@@ -124,6 +142,20 @@ def move_gripper(width: float):
     )
 
     robot_command.add_task(ri.mios_task_factory.generate_gripper_move_mp(width=width))
+
+    robot_command.execute_task_list_sync()
+
+
+def home_gripper():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(ri.mios_task_factory.generate_gripper_home_mp())
 
     robot_command.execute_task_list_sync()
 

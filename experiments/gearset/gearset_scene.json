@@ -16,10 +16,6 @@
             "source": "mios"
         },
         {
-            "object_name": "test_object",
-            "source": "mios"
-        },
-        {
             "object_name": "inward_claw",
             "source": "mios"
         },

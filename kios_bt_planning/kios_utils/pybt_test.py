@@ -76,9 +76,20 @@ def tick_loop_test(bt: py_trees.trees.BehaviourTree):
 def tick_1000HZ_test(bt: py_trees.trees.BehaviourTree):
     py_trees.logging.level = py_trees.logging.Level.DEBUG
 
+    tick_count = 0
+
     def tick():
+        nonlocal tick_count
         bt.tick()
-        scheduler.enter(1 / 1000, 1, tick)
+        tick_count += 1
+        if bt.root.status == py_trees.common.Status.SUCCESS:
+            print("\033[94mTree finished with success\033[0m")
+        elif bt.root.status == py_trees.common.Status.FAILURE:
+            print("\033[91mTree finished with failure\033[0m")
+        elif bt.root.status == py_trees.common.Status.RUNNING:
+            scheduler.enter(1 / 1000, 1, tick)
+        else:
+            raise Exception("Unknown status!")
 
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, tick)

@@ -1,4 +1,7 @@
 import numpy as np
+from spatialmath import *
+from spatialmath.base import trnorm
+
 
 from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.robot_command import RobotCommand
@@ -63,20 +66,40 @@ def set_tool(toolbox_name: str):
     robot_command.clear_tasks()
 
 
-# def transformation_test():
-#     HT = np.array(
-#         [
-#             [1, 0, 0, 0.0],
-#             [0, 1, 0, 0.0],
-#             [0, 0, 1, 0.1],
-#             [0, 0, 0, 1],
-#         ]
-#     )
-#     print(HT)
-#     HT_list = HT.flatten().tolist()
-#     print(HT_list)
-#     HT_2 = np.reshape(np.array(HT_list), (4, 4)).T
-#     print(HT_2)
+def test_cartesian_joint_move():
+    # need object "test"
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    O_T_TCP = scene.get_object("test").O_T_TCP
+    print(O_T_TCP)
+    print(type(O_T_TCP))
+    print(O_T_TCP.shape)
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_cartesian_move_mp(O_T_TCP=O_T_TCP)
+    )
+
+    # rotate in z axis by 90 degrees
+    # rotation_90 = SE3.Rz(np.deg2rad(90))
+
+    # rotate in x axis by 90 degrees
+    rotation_90 = SE3.Rx(np.deg2rad(90))
+
+    se_O_T_TCP = SE3(trnorm(O_T_TCP))
+    result = se_O_T_TCP * rotation_90
+    O_T_TCP = result.A
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_cartesian_move_mp(O_T_TCP=O_T_TCP)
+    )
+
+    robot_command.execute_task_list_sync()
 
 
 def tool_test():

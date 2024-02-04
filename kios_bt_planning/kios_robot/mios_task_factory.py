@@ -209,7 +209,7 @@ class MiosTaskFactory:
                         "dX_d": [0.1, 0.5],
                         "ddX_d": [0.5, 1],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
-                        "T_T_EE_g": O_T_TCP.T.flatten().tolist(),
+                        "T_T_EE_g": O_T_TCP.T.flatten().tolist(),  # ! TTEE IS ACTUALLY O_T_TCP!
                     },
                     # "objects": {"GoalPose": "NullObject"},
                 },

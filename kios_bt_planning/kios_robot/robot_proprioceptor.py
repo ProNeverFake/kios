@@ -4,6 +4,7 @@ from typing import Any, List, Dict
 
 from kios_robot.data_types import (
     MiosObject,
+    KiosObject,
     MiosInterfaceResponse,
     RobotState,
     TaskScene,
@@ -59,11 +60,13 @@ class RobotProprioceptor:
             mios_object = self.mongodb_interface.query_mios_object(object_name)
 
             if scene.object_map.get(object_name) is None:
-                raise Exception("The object does not exist in the scene.")
+                print(
+                    "\033[93m"
+                    + f"object {object_name} is not in the scene. Add it now."
+                )
+                # scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
 
-            scene.object_map[object_name] = scene.object_map[
-                object_name
-            ].from_mios_object(mios_object)
+            scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
         except Exception as e:
             print(e)
             raise e

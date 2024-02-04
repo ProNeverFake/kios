@@ -99,7 +99,12 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
 > BB: The project is still under development. Please feel free to start an issue if you have any question or suggestion. 
 
 ### Packages
-
+- experiments: the experiment files of different problems.
+  - chair...
+  - gearset...
+    - scene
+    - domain
+    - problem
 - kios_bt_planning
   - kios_agent: the agents for task planning and behavior tree generating
     - kios_llm_bt: prompt engineering files for end-to-end behavior tree generating
@@ -115,17 +120,23 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
     - ...
   - kios_planner: discarded now
   - kios_robot: robot modules for real-world robot manipulation
+    - kios_vision
     - robot_interface: interface methods to execute the actions in behavior trees.
-    - robot_proprioceptor: class for getting robot states
-    - robot_status: class for keeping the robot status.
-    - robot_actuator: primitive actions for robot manipulation.
-    - robot_skill_engine: compound actions for robot manipulation.
+    - robot_proprioceptor: class for interacting with the robot (get/set states).
+    - mios_task_factory: task factory for miosskill, mioscall and kioscall.
+    - mios_async: asynchronization module for robot_command
+    - robot_command: the command (list of calls/skills) for the robot.
+  - kios_scene: modules for the task scene model
+    - mongodb_interface
+    - scene_factory
+    - (scene-world_linker)
   - kios_world: modules for the world model
     - world_interface: interfaces for query/update the world state.
     - graph_interface: interfaces for interacting with inner world graph.
     - neo4j_interface: interfaces for neo4j database.
   - kios_utils: utility modules
   - tests: test files for the modules above.
+
 (old version packages)
 - kios_cpp: the behavior tree executor implemented in c++. discarded now.
 - kios_py: the behavior tree executor implemented in python. discarded now.

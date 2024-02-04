@@ -13,8 +13,6 @@ from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.data_types import TaskScene, MiosInterfaceResponse
 
-# from kios_robot.robot_status import RobotStatus
-
 
 # # * use localhost when running mios locally.
 # MIOS = "127.0.0.1"

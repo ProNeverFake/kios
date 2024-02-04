@@ -10,8 +10,6 @@ import py_trees
 from typing import List, Dict, Any
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
-# import kios_bt.behavior_nodes
-
 from kios_bt.pybt_io import BehaviorTreeTemplates
 
 from kios_world.world_interface import WorldInterface

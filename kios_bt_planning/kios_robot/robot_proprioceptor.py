@@ -12,9 +12,6 @@ from kios_robot.data_types import (
 from kios_scene.mongodb_interface import MongoDBInterface
 
 
-# from kios_robot.robot_status import RobotStatus
-
-
 class RobotProprioceptor:
     robot_address: str = None
     robot_port: int = None

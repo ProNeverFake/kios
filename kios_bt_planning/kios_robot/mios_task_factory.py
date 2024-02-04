@@ -17,7 +17,6 @@ from kios_robot.data_types import (
     MiosObject,
 )
 
-# from kios_robot.robot_status import RobotStatus
 from kios_bt.data_types import Action
 
 """

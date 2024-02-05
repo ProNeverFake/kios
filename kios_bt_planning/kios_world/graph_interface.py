@@ -1,6 +1,7 @@
 """
 very simple interface to model the objects in the world and the states of them.
 """
+
 import networkx as nx
 from typing import Set, Dict, List, Any
 
@@ -120,11 +121,14 @@ class GraphInterface:
             self.add_node(node["name"])
             self.add_properties(node["name"], node["properties"])
 
-        # * add constraints (unchangeable relations)
-        for constraint in json_data["constraints"]:
-            self.add_relation(
-                constraint["source"], constraint["name"], constraint["target"]
-            )
+        if json_data.get("relations") is None:
+            print("\033[93mWarning: No relations found in the JSON data.\033[0m")
+        else:
+            # * add constraints (unchangeable relations)
+            for constraint in json_data["constraints"]:
+                self.add_relation(
+                    constraint["source"], constraint["name"], constraint["target"]
+                )
 
         # * add relations
         for relation in json_data["relations"]:

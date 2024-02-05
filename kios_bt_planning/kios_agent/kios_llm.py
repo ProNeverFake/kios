@@ -4,6 +4,7 @@ import tiktoken
 import json
 import os
 import re
+import ast
 import argparse
 import sys
 import textwrap
@@ -245,8 +246,54 @@ def test_llm():
     llm_model.dump_json(f"./out/{problem_name}/0")
 
 
+def extract_json_part(text):
+    """
+    extract the markdown code block part from the text
+    """
+    if text.find("```") == -1:
+        return text
+    text_json = text[text.find("```") + 3 : text.find("```", text.find("```") + 3)]
+    return text_json
+
+
+def test_json_file():
+    current_dir = os.path.dirname(__file__)
+
+    with open(os.path.join(current_dir, "the_string.txt"), "r") as f:
+        text = f.read()
+    print(text)
+    last_response = text
+    last_response = extract_json_part(last_response)
+    last_response = last_response.replace("'", '"')
+    # dump to a text file
+    with open("last_response.txt", "w") as f:
+        f.write(last_response)
+        try:
+            json_dict = ast.literal_eval(last_response)
+            # json_dict = json.loads(last_response, strict=False)
+            # update the environment after the execution of the action
+            environment = json_dict["environment_after"]
+        except json.JSONDecodeError as e:
+            print("Error decoding JSON:", e)
+            print("Problematic part:", last_response[e.pos - 10 : e.pos + 10])
+            raise e
+
+    # * use the last response as the assistant prompt for the next round
+    # if len(self.messages) > 0 and self.last_response is not None:
+    #     self.messages.append({"sender": "assistant", "text": self.last_response})
+
+    # print(json_dict)
+    print("the behavior tree is:")
+    print(json_dict["task_cohesion"]["behavior_tree"])
+    print("the environment after the action is:")
+    print(environment)
+
+
 if __name__ == "__main__":
-    test_llm()
+    # test_llm()
+
+    test_json_file()
+
     # # ! CHEAT
     # scenario_name = "gearset_1"
     # problem = None

@@ -1,4 +1,6 @@
 import bs4
+import os
+import getpass
 from langchain import hub
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
@@ -6,6 +8,11 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+os.environ["LANGCHAIN_API_KEY"] = getpass.getpass()
+os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
 # Load, chunk and index the contents of the blog.
 loader = WebBaseLoader(
@@ -39,5 +46,5 @@ rag_chain = (
     | StrOutputParser()
 )
 
-for chunk in rag_chain.stream("What is Task Decomposition?"):
+for chunk in rag_chain.stream("What is a task in task composition?"):
     print(chunk, end="", flush=True)

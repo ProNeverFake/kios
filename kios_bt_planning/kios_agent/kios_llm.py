@@ -38,7 +38,10 @@ class KiosLLM:
 
     # The list of messages for prompting, will be sent to api
     # including: the required format (in prompt folder), the last response as assistant prompt
-    messages: List[str] = None
+    messages: List[Dict[str, str]] = None
+
+    ######################################## * dir
+    history_dir: str = None
 
     def __init__(self, openai_api_key: str = None):
         if openai_api_key is not None:
@@ -71,6 +74,11 @@ class KiosLLM:
             "prompt_output_format",  # the output format ... Done
             "prompt_example",  # some examples ... Done
         ]
+
+        # history directory
+        if not os.path.exists(os.path.join(script_dir, "query_history")):
+            os.makedirs(os.path.join(script_dir, "query_history"))
+        self.history_dir = os.path.join(script_dir, "query_history")
 
         # default
         self.max_token_length: int = 16000
@@ -151,7 +159,7 @@ class KiosLLM:
             prompt = self.create_prompt()
         return prompt
 
-    def query_llm(self, problem: str) -> dict:
+    def query_llm(self, problem: str, problem_name: str) -> dict:
         """
         runtime_instruction: the instruction from the problem/user
         """
@@ -178,26 +186,19 @@ class KiosLLM:
             frequency_penalty=0.0,
             presence_penalty=0.3,
         )
-        text = response.choices[0].message.content
 
+        text = response.choices[0].message.content
         print(text)
+
         self.last_response = text
         self.last_response = self.extract_json_part(self.last_response)
         self.last_response = self.last_response.replace("'", '"')
-        # dump to a text file
-        with open("last_response.txt", "w") as f:
-            f.write(self.last_response)
-            try:
-                self.json_dict = json.loads(self.last_response, strict=False)
-                # update the environment after the execution of the action
-                self.environment = self.json_dict["environment_after"]
-            except json.JSONDecodeError as e:
-                print("Error decoding JSON:", e)
-                print("Problematic part:", self.last_response[e.pos - 10 : e.pos + 10])
 
-        # * use the last response as the assistant prompt for the next round
-        if len(self.messages) > 0 and self.last_response is not None:
-            self.messages.append({"sender": "assistant", "text": self.last_response})
+        self.record_history(
+            query=text_base, response=self.last_response, problem_name=problem_name
+        )
+
+        self.json_dict = json.loads(self.last_response, strict=False)
 
         return self.json_dict
 
@@ -220,9 +221,37 @@ class KiosLLM:
             with open(fp, "w") as f:
                 json.dump(self.json_dict, f, indent=4)
 
+    def record_history(self, query: str, response: str, problem_name: str):
+
+        while not os.path.exists(os.path.join(self.history_dir, problem_name)):
+            os.makedirs(os.path.join(self.history_dir, problem_name))
+
+        problem_dir = os.path.join(self.history_dir, problem_name)
+
+        i = 0
+        while os.path.exists(os.path.join(problem_dir, str(i))):
+            i = i + 1
+        os.makedirs(os.path.join(problem_dir, str(i)))
+        this_problem_dir = os.path.join(problem_dir, str(i))
+
+        # get the json response
+        json_response = response
+
+        # dump to a text file
+        with open(os.path.join(this_problem_dir, "response.txt"), "w") as f:
+            f.write(json_response)
+
+        # write the query problem
+        with open(os.path.join(this_problem_dir, "query.txt"), "w") as f:
+            f.write(query)
+
+        # copy the prompts
+        with open(os.path.join(this_problem_dir, "message.txt"), "w") as f:
+            f.write(str(self.messages))
+
 
 def test_llm():
-    problem_name = "test_problem"
+    problem_name = "gearset"
     problem = "(define (problem robot_assembly_problem-problem)\
                     (:domain robot_assembly_problem-domain)\
                     (:objects\
@@ -237,62 +266,22 @@ def test_llm():
     llm_model = KiosLLM()
     llm_model.initialize()
 
-    if not os.path.exists("./out/" + problem_name):
-        os.makedirs("./out/" + problem_name)
-
     # run the instructions one by one
-    response = llm_model.query_llm(problem)
-
-    llm_model.dump_json(f"./out/{problem_name}/0")
+    response = llm_model.query_llm(problem, problem_name)
 
 
-def extract_json_part(text):
-    """
-    extract the markdown code block part from the text
-    """
-    if text.find("```") == -1:
-        return text
-    text_json = text[text.find("```") + 3 : text.find("```", text.find("```") + 3)]
-    return text_json
-
-
-def test_json_file():
-    current_dir = os.path.dirname(__file__)
-
-    with open(os.path.join(current_dir, "the_string.txt"), "r") as f:
-        text = f.read()
-    print(text)
-    last_response = text
-    last_response = extract_json_part(last_response)
-    last_response = last_response.replace("'", '"')
-    # dump to a text file
-    with open("last_response.txt", "w") as f:
-        f.write(last_response)
-        try:
-            json_dict = ast.literal_eval(last_response)
-            # json_dict = json.loads(last_response, strict=False)
-            # update the environment after the execution of the action
-            environment = json_dict["environment_after"]
-        except json.JSONDecodeError as e:
-            print("Error decoding JSON:", e)
-            print("Problematic part:", last_response[e.pos - 10 : e.pos + 10])
-            raise e
-
-    # * use the last response as the assistant prompt for the next round
-    # if len(self.messages) > 0 and self.last_response is not None:
-    #     self.messages.append({"sender": "assistant", "text": self.last_response})
-
-    # print(json_dict)
-    print("the behavior tree is:")
-    print(json_dict["task_cohesion"]["behavior_tree"])
-    print("the environment after the action is:")
-    print(environment)
+# def extract_json_part(text):
+#     """
+#     extract the markdown code block part from the text
+#     """
+#     if text.find("```") == -1:
+#         return text
+#     text_json = text[text.find("```") + 3 : text.find("```", text.find("```") + 3)]
+#     return text_json
 
 
 if __name__ == "__main__":
-    # test_llm()
-
-    test_json_file()
+    test_llm()
 
     # # ! CHEAT
     # scenario_name = "gearset_1"

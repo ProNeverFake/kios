@@ -143,13 +143,13 @@
                                     "type_name": "sequence",
                                     "children": [
                                         {
-                                            "summary": "check if parallel_box1 is free",
-                                            "name": "check parallel_box1 is_free",
+                                            "summary": "check if gear1 is free",
+                                            "name": "check gear1 is_free",
                                             "identifier": 13,
                                             "type_name": "condition",
                                             "conditions": [
                                                 {
-                                                    "object_name": "parallel_box1",
+                                                    "object_name": "gear1",
                                                     "property_name": "is_free",
                                                     "property_value": null,
                                                     "status": true
@@ -169,7 +169,7 @@
                                                     "status": true
                                                 },
                                                 {
-                                                    "object_name": "parallel_box1",
+                                                    "object_name": "gear1",
                                                     "property_name": "is_free",
                                                     "property_value": null,
                                                     "status": false
@@ -240,6 +240,6 @@
             {"source": "left_hand", "name": "hold", "target": "parallel_box1"}
         ]
     },
-    "instruction_summary": "Insert gear1 into shaft1 using parallel_box1 with the left hand.",
+    "instruction_summary": "Equip parallel_box1 to left hand, pick up gear1, and insert it into shaft1.",
     "question": ""
 }

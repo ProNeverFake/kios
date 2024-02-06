@@ -1,5 +1,5 @@
 [user]
-Information about world states are given as python dictionary. Example:
+Information about world states are given as json dictionary. Example:
 """
 {
     "objects": [

@@ -2,11 +2,11 @@ Start working. Resume from problem below.
 """
 {"problem": [PROBLEM]}
 """
-The dictionary that you return should be formatted as python dictionary. Follow these rules:
+The dictionary that you return should be formatted as json file. Follow these rules:
 1. Always equip the proper tools before performing specific object manipulaion.
 2. Make sure that each element of the ["action_instructions"] explains corresponding element of the ["action_sequence"]. Refer to the "ROBOT ACTION LIST" to understand the elements of ["action_sequence"].
 3, The length of the ["action_instructions"] list must be the same as the length of the ["action_sequence"] list.
-4. Never left ',' at the end of the list.
+4. Never left ',' at the end of the list. Use json boolean values, "true" or "false", instead of "True" or "False".
 5. Keep track of all items listed in the "objects" section of the "environment_before" field. Please make sure you fill out the "objects" section for all listed items. 
 6. Use the "PREDICATE_LIST" for the states in the problem.
 7. All keys of the dictionary should be double-quoted.

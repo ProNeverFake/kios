@@ -1,4 +1,3 @@
-
 {
     "task_cohesion": {
         "action_sequence": [
@@ -11,7 +10,12 @@
             "Pick up the gear1 with the left hand using the parallel_box1.",
             "Insert the gear1 into the shaft1 using the left hand equipped with the parallel_box1."
         ],
-        "manipulated_objects": ["left_hand", "parallel_box1", "gear1", "shaft1"],
+        "manipulated_objects": [
+            "left_hand",
+            "parallel_box1",
+            "gear1",
+            "shaft1"
+        ],
         "behavior_tree": {
             "name": "insert selector",
             "identifier": 1,
@@ -213,31 +217,91 @@
     },
     "environment_before": {
         "objects": [
-            {"name": "gear1", "properties": ["is_free"]},
-            {"name": "shaft1", "properties": ["is_free"]},
-            {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
-            {"name": "left_hand", "properties": ["is_free"]}
+            {
+                "name": "gear1",
+                "properties": [
+                    "is_free"
+                ]
+            },
+            {
+                "name": "shaft1",
+                "properties": [
+                    "is_free"
+                ]
+            },
+            {
+                "name": "parallel_box1",
+                "properties": [
+                    "is_free",
+                    "is_equippable"
+                ]
+            },
+            {
+                "name": "left_hand",
+                "properties": [
+                    "is_free"
+                ]
+            }
         ],
         "constraints": [
-            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
-            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
+            {
+                "source": "parallel_box1",
+                "name": "can_manipulate",
+                "target": "gear1"
+            },
+            {
+                "source": "gear1",
+                "name": "can_insert_to",
+                "target": "shaft1"
+            }
         ],
         "relations": []
     },
     "environment_after": {
         "objects": [
-            {"name": "gear1", "properties": []},
-            {"name": "shaft1", "properties": []},
-            {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
-            {"name": "left_hand", "properties": []}
+            {
+                "name": "gear1",
+                "properties": []
+            },
+            {
+                "name": "shaft1",
+                "properties": []
+            },
+            {
+                "name": "parallel_box1",
+                "properties": [
+                    "is_free",
+                    "is_equippable"
+                ]
+            },
+            {
+                "name": "left_hand",
+                "properties": []
+            }
         ],
         "constraints": [
-            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
-            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
+            {
+                "source": "parallel_box1",
+                "name": "can_manipulate",
+                "target": "gear1"
+            },
+            {
+                "source": "gear1",
+                "name": "can_insert_to",
+                "target": "shaft1"
+            }
         ],
         "relations": [
-            {"source": "gear1", "name": "is_inserted_to", "target": "shaft1"},
-            {"source": "left_hand", "name": "hold", "target": "parallel_box1"}
+            {
+                "source": "gear1",
+                "name": "is_inserted_to",
+                "target": "shaft1"
+            },
+            {
+                "source": "left_hand",
+                "name": "hold",
+                "target": "parallel_box1"
+            }
         ]
     },
     "instruction_summary": "Insert gear1 into shaft1 using parallel_box1 with the left hand.",

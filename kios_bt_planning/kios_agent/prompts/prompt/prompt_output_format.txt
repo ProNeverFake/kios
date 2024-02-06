@@ -1,5 +1,5 @@
 [user]
-You divide the actions given in the text into detailed robot actions and contruct a behavior tree based on it in python dictionary format.
+You divide the actions given in the text into detailed robot actions and contruct a behavior tree based on it in json dictionary format.
 The dictionary has five keys.
 """
 - dictionary["task_cohesion"]: A dictionary containing information about the robot's actions that have been split up.

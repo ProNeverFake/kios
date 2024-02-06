@@ -1,5 +1,5 @@
 [user]
-The behavior tree should be in python dictionary format and have a structure like the following example:
+The behavior tree should be in json dictionary format and have a structure like the following example:
 """
 {
     "name": "load_tool selector",
@@ -84,7 +84,7 @@ The behavior tree should be in python dictionary format and have a structure lik
     ],
 }
 """
-The dictionary that you return should be formatted as python dictionary. Follow these rules:
+The dictionary that you return should be formatted as json dictionary. Follow these rules:
 1. Every node should have three basic keys:
     - "name": the name of the node (for action node, the name should be the same as defined in the domain knowledge)
     - "identifier": the unique id of the node

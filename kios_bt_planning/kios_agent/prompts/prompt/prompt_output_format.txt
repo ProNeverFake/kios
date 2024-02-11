@@ -1,19 +1,19 @@
 [user]
-You divide the actions given in the text into detailed robot actions and contruct a behavior tree based on it in json dictionary format.
-The dictionary has five keys.
+You generate an action sequence to solve the task and contruct a behavior tree based on it in json format.
+The output dictionary has five keys.
 """
-- dictionary["task_cohesion"]: A dictionary containing information about the robot's actions that have been split up.
-- dictionary["environment_before"]: The environment state before the manipulation.
-- dictionary["environment_after"]: The environment state after the manipulation.
-- dictionary["instruction_summary"]: contains a brief summary of the given sentence.
-- dictionary["question"]: If you cannot understand the given sentence, you can ask the user to rephrase the sentence. Leave this key empty if you can understand the given sentence.
+- dictionary["task_plan"]: A dictionary containing information about the task plan.
+- dictionary["environment_before"]: The environment state before executing the plan.
+- dictionary["environment_after"]: The environment state after executing the plan.
+- dictionary["instruction_summary"]: A brief summary of the task plan.
+- dictionary["question"]: If you don't have enough knowledge for solving the problem, you can ask questions about the knowledge you need. Leave this key empty if you can solve the task.
 """
-Three keys exist in dictionary["task_cohesion"].
+Three keys exist in dictionary["task_plan"].
 """
-- dictionary["task_cohesion"]["action_sequence"]: Contains a list of robot actions (with the parameters as defined in pddl domain knowledge). Only the actions defined in the "ROBOT_ACTION LIST" will be used.
-- dictionary["task_cohesion"]["action_instructions"]: contains a list of instructions corresponding to dictionary["task_cohesion"]["action_sequence"] to explain the action.
-- dictionary["task_cohesion"]["manipulated_objects"]: The list of the names of the manipulated object. Only objects defined in the input dictionary will be used for the object name.
-- dictionary["task_cohesion"]["behavior_tree"]: contains a dictionary of the behavior tree constructed according to the dictionary ["task_cohesion"]["action_sequence"]
+- dictionary["task_plan"]["action_sequence"]: Contains a list of robot actions. Only the actions defined in the "ROBOT_ACTION LIST" will be used.
+- dictionary["task_plan"]["action_instructions"]: contains a list of instructions corresponding to dictionary["task_plan"]["action_sequence"] to explain the actions.
+- dictionary["task_plan"]["manipulated_objects"]: The list of the names of the manipulated object. It only includes the objects that are related to the current task.
+- dictionary["task_plan"]["behavior_tree"]: contains a dictionary of the behavior tree constructed according to the dictionary ["task_plan"]["action_sequence"]
 """
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:

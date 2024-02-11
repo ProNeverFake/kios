@@ -17,7 +17,8 @@ from kios_robot.robot_interface import RobotInterface
 
 
 class BehaviorTreeFactory:
-    roster: Dict[int, Any] = {}
+    visualization_only: bool
+    roster: Dict[int, Any] = {}  # * roster hasn't be tested yet.
 
     world_interface: WorldInterface = None
     robot_interface: RobotInterface = None
@@ -27,6 +28,7 @@ class BehaviorTreeFactory:
         bt_templates: BehaviorTreeTemplates = None,
         world_interface: WorldInterface = None,
         robot_interface: RobotInterface = None,
+        visualization_only: bool = False,
     ):
         """
         initialize the subtree factory with lists of preconditions,
@@ -50,10 +52,90 @@ class BehaviorTreeFactory:
         else:
             self.robot_interface = robot_interface
 
+        self.visualization_only = visualization_only
+
     def initialize(self):
         pass
 
     ##########################################################
+    # * visualization only, dirty imp.
+    def from_json_to_simple_bt(self, json_data: dict):
+        """
+        generate a behavior tree from a json file (but you need to parse it first)
+        """
+        if json_data["type_name"] == "selector":
+            control_flow_node = py_trees.composites.Selector(
+                name=json_data["name"], memory=False
+            )
+            for child in json_data["children"]:
+                child_node = self.from_json_to_simple_bt(child)
+                control_flow_node.add_child(child_node)
+
+            return control_flow_node
+
+        elif json_data["type_name"] == "sequence":
+            control_flow_node = py_trees.composites.Sequence(
+                name=json_data["name"], memory=False
+            )
+            for child in json_data["children"]:
+                child_node = self.from_json_to_simple_bt(child)
+                control_flow_node.add_child(child_node)
+
+            return control_flow_node
+
+        elif json_data["type_name"] == "condition":
+            return self.from_json_to_simple_condition_node(json_data)
+        elif json_data["type_name"] == "action":
+            return self.from_json_to_simple_action_node(json_data)
+
+    def from_json_to_simple_condition_node(self, json_data: dict) -> ConditionNode:
+        """
+        from json to condition node, and add it to the roster
+        """
+        condition = Condition(
+            summary=json_data["summary"],
+            identifier=0,
+            name=json_data["name"],
+            conditions=[],
+        )
+        condition_node = ConditionNode(
+            condition,
+            self.world_interface,
+            self.robot_interface,
+        )
+        return condition_node
+
+    def from_json_to_simple_action_node(
+        self, json_data: Dict[str, Any]
+    ) -> ActionNodeTest:
+        """
+        from json to action node, and add it to the roster
+        """
+        effects = []
+        action = Action(
+            summary=json_data["summary"],
+            identifier=0,
+            name=json_data["name"],
+            effects=[],
+        )
+        # ! BBHACK
+        action_node = ActionNodeTest(
+            action,
+            self.world_interface,
+            self.robot_interface,
+        )
+        return action_node
+
+    # def register_node(self, json_data: dict):
+    #     """
+    #     register a node to the roster
+    #     """
+    #     if self.visualization_only:
+    #         # do nothing if it's visualization only
+    #         return
+    #     node = self.from_json_to_bt(json_data)
+    #     self.roster[json_data["identifier"]] = node
+
     # * json to bt
     def from_json_to_bt(self, json_data: dict):
         """

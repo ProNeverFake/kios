@@ -1,9 +1,9 @@
 [user]
-Information about the problem is given as pddl problem file that corresponds to the domain file.
+Information about the problem is given as a pddl problem.
 It includes the following information:
-- Objects in the world
-- Initial states you start with
-- Goal states you need to achieve
+- Objects in the world: all instances of the types defined in the domain knowledge. For example, "parallel_box1" is an instance of the type "tool", while "gear1" is an instance of the type "part".
+- Initial states: the world states to start with, described with [PREDICATE_LIST] from domain knowledge. For example, "is_free hand" means the object "hand" is free and holds nothing.
+- Goal states: the world states to achieve, described with [PREDICATE_LIST] from domain knowledge.
 Example:
 """
 (define (problem robot_assembly_problem-problem)
@@ -17,9 +17,6 @@ Example:
  (:goal (and (is_inserted_to shaft1 base)))
 )
 """
-Objects in the world are all instances of the types defined in the domain file. For example, the object "parallel_box1" is an instance of the type "tool". The object "gear1" is an instance of the type "part".
-Initial states are represented using the [PREDICATE_LIST] from the domain file. For example, the initial state "can_manipulate parallel_box1 gear1" means that the object "parallel_box1" can be used to manipulate the object "gear1".
-Goal states are represented using the [PREDICATE_LIST] from the domain file. For example, the goal state "is_inserted_to shaft1 base" means that the object "shaft1" is inserted to the object "base".
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]

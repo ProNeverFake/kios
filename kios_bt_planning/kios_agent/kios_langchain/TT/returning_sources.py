@@ -1,6 +1,10 @@
-import bs4
 import os
-import getpass
+
+"""
+show users the sources that were used to generate the answer
+"""
+
+import bs4
 from langchain import hub
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
@@ -9,21 +13,15 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
-# * langsmith tracing
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-# terminal input
-# os.environ["LANGCHAIN_API_KEY"] = getpass.getpass()
 os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
 # Load, chunk and index the contents of the blog.
+bs_strainer = bs4.SoupStrainer(class_=("post-content", "post-title", "post-header"))
 loader = WebBaseLoader(
     web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
-    bs_kwargs=dict(
-        parse_only=bs4.SoupStrainer(
-            class_=("post-content", "post-title", "post-header")
-        )
-    ),
+    bs_kwargs={"parse_only": bs_strainer},
 )
 docs = loader.load()
 
@@ -41,12 +39,26 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-rag_chain = (
-    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+# rag_chain = (
+#     {"context": retriever | format_docs, "question": RunnablePassthrough()}
+#     | prompt
+#     | llm
+#     | StrOutputParser()
+# )
+
+# rag_chain.invoke("What is Task Decomposition?")
+
+from langchain_core.runnables import RunnableParallel
+
+rag_chain_from_docs = (
+    RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
     | prompt
     | llm
     | StrOutputParser()
 )
 
-for chunk in rag_chain.stream("What is a task in task composition?"):
-    print(chunk, end="", flush=True)
+rag_chain_with_source = RunnableParallel(
+    {"context": retriever, "question": RunnablePassthrough()}
+).assign(answer=rag_chain_from_docs)
+
+rag_chain_with_source.invoke("What is Task Decomposition")

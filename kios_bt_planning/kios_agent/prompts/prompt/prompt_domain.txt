@@ -56,16 +56,16 @@ Following is the domain knowledge you need in pddl domain format, which includes
 The precidates are explained as follows:
 """
 "PREDICATE_LIST"
-- is_free(<thing>): <thing> is free and can hold something. (Initially defaulted to be true) (Note: <thing> can be a <hand> or a <tool>)
-- is_equippable(<tool>): <tool> is ready to be eqquipped by a robot hand. (Initially defaulted to be true)
-- can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint) (Initially defaulted to be false)
-- can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint) (Initially defaulted to be false)
-- can_screw_to(<part1>, <part2>): <part1> can be screwed into <part2> (screw assembly constraint) (Initially defaulted to be false)
-- can_place_to(<part1>, <part2>): <part1> can be placed into <part2> (placement assembly constraint) (Initially defaulted to be false)
-- hold(<thing1>, <thing2>): <thing1> is being held by <thing2> (Initially defaulted to be false)
-- is_inserted_to(<part1>, <part2>): <part1> is inserted into <part2> (insertion assembly constraint is satisfied) (Initially defaulted to be false)
-- is_screwed_to(<part1>, <part2>): <part1> is screwed into <part2> (screw assembly constraint is satisfied) (Initially defaulted to be false)
-- is_placed_to(<part1>, <part2>): <part1> is placed into <part2> (placement assembly constraint is satisfied) (Initially defaulted to be false)
+- is_free(<thing>): <thing> is free and can hold something. (default: true)
+- is_equippable(<tool>): <tool> is ready to be eqquipped by a robot hand. (default: true)
+- can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint) (default: false)
+- can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint) (default: false)
+- can_screw_to(<part1>, <part2>): <part1> can be screwed into <part2> (screw assembly constraint) (default: false)
+- can_place_to(<part1>, <part2>): <part1> can be placed into <part2> (placement assembly constraint) (default: false)
+- hold(<thing1>, <thing2>): <thing1> is holding <thing2> (default: false)
+- is_inserted_to(<part1>, <part2>): <part1> is inserted into <part2> (insertion assembly constraint is satisfied) (default: false)
+- is_screwed_to(<part1>, <part2>): <part1> is screwed into <part2> (screw assembly constraint is satisfied) (default: false)
+- is_placed_to(<part1>, <part2>): <part1> is placed into <part2> (placement assembly constraint is satisfied) (default: false)
 """
 
 The actions are explained as follows:

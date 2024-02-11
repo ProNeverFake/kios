@@ -89,7 +89,7 @@ class ActionNode(BehaviorNode):
     monitor: ...
     shared_data: Any
     robot_command: RobotCommand
-    multiprocessing_manager: Manager
+    multiprocessing_manager: Any
     parent_connection: multiprocessing.connection.Connection
     child_connection: multiprocessing.connection.Connection
 
@@ -244,7 +244,17 @@ class ActionNodeTest(ActionNode):
         world_interface: WorldInterface,
         robot_interface: RobotInterface,
     ):
-        super().__init__(action, world_interface, robot_interface)
+        self.action = action
+        """Configure the name of the behaviour."""
+        self.identifier = action.identifier
+        self.behavior_name = self.action.name
+        super(ActionNode, self).__init__(world_interface, robot_interface)
+
+        # * setup the task
+        self.multiprocessing_manager = Manager()
+        self.shared_data = self.multiprocessing_manager.dict()
+        self.robot_command = None
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
         pass

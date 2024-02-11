@@ -9,7 +9,17 @@ import argparse
 import sys
 import textwrap
 
-VALID_API_VERSIONS = ["2022-12-01", "2023-05-15"]
+from langsmith import traceable
+from langsmith.wrappers import wrap_openai
+
+"""
+the llm class for prompt testing.
+"""
+
+# langsmith tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
 
 class KiosLLM:
@@ -55,7 +65,7 @@ class KiosLLM:
                 )
 
     # ! extend this method later.
-    def initialize(self):
+    def initialize(self, prompt_load_order: List[str] = None):
         self.encoder = tiktoken.get_encoding("cl100k_base")
         script_dir = os.path.dirname(__file__)
         prompt_dir = os.path.join(script_dir, "prompts")
@@ -65,15 +75,20 @@ class KiosLLM:
             "prompt": os.path.join(prompt_dir, "prompt"),
         }
         # default prompt load order
-        self.prompt_load_order = [
-            "prompt_role",  # your are a good interpreter ... Done
-            "prompt_domain",  # domain knowledge ... Done
-            "prompt_problem",  # how the problem is provided ... Done
-            "prompt_environment",  # how to express the environment ... Done
-            "prompt_behaviortree",  # how to construct the behavior tree ... Done
-            "prompt_output_format",  # the output format ... Done
-            "prompt_example",  # some examples ... Done
-        ]
+        if prompt_load_order is not None:
+            self.prompt_load_order = prompt_load_order
+        else:
+            self.prompt_load_order = [
+                "prompt_role",  # your are a good interpreter ... Done
+                "prompt_domain",  # domain knowledge ... Done
+                "prompt_problem",  # how the problem is provided ... Done
+                "prompt_environment",  # how to express the environment ... Done
+                # "prompt_behaviortree",  # how to construct the behavior tree ... Done
+                "prompt_bt_skeleton",  # how to construct the skeleton behavior tree ... Done
+                "prompt_bt_skeleton_example",  # some skeleton examples ... Done
+                "prompt_output_format",  # the output format ... Done
+                # "prompt_example",  # some examples ... Done
+            ]
 
         # history directory
         if not os.path.exists(os.path.join(script_dir, "query_history")):
@@ -159,7 +174,7 @@ class KiosLLM:
             prompt = self.create_prompt()
         return prompt
 
-    def query_llm(self, problem: str, problem_name: str) -> dict:
+    def query_llm(self, problem: str, problem_name: str, model: str = None) -> dict:
         """
         runtime_instruction: the instruction from the problem/user
         """
@@ -174,13 +189,19 @@ class KiosLLM:
         # finally, add the text_base to the user query message
         self.messages.append({"sender": "user", "text": text_base})
 
+        # * Substitue the openai.Client() with wrap_openai(openai.Client()) to enable tracing
+        client = wrap_openai(openai.Client())
+
         # * request the gpt to response
-        response = openai.chat.completions.create(
+        if model is None:
+            model = "gpt-4-1106-preview"
+
+        response = client.chat.completions.create(
             # model="gpt-3.5-turbo-16k-0613",
             # model="gpt-4-0613", # not this
-            model="gpt-4-1106-preview",
+            model=model,
             messages=self.create_prompt(),
-            temperature=0.1,
+            temperature=0.0,
             max_tokens=self.max_completion_length,
             top_p=0.3,
             frequency_penalty=0.0,
@@ -251,7 +272,7 @@ class KiosLLM:
 
 
 def test_llm():
-    problem_name = "gearset"
+    problem_name = "gearset_skeleton_v1"
     problem = "(define (problem robot_assembly_problem-problem)\
                     (:domain robot_assembly_problem-domain)\
                     (:objects\
@@ -270,71 +291,5 @@ def test_llm():
     response = llm_model.query_llm(problem, problem_name)
 
 
-# def extract_json_part(text):
-#     """
-#     extract the markdown code block part from the text
-#     """
-#     if text.find("```") == -1:
-#         return text
-#     text_json = text[text.find("```") + 3 : text.find("```", text.find("```") + 3)]
-#     return text_json
-
-
 if __name__ == "__main__":
     test_llm()
-
-    # # ! CHEAT
-    # scenario_name = "gearset_1"
-    # problem = None
-
-    # if scenario_name == "chair_assembly_bt":
-    #     problem = "(define (problem robot_assembly_problem-problem)\
-    #                     (:domain robot_assembly_problem-domain)\
-    #                     (:objects\
-    #                     parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-    #                     gear1 gear2 gear3 shaft1 shaft2 base - part\
-    #                     left_hand - hand\
-    #                     )\
-    #                     (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft2 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_free gear1) (is_free gear2) (is_free gear3) (is_free shaft1) (is_free shaft2) (is_free base) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
-    #                     (:goal (and (is_inserted_to gear3 shaft2)))\
-    #                     )\
-    #                     "
-    # if scenario_name == "gearset_1":
-    #     problem = "(define (problem robot_assembly_problem-problem)\
-    #                     (:domain robot_assembly_problem-domain)\
-    #                     (:objects\
-    #                         parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-    #                         gear1 gear2 gear3 shaft1 shaft2 base - part\
-    #                         left_hand - hand\
-    #                     )\
-    #                     (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft1 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_free gear1) (is_free gear2) (is_free gear3) (is_free shaft1) (is_free shaft2) (is_free base) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
-    #                     (:goal (and (is_inserted_to gear1 shaft1)))\
-    #                     )"  # ! CHEAT
-
-    #     # formatted_problem = textwrap.dedent(problem)
-    #     # print(formatted_problem)
-    # else:
-    #     parser.error("Invalid scenario name:" + scenario_name)
-
-    # aimodel = ChatGPT(
-    #     credentials,
-    #     prompt_load_order=prompt_load_order,
-    #     use_azure=False,
-    #     api_version="2023-05-15",
-    # )
-
-    # if not os.path.exists("./out/" + scenario_name):
-    #     os.makedirs("./out/" + scenario_name)
-    # # run the instructions one by one
-    # text = aimodel.generate_with_problem(problem, is_user_feedback=False)
-    # while True:
-    #     user_feedback = input("user feedback (return empty if satisfied): ")
-    #     if user_feedback == "q":
-    #         exit()
-    #     if user_feedback != "":
-    #         text = aimodel.generate(user_feedback, environment, is_user_feedback=True)
-    #     else:
-    #         # update the current environment
-    #         environment = aimodel.environment
-    #         break
-    # aimodel.dump_json(f"./out/{scenario_name}/0")

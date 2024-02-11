@@ -1290,6 +1290,121 @@ prompt_example = {
     ],
 }
 
+bt_skeleton = {
+    "summary": "selector to insert gear1 into shaft1",
+    "name": "selector: insert gear1 into shaft1",
+    "type_name": "selector",
+    "children": [
+        {
+            "summary": "check if gear1 is inserted to shaft1",
+            "name": "target: is_inserted_to(gear1, shaft1)",
+            "type_name": "condition",
+        },
+        {
+            "summary": "sequence to insert gear1 into shaft1",
+            "name": "sequence: insert gear1 into shaft1",
+            "type_name": "sequence",
+            "children": [
+                {
+                    "summary": "selector to load parallel_box1",
+                    "name": "selector: load parallel_box1",
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 is held by left hand",
+                            "name": "target: hold(left_hand, parallel_box1)",
+                            "type_name": "condition",
+                        },
+                        {
+                            "summary": "sequence to load parallel_box1",
+                            "name": "sequence: load parallel_box1",
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is equippable",
+                                    "name": "precondition: is_equippable(parallel_box1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "check if left hand is free",
+                                    "name": "precondition: is_free(left_hand)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "equip parallel_box1 to left hand",
+                                    "name": "action: load_tool(left_hand, parallel_box1)",
+                                    "type_name": "action",
+                                    "effects": [
+                                        {"summary": "left hand will be not free"},
+                                        {
+                                            "summary": "parallel_box1 will be not equippable"
+                                        },
+                                        {
+                                            "summary": "left hand will hold parallel_box1"
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "selector to pick up gear1",
+                    "name": "selector: pick up gear1",
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 holds gear1",
+                            "name": "target: hold(parallel_box1, gear1)",
+                            "type_name": "condition",
+                        },
+                        {
+                            "summary": "sequence to pick up gear1",
+                            "name": "sequence: pick up gear1",
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 can manipulate gear1",
+                                    "name": "precondition: can_manipulate(parallel_box1, gear1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "check if gear1 is free",
+                                    "name": "precondition: is_free(gear1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "pick up gear1 using parallel_box1",
+                                    "name": "action: pick_up(left_hand, parallel_box1, gear1)",
+                                    "type_name": "action",
+                                    "effects": [
+                                        {"summary": "parallel_box1 will hold gear1"},
+                                        {"summary": "gear1 will be not free"},
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "check if gear1 can be inserted to shaft1",
+                    "name": "precondition: can_insert_to(gear1, shaft1)",
+                    "type_name": "condition",
+                },
+                {
+                    "summary": "insert gear1 to shaft1",
+                    "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)",
+                    "type_name": "action",
+                    "effects": [
+                        {"summary": "parallel_box1 will be free"},
+                        {"summary": "gear1 will be inserted to shaft1"},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+
 
 def test_result_bt(result_bt):
     test_class = BehaviorTreeFactory()
@@ -1303,12 +1418,22 @@ def test_result_bt(result_bt):
 
 def test_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
-    bt = test_class.from_json_to_bt(bt_json)
+    bt = test_class.from_json_to_simple_bt(bt_json)
     bt_stewardship = generate_bt_stewardship(bt)
     bt_stewardship.setup(timeout=15)
     render_dot_tree(bt_stewardship)
 
     tick_loop_test(bt_stewardship)
+
+
+def visualize_bt(bt_json: json):
+    test_class = BehaviorTreeFactory()
+    bt = test_class.from_json_to_simple_bt(bt_json)
+    bt_stewardship = generate_bt_stewardship(bt)
+    # bt_stewardship.setup(timeout=15)
+    render_dot_tree(bt_stewardship)
+
+    # tick_loop_test(bt_stewardship)
 
 
 if __name__ == "__main__":
@@ -1318,4 +1443,5 @@ if __name__ == "__main__":
     # test_bt(prompt_example)
     py_trees.logging.level = py_trees.logging.Level.DEBUG
     # test_bt(result_bt_json)
-    test_bt(response_ed1)
+    test_bt(bt_skeleton)
+    # visualize_bt(bt_skeleton)

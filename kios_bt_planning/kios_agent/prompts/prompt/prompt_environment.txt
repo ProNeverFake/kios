@@ -20,11 +20,11 @@ Information about world states are given as json dictionary. Example:
 }
 """
 It contains three lists: 
-    - objects are the objects and their properties (as lists of strings) in the environment. The properties can be changed by robot actions.
-    - constraints are the relations that are enforced (which are truth knowledge or defined by the user in the current contexts). They are given as a part of the problem and should not be changed.
-    - relations are the relations that are observed in the environment. They can be changed by robot actions.
-The available properties, constraints and relations can be found in the [PREDICATE_LIST].
-You should only concentrate on those objects, constraints and relations that are relevant for the current task.
+    - "objects": the objects and their properties (as lists of strings) in the environment. The properties can be changed by robot actions.
+    - "constraints": the constraint relations that are enforced and should not be changed. They are knowledge about the world or some constraints set by the user.
+    - "relations": the relations in the environment. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.
+You should only concentrate on the objects, constraints and relations that are related to (or can be effected by) the current task.
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]

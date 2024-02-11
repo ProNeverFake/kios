@@ -293,6 +293,45 @@ class MiosTaskFactory:
     def generate_lift_tool(self) -> MiosCall:
         # move finger to the right position
         return self.generate_gripper_move_mp(0.08)
+    
+    def generate_screw_in_mp(self, object_name:str = None, O_T_OB = None)->MiosSkill:
+        """
+        # ! DO NOT USE THIS METHOD
+        """
+        if object_name is None and O_T_OB is None:
+            raise Exception("Object target is not set!")
+        if object_name:
+            payload = {
+                "skill": {
+                    "p0": {
+                        "dX_d": [0.1, 0.5],
+                        "ddX_d": [0.5, 1],
+                        "K_x": [1500, 1500, 1500, 150, 150, 150],
+                    },
+                    "objects": {"Container": object_name},
+                },
+                "control": {"control_mode": 0},
+            }
+        else:
+            payload = {
+                "skill": {
+                    "p0": {
+                        "dX_d": [0.1, 0.5],
+                        "ddX_d": [0.5, 1],
+                        "K_x": [1500, 1500, 1500, 150, 150, 150],
+                        "O_T_OB": O_T_OB.T.flatten().tolist(),
+                    },
+                    # "objects": {"GoalPose": "NullObject"},
+                },
+                "control": {"control_mode": 0},
+            }
+
+        return MiosSkill(
+            skill_name="screw_in",
+            skill_type="KiosScrewIn",
+            skill_parameters=payload,
+        )
+
 
     def generate_update_tool_call(self, tool_name: str = None) -> MiosCall:
         """let mios know the tool is loaded and it need to change EE_T_TCP.

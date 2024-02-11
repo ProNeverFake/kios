@@ -102,6 +102,27 @@ def test_cartesian_joint_move():
     robot_command.execute_task_list_sync()
 
 
+def test_screw_in():
+    # need object "test"
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    O_T_OB = scene.get_object("test").O_T_TCP
+
+    print(O_T_OB)
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_screw_in_mp(O_T_OB=O_T_OB)
+    )
+
+    robot_command.execute_task_list_sync()
+
+
 def tool_test():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",

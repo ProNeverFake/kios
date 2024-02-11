@@ -1,30 +1,52 @@
 """
 a class that manages the behavior tree, help to localize the behavior nodes in
 the behavior tree and help to modify the tree. (interfaces opened for planner/LLM)
+
+should provide:
+
+- simulator fake run
+- tree mod
+- tree visualization
+- test run
 """
 
 from typing import List, Set, Dict, Any, Tuple, Optional
 
-from kios_bt.behavior_nodes import ActionNode, ConditionNode
+from kios_bt.behavior_nodes import (
+    ActionNode,
+    ConditionNode,
+    ActionNodeTest,
+    ActionNodeSim,
+)
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_world.world_interface import WorldInterface
+from kios_robot.robot_interface import RobotInterface
+from kios_bt.data_types import TreeResult
 
 import py_trees
 
 import functools
+import copy
 
 
 class BehaviorTreeStewardship:
-    tree_stewardship: py_trees.trees.BehaviourTree = None
-    behaviortree_factory: BehaviorTreeFactory = None
-    world_interface: WorldInterface = None
-    roster: Dict[int, Any] = {}
+    tree_stewardship: py_trees.trees.BehaviourTree = None  # for pytree bt functionality
+    behaviortree_factory: BehaviorTreeFactory = None  # for the roster
+    world_interface: WorldInterface = None  # for world states
+    robot_interface: RobotInterface = None  # for robot actions
+    roster: Dict[int, Any] = {}  # for tree mod
 
     def __init__(
         self,
         behaviortree_factory: BehaviorTreeFactory = None,
         world_interface: WorldInterface = None,
+        robot_interface: RobotInterface = None,  # ! set up the scene before passing in!
     ) -> None:
+        if robot_interface is None:
+            raise Exception("robot_interface is not set")
+        else:
+            self.robot_interface = robot_interface
+
         if world_interface is None:
             self.world_interface = WorldInterface()
             self.world_interface.initialize()
@@ -32,7 +54,10 @@ class BehaviorTreeStewardship:
             self.world_interface = world_interface
 
         if behaviortree_factory is None:
-            self.behaviortree_factory = BehaviorTreeFactory(None, self.world_interface)
+            self.behaviortree_factory = BehaviorTreeFactory(
+                None,
+                world_interface=self.world_interface,
+            )
             self.behaviortree_factory.initialize()
         else:
             self.behaviortree_factory = behaviortree_factory
@@ -104,6 +129,62 @@ class BehaviorTreeStewardship:
 
         print("\n")
 
+    # * you may need to expand the return type if the simulator is imp as a tool
+    def tick_until_success(
+        self,
+        stw: py_trees.trees.BehaviourTree,
+        timeout_ms: float = 5000,
+    ) -> TreeResult:
+        time_ms = 0
+
+        period_ms = 1
+        iter_per_round = 10
+
+        while time_ms < timeout_ms:
+            stw.tick_tock(period_ms=period_ms, number_of_iterations=iter_per_round)
+            time_ms += period_ms * iter_per_round
+            if stw.root.status == py_trees.common.Status.SUCCESS:
+                return TreeResult(
+                    result="success",
+                    summary="Behavior tree tick returns success",
+                    defect_node=None,
+                )
+            elif stw.root.status == py_trees.common.Status.FAILURE:
+                tip_node = stw.root.tip()
+                defect_node = None
+                if tip_node is None:
+                    defect_node = None
+                    return TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure with the defect node unknown",
+                        defect_node=defect_node,
+                    )
+                if isinstance(tip_node, ActionNode):
+                    defect_node = tip_node.action
+                elif isinstance(tip_node, ConditionNode):
+                    defect_node = tip_node.condition
+
+                return TreeResult(
+                    result="failure",
+                    summary="Behavior tree tick returns failure",  # ! the exceptions should be caught and handled!
+                    defect_node=defect_node,
+                )
+            elif stw.root.status == py_trees.common.Status.RUNNING:
+                continue
+            elif stw.root.status == py_trees.common.Status.INVALID:
+                return TreeResult(
+                    result="invalid",
+                    summary="Behavior tree tick returns invalid status!",
+                    defect_node=None,
+                )
+
+        # default timeout
+        return TreeResult(
+            result="timeout",
+            summary="Behavior tree tick returns timeout!",
+            defect_node=None,
+        )
+
     def tick_once_test(self):
         self.tree_stewardship.tick()
         py_trees.console.read_single_keypress()
@@ -146,3 +227,30 @@ class BehaviorTreeStewardship:
         self.tree_stewardship.prune_subtree(to_remove_node_id)
 
     ##########################################################
+    # * fake run methods
+    def simulate(self) -> dict:
+        # ! maybe it is better to imp a new class for the simulation
+        """
+        simulate the tree run with action nodes returning only success.
+
+        this should be the following step of the full tree generation.
+        """
+        sim_stw = copy.deepcopy(self.tree_stewardship)
+        root = sim_stw.root
+
+        self.replace_action_node_with_sim(sim_stw, root)
+
+        sim_stw.setup(timeout=10)
+
+        tree_result = self.tick_until_success(sim_stw, timeout_ms=5000)
+
+        return tree_result.to_json()
+
+    def replace_action_node_with_sim(self, stw, root):
+        for child in root.children:
+            # replace the action node with sim node
+            if isinstance(child, ActionNode):
+                sim_node = ActionNodeSim.from_action_node(child)
+                stw.replace_subtree(child.id, sim_node)
+            # recursively replace the children
+            self.replace_action_node_with_sim(stw, child)

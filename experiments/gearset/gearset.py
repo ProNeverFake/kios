@@ -1,6 +1,7 @@
 import json
 import os
 
+from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_robot.robot_interface import RobotInterface
@@ -54,11 +55,19 @@ def core_loop():
         json_object = json.load(file)
         behavior_tree = bt_factory.from_json_to_bt(json_object)
 
-    ####################### run
-    bt_steward = generate_bt_stewardship(behavior_tree)
-    render_dot_tree(bt_steward)
-    # tick_loop_test(bt_steward)
-    tick_frequency_test(bt_steward)
+    ####################### * old code
+    # bt_steward = generate_bt_stewardship(behavior_tree)
+    # render_dot_tree(bt_steward)
+    # # tick_loop_test(bt_steward)
+    # tick_frequency_test(bt_steward)
+
+    # * new code
+    bt_steward = BehaviorTreeStewardship(
+        behavior_tree,
+        world_interface,
+        robot_interface,
+        bt_factory,
+    )
 
 
 if __name__ == "__main__":

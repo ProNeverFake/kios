@@ -299,6 +299,52 @@ class ActionNodeTest(ActionNode):
         return new_status
 
 
+class ActionNodeSim(ActionNode):
+    success_flag: bool
+
+    @staticmethod
+    def from_action_node(action_node: ActionNode) -> "ActionNodeSim":
+        return ActionNodeSim(action_node.action, action_node.world_interface)
+
+    def __init__(
+        self,
+        action: Action,
+        world_interface: WorldInterface,
+        robot_interface: RobotInterface = None,  #  not needed for simulation
+    ):
+        self.success_flag = False
+        self.action = action
+        """Configure the name of the behaviour."""
+        self.identifier = action.identifier
+        self.behavior_name = self.action.name
+        super(ActionNode, self).__init__(world_interface, robot_interface)
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
+
+    def setup(self, **kwargs: int) -> None:
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
+
+    def initialise(self) -> None:
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        self.logger.info(f"Sim action node {self.behavior_name} started.")
+
+    def update(self) -> py_trees.common.Status:
+        """
+        running ---> success
+        """
+        self.logger.debug("%s.update()" % (self.__class__.__name__))
+
+        if self.success_flag == True:
+            self.logger.info(f'Action "{self.behavior_name}" finished successfully')
+            new_status = py_trees.common.Status.SUCCESS
+            self.take_effect()
+
+        else:
+            self.success_flag = True
+            new_status = py_trees.common.Status.RUNNING
+
+        return new_status
+
+
 ##############################################################################
 # Main
 ##############################################################################

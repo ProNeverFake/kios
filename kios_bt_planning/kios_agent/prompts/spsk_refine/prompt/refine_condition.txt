@@ -1,0 +1,37 @@
+[user]
+For condition nodes, you should:
+1. refine and add the key "conditions", which is a list of conditions to be checked. Each condition should have the following keys:
+    - "object_name": the object to check.
+    - "property_name": the property/relation of the object to be checked.
+    - "property_value": this should be the other object in the relation. For property it should be null.
+    - "status": true if the property/relation is expected to be true, false otherwise.
+An example is shown below:
+the skeleton:
+"""
+{
+    "summary": "check if left_hand is holding parallel_box1",
+    "name": "target: hold(left_hand, parallel_box1)",
+}
+"""
+after refinement:
+"""
+{
+    "summary": "check if left_hand is holding parallel_box1",
+    "name": "target: hold(left_hand, parallel_box1)",
+    "identifier": 4,
+    "type_name": "condition",
+    "conditions": [
+        {
+            "object_name": "left_hand",
+            "property_name": "hold",
+            "property_value": "parallel_box1",
+            "status": true,
+        }
+    ],
+},
+"""
+
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. I will wait for further instructions before starting to work.

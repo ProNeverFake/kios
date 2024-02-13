@@ -28,9 +28,9 @@ class MiosCall:
 
 @dataclass
 class KiosCall:
-    call_name: str = field(default="default name")  # ! alarm: test!
     method: object
     args: List[Any]
+    call_name: str = field(default="default name")  # ! alarm: test!
 
     def __str__(self) -> str:
         return self.call_name

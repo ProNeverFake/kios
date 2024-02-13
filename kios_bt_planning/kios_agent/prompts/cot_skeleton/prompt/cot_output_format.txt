@@ -8,7 +8,7 @@ The output dictionary has five keys.
 - dictionary["instruction_summary"]: A brief summary of the task plan.
 - dictionary["question"]: If you don't have enough knowledge for solving the problem, you can ask questions about the knowledge you need. Leave this key empty if you can solve the task.
 """
-Three keys exist in dictionary["task_plan"].
+Four keys exist in dictionary["task_plan"].
 """
 - dictionary["task_plan"]["action_sequence"]: Contains a list of robot actions. Only the actions defined in the "ROBOT_ACTION LIST" will be used.
 - dictionary["task_plan"]["action_instructions"]: contains a list of instructions corresponding to dictionary["task_plan"]["action_sequence"] to explain the actions.

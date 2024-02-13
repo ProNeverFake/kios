@@ -1,0 +1,150 @@
+
+{
+    "task_plan": {
+        "action_sequence": [
+            "load_tool(left_hand, inward_claw)",
+            "pick_up(left_hand, inward_claw, gear3)",
+            "insert(left_hand, inward_claw, gear3, shaft2)"
+        ],
+        "action_instructions": [
+            "Equip the inward_claw on the left hand",
+            "Pick up the gear3 with the inward_claw in the left hand",
+            "Insert the gear3 into the shaft2 using the inward_claw in the left hand"
+        ],
+        "manipulated_objects": ["left_hand", "inward_claw", "gear3", "shaft2"],
+        "behavior_tree": {
+            "summary": "selector to insert gear3 into shaft2",
+            "children": [
+                {
+                    "summary": "condition node to check if gear3 is inserted to shaft2"
+                },
+                {
+                    "summary": "sequence to insert gear3 into shaft2",
+                    "children": [
+                        {
+                            "summary": "selector to load_tool",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if inward_claw is held by left hand"
+                                },
+                                {
+                                    "summary": "sequence to load inward_claw to left hand",
+                                    "children": [
+                                        {
+                                            "summary": "condition node to check if inward_claw is equippable"
+                                        },
+                                        {
+                                            "summary": "condition node to check if left hand is free"
+                                        },
+                                        {
+                                            "summary": "action node to equip inward_claw to left hand",
+                                            "effects": [
+                                                {
+                                                    "summary": "left hand will be not free"
+                                                },
+                                                {
+                                                    "summary": "inward_claw will be not equippable"
+                                                },
+                                                {
+                                                    "summary": "left_hand will hold inward_claw"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "summary": "selector to pick_up",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if inward_claw holds gear3"
+                                },
+                                {
+                                    "summary": "sequence to pick_up",
+                                    "children": [
+                                        {
+                                            "summary": "condition node to check if inward_claw is free"
+                                        },
+                                        {
+                                            "summary": "condition node to check if left hand holds inward_claw"
+                                        },
+                                        {
+                                            "summary": "action node to pick up gear3 using inward_claw",
+                                            "effects": [
+                                                {
+                                                    "summary": "inward_claw will hold gear3"
+                                                },
+                                                {
+                                                    "summary": "inward_claw will be not free"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "summary": "condition node to check if gear3 can be inserted to shaft2"
+                        },
+                        {
+                            "summary": "action node to insert gear3 to shaft2",
+                            "effects": [
+                                {
+                                    "summary": "inward_claw will be not holding gear3"
+                                },
+                                {
+                                    "summary": "inward_claw will be free"
+                                },
+                                {
+                                    "summary": "gear3 will be inserted to shaft2"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "initial_state": {
+        "objects": [
+            {
+                "name": "gear3",
+                "properties": []
+            },
+            {
+                "name": "shaft2",
+                "properties": []
+            },
+            {
+                "name": "inward_claw",
+                "properties": ["is_equippable", "is_free"]
+            },
+            {
+                "name": "left_hand",
+                "properties": ["is_free"]
+            }
+        ],
+        "constraints": [
+            {
+                "source": "gear3",
+                "name": "can_insert_to",
+                "target": "shaft2"
+            },
+            {
+                "source": "inward_claw",
+                "name": "can_manipulate",
+                "target": "gear3"
+            }
+        ],
+        "relations": [
+            {
+                "source": "shaft2",
+                "name": "is_inserted_to",
+                "target": "base"
+            }
+        ]
+    },
+    "instruction_summary": "Insert gear3 into shaft2",
+    "question": ""
+}

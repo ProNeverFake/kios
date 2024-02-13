@@ -20,6 +20,7 @@ from kios_agent.kios_llm import KiosLLM
 from typing import List, Dict, Any
 
 import json
+import os
 
 import py_trees
 
@@ -80,50 +81,76 @@ def main():
     #                 (:goal (and (is_inserted_to gear1 shaft1)))\
     #                 )"  # ! CHEAT
 
-    problem_name = "gearset2"
-    problem = "(define (problem robot_assembly_problem-problem)\
-                    (:domain robot_assembly_problem-domain)\
-                    (:objects\
-                    parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-                    gear1 gear2 gear3 shaft1 shaft2 base - part\
-                    left_hand - hand\
-                    )\
-                    (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft2 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
-                    (:goal (and (is_inserted_to gear3 shaft2)))\
-                    )\
-                    "
+    # problem_name = "gearset2"  # ! updated default initial states
+    # problem = "(define (problem robot_assembly_problem-problem)\
+    #                 (:domain robot_assembly_problem-domain)\
+    #                 (:objects\
+    #                 parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
+    #                 gear1 gear2 gear3 shaft1 shaft2 base - part\
+    #                 left_hand - hand\
+    #                 )\
+    #                 (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft2 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
+    #                 (:goal (and (is_inserted_to gear3 shaft2)))\
+    #                 )\
+    #                 "
 
-    problem_name = "gearset3"  # ! updated default initial states
-    problem = "(define (problem robot_assembly_problem-problem)\
-                    (:domain robot_assembly_problem-domain)\
-                    (:objects\
-                    parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-                    gear1 gear2 gear3 shaft1 shaft2 base - part\
-                    left_hand - hand\
-                    )\
-                    (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_inserted_to shaft2 base))\
-                    (:goal (and (is_inserted_to gear3 shaft2)))\
-                    )"
+    # problem_name = "gearset3"  # ! updated default initial states
+    # problem = "(define (problem robot_assembly_problem-problem)\
+    #                 (:domain robot_assembly_problem-domain)\
+    #                 (:objects\
+    #                 parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
+    #                 gear1 gear2 gear3 shaft1 shaft2 base - part\
+    #                 left_hand - hand\
+    #                 )\
+    #                 (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_inserted_to shaft2 base))\
+    #                 (:goal (and (is_inserted_to gear3 shaft2)))\
+    #                 )"
+
+    problem_name = "gearset3_spsk"  # super skeleton
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    problem_dir = os.path.join(file_dir, "gearset3_spsk.txt")
+    with open(problem_dir, "r") as f:
+        problem = f.read()
 
     llm_model = KiosLLM()
 
     ### * end_to_end
-    feature = "e2e"
+    # feature = "e2e"
+    # model = "gpt-4-1106-preview"
+    # ver = "v2"
+
+    # prompt_dir = "prompts/end_to_end_v2"
+    # prompt_load_order = [
+    #     "e2e_role",  # your are a good interpreter
+    #     "e2e_output_format",  # how to generate the output
+    #     "e2e_domain",  # domain knowledge
+    #     "e2e_problem",  # the problem format
+    #     "e2e_state",  # hot to describe the state
+    #     "e2e_bt",  # how to build tree
+    #     "e2e_chain",  # COT
+    #     "e2e_example",  # some skeleton examples ... Done
+    # ]
+    ### *
+
+    ### * refine_super_sk
+    feature = "re_sp_sk"
     model = "gpt-4-1106-preview"
-    ver = "v2"
+    # model = "gpt-3.5-turbo-16k-0613"
+    ver = "v1"
 
-    prompt_dir = "prompts/end_to_end_v2"
+    prompt_dir = "prompts/spsk_refine"
     prompt_load_order = [
-        "e2e_role",  # your are a good interpreter
-        "e2e_output_format",  # how to generate the output
-        "e2e_domain",  # domain knowledge
-        "e2e_problem",  # the problem format
-        "e2e_state",  # hot to describe the state
-        "e2e_bt",  # how to build tree
-        "e2e_chain",  # COT
-        "e2e_example",  # some skeleton examples ... Done
+        "refine_role",  # your are a good interpreter
+        "refine_input_format",  # about the input
+        "refine_state",  # about the state
+        # "refine_domain", # domain knowledge
+        "refine_help",  # tips about how to refine the nodes
+        "refine_controlflow",  # how to refine controlflow nodes
+        "refine_condition",  # how to refine condition nodes
+        "refine_action",  # how to refine action nodes
+        "refine_output_format",  # the output format
+        # "refine_chain",  # COT
     ]
-
     ### *
 
     ### *skeleton
@@ -169,12 +196,9 @@ def main():
         prompt_load_order=prompt_load_order,
     )
 
-    # model = "gpt-3.5-turbo-16k-0613"
-    # model="gpt-4-0613", # not this
-    # model="gpt-4-1106-preview",
-    feature = "e2e"
-    model = "gpt-4-1106-preview"
-    ver = "v2"
+    # * model = "gpt-3.5-turbo-16k-0613"
+    # * model="gpt-4-0613", # not this
+    # * model="gpt-4-1106-preview",
 
     full_problem_name = f"{problem_name}_{feature}_{ver}_{model}"
 
@@ -203,3 +227,4 @@ if __name__ == "__main__":
 # ! BUG in example: env after ist falsch!
 # ! BUG in example: the boolean value is T F instead of t f. also should be null not None
 # ! The action name "action: xxx(xxx, xxx)" is not consistent with the format requirement in action parser!
+# ! BUG in output_format: four instead of three!

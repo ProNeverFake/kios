@@ -306,7 +306,9 @@ class MiosTaskFactory:
                     "p0": {
                         "dX_d": [0.1, 0.5],
                         "ddX_d": [0.5, 1],
+                        # "O_T_OB":
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
+                        "F_ff": [0,0,0,0,0,2],
                     },
                     "objects": {"Container": object_name},
                 },
@@ -320,6 +322,7 @@ class MiosTaskFactory:
                         "ddX_d": [0.5, 1],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "O_T_OB": O_T_OB.T.flatten().tolist(),
+                        "F_ff": [0,0,0,0,0,0.8],
                     },
                     # "objects": {"GoalPose": "NullObject"},
                 },

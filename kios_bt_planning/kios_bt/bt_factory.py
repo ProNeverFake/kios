@@ -7,6 +7,7 @@ from kios_bt.data_types import (
 )
 import copy
 import py_trees
+import re
 from typing import List, Dict, Any, Tuple
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
@@ -65,10 +66,25 @@ class BehaviorTreeFactory:
 
     ##########################################################
     # * visualization only, dirty imp.
+    def parse_name(self, name: str) -> str:
+        pattern = r"(selector|sequence|target|precondition|condition|action)"
+        match = re.search(pattern, name)
+        if match:
+            return match.group(0)
+        else:
+            raise ValueError(f"unable to parse the type of the node from {name}")
+
     def from_json_to_simple_bt(self, json_data: dict):
         """
         generate a behavior tree from a json file (but you need to parse it first)
         """
+        if json_data.get("type_name") is None:
+            # parse the type from "name"
+            if json_data.get("name") is None:
+                raise ValueError("unable to determine the type of the node!")
+
+            json_data["type_name"] = self.parse_name(json_data["name"])
+
         if json_data["type_name"] == "selector":
             control_flow_node = py_trees.composites.Selector(
                 name=json_data["name"], memory=False
@@ -89,10 +105,12 @@ class BehaviorTreeFactory:
 
             return control_flow_node
 
-        elif json_data["type_name"] == "condition":
+        elif json_data["type_name"] in ["precondition", "condition", "target"]:
             return self.from_json_to_simple_condition_node(json_data)
         elif json_data["type_name"] == "action":
             return self.from_json_to_simple_action_node(json_data)
+        else:
+            raise ValueError(f"unknown type name {json_data['type_name']}")
 
     def from_json_to_simple_condition_node(self, json_data: dict) -> ConditionNode:
         """

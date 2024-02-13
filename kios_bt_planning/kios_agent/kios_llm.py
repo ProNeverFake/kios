@@ -32,6 +32,7 @@ class KiosLLM:
     last_response: str = None
 
     ######################################## * prompts
+    prompt_dir: str = None
     prompt_load_order: List[str] = None
 
     # the problem description
@@ -65,15 +66,24 @@ class KiosLLM:
                 )
 
     # ! extend this method later.
-    def initialize(self, prompt_load_order: List[str] = None):
+    def initialize(self, prompt_dir: str = None, prompt_load_order: List[str] = None):
         self.encoder = tiktoken.get_encoding("cl100k_base")
         script_dir = os.path.dirname(__file__)
-        prompt_dir = os.path.join(script_dir, "prompts")
+        if prompt_dir is not None:
+            self.prompt_dir = os.path.join(script_dir, prompt_dir)
+        else:
+            self.prompt_dir = os.path.join(script_dir, "prompts")
         self.prompt_directories = {
-            "system": os.path.join(prompt_dir, "system"),
-            "query": os.path.join(prompt_dir, "query"),
-            "prompt": os.path.join(prompt_dir, "prompt"),
+            "system": os.path.join(self.prompt_dir, "system"),
+            "query": os.path.join(self.prompt_dir, "query"),
+            "prompt": os.path.join(self.prompt_dir, "prompt"),
         }
+
+        # * check the prompt directories
+        print("prompt directories:")
+        for key, value in self.prompt_directories.items():
+            print(f'["{key}"] = {value}')
+
         # default prompt load order
         if prompt_load_order is not None:
             self.prompt_load_order = prompt_load_order

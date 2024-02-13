@@ -50,24 +50,35 @@ def core_loop():
         robot_interface=robot_interface,
     )
 
-    behavior_tree = None
-    with open(bt_json_file_path, "r") as file:
-        json_object = json.load(file)
-        behavior_tree = bt_factory.from_json_to_bt(json_object)
-
     ####################### * old code
+    # behavior_tree = None
+    # with open(bt_json_file_path, "r") as file:
+    #     json_object = json.load(file)
+    #     behavior_tree = bt_factory.from_json_to_bt(json_object)
+
     # bt_steward = generate_bt_stewardship(behavior_tree)
     # render_dot_tree(bt_steward)
     # # tick_loop_test(bt_steward)
     # tick_frequency_test(bt_steward)
 
     # * new code
-    bt_steward = BehaviorTreeStewardship(
-        behavior_tree,
-        world_interface,
-        robot_interface,
-        bt_factory,
+    behavior_tree_stewardship = BehaviorTreeStewardship(
+        behaviortree_factory=bt_factory,
+        world_interface=world_interface,
+        robot_interface=robot_interface,
     )
+
+    with open(bt_json_file_path, "r") as file:
+        json_object = json.load(file)
+        behavior_tree_stewardship.setup_bt_json(json_object)
+
+    behavior_tree_stewardship.generate_behavior_tree()
+    behavior_tree_stewardship.setup_behavior_tree()
+    behavior_tree_stewardship.render_dot_tree()
+    sim_result = behavior_tree_stewardship.simulate_behavior_tree()
+    print(sim_result.to_json())
+
+    # ! world state has problem. gear3 is not free!
 
 
 if __name__ == "__main__":

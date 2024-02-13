@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 import py_trees
 from kios_bt.data_types import (
     GroundedAction,
@@ -17,6 +17,8 @@ class WorldInterface:
     blackboard: py_trees.blackboard.Client = None
     graph_interface: GraphInterface = None
 
+    check_point: Dict[str, dict] = {}
+
     def __init__(self, graph_interface=True, blackboard=False, neo4j=False) -> None:
         if graph_interface:
             self.graph_interface = GraphInterface()
@@ -29,6 +31,22 @@ class WorldInterface:
 
     def initialize(self):
         pass
+
+    def record_check_point(self, check_point_name: str = None):
+        """
+        record the current world state
+        """
+        if check_point_name is None:
+            check_point_name = "default"
+        self.check_point[check_point_name] = self.graph_interface.to_json()
+
+    def restore_check_point(self, check_point_name: str = None):
+        """
+        restore the world state to the check point
+        """
+        if check_point_name is None:
+            check_point_name = "default"
+        self.graph_interface.from_json(self.check_point[check_point_name])
 
     def load_world_from_json(self, json_data: dict):
         """
@@ -98,21 +116,19 @@ class WorldInterface:
         return True
 
     def check_property(self, prop: ObjectProperty) -> bool:
+        # ! BBDEBUG 11022024
         """
         check if the property is in the same status as specified in the property object
         """
         if prop.property_value is None:
             # this is a property
-            result = self.graph_interface.check_property(
-                prop.object_name, prop.property_name
+            return self.graph_interface.check_property(
+                prop.object_name, prop.property_name, prop.status
             )
-            if result != prop.status:
-                return False
         else:
             # this is a relation
-            result = self.graph_interface.check_relation(
-                prop.object_name, prop.property_name, prop.property_value
+            return self.graph_interface.check_relation(
+                prop.object_name, prop.property_name, prop.property_value, prop.status
             )
-            if result != prop.status:
-                return False
-        return True
+
+        return False

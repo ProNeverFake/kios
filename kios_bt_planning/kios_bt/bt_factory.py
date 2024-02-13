@@ -7,13 +7,19 @@ from kios_bt.data_types import (
 )
 import copy
 import py_trees
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
 from kios_bt.pybt_io import BehaviorTreeTemplates
 
 from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
+
+"""
+bt_stewardship: the stewardship of the behavior tree, kios class.
+behavior_tree: py_trees.trees.BehaviourTree, the wrapper of the tree root
+tree_root: py_trees.behaviour.Behaviour, the root of the tree
+"""
 
 
 class BehaviorTreeFactory:
@@ -133,11 +139,20 @@ class BehaviorTreeFactory:
     #     if self.visualization_only:
     #         # do nothing if it's visualization only
     #         return
-    #     node = self.from_json_to_bt(json_data)
+    #     node = self.from_json_to_tree_root(json_data)
     #     self.roster[json_data["identifier"]] = node
 
+    # * json to bt_stw
+    def from_json_to_behavior_tree(
+        self, json_data: dict
+    ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree]:
+
+        tree_root = self.from_json_to_tree_root(json_data)
+        behavior_tree = py_trees.trees.BehaviourTree(tree_root)
+        return [self.roster, behavior_tree]
+
     # * json to bt
-    def from_json_to_bt(self, json_data: dict):
+    def from_json_to_tree_root(self, json_data: dict) -> py_trees.behaviour.Behaviour:
         """
         generate a behavior tree from a json file (but you need to parse it first)
         """
@@ -146,7 +161,7 @@ class BehaviorTreeFactory:
                 name=json_data["name"], memory=False
             )
             for child in json_data["children"]:
-                child_node = self.from_json_to_bt(child)
+                child_node = self.from_json_to_tree_root(child)
                 control_flow_node.add_child(child_node)
 
             self.roster[json_data["identifier"]] = control_flow_node
@@ -157,7 +172,7 @@ class BehaviorTreeFactory:
                 name=json_data["name"], memory=False
             )
             for child in json_data["children"]:
-                child_node = self.from_json_to_bt(child)
+                child_node = self.from_json_to_tree_root(child)
                 control_flow_node.add_child(child_node)
 
             self.roster[json_data["identifier"]] = control_flow_node

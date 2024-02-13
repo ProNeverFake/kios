@@ -7,6 +7,8 @@ import os
 import os.path
 import re
 
+from typing import List, Dict, Any, Tuple
+
 
 class PddlInterface:
     pddl_writer: PDDLWriter = None
@@ -25,14 +27,18 @@ class PddlInterface:
     ):
         if default_domain_path is None:
             self.default_domain_path = os.path.join(
-                os.getcwd(),
-                "src/kios/kios_bt_planning/kios_domain",
+                os.path.dirname(os.path.realpath(__file__)),
+                "domains",
             )
+            if not os.path.exists(self.default_domain_path):
+                os.makedirs(self.default_domain_path)
         if default_problem_path is None:
             self.default_problem_path = os.path.join(
-                os.getcwd(),
-                "src/kios/kios_bt_planning/kios_domain",
+                os.path.dirname(os.path.realpath(__file__)),
+                "problems",
             )
+            if not os.path.exists(self.default_problem_path):
+                os.makedirs(self.default_problem_path)
 
         print(
             "\033[93m################################## BB WARNING ###################################"
@@ -138,10 +144,16 @@ class PddlInterface:
 
             problem_file_path = os.path.join(problem_path, problem_file_name)
 
+        # Create the directories if they don't exist
+        if not os.path.exists(domain_path):
+            os.makedirs(domain_path)
+        if not os.path.exists(problem_path):
+            os.makedirs(problem_path)
+
         self.pddl_writer.write_domain(domain_file_path)
         self.pddl_writer.write_problem(problem_file_path)
 
-    def get_pddl_string(self) -> [str, str]:
+    def get_pddl_string(self) -> Tuple[str, str]:
         if self.problem is None:
             raise Exception("Problem is not set")
         self.update_problem()

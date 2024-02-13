@@ -2,6 +2,8 @@ from kios_utils.task import *
 from typing import List, Any
 import time
 import json
+from tabulate import tabulate
+
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
@@ -18,7 +20,7 @@ class RobotCommand:
 
     task_scene: TaskScene = None
 
-    task_list: List[MiosSkill or MiosCall or KiosCall] = []
+    task_list: List[MiosSkill | MiosCall | KiosCall] = []
 
     def __init__(
         self,
@@ -137,15 +139,28 @@ class RobotCommand:
         print("\033[94mRobot command has successfully finished\033[0m")  # Print in blue
         return True
 
-    def add_task(self, task: MiosSkill or MiosCall or KiosCall):
+    def add_task(self, task: MiosSkill | MiosCall | KiosCall):
         self.task_list.append(task)
 
-    def add_tasks(self, tasks: List[MiosSkill or MiosCall or KiosCall]):
+    def add_tasks(self, tasks: List[MiosSkill | MiosCall | KiosCall]):
         self.task_list.extend(tasks)
+
+    def prepend_task(self, task: MiosSkill | MiosCall | KiosCall):
+        self.task_list.insert(0, task)
+
+    def prepend_tasks(self, tasks: List[MiosSkill | MiosCall | KiosCall]):
+        self.task_list = tasks + self.task_list
 
     def clear_tasks(self):
         self.task_list = []
 
     def show_tasks(self):
-        # print(self.task_list)
-        pass
+        task_table = []
+        for task in self.task_list:
+            task_type = type(task).__name__  # mios_skill, mios_call, kios_call
+            task_name = str(task)
+            task_table.append([task_type, task_name])
+
+        print(tabulate(task_table, headers=["Task Type", "Task Name"], tablefmt="grid"))
+
+        # pass

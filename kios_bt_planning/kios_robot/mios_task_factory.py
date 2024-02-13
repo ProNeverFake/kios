@@ -59,7 +59,7 @@ class MiosTaskFactory:
             Dict[str, Any]: action_name: str, args: List[str]
         """
         # use re to parse the action
-        pattern = r"(\w+)\(([\w\s,]+)\)"
+        pattern = r"(\w+):?\s*\(([\w\s,]+)\)"  # ! alarm
         action_string = action.name
         match = re.match(pattern, action_string)
         if match:
@@ -73,14 +73,14 @@ class MiosTaskFactory:
             }  # Return a dictionary with the action name and arguments
         else:
             raise Exception(
-                "Action format error!"
+                f'Action "{action_string}" is not in the correct format.'
             )  # Raise an exception if the action format is incorrect
             # return {"action_name": None, "args": []}
 
     # * BBCORE
     def generate_tasks(
         self, action: Action, shared_data: Any = None
-    ) -> List[MiosCall or MiosSkill]:
+    ) -> List[MiosCall | MiosSkill]:
         """core function.
         generate mios tasks from a kios action and return them in a list.
 
@@ -103,7 +103,7 @@ class MiosTaskFactory:
         else:
             raise Exception(f"action {parsed_action['name']} is not supported yet.")
 
-    def generate_fake_mios_tasks(self, action: Action) -> List[MiosCall or MiosSkill]:
+    def generate_fake_mios_tasks(self, action: Action) -> List[MiosCall | MiosSkill]:
         """
         test function.
         """
@@ -293,8 +293,8 @@ class MiosTaskFactory:
     def generate_lift_tool(self) -> MiosCall:
         # move finger to the right position
         return self.generate_gripper_move_mp(0.08)
-    
-    def generate_screw_in_mp(self, object_name:str = None, O_T_OB = None)->MiosSkill:
+
+    def generate_screw_in_mp(self, object_name: str = None, O_T_OB=None) -> MiosSkill:
         """
         # ! DO NOT USE THIS METHOD
         """
@@ -332,7 +332,6 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
-
     def generate_update_tool_call(self, tool_name: str = None) -> MiosCall:
         """let mios know the tool is loaded and it need to change EE_T_TCP.
 
@@ -366,7 +365,7 @@ class MiosTaskFactory:
 
     def generate_load_tool_skill(
         self, parsed_action: Dict[str, Any]
-    ) -> List[MiosSkill or MiosCall]:
+    ) -> List[MiosSkill | MiosCall]:
         tool_name = parsed_action["args"][1]
         if tool_name is None:
             raise Exception("tool_name is not set!")
@@ -426,7 +425,7 @@ class MiosTaskFactory:
 
     def generate_unload_tool_skill(
         self, parsed_action: Dict[str, Any]
-    ) -> List[MiosSkill or MiosCall]:
+    ) -> List[MiosSkill | MiosCall]:
         tool_name = parsed_action["args"][1]
         if tool_name is None:
             raise Exception("tool_name is not set!")
@@ -486,7 +485,7 @@ class MiosTaskFactory:
 
     def generate_pick_up_skill(
         self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall or MiosSkill]:
+    ) -> List[MiosCall | MiosSkill]:
         # tool_name = parsed_action["args"][1]
         # if tool_name is None:
         #     raise Exception("tool_name is not set!")
@@ -518,7 +517,7 @@ class MiosTaskFactory:
 
     def generate_drive_skill(
         self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall or MiosSkill or KiosCall]:
+    ) -> List[MiosCall | MiosSkill | KiosCall]:
         # ! YOU MAY NEED TO ADD INSERT?
         # ! YOU MAY NEED THE OBJECT?
         tool_name = parsed_action["args"][1]
@@ -572,7 +571,7 @@ class MiosTaskFactory:
 
     def generate_insert_skill(
         self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall or MiosSkill]:
+    ) -> List[MiosCall | MiosSkill]:
         insertable = parsed_action["args"][2]
         container = parsed_action["args"][3]
         if container is None:

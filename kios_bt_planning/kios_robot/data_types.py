@@ -13,17 +13,27 @@ class MiosSkill:
     skill_type: str
     skill_parameters: Dict[str, Any]
 
+    def __str__(self) -> str:
+        return self.skill_name
+
 
 @dataclass
 class MiosCall:
     method_name: str
     method_payload: Dict[str, Any]
 
+    def __str__(self) -> str:
+        return self.method_name
+
 
 @dataclass
 class KiosCall:
+    call_name: str = field(default="default name")  # ! alarm: test!
     method: object
     args: List[Any]
+
+    def __str__(self) -> str:
+        return self.call_name
 
 
 # @dataclass
@@ -99,7 +109,9 @@ class MiosObject:
 
 @dataclass
 class MiosInterfaceResponse:
-    has_finished: bool  # * whether the task is fully conducted or not (has exception or not)
+    has_finished: (
+        bool  # * whether the task is fully conducted or not (has exception or not)
+    )
     error_message: Optional[str]
     task_result: "MiosTaskResult" = field(default=None)
 
@@ -205,9 +217,9 @@ class KiosObject:
             joint_pose=json["joint_pose"] if "joint_pose" in json else None,
             O_T_TCP=np.array(json["O_T_TCP"]) if "O_T_TCP" in json else None,
             O_T_EE=np.array(json["O_T_EE"]) if "O_T_EE" in json else None,
-            reference_object=json["reference_object"]
-            if "reference_object" in json
-            else None,
+            reference_object=(
+                json["reference_object"] if "reference_object" in json else None
+            ),
         )
 
     @staticmethod

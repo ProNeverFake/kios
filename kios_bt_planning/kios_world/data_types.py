@@ -1,7 +1,7 @@
 from typing import Set
 
 
-class WorldNode:  # discard this class
+class WorldNode:
     def __init__(self, name: str) -> None:
         self.name = name
         self.properties = set()
@@ -19,21 +19,26 @@ class WorldNode:  # discard this class
         self.properties.discard(prop)
 
     def check_property(self, prop: str) -> bool:
-        return prop in self.properties
+        # ! BBDEBUG 11022024
+        if prop in self.properties:
+            return True
+        else:
+            return False
 
     def __repr__(self):
         # return f"{self.name}: {', '.join(self.properties)}"
         return f"{', '.join(self.properties)}"
 
 
-class Relationship:  # discard this class
+class Relationship:
     """
     directed relationship from source to target
     """
 
-    def __init__(self, source, relation_name, target):
+    def __init__(self, source, relation_name, target, isConstraint=False):
         self.relation_name = relation_name
         self.objects = [source, target]
+        self.isConstraint = isConstraint
 
     def __repr__(self):
         return f"{self.objects[0]} {self.relation_name} {self.objects[1]}"

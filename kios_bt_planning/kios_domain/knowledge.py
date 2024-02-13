@@ -5,8 +5,9 @@ problem = Problem("robot_assembly_problem")
 ########################## * knowledge
 
 # * property
-problem.add_fluent(is_free, default_initial_value=True)
-problem.add_fluent(is_equippable, default_initial_value=True)
+# ! BBMOD
+problem.add_fluent(is_free, default_initial_value=False)
+problem.add_fluent(is_equippable, default_initial_value=False)
 
 # * relation
 problem.add_fluent(can_manipulate, default_initial_value=False)

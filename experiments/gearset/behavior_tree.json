@@ -152,7 +152,7 @@
                                             "object_name": "inward_claw",
                                             "property_name": "hold",
                                             "property_value": "gear3",
-                                            "status": true
+                                            "status": false
                                         },
                                         {
                                             "object_name": "inward_claw",

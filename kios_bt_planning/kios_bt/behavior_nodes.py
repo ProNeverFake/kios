@@ -180,6 +180,11 @@ class ActionNode(BehaviorNode):
                 new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
+                # ! I think here the action node should not return a success. it should always return running.
+                # ! and it should "task effect".
+                # ! the target condition node in the selector will be fulfilled by the "task effect"
+                # ! the action node will be interrupted by the selector, and the tick goes on...
+                # ! YOU WILL UNDERSTAND ME SOONER OR LATER...
             else:
                 self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE
@@ -230,6 +235,7 @@ class ConditionNode(BehaviorNode):
         if result == True:
             self.logger.info(f'Condition "{self.behavior_name}" is satisfied')
             new_status = py_trees.common.Status.SUCCESS
+
         else:
             self.logger.info(f'Condition "{self.behavior_name}" is not satisfied')
             new_status = py_trees.common.Status.FAILURE
@@ -313,6 +319,9 @@ class ActionNodeSim(ActionNode):
         robot_interface: RobotInterface = None,  #  not needed for simulation
     ):
         self.success_flag = False
+        self.tick_times = 0
+        self.tick_times_target = 3
+        self.hasTakenEffect = False
         self.action = action
         """Configure the name of the behaviour."""
         self.identifier = action.identifier
@@ -325,7 +334,18 @@ class ActionNodeSim(ActionNode):
 
     def initialise(self) -> None:
         self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        self.tick_times = 0
+        self.hasTakenEffect = False
         self.logger.info(f"Sim action node {self.behavior_name} started.")
+
+    def take_effect(self):
+        """
+        interact with the world interface to exert the effects
+        """
+        if self.hasTakenEffect:
+            return
+        self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
+        self.world_interface.take_effect(self.action)
 
     def update(self) -> py_trees.common.Status:
         """
@@ -333,13 +353,16 @@ class ActionNodeSim(ActionNode):
         """
         self.logger.debug("%s.update()" % (self.__class__.__name__))
 
-        if self.success_flag == True:
+        if self.tick_times >= self.tick_times_target:
             self.logger.info(f'Action "{self.behavior_name}" finished successfully')
-            new_status = py_trees.common.Status.SUCCESS
+            # new_status = py_trees.common.Status.SUCCESS
+            new_status = py_trees.common.Status.RUNNING
+            # ! As I said, the action node should always return running.
+            # ! this will help to catch the mistakes in action effects.
             self.take_effect()
 
         else:
-            self.success_flag = True
+            self.tick_times += 1
             new_status = py_trees.common.Status.RUNNING
 
         return new_status

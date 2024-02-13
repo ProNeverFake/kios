@@ -116,9 +116,7 @@ def test_screw_in():
 
     print(O_T_OB)
 
-    robot_command.add_task(
-        ri.mios_task_factory.generate_screw_in_mp(O_T_OB=O_T_OB)
-    )
+    robot_command.add_task(ri.mios_task_factory.generate_screw_in_mp(O_T_OB=O_T_OB))
 
     robot_command.execute_task_list_sync()
 

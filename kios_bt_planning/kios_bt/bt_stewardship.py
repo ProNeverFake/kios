@@ -21,7 +21,7 @@ from kios_bt.behavior_nodes import (
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
-from kios_bt.data_types import TreeResult
+from kios_bt.data_types import TreeResult, Action, Condition
 
 import py_trees
 
@@ -30,8 +30,9 @@ import copy
 
 
 class BehaviorTreeStewardship:
-    tree_stewardship: py_trees.trees.BehaviourTree = None  # for pytree bt functionality
+    behavior_tree: py_trees.trees.BehaviourTree = None  # for pytree bt functionality
     behaviortree_factory: BehaviorTreeFactory = None  # for the roster
+    bt_json: dict = None  # for tree regeneration.
     world_interface: WorldInterface = None  # for world states
     robot_interface: RobotInterface = None  # for robot actions
     roster: Dict[int, Any] = {}  # for tree mod
@@ -63,11 +64,26 @@ class BehaviorTreeStewardship:
             self.behaviortree_factory = behaviortree_factory
 
     def initialize(self):
-        # map the roster from the factory
-        self.roster = self.behaviortree_factory.roster
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
+
+        pass
+
+    def setup_bt_json(self, bt_json: dict) -> None:
+        self.bt_json = bt_json
+
+    def generate_behavior_tree(self) -> None:
+        self.roster, self.behavior_tree = (
+            self.behaviortree_factory.from_json_to_behavior_tree(self.bt_json)
+        )
+
+    def generate_behavior_tree_from_json(self, json_data: dict) -> None:
+        self.roster, self.behavior_tree = (
+            self.behaviortree_factory.from_json_to_behavior_tree(json_data)
+        )
 
     # * tick handlers
     def post_tick_handler(
+        self,
         snapshot_visitor: py_trees.visitors.SnapshotVisitor,
         behaviour_tree: py_trees.trees.BehaviourTree,
     ) -> None:
@@ -88,7 +104,7 @@ class BehaviorTreeStewardship:
         )
         print(py_trees.display.unicode_blackboard())
 
-    def pre_tick_handler(behaviour_tree: py_trees.trees.BehaviourTree) -> None:
+    def pre_tick_handler(self, behaviour_tree: py_trees.trees.BehaviourTree) -> None:
         """Print a banner with current tick count prior to ticking the tree.
 
         Args:
@@ -96,43 +112,39 @@ class BehaviorTreeStewardship:
         """
         print("\n--------- Run %s ---------\n" % behaviour_tree.count)
 
-    def generate_behaviortree_from_json(self, json_data: dict) -> None:
-        self.setup_bt_stewardship(self.behaviortree_factory.from_json_to_bt(json_data))
-
-    def setup_bt_stewardship(self, bt: py_trees.behaviour.Behaviour) -> None:
-        ####################
-        # Tree Stewardship
-        ####################
-        self.tree_stewardship = py_trees.trees.BehaviourTree(bt)
-
-        self.tree_stewardship.add_pre_tick_handler(self.pre_tick_handler)
-        self.tree_stewardship.visitors.append(py_trees.visitors.DebugVisitor())
+    def setup_behavior_tree(self, behavior_tree=None) -> None:
+        """
+        setup vor/nachhandlers. setup the tree.
+        """
+        if behavior_tree == None:
+            behavior_tree = self.behavior_tree
+        behavior_tree.add_pre_tick_handler(self.pre_tick_handler)
+        behavior_tree.visitors.append(py_trees.visitors.DebugVisitor())
         snapshot_visitor = py_trees.visitors.SnapshotVisitor()
-        self.tree_stewardship.add_post_tick_handler(
+        behavior_tree.add_post_tick_handler(
             functools.partial(self.post_tick_handler, snapshot_visitor)
         )
-        self.tree_stewardship.visitors.append(snapshot_visitor)
-        self.tree_stewardship.setup(timeout=15)
+        behavior_tree.visitors.append(snapshot_visitor)
+        behavior_tree.setup(timeout=15)
 
     def render_dot_tree(self):
         py_trees.display.render_dot_tree(
-            self.tree_stewardship, with_blackboard_variables=False
+            self.behavior_tree.root, with_blackboard_variables=False
         )
 
     def tick_loop_test(self):
         while True:
             try:
-                self.tree_stewardship.tick()
+                self.behavior_tree.tick()
                 py_trees.console.read_single_keypress()
             except KeyboardInterrupt:
                 break
 
         print("\n")
 
-    # * you may need to expand the return type if the simulator is imp as a tool
     def tick_until_success(
         self,
-        stw: py_trees.trees.BehaviourTree,
+        bt: py_trees.trees.BehaviourTree,
         timeout_ms: float = 5000,
     ) -> TreeResult:
         time_ms = 0
@@ -141,16 +153,16 @@ class BehaviorTreeStewardship:
         iter_per_round = 10
 
         while time_ms < timeout_ms:
-            stw.tick_tock(period_ms=period_ms, number_of_iterations=iter_per_round)
+            bt.tick_tock(period_ms=period_ms, number_of_iterations=iter_per_round)
             time_ms += period_ms * iter_per_round
-            if stw.root.status == py_trees.common.Status.SUCCESS:
+            if bt.root.status == py_trees.common.Status.SUCCESS:
                 return TreeResult(
                     result="success",
                     summary="Behavior tree tick returns success",
                     defect_node=None,
                 )
-            elif stw.root.status == py_trees.common.Status.FAILURE:
-                tip_node = stw.root.tip()
+            elif bt.root.status == py_trees.common.Status.FAILURE:
+                tip_node = bt.root.tip()
                 defect_node = None
                 if tip_node is None:
                     defect_node = None
@@ -169,9 +181,9 @@ class BehaviorTreeStewardship:
                     summary="Behavior tree tick returns failure",  # ! the exceptions should be caught and handled!
                     defect_node=defect_node,
                 )
-            elif stw.root.status == py_trees.common.Status.RUNNING:
+            elif bt.root.status == py_trees.common.Status.RUNNING:
                 continue
-            elif stw.root.status == py_trees.common.Status.INVALID:
+            elif bt.root.status == py_trees.common.Status.INVALID:
                 return TreeResult(
                     result="invalid",
                     summary="Behavior tree tick returns invalid status!",
@@ -185,14 +197,77 @@ class BehaviorTreeStewardship:
             defect_node=None,
         )
 
+    def tick_loop_until_success(
+        self,
+        bt: py_trees.trees.BehaviourTree,
+        loop_max: int = 20,
+    ) -> TreeResult:
+        i = 0
+
+        while i < loop_max:
+            i += 1
+            bt.tick()
+            if bt.root.status == py_trees.common.Status.SUCCESS:
+                return TreeResult(
+                    result="success",
+                    summary="Behavior tree tick returns success",
+                    defect_node=None,
+                )
+            elif bt.root.status == py_trees.common.Status.FAILURE:
+                tip_node = bt.root.tip()
+                if tip_node is None:
+                    return TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure with the defect node unknown",
+                        defect_node=None,
+                    )
+
+                return TreeResult(
+                    result="failure",
+                    summary="Behavior tree tick returns failure",  # ! the exceptions should be caught and handled!
+                    defect_node=self.extract_node_metadata(tip_node),
+                )
+            elif bt.root.status == py_trees.common.Status.RUNNING:
+                continue
+            elif bt.root.status == py_trees.common.Status.INVALID:
+                return TreeResult(
+                    result="invalid",
+                    summary="Behavior tree tick returns invalid status!",
+                    defect_node=None,
+                )
+
+        # default timeout
+        tip_node = bt.root.tip()
+        return TreeResult(
+            result="timeout",
+            summary="Behavior tree tick returns timeout!",
+            defect_node=self.extract_node_metadata(tip_node),
+        )
+
+    def extract_node_metadata(
+        self, node: py_trees.behaviour.Behaviour
+    ) -> Action | Condition | None:
+        """
+        extract the metadata from the node
+        """
+        if node is None:
+            return None
+
+        if isinstance(node, ActionNode):
+            node_meta = node.action
+        elif isinstance(node, ConditionNode):
+            node_meta = node.condition
+
+        return node_meta
+
     def tick_once_test(self):
-        self.tree_stewardship.tick()
+        self.behavior_tree.tick()
         py_trees.console.read_single_keypress()
 
         print("\n")
 
     def tick_once(self):
-        self.tree_stewardship.tick()
+        self.behavior_tree.tick()
 
     # * methods to modify the tree
     ##########################################################
@@ -206,7 +281,7 @@ class BehaviorTreeStewardship:
         insert a subtree into the tree as a child of a specific node at a specific index
         """
         parent_id = self.roster[parent_identifer].id
-        self.tree_stewardship.insert_subtree(subtree, parent_id, index)
+        self.behavior_tree.insert_subtree(subtree, parent_id, index)
 
     def replace_subtree(
         self,
@@ -217,35 +292,44 @@ class BehaviorTreeStewardship:
         replace a specific subtree in the tree with another subtree
         """
         to_replace_node_id = self.roster[identifier].id
-        self.tree_stewardship.replace_subtree(to_replace_node_id, subtree)
+        self.behavior_tree.replace_subtree(to_replace_node_id, subtree)
 
     def prune_subtree(self, identifier: int):
         """
         remove a specific subtree from the tree
         """
         to_remove_node_id = self.roster[identifier].id
-        self.tree_stewardship.prune_subtree(to_remove_node_id)
+        self.behavior_tree.prune_subtree(to_remove_node_id)
 
     ##########################################################
-    # * fake run methods
-    def simulate(self) -> dict:
+    def simulate_behavior_tree(self) -> TreeResult:
         # ! maybe it is better to imp a new class for the simulation
         """
         simulate the tree run with action nodes returning only success.
 
         this should be the following step of the full tree generation.
         """
-        sim_stw = copy.deepcopy(self.tree_stewardship)
-        root = sim_stw.root
+        # * record world check point
+        self.world_interface.record_check_point()
 
-        self.replace_action_node_with_sim(sim_stw, root)
+        roster, sim_bt = self.behaviortree_factory.from_json_to_behavior_tree(
+            self.bt_json
+        )
+        root = sim_bt.root
 
-        sim_stw.setup(timeout=10)
+        self.replace_action_node_with_sim(sim_bt, root)
 
-        tree_result = self.tick_until_success(sim_stw, timeout_ms=5000)
+        self.setup_behavior_tree(sim_bt)
 
-        return tree_result.to_json()
+        tree_result = self.tick_loop_until_success(sim_bt, loop_max=20)
 
+        # * restore world check point
+        # ! dirty but works well.
+        self.world_interface.restore_check_point()
+
+        return tree_result
+
+    # ! please generate two trees instead.
     def replace_action_node_with_sim(self, stw, root):
         for child in root.children:
             # replace the action node with sim node

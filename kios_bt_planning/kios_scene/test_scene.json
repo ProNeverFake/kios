@@ -30,6 +30,10 @@
         {
             "object_name": "inward_claw",
             "source": "mios"
+        },
+        {
+            "object_name": "test",
+            "source": "mios"
         }
     ],
     "tools": 

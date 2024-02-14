@@ -2,72 +2,72 @@
 {
     "task_cohesion": {
         "action_sequence": [
-            "load_tool(left_hand, inward_claw)",
-            "pickup(left_hand, gear3, inward_claw)",
-            "insert(left_hand, inward_claw, gear3, shaft2)"
+            "load_tool(left_hand, parallel_box1)",
+            "pick_up(left_hand, parallel_box1, gear1)",
+            "insert(left_hand, parallel_box1, gear1, shaft1)"
         ],
         "action_instructions": [
-            "equip the inward_claw on the left hand",
-            "pick up gear3 with the left hand using the inward_claw",
-            "insert gear3 into shaft2 using the left hand with the inward_claw"
+            "Equip the parallel_box1 on the left hand.",
+            "Pick up the gear1 with the left hand using the parallel_box1.",
+            "Insert the gear1 into the shaft1 using the left hand equipped with the parallel_box1."
         ],
-        "manipulated_objects": ["left_hand", "gear3", "inward_claw", "shaft2"],
+        "manipulated_objects": ["left_hand", "parallel_box1", "gear1", "shaft1"],
         "behavior_tree": {
-            "name": "insert gear3 into shaft2 selector",
-            "identifier": 0,
+            "name": "insert selector",
+            "identifier": 1,
             "type_name": "selector",
             "children": [
                 {
-                    "summary": "check if gear3 is inserted to shaft2",
-                    "name": "check gear3 is_inserted_to shaft2",
-                    "identifier": 1,
+                    "summary": "check if gear1 is inserted to shaft1",
+                    "name": "check gear1 is_inserted_to shaft1",
+                    "identifier": 2,
                     "type_name": "condition",
                     "conditions": [
                         {
-                            "object_name": "gear3",
+                            "object_name": "gear1",
                             "property_name": "is_inserted_to",
-                            "property_value": "shaft2",
+                            "property_value": "shaft1",
                             "status": true
                         }
                     ]
                 },
                 {
-                    "name": "insert gear3 into shaft2 sequence",
-                    "identifier": 2,
+                    "name": "insert sequence",
+                    "identifier": 3,
                     "type_name": "sequence",
                     "children": [
                         {
                             "name": "load_tool selector",
-                            "identifier": 3,
+                            "identifier": 4,
                             "type_name": "selector",
                             "children": [
                                 {
-                                    "summary": "check if inward_claw is held by left hand",
-                                    "name": "check left_hand hold inward_claw",
-                                    "identifier": 4,
+                                    "summary": "check if parallel_box1 is held by left hand",
+                                    "name": "check left_hand hold parallel_box1",
+                                    "identifier": 5,
                                     "type_name": "condition",
                                     "conditions": [
                                         {
                                             "object_name": "left_hand",
                                             "property_name": "hold",
-                                            "property_value": "inward_claw",
+                                            "property_value": "parallel_box1",
                                             "status": true
                                         }
                                     ]
                                 },
                                 {
                                     "name": "load_tool sequence",
-                                    "identifier": 5,
+                                    "identifier": 6,
                                     "type_name": "sequence",
                                     "children": [
                                         {
-                                            "summary": "check if inward_claw is equippable",
-                                            "name": "check inward_claw is_equippable",
-                                            "identifier": 6,
+                                            "summary": "check if parallel_box1 is equippable",
+                                            "name": "check parallel_box1 is_equippable",
+                                            "identifier": 7,
                                             "type_name": "condition",
                                             "conditions": [
                                                 {
-                                                    "object_name": "inward_claw",
+                                                    "object_name": "parallel_box1",
                                                     "property_name": "is_equippable",
                                                     "property_value": null,
                                                     "status": true
@@ -77,7 +77,7 @@
                                         {
                                             "summary": "check if left hand is free",
                                             "name": "check left_hand is_free",
-                                            "identifier": 7,
+                                            "identifier": 8,
                                             "type_name": "condition",
                                             "conditions": [
                                                 {
@@ -89,9 +89,9 @@
                                             ]
                                         },
                                         {
-                                            "summary": "equip inward_claw to left hand",
-                                            "name": "load_tool(left_hand, inward_claw)",
-                                            "identifier": 8,
+                                            "summary": "equip parallel_box1 to left hand",
+                                            "name": "load_tool(left_hand, parallel_box1)",
+                                            "identifier": 9,
                                             "type_name": "action",
                                             "effects": [
                                                 {
@@ -101,7 +101,7 @@
                                                     "status": false
                                                 },
                                                 {
-                                                    "object_name": "inward_claw",
+                                                    "object_name": "parallel_box1",
                                                     "property_name": "is_equippable",
                                                     "property_value": null,
                                                     "status": false
@@ -109,7 +109,7 @@
                                                 {
                                                     "object_name": "left_hand",
                                                     "property_name": "hold",
-                                                    "property_value": "inward_claw",
+                                                    "property_value": "parallel_box1",
                                                     "status": true
                                                 }
                                             ]
@@ -119,37 +119,37 @@
                             ]
                         },
                         {
-                            "name": "pickup selector",
-                            "identifier": 9,
+                            "name": "pick_up selector",
+                            "identifier": 10,
                             "type_name": "selector",
                             "children": [
                                 {
-                                    "summary": "check if gear3 is held by inward_claw",
-                                    "name": "check inward_claw hold gear3",
-                                    "identifier": 10,
+                                    "summary": "check if parallel_box1 holds gear1",
+                                    "name": "check parallel_box1 hold gear1",
+                                    "identifier": 11,
                                     "type_name": "condition",
                                     "conditions": [
                                         {
-                                            "object_name": "inward_claw",
+                                            "object_name": "parallel_box1",
                                             "property_name": "hold",
-                                            "property_value": "gear3",
+                                            "property_value": "gear1",
                                             "status": true
                                         }
                                     ]
                                 },
                                 {
-                                    "name": "pickup sequence",
-                                    "identifier": 11,
+                                    "name": "pick_up sequence",
+                                    "identifier": 12,
                                     "type_name": "sequence",
                                     "children": [
                                         {
-                                            "summary": "check if gear3 is free",
-                                            "name": "check gear3 is_free",
-                                            "identifier": 12,
+                                            "summary": "check if parallel_box1 is free",
+                                            "name": "check parallel_box1 is_free",
+                                            "identifier": 13,
                                             "type_name": "condition",
                                             "conditions": [
                                                 {
-                                                    "object_name": "gear3",
+                                                    "object_name": "parallel_box1",
                                                     "property_name": "is_free",
                                                     "property_value": null,
                                                     "status": true
@@ -157,19 +157,19 @@
                                             ]
                                         },
                                         {
-                                            "summary": "pick up gear3 using inward_claw",
-                                            "name": "pickup(left_hand, gear3, inward_claw)",
-                                            "identifier": 13,
+                                            "summary": "pick up gear1 using parallel_box1",
+                                            "name": "pick_up(left_hand, parallel_box1, gear1)",
+                                            "identifier": 14,
                                             "type_name": "action",
                                             "effects": [
                                                 {
-                                                    "object_name": "inward_claw",
+                                                    "object_name": "parallel_box1",
                                                     "property_name": "hold",
-                                                    "property_value": "gear3",
+                                                    "property_value": "gear1",
                                                     "status": true
                                                 },
                                                 {
-                                                    "object_name": "inward_claw",
+                                                    "object_name": "parallel_box1",
                                                     "property_name": "is_free",
                                                     "property_value": null,
                                                     "status": false
@@ -181,41 +181,27 @@
                             ]
                         },
                         {
-                            "summary": "check if gear3 can be inserted to shaft2",
-                            "name": "check gear3 can_insert_to shaft2",
-                            "identifier": 14,
-                            "type_name": "condition",
-                            "conditions": [
-                                {
-                                    "object_name": "gear3",
-                                    "property_name": "can_insert_to",
-                                    "property_value": "shaft2",
-                                    "status": true
-                                }
-                            ]
-                        },
-                        {
-                            "summary": "insert gear3 into shaft2",
-                            "name": "insert(left_hand, inward_claw, gear3, shaft2)",
+                            "summary": "insert gear1 into shaft1",
+                            "name": "insert(left_hand, parallel_box1, gear1, shaft1)",
                             "identifier": 15,
                             "type_name": "action",
                             "effects": [
                                 {
-                                    "object_name": "inward_claw",
-                                    "property_name": "hold",
-                                    "property_value": "gear3",
-                                    "status": false
-                                },
-                                {
-                                    "object_name": "inward_claw",
-                                    "property_name": "is_free",
-                                    "property_value": null,
+                                    "object_name": "gear1",
+                                    "property_name": "is_inserted_to",
+                                    "property_value": "shaft1",
                                     "status": true
                                 },
                                 {
-                                    "object_name": "gear3",
-                                    "property_name": "is_inserted_to",
-                                    "property_value": "shaft2",
+                                    "object_name": "parallel_box1",
+                                    "property_name": "hold",
+                                    "property_value": "gear1",
+                                    "status": false
+                                },
+                                {
+                                    "object_name": "parallel_box1",
+                                    "property_name": "is_free",
+                                    "property_value": null,
                                     "status": true
                                 }
                             ]
@@ -227,33 +213,33 @@
     },
     "environment_before": {
         "objects": [
-            {"name": "gear3", "properties": ["is_free"]},
-            {"name": "shaft2", "properties": ["is_free"]},
-            {"name": "inward_claw", "properties": ["is_equippable", "is_free"]},
+            {"name": "gear1", "properties": ["is_free"]},
+            {"name": "shaft1", "properties": ["is_free"]},
+            {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
             {"name": "left_hand", "properties": ["is_free"]}
         ],
         "constraints": [
-            {"source": "gear3", "name": "can_insert_to", "target": "shaft2"},
-            {"source": "inward_claw", "name": "can_manipulate", "target": "gear3"}
+            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
         ],
         "relations": []
     },
     "environment_after": {
         "objects": [
-            {"name": "gear3", "properties": []},
-            {"name": "shaft2", "properties": []},
-            {"name": "inward_claw", "properties": ["is_equippable", "is_free"]},
+            {"name": "gear1", "properties": []},
+            {"name": "shaft1", "properties": []},
+            {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
             {"name": "left_hand", "properties": []}
         ],
         "constraints": [
-            {"source": "gear3", "name": "can_insert_to", "target": "shaft2"},
-            {"source": "inward_claw", "name": "can_manipulate", "target": "gear3"}
+            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
         ],
         "relations": [
-            {"source": "gear3", "name": "is_inserted_to", "target": "shaft2"},
-            {"source": "left_hand", "name": "hold", "target": "inward_claw"}
+            {"source": "gear1", "name": "is_inserted_to", "target": "shaft1"},
+            {"source": "left_hand", "name": "hold", "target": "parallel_box1"}
         ]
     },
-    "instruction_summary": "insert gear3 into shaft2",
+    "instruction_summary": "Insert gear1 into shaft1 using parallel_box1 with the left hand.",
     "question": ""
 }

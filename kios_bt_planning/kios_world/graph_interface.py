@@ -1,6 +1,7 @@
 """
 very simple interface to model the objects in the world and the states of them.
 """
+
 import networkx as nx
 from typing import Set, Dict, List, Any
 
@@ -78,7 +79,7 @@ class GraphInterface:
         else:
             self.remove_relation(source, name, target)
 
-    def add_relation(self, source: str, name: str, target: str):
+    def add_relation(self, source: str, name: str, target: str, isConstraint=False):
         """
         add a relation between two objects.
         if the objects do not exist, create them.
@@ -93,7 +94,7 @@ class GraphInterface:
         if target_node is None:
             # raise ValueError(f"Object {target} does not exist in the database!")
             self.add_node(target)
-        rel = Relationship(source, name, target)
+        rel = Relationship(source, name, target, isConstraint=isConstraint)
         self.relations.add(rel)
 
     def remove_relation(self, source: str, name: str, target: str):
@@ -101,14 +102,16 @@ class GraphInterface:
         self.relations.discard(rel)
 
     # for condition node checking
-    def check_property(self, node_name: str, prop: str) -> bool:
+    def check_property(self, node_name: str, prop: str, status: bool = True) -> bool:
         if node_name not in self.nodes:
-            return False
-        return self.nodes[node_name].check_property(prop)
+            return not status
+        return self.nodes[node_name].check_property(prop) == status
 
-    def check_relation(self, source: str, name: str, target: str) -> bool:
+    def check_relation(
+        self, source: str, name: str, target: str, status: bool = True
+    ) -> bool:
         rel = Relationship(source, name, target)
-        return rel in self.relations
+        return (rel in self.relations) == status
 
     def discard_relation(self, source: str, name: str, target: str):
         rel = Relationship(source, name, target)
@@ -120,9 +123,53 @@ class GraphInterface:
             self.add_node(node["name"])
             self.add_properties(node["name"], node["properties"])
 
+        if json_data.get("constraints") is None:
+            print("\033[93mWarning: No constraint found in the JSON data.\033[0m")
+        else:
+            # * add constraints (unchangeable relations)
+            for constraint in json_data["constraints"]:
+                self.add_relation(
+                    constraint["source"],
+                    constraint["name"],
+                    constraint["target"],
+                    isConstraint=True,
+                )
+
         # * add relations
-        for relation in json_data["relations"]:
-            self.add_relation(relation["source"], relation["name"], relation["target"])
+        if json_data.get("relations") is None:
+            print("\033[93mWarning: No relations found in the JSON data.\033[0m")
+        else:
+            for relation in json_data["relations"]:
+                self.add_relation(
+                    relation["source"], relation["name"], relation["target"]
+                )
+
+    def to_json(self) -> Dict[str, Any]:
+        json_data = {"objects": [], "constraints": [], "relations": []}
+
+        # * add nodes
+        for node_name, node in self.nodes.items():
+            node_data = {"name": node_name, "properties": node.properties}
+            json_data["objects"].append(node_data)
+
+        # * add constraints and relations (unchangeable relations)
+        for rel in self.relations:
+            if rel.isConstraint:
+                constraint_data = {
+                    "source": rel.objects[0],
+                    "name": rel.relation_name,
+                    "target": rel.objects[1],
+                }
+                json_data["constraints"].append(constraint_data)
+            else:
+                relation_data = {
+                    "source": rel.objects[0],
+                    "name": rel.relation_name,
+                    "target": rel.objects[1],
+                }
+                json_data["relations"].append(relation_data)
+
+        return json_data
 
     def refresh_neo4j(self):
         self.neo4j.open_driver()

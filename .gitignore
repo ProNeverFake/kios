@@ -2,6 +2,8 @@
 secrets.json
 # llama2 code with secrets
 llama2_eval.py
+# query data
+query_history
 # python files
 *.pyc
 __pycache__/
@@ -15,3 +17,8 @@ log/
 logs/
 # .vscode
 .vscode/
+
+# graphs
+.dot
+.svg
+

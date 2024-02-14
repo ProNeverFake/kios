@@ -1,18 +1,34 @@
+# basics
+numpy
+websockets
+
+# behavior tree
 py_trees==2.2.3
+
+# pddl classical planning
 unified-planning
 unified-planning[engines] # for solving the pddl problems
+
+# graph modules
 networkx
 neo4j
+graphviz
+
+# openai
 openai # you may need to upgrade this after installing it
 # * see openai api change log for more info 
 tiktoken
-numpy
-websockets
-graphviz
+cohere
+langchain
+
+# robotics 
 roboticstoolbox-python
+
+# LLAMA
 torch
 fairscale
 fire
 sentencepiece
+
 # scene
 pymongo

@@ -846,6 +846,219 @@ result_bt_json = {
     ],
 }
 
+response_ed1 = {
+    "name": "insert selector",
+    "identifier": 0,
+    "type_name": "selector",
+    "children": [
+        {
+            "summary": "check if gear1 is inserted to shaft1",
+            "name": "check gear1 is_inserted_to shaft1",
+            "identifier": 1,
+            "type_name": "condition",
+            "conditions": [
+                {
+                    "object_name": "gear1",
+                    "property_name": "is_inserted_to",
+                    "property_value": "shaft1",
+                    "status": True,
+                }
+            ],
+        },
+        {
+            "name": "insert sequence",
+            "identifier": 2,
+            "type_name": "sequence",
+            "children": [
+                {
+                    "name": "load_tool selector",
+                    "identifier": 3,
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 is equipped",
+                            "name": "check left_hand hold parallel_box1",
+                            "identifier": 4,
+                            "type_name": "condition",
+                            "conditions": [
+                                {
+                                    "object_name": "left_hand",
+                                    "property_name": "hold",
+                                    "property_value": "parallel_box1",
+                                    "status": True,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "load_tool sequence",
+                            "identifier": 5,
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is equippable",
+                                    "name": "check parallel_box1 is_equippable",
+                                    "identifier": 6,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_equippable",
+                                            "property_value": None,
+                                            "status": True,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "check if left hand is free",
+                                    "name": "check left_hand is_free",
+                                    "identifier": 7,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "left_hand",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": True,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "equip parallel_box1 to left hand",
+                                    "name": "load_tool(left_hand, parallel_box1)",
+                                    "identifier": 8,
+                                    "type_name": "action",
+                                    "effects": [
+                                        {
+                                            "object_name": "left_hand",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": False,
+                                        },
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_equippable",
+                                            "property_value": None,
+                                            "status": False,
+                                        },
+                                        {
+                                            "object_name": "left_hand",
+                                            "property_name": "hold",
+                                            "property_value": "parallel_box1",
+                                            "status": True,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "name": "pick_up selector",
+                    "identifier": 9,
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if gear1 is held by parallel_box1",
+                            "name": "check parallel_box1 hold gear1",
+                            "identifier": 10,
+                            "type_name": "condition",
+                            "conditions": [
+                                {
+                                    "object_name": "parallel_box1",
+                                    "property_name": "hold",
+                                    "property_value": "gear1",
+                                    "status": True,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "pick_up sequence",
+                            "identifier": 11,
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if gear1 is free",
+                                    "name": "check gear1 is_free",
+                                    "identifier": 12,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "gear1",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": True,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "pick up gear1 using parallel_box1",
+                                    "name": "pick_up(left_hand, parallel_box1, gear1)",
+                                    "identifier": 13,
+                                    "type_name": "action",
+                                    "effects": [
+                                        {
+                                            "object_name": "gear1",
+                                            "property_name": "is_free",
+                                            "property_value": None,
+                                            "status": False,
+                                        },
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "hold",
+                                            "property_value": "gear1",
+                                            "status": True,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "check if gear1 can be inserted to shaft1",
+                    "name": "check gear1 can_insert_to shaft1",
+                    "identifier": 14,
+                    "type_name": "condition",
+                    "conditions": [
+                        {
+                            "object_name": "gear1",
+                            "property_name": "can_insert_to",
+                            "property_value": "shaft1",
+                            "status": True,
+                        }
+                    ],
+                },
+                {
+                    "summary": "insert gear1 to shaft1",
+                    "name": "insert(left_hand, parallel_box1, gear1, shaft1)",
+                    "identifier": 15,
+                    "type_name": "action",
+                    "effects": [
+                        {
+                            "object_name": "gear1",
+                            "property_name": "is_inserted_to",
+                            "property_value": "shaft1",
+                            "status": True,
+                        },
+                        {
+                            "object_name": "parallel_box1",
+                            "property_name": "hold",
+                            "property_value": "gear1",
+                            "status": False,
+                        },
+                        {
+                            "object_name": "parallel_box1",
+                            "property_name": "is_free",
+                            "property_value": None,
+                            "status": True,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}
+
 prompt_example = {
     "name": "insert selector",
     "identifier": 13,
@@ -1077,6 +1290,121 @@ prompt_example = {
     ],
 }
 
+bt_skeleton = {
+    "summary": "selector to insert gear1 into shaft1",
+    "name": "selector: insert gear1 into shaft1",
+    "type_name": "selector",
+    "children": [
+        {
+            "summary": "check if gear1 is inserted to shaft1",
+            "name": "target: is_inserted_to(gear1, shaft1)",
+            "type_name": "condition",
+        },
+        {
+            "summary": "sequence to insert gear1 into shaft1",
+            "name": "sequence: insert gear1 into shaft1",
+            "type_name": "sequence",
+            "children": [
+                {
+                    "summary": "selector to load parallel_box1",
+                    "name": "selector: load parallel_box1",
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 is held by left hand",
+                            "name": "target: hold(left_hand, parallel_box1)",
+                            "type_name": "condition",
+                        },
+                        {
+                            "summary": "sequence to load parallel_box1",
+                            "name": "sequence: load parallel_box1",
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is equippable",
+                                    "name": "precondition: is_equippable(parallel_box1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "check if left hand is free",
+                                    "name": "precondition: is_free(left_hand)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "equip parallel_box1 to left hand",
+                                    "name": "action: load_tool(left_hand, parallel_box1)",
+                                    "type_name": "action",
+                                    "effects": [
+                                        {"summary": "left hand will be not free"},
+                                        {
+                                            "summary": "parallel_box1 will be not equippable"
+                                        },
+                                        {
+                                            "summary": "left hand will hold parallel_box1"
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "selector to pick up gear1",
+                    "name": "selector: pick up gear1",
+                    "type_name": "selector",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 holds gear1",
+                            "name": "target: hold(parallel_box1, gear1)",
+                            "type_name": "condition",
+                        },
+                        {
+                            "summary": "sequence to pick up gear1",
+                            "name": "sequence: pick up gear1",
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 can manipulate gear1",
+                                    "name": "precondition: can_manipulate(parallel_box1, gear1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "check if gear1 is free",
+                                    "name": "precondition: is_free(gear1)",
+                                    "type_name": "condition",
+                                },
+                                {
+                                    "summary": "pick up gear1 using parallel_box1",
+                                    "name": "action: pick_up(left_hand, parallel_box1, gear1)",
+                                    "type_name": "action",
+                                    "effects": [
+                                        {"summary": "parallel_box1 will hold gear1"},
+                                        {"summary": "gear1 will be not free"},
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "check if gear1 can be inserted to shaft1",
+                    "name": "precondition: can_insert_to(gear1, shaft1)",
+                    "type_name": "condition",
+                },
+                {
+                    "summary": "insert gear1 to shaft1",
+                    "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)",
+                    "type_name": "action",
+                    "effects": [
+                        {"summary": "parallel_box1 will be free"},
+                        {"summary": "gear1 will be inserted to shaft1"},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+
 
 def test_result_bt(result_bt):
     test_class = BehaviorTreeFactory()
@@ -1090,12 +1418,22 @@ def test_result_bt(result_bt):
 
 def test_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
-    bt = test_class.from_json_to_bt(bt_json)
+    bt = test_class.from_json_to_simple_bt(bt_json)
     bt_stewardship = generate_bt_stewardship(bt)
     bt_stewardship.setup(timeout=15)
     render_dot_tree(bt_stewardship)
 
     tick_loop_test(bt_stewardship)
+
+
+def visualize_bt(bt_json: json):
+    test_class = BehaviorTreeFactory()
+    bt = test_class.from_json_to_simple_bt(bt_json)
+    bt_stewardship = generate_bt_stewardship(bt)
+    # bt_stewardship.setup(timeout=15)
+    render_dot_tree(bt_stewardship)
+
+    # tick_loop_test(bt_stewardship)
 
 
 if __name__ == "__main__":
@@ -1104,4 +1442,6 @@ if __name__ == "__main__":
     # test_result_bt(result_bt_json)
     # test_bt(prompt_example)
     py_trees.logging.level = py_trees.logging.Level.DEBUG
-    test_bt(result_bt_json)
+    # test_bt(result_bt_json)
+    test_bt(bt_skeleton)
+    # visualize_bt(bt_skeleton)

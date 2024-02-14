@@ -2,9 +2,12 @@ from kios_utils.task import *
 from typing import List, Any
 import time
 import json
+from tabulate import tabulate
 
+
+from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
-from kios_robot.data_types import MiosSkill, MiosCall
+from kios_robot.data_types import MiosSkill, MiosCall, KiosCall
 from kios_robot.data_types import TaskScene
 
 
@@ -13,16 +16,19 @@ class RobotCommand:
     robot_port: int = None
     shared_data: Any = None
 
-    task_scene: TaskScene = None  # currently not used
+    robot_interface: RobotInterface = None
 
-    task_list: List[MiosSkill or MiosCall] = []
+    task_scene: TaskScene = None
+
+    task_list: List[MiosSkill | MiosCall | KiosCall] = []
 
     def __init__(
         self,
         robot_address: str,
         robot_port: int,
         shared_data: Any,
-        robot_scene: TaskScene,
+        task_scene: TaskScene,
+        robot_interface: RobotInterface,  # ! not used yet
     ):
         if robot_address is not None:
             self.robot_address = robot_address
@@ -39,11 +45,17 @@ class RobotCommand:
         else:
             print("warning: robot command shared_data is not set.")
 
-        if robot_scene is not None:
-            self.task_scene = robot_scene
+        if task_scene is not None:
+            self.task_scene = task_scene
         else:
             # raise Exception("robot_scene is not set")
-            pass
+            print("warning: robot command task_scene is not set.")
+
+        if robot_interface is not None:
+            self.robot_interface = robot_interface
+        else:
+            raise Exception("robot_interface is not set")
+        self.task_list = []
 
     def initialize(self):
         pass
@@ -61,6 +73,7 @@ class RobotCommand:
         call_method(self.robot_address, self.robot_port, "stop_task", payload=payload)
 
     def execute_task_list_sync(self) -> bool:
+        self.show_tasks()
         for task_item in self.task_list:
             if isinstance(task_item, MiosSkill):  # * use general task
                 mios_task = Task(self.robot_address)
@@ -95,13 +108,17 @@ class RobotCommand:
                 if mios_response.task_result.has_succeeded == False:
                     return False
 
-            if isinstance(task_item, MiosCall):  # * use general call
+            elif isinstance(task_item, MiosCall):  # * use general call
                 result = call_method(
                     self.robot_address,
                     self.robot_port,
                     task_item.method_name,
                     task_item.method_payload,
                 )
+                if result is None:
+                    raise Exception(
+                        "Mios call failed. Please check mios for more debug info."
+                    )
                 mios_response = MiosInterfaceResponse.from_json(result["result"])
                 # print("Result: " + str(result))
                 print("\033[92mMios replied: ")
@@ -110,7 +127,40 @@ class RobotCommand:
                 if mios_response.has_finished == False:
                     return False
 
+            elif isinstance(task_item, KiosCall):  # * use general call
+                result_bool = task_item.method(*task_item.args)
+                if result_bool != True:
+                    return False
+
+            else:
+                raise Exception("Unknown task type: {}".format(task_item))
+                # raise Exception("Unknown task type: {}".format(task_item))
+
+        print("\033[94mRobot command has successfully finished\033[0m")  # Print in blue
         return True
 
-    def add_mios_task(self, mios_task: MiosSkill or MiosCall):
-        self.task_list.append(mios_task)
+    def add_task(self, task: MiosSkill | MiosCall | KiosCall):
+        self.task_list.append(task)
+
+    def add_tasks(self, tasks: List[MiosSkill | MiosCall | KiosCall]):
+        self.task_list.extend(tasks)
+
+    def prepend_task(self, task: MiosSkill | MiosCall | KiosCall):
+        self.task_list.insert(0, task)
+
+    def prepend_tasks(self, tasks: List[MiosSkill | MiosCall | KiosCall]):
+        self.task_list = tasks + self.task_list
+
+    def clear_tasks(self):
+        self.task_list = []
+
+    def show_tasks(self):
+        task_table = []
+        for task in self.task_list:
+            task_type = type(task).__name__  # mios_skill, mios_call, kios_call
+            task_name = str(task)
+            task_table.append([task_type, task_name])
+
+        print(tabulate(task_table, headers=["Task Type", "Task Name"], tablefmt="grid"))
+
+        # pass

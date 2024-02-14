@@ -2,8 +2,34 @@
 typing dataclasses for the kios_bt_planning package
 """
 
+# ! most of the data types here are deprecated and not used in the current version of the package
+
 from dataclasses import dataclass
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
+
+import py_trees
+import json
+
+
+# * in use
+@dataclass
+class TreeResult:
+    """
+    a result from the simulation
+    """
+
+    result: str
+    summary: str
+    final_node: Optional[dict]  # ! alaerm
+    world_state: Dict[str, List[Dict[str, str]]]
+
+    def to_json(self):
+        return {
+            "result": self.result,
+            "summary": self.summary,
+            "final_node": self.final_node,
+            "world_state": self.world_state,
+        }
 
 
 @dataclass
@@ -77,9 +103,9 @@ class GroundedAction:
                     "mios_parameters is not fully grounded. Value cannot be None."
                 )
 
-        self.mios_parameters["skill_parameters"]["skill"][
-            "objects"
-        ] = self.mios_parameters["skill_objects"]
+        self.mios_parameters["skill_parameters"]["skill"]["objects"] = (
+            self.mios_parameters["skill_objects"]
+        )
 
     # TODO not condition.
     def ground_preconditions(self) -> List[GroundedCondition]:
@@ -173,6 +199,7 @@ class Predicate:  # not used yet
     variables: List[List[str]]
 
 
+################################################################## * in use ##################################################################
 @dataclass
 class ObjectProperty:  # for indicating the conditions and the effects in an object-centric way
     """
@@ -187,6 +214,14 @@ class ObjectProperty:  # for indicating the conditions and the effects in an obj
     property_value: str
     status: bool
 
+    def to_json(self):
+        return {
+            "object_name": self.object_name,
+            "property_name": self.property_name,
+            "property_value": self.property_value,
+            "status": self.status,
+        }
+
 
 @dataclass
 class Condition:  # for generating a condition node
@@ -195,6 +230,14 @@ class Condition:  # for generating a condition node
     name: str  # the name of the condition you want this node to check
     conditions: List[ObjectProperty]
 
+    def to_json(self):
+        return {
+            "summary": self.summary,
+            "identifier": self.identifier,
+            "name": self.name,
+            "conditions": [condition.to_json() for condition in self.conditions],
+        }
+
 
 @dataclass
 class Action:  # for generating an action node
@@ -202,6 +245,14 @@ class Action:  # for generating an action node
     identifier: int
     name: str  # the name of the action you want this node to conduct
     effects: List[ObjectProperty]  # the effects of the action
+
+    def to_json(self):
+        return {
+            "summary": self.summary,
+            "identifier": self.identifier,
+            "name": self.name,
+            "effects": [effect.to_json() for effect in self.effects],
+        }
 
 
 @dataclass

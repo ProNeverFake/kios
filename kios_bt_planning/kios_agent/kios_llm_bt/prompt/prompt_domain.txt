@@ -1,8 +1,8 @@
 [user]
-Following is the domain knowledge you need, given as a pddl domain file, which includes:
-- the types of objects in the world,
-- the predicates that can be used to describe the states of the world,
-- the actions that you can apply, including their precondtions and effects.
+Following is the domain knowledge you need in pddl domain format, which includes:
+- the object types in the world,
+- the predicates for describing the states of the world,
+- the actions that the robot can apply, with their precondtions and effects defined.
 """
 (define (domain robot_assembly_problem-domain)
  (:requirements :strips :typing)
@@ -56,7 +56,7 @@ Following is the domain knowledge you need, given as a pddl domain file, which i
 The precidates are explained as follows:
 """
 "PREDICATE_LIST"
-- is_free(<thing>): <thing> is free and can hold something. (Initially defaulted to be true)
+- is_free(<thing>): <thing> is free and can hold something. (Initially defaulted to be true) (Note: <thing> can be a <hand> or a <tool>)
 - is_equippable(<tool>): <tool> is ready to be eqquipped by a robot hand. (Initially defaulted to be true)
 - can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint) (Initially defaulted to be false)
 - can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint) (Initially defaulted to be false)

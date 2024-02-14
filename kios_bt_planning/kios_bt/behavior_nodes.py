@@ -24,7 +24,7 @@ import py_trees.common
 import py_trees.console as console
 
 # kios
-from kios_utils.kios_utils import ActionPhase
+from backups.kios_utils import ActionPhase
 from kios_utils.task import *
 from kios_bt.data_types import (
     ActionInstance,
@@ -37,7 +37,8 @@ from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.robot_command import RobotCommand
 from kios_robot.mios_async import fake_robot_command_monitor, robot_command_monitor
-from kios_bt.mios_async import mios_monitor, fake_monitor
+
+# from kios_bt.mios_async import mios_monitor, fake_monitor
 
 
 ##############################################################################
@@ -67,7 +68,7 @@ class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
         # * stop the monitor process, regardless of the result
         if self.monitor is None:
             pass
-            # print(self.__class__.__name__ + ": monitor is None")
+            # self.debug(f'Node "{self.behavior_name}" has no monitor to terminate')
         else:
             self.monitor.terminate()
 
@@ -88,7 +89,7 @@ class ActionNode(BehaviorNode):
     monitor: ...
     shared_data: Any
     robot_command: RobotCommand
-    multiprocessing_manager: Manager
+    multiprocessing_manager: Any
     parent_connection: multiprocessing.connection.Connection
     child_connection: multiprocessing.connection.Connection
 
@@ -114,13 +115,13 @@ class ActionNode(BehaviorNode):
             action, self.shared_data
         )
         self.robot_command.initialize()
-
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def take_effect(self):
         """
         interact with the world interface to exert the effects
         """
+        self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
         self.world_interface.take_effect(self.action)
 
     def setup(self, **kwargs: int) -> None:
@@ -143,6 +144,7 @@ class ActionNode(BehaviorNode):
         )
         atexit.register(self.monitor.terminate)
         self.monitor.start()
+        self.logger.info(f"Action node {self.behavior_name} started.")
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
@@ -174,12 +176,17 @@ class ActionNode(BehaviorNode):
         if self.parent_connection.poll():
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
-                self.logger.debug("Task finished successfully")
+                self.logger.info(f'Action "{self.behavior_name}" finished successfully')
                 new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
+                # ! I think here the action node should not return a success. it should always return running.
+                # ! and it should "task effect".
+                # ! the target condition node in the selector will be fulfilled by the "task effect"
+                # ! the action node will be interrupted by the selector, and the tick goes on...
+                # ! YOU WILL UNDERSTAND ME SOONER OR LATER...
             else:
-                self.logger.debug("Task finished with error")
+                self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE
 
         return new_status
@@ -226,8 +233,11 @@ class ConditionNode(BehaviorNode):
         result = self.world_interface.check_condition(self.condition)
 
         if result == True:
+            self.logger.info(f'Condition "{self.behavior_name}" is satisfied')
             new_status = py_trees.common.Status.SUCCESS
+
         else:
+            self.logger.info(f'Condition "{self.behavior_name}" is not satisfied')
             new_status = py_trees.common.Status.FAILURE
 
         return new_status
@@ -240,7 +250,17 @@ class ActionNodeTest(ActionNode):
         world_interface: WorldInterface,
         robot_interface: RobotInterface,
     ):
-        super().__init__(action, world_interface, robot_interface)
+        self.action = action
+        """Configure the name of the behaviour."""
+        self.identifier = action.identifier
+        self.behavior_name = self.action.name
+        super(ActionNode, self).__init__(world_interface, robot_interface)
+
+        # * setup the task
+        self.multiprocessing_manager = Manager()
+        self.shared_data = self.multiprocessing_manager.dict()
+        self.robot_command = None
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def register_predicates(self) -> None:
         pass
@@ -263,6 +283,7 @@ class ActionNodeTest(ActionNode):
         )
         atexit.register(self.monitor.terminate)
         self.monitor.start()
+        self.logger.info(f"Action node {self.behavior_name} started.")
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
@@ -273,13 +294,76 @@ class ActionNodeTest(ActionNode):
         if self.parent_connection.poll():
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
-                self.logger.debug("Task finished successfully")
+                self.logger.info(f'Action "{self.behavior_name}" finished successfully')
                 new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
             else:
-                self.logger.debug("Task finished with error")
+                self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE
+
+        return new_status
+
+
+class ActionNodeSim(ActionNode):
+    success_flag: bool
+
+    @staticmethod
+    def from_action_node(action_node: ActionNode) -> "ActionNodeSim":
+        return ActionNodeSim(action_node.action, action_node.world_interface)
+
+    def __init__(
+        self,
+        action: Action,
+        world_interface: WorldInterface,
+        robot_interface: RobotInterface = None,  #  not needed for simulation
+    ):
+        self.success_flag = False
+        self.tick_times = 0
+        self.tick_times_target = 3
+        self.hasTakenEffect = False
+        self.action = action
+        """Configure the name of the behaviour."""
+        self.identifier = action.identifier
+        self.behavior_name = self.action.name
+        super(ActionNode, self).__init__(world_interface, robot_interface)
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
+
+    def setup(self, **kwargs: int) -> None:
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
+
+    def initialise(self) -> None:
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        self.tick_times = 0
+        self.hasTakenEffect = False
+        self.logger.info(f"Sim action node {self.behavior_name} started.")
+
+    def take_effect(self):
+        """
+        interact with the world interface to exert the effects
+        """
+        if self.hasTakenEffect:
+            return
+        self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
+        self.world_interface.take_effect(self.action)
+
+    def update(self) -> py_trees.common.Status:
+        """
+        running ---> success
+        """
+        self.logger.debug("%s.update()" % (self.__class__.__name__))
+
+        if self.tick_times >= self.tick_times_target:
+            self.logger.info(f'Action "{self.behavior_name}" finished successfully')
+            # new_status = py_trees.common.Status.SUCCESS
+            new_status = py_trees.common.Status.RUNNING
+            # ! As I said, the action node should always return running.
+            # ! this will help to catch the mistakes in action effects.
+            self.take_effect()
+
+        else:
+            self.tick_times += 1
+            new_status = py_trees.common.Status.RUNNING
 
         return new_status
 

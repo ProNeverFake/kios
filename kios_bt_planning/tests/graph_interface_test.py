@@ -91,6 +91,7 @@ def test_from_json():
     gi.from_json(json_data)
     print(gi.nodes)
     print(gi.relations)
+    gi.refresh_neo4j()
 
 
 if __name__ == "__main__":

@@ -13,11 +13,27 @@ class MiosSkill:
     skill_type: str
     skill_parameters: Dict[str, Any]
 
+    def __str__(self) -> str:
+        return self.skill_name
+
 
 @dataclass
 class MiosCall:
     method_name: str
     method_payload: Dict[str, Any]
+
+    def __str__(self) -> str:
+        return self.method_name
+
+
+@dataclass
+class KiosCall:
+    method: object
+    args: List[Any]
+    call_name: str = field(default="default name")  # ! alarm: test!
+
+    def __str__(self) -> str:
+        return self.call_name
 
 
 # @dataclass
@@ -27,6 +43,7 @@ class MiosCall:
 class MiosObject:
     name: str
     O_T_OB: np.ndarray
+    O_T_TCP: np.ndarray
     OB_T_gp: np.ndarray
     OB_T_TCP: np.ndarray
     OB_I: np.ndarray
@@ -38,9 +55,15 @@ class MiosObject:
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "MiosObject":
+        O_T_TCP = (
+            np.reshape(np.array(json["O_T_TCP"]), (4, 4)).T
+            if "O_T_TCP" in json
+            else None
+        )
         return MiosObject(
             name=json["name"],
             O_T_OB=np.reshape(np.array(json["O_T_OB"]), (4, 4)).T,
+            O_T_TCP=O_T_TCP,
             OB_T_gp=np.reshape(np.array(json["OB_T_gp"]), (4, 4)).T,
             OB_T_TCP=np.reshape(np.array(json["OB_T_TCP"]), (4, 4)).T,
             OB_I=np.reshape(np.array(json["OB_I"]), (3, 3)).T,
@@ -56,6 +79,7 @@ class MiosObject:
         return {
             "name": mios_object.name,
             "O_T_OB": mios_object.O_T_OB.T.flatten().tolist(),
+            "O_T_TCP": mios_object.O_T_TCP.T.flatten().tolist(),
             "OB_T_gp": mios_object.OB_T_gp.T.flatten().tolist(),
             "OB_T_TCP": mios_object.OB_T_TCP.T.flatten().tolist(),
             "OB_I": mios_object.OB_I.T.flatten().tolist(),
@@ -70,6 +94,7 @@ class MiosObject:
         table = [
             ["name", str(self.name)],
             ["O_T_OB", str(self.O_T_OB)],
+            ["O_T_TCP", str(self.O_T_TCP)],
             ["OB_T_gp", str(self.OB_T_gp)],
             ["OB_T_TCP", str(self.OB_T_TCP)],
             ["OB_I", str(self.OB_I)],
@@ -84,7 +109,9 @@ class MiosObject:
 
 @dataclass
 class MiosInterfaceResponse:
-    has_finished: bool  # * whether the task is fully conducted or not (has exception or not)
+    has_finished: (
+        bool  # * whether the task is fully conducted or not (has exception or not)
+    )
     error_message: Optional[str]
     task_result: "MiosTaskResult" = field(default=None)
 
@@ -154,15 +181,30 @@ class MiosTaskResult:
 @dataclass
 class KiosObject:
     name: str
+    source: str
+    O_T_TCP: np.ndarray
     O_T_EE: np.ndarray
     joint_pose: List[float] = field(default=None)
     reference_object: None = field(default=None)
+
+    def __str__(self) -> str:
+        table = [
+            ["name", self.name],
+            ["source", self.source],
+            ["joint_pose", self.joint_pose],
+            ["O_T_TCP", self.O_T_TCP.tolist()],
+            ["O_T_EE", self.O_T_EE.tolist()],
+            ["reference_object", self.reference_object],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     @staticmethod
     def from_mios_object(mios_object: MiosObject) -> "KiosObject":
         return KiosObject(
             name=mios_object.name,
+            source="mios",
             joint_pose=mios_object.q,
+            O_T_TCP=mios_object.O_T_TCP,
             O_T_EE=mios_object.O_T_OB,
             reference_object=None,
         )
@@ -170,10 +212,14 @@ class KiosObject:
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "KiosObject":
         return KiosObject(
-            name=json["name"],
-            joint_pose=json["joint_pose"],
-            O_T_EE=json["O_T_EE"],
-            reference_object=json["reference_object"],
+            name=json["object_name"],
+            source=json["source"],
+            joint_pose=json["joint_pose"] if "joint_pose" in json else None,
+            O_T_TCP=np.array(json["O_T_TCP"]) if "O_T_TCP" in json else None,
+            O_T_EE=np.array(json["O_T_EE"]) if "O_T_EE" in json else None,
+            reference_object=(
+                json["reference_object"] if "reference_object" in json else None
+            ),
         )
 
     @staticmethod
@@ -185,12 +231,13 @@ class KiosObject:
                 relation.reference_object.joint_pose + relation.relative_joint_pose
             )
 
-        O_T_EE = relation.reference_object.O_T_EE.dot(relation.relative_HT)
+        O_T_TCP = relation.reference_object.O_T_TCP.dot(relation.relative_HT)
 
         return KiosObject(
             name=name,
+            source="relation",
             joint_pose=joint_pose,
-            O_T_EE=O_T_EE,
+            O_T_TCP=O_T_TCP,
             reference_object=relation.reference_object,
         )
 
@@ -198,6 +245,7 @@ class KiosObject:
 # ! BBWORK suspend here. need to figure out if using MiosObject is a good idea.
 @dataclass
 class ReferenceRelation:
+    name: str  # ! this is not unique!
     reference_object: KiosObject
     relative_HT: np.ndarray  # from reference object to this object
     relative_joint_pose: List[float] = field(
@@ -243,6 +291,8 @@ class ReferenceRelation:
 class Toolbox:
     name: str
     # * for future you should consider using these parameters to invoke the gripper-related skills
+    EE_finger_width_max: float = field(default=0.08)
+    EE_finger_width_min: float = field(default=0.0)
     load_width: float = field(
         default=0.042
     )  # the width the hand to reach in order to load this tool
@@ -254,32 +304,51 @@ class Toolbox:
     grasp_eps_in: float = field(default=0.005)  # not used yet
     grasp_eps_out: float = field(default=0.005)
     # kinematics parameters
-    EE_HT_TCP: np.ndarray = field(default=np.eye(4))
+    EE_T_TCP: np.ndarray = field(default=np.eye(4))
+
+    def __str__(self):
+        table = [
+            ["name", self.name],
+            ["EE_finger_width_max", self.EE_finger_width_max],
+            ["EE_finger_width_min", self.EE_finger_width_min],
+            ["load_width", self.load_width],
+            ["unload_width", self.unload_width],
+            ["grasp_force", self.grasp_force],
+            ["grasp_speed", self.grasp_speed],
+            ["grasp_eps_in", self.grasp_eps_in],
+            ["grasp_eps_out", self.grasp_eps_out],
+            ["EE_T_TCP", self.EE_T_TCP.tolist()],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "Toolbox":
         return Toolbox(
             name=json["name"],
+            EE_finger_width_max=json["EE_finger_width_max"],
+            EE_finger_width_min=json["EE_finger_width_min"],
             load_width=json["load_width"],
             unload_width=json["unload_width"],
             grasp_force=json["grasp_force"],
             grasp_speed=json["grasp_speed"],
             grasp_eps_in=json["grasp_eps_in"],
             grasp_eps_out=json["grasp_eps_out"],
-            EE_HT_TCP=np.reshape(np.array(json["EE_HT_TCP"]), (4, 4)).T,
+            EE_T_TCP=np.reshape(np.array(json["EE_T_TCP"]), (4, 4)).T,
         )
 
     @staticmethod
     def to_json(toolbox: "Toolbox") -> Dict[str, Any]:
         return {
             "name": toolbox.name,
+            "EE_finger_width_max": toolbox.EE_finger_width_max,
+            "EE_finger_width_min": toolbox.EE_finger_width_min,
             "load_width": toolbox.load_width,
             "unload_width": toolbox.unload_width,
             "grasp_force": toolbox.grasp_force,
             "grasp_speed": toolbox.grasp_speed,
             "grasp_eps_in": toolbox.grasp_eps_in,
             "grasp_eps_out": toolbox.grasp_eps_out,
-            "EE_HT_TCP": toolbox.EE_HT_TCP.T.flatten().tolist(),
+            "EE_T_TCP": toolbox.EE_T_TCP.T.flatten().tolist(),
         }
 
 
@@ -288,3 +357,98 @@ class TaskScene:
     tool_map: Dict[str, Toolbox] = field(default_factory=dict)
     object_map: Dict[str, KiosObject] = field(default_factory=dict)
     reference_map: Dict[str, ReferenceRelation] = field(default_factory=dict)
+
+    def __str__(self) -> str:
+        table = [
+            ["tools", self.tool_map],
+            ["objects", self.object_map],
+            ["references", self.reference_map],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
+    def get_object(self, object_name: str) -> Optional[KiosObject]:
+        return self.object_map.get(object_name)
+
+    def get_tool(self, tool_name: str = None) -> Toolbox:
+        if tool_name is None:
+            return self.tool_map.get("default_tool")
+        tool = self.tool_map.get(tool_name)
+        if tool is None:
+            raise Exception(f"Tool {tool_name} is not in the scene!")
+        return tool
+
+
+@dataclass
+class RobotState:
+    joint_pose: List[float]
+    O_T_EE: np.ndarray
+    EE_T_TCP: np.ndarray
+    O_T_TCP: np.ndarray
+    status: str
+    current_task: str
+    gripper_width: float
+    TF_T_EE_d: np.ndarray = field(default=None)
+    q_d: List[float] = field(default=None)
+
+    def __str__(self) -> str:
+        table = [
+            ["joint_pose", self.joint_pose],
+            [
+                "O_T_EE",
+                "\n".join(["\t".join(map(str, row)) for row in self.O_T_EE.tolist()]),
+            ],
+            [
+                "EE_T_TCP",
+                "\n".join(["\t".join(map(str, row)) for row in self.EE_T_TCP.tolist()]),
+            ],
+            [
+                "O_T_TCP",
+                "\n".join(["\t".join(map(str, row)) for row in self.O_T_TCP.tolist()]),
+            ],
+            ["status", self.status],
+            ["current_task", self.current_task],
+            ["gripper_width", self.gripper_width],
+            # ["q_d", self.q_d],
+            # ["TF_T_EE_d", "\n".join(["\t".join(map(str, row)) for row in self.TF_T_EE_d.tolist()])],
+        ]
+        return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
+    @staticmethod
+    def from_json(json: Dict[str, Any]) -> "RobotState":
+        return RobotState(
+            joint_pose=json["q"],
+            O_T_EE=np.reshape(np.array(json["O_T_EE"]), (4, 4)).T,
+            EE_T_TCP=np.reshape(np.array(json["EE_T_TCP"]), (4, 4)).T,
+            O_T_TCP=np.reshape(np.array(json["O_T_TCP"]), (4, 4)).T,
+            status=json["status"],
+            current_task=json["current_task"],
+            gripper_width=json["gripper_width"],
+            # q_d=json["q_d"],
+            # TF_T_EE_d=np.reshape(np.array(json["TF_T_EE_d"]), (4, 4)).T,
+        )
+
+    @staticmethod
+    def to_json(robot_state: "RobotState") -> Dict[str, Any]:
+        return {
+            "q": robot_state.joint_pose,
+            "O_T_EE": robot_state.O_T_EE.T.flatten().tolist(),
+            "EE_T_TCP": robot_state.EE_T_TCP.T.flatten().tolist(),
+            "O_T_TCP": robot_state.O_T_TCP.T.flatten().tolist(),
+            "status": robot_state.status,
+            "current_task": robot_state.current_task,
+            "gripper_width": robot_state.gripper_width,
+            # "q_d": robot_state.q_d,
+            # "TF_T_EE_d": robot_state.TF_T_EE_d.T.flatten().tolist(),
+        }
+
+
+@dataclass
+class ParsedAction:
+    action_name: str
+    args: List[str]
+
+    @staticmethod
+    def from_string(action_string: str) -> "ParsedAction":
+        # ! haven't tested yet
+        action_name, *args = action_string.split()
+        return ParsedAction(action_name, args)

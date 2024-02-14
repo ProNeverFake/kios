@@ -1,0 +1,99 @@
+{
+    "reference_objects":
+    [
+        {
+            "object_name": "test_box1",
+            "source": "pre-defined",
+            "O_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, -0.1],
+                [0, 0, 0, 1]
+            ]
+        },
+        {
+            "object_name": "TestObject1",
+            "source": "mios"
+        },
+        {
+            "object_name": "inward_claw",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear3",
+            "source": "mios"
+        },
+        {
+            "object_name": "shaft2",
+            "source": "mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "parallel_box1",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "parallel_box2",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "inward_claw",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "outward_claw",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.1],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "no_tool",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.0],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
+        }
+    ]
+}

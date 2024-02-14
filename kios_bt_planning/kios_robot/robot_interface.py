@@ -11,10 +11,7 @@ from kios_bt.data_types import Action
 
 from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
-
-# from kios_robot.robot_actuator import RobotActuator
-from kios_robot.robot_command import RobotCommand
-from kios_robot.data_types import TaskScene
+from kios_robot.data_types import TaskScene, MiosInterfaceResponse
 
 
 # # * use localhost when running mios locally.
@@ -31,6 +28,7 @@ class RobotInterface:
     mios_task_factory: MiosTaskFactory = None
     # actuator: RobotActuator = None
 
+    # robot_status: RobotStatus = None
     task_scene: TaskScene = None
 
     def __init__(self, robot_address: str = None, robot_port: int = None):
@@ -44,15 +42,17 @@ class RobotInterface:
         else:
             self.robot_port = 12000
 
+        # assert self.test_connection() == True
+
         self.initialize()
 
     def initialize(self):
         self.proprioceptor = RobotProprioceptor(self.robot_address, self.robot_port)
-        self.mios_task_factory = MiosTaskFactory(self.task_scene)
-        # self.actuator = RobotActuator(self.robot_address, self.robot_port)
+        self.mios_task_factory = MiosTaskFactory(self.task_scene, robot_interface=self)
 
     def mios_setup(self):
-        dummy_object = self.proprioceptor.get_dummy_object()
+        pass
+        # dummy_object = self.proprioceptor.get_dummy_object()
         # set the tool objects
 
     def setup_scene(self, task_scene: TaskScene):
@@ -60,16 +60,25 @@ class RobotInterface:
         self.mios_task_factory.setup_scene(task_scene)
         # teach the scene to mios
 
-    def test_connection(self):
-        return call_method(self.robot_address, self.robot_port, "test_connection")
+    def test_connection(self) -> bool:
+        response = call_method(self.robot_address, self.robot_port, "test_connection")
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(mios_response)
+        return mios_response.has_finished
 
     # * BBCORE
-    def generate_robot_command(self, action: Action, shared_data: Any) -> RobotCommand:
+    def generate_robot_command(self, action: Action, shared_data: Any):
+        """
+        shard data is shared between the action node and the robot command thread.
+        """
+        from kios_robot.robot_command import RobotCommand
+
         robot_command = RobotCommand(
             robot_address=self.robot_address,
             robot_port=self.robot_port,
             shared_data=shared_data,
-            robot_scene=self.task_scene,
+            task_scene=self.task_scene,
+            robot_interface=self,  # ! LET'S HACK!
         )
         """core method. 
         generate a robot command from an action. load the shared data into the command for possible use.
@@ -81,53 +90,51 @@ class RobotInterface:
             RobotCommand: the robot command for the action node to execute.
         """
         # ! hack
-        tasks = self.mios_task_factory.generate_fake_mios_tasks(action=action)
-        if tasks is not None:
-            for task in tasks:
-                robot_command.add_mios_task(task)
+        tasks = self.mios_task_factory.generate_tasks(
+            action=action, shared_data=shared_data
+        )
+        if tasks is not None and len(tasks) > 0:
+            robot_command.add_tasks(tasks)
         else:
             raise Exception("Action to robot command: None task is generated!")
 
         return robot_command
 
-    def create_guidance_pose(self, object_name: str, DeltaHT: np.ndarray):
-        # get the object pose
-        pass
+    # # * robot command tests
+    # def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
+    #     print("todo: check the tool in the scene.")
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(
+    #         self.mios_task_factory.generate_load_tool(tool_name)
+    #     )
+    #     print("todo: add change robot TCP")
+    #     return robot_command
 
-    def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
-        print("todo: check the tool in the scene.")
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(
-            self.mios_task_factory.generate_load_tool(tool_name)
-        )
-        print("todo: add change robot TCP")
-        return robot_command
+    # def unload_tool(self, robot: str, tool_name: str):
+    #     print("todo: check the tool in the scene.")
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(
+    #         self.mios_task_factory.generate_unload_tool(tool_name)
+    #     )
+    #     print("todo: change robot status TCP")
+    #     return robot_command
 
-    def unload_tool(self, robot: str, tool_name: str):
-        print("todo: check the tool in the scene.")
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(
-            self.mios_task_factory.generate_unload_tool(tool_name)
-        )
-        print("todo: change robot status TCP")
-        return robot_command
-
-    def pick(self, object_name: str):
-        robot_command = RobotCommand(
-            robot_address=self.robot_address,
-            robot_port=self.robot_port,
-            robot_scene=self.task_scene,
-        )
-        robot_command.add_mios_task(self.mios_task_factory.generate_pick(object_name))
-        robot_command.add_mios_task(self.mios_task_factory.generate_move_to_object())
-        robot_command.add_mios_task(self.mios_task_factory.generate_gripper_grasp())
-        robot_command.add_mios_task(self.mios_task_factory.generate_())
-        return robot_command
+    # def pick(self, object_name: str):
+    #     robot_command = RobotCommand(
+    #         robot_address=self.robot_address,
+    #         robot_port=self.robot_port,
+    #         robot_scene=self.task_scene,
+    #     )
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_pick(object_name))
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_move_to_object())
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_gripper_grasp())
+    #     robot_command.add_mios_task(self.mios_task_factory.generate_())
+    #     return robot_command

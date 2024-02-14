@@ -1,9 +1,0 @@
-I think, 
-from my point of view, 
-as far as I concerned, 
-to be honest, 
-I'm just saying, 
-you know that you are learning about a robotic project
-only if a "ros" is preserved in the project,
-even if only in its name,
-even if there is a "no" to declare the absence.

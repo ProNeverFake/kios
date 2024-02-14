@@ -49,7 +49,8 @@ class Task:
             },
             "skills": self.skill_context,
         }
-        print(self.skill_context)
+        # ceased. 13022024
+        # print(self.skill_context)
         response = start_task(self.robot, "GenericTask", parameters)
         self.task_start_response = response
 

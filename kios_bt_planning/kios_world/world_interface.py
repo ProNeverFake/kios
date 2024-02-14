@@ -54,6 +54,12 @@ class WorldInterface:
         """
         self.graph_interface.from_json(json_data)
 
+    def get_world_to_json(self) -> dict:
+        """
+        return the world state in json dict
+        """
+        return self.graph_interface.to_json()
+
     # for action node
     def take_effect(self, action: Action):
         # to add/update

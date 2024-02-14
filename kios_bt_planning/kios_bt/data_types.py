@@ -20,13 +20,15 @@ class TreeResult:
 
     result: str
     summary: str
-    defect_node: Optional[dict]
+    final_node: Optional[dict]  # ! alaerm
+    world_state: Dict[str, List[Dict[str, str]]]
 
     def to_json(self):
         return {
             "result": self.result,
             "summary": self.summary,
-            "defect_node": self.defect_node,
+            "final_node": self.final_node,
+            "world_state": self.world_state,
         }
 
 

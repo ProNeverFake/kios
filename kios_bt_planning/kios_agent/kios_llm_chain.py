@@ -12,8 +12,17 @@ import textwrap
 from langsmith import traceable
 from langsmith.wrappers import wrap_openai
 
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    FewShotChatMessagePromptTemplate,
+    BaseChatPromptTemplate,
+)
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_openai import ChatOpenAI
+
+
 """
-the llm class for prompt testing.
+the langchain version of the kios llm
 """
 
 # langsmith tracing
@@ -22,8 +31,7 @@ os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
 
-class KiosLLM:
-    encoder: tiktoken.Encoding = None
+class KiosLLMSupporter:
     prompt_directories: Dict[str, str] = None
 
     ######################################## *
@@ -45,7 +53,7 @@ class KiosLLM:
     instruction: str = None
 
     # the "system" prompt part
-    system_message: dict = None
+    system_message: str = None
 
     # The list of messages for prompting, will be sent to api
     # including: the required format (in prompt folder), the last response as assistant prompt
@@ -54,20 +62,11 @@ class KiosLLM:
     ######################################## * dir
     history_dir: str = None
 
-    def __init__(self, openai_api_key: str = None):
-        if openai_api_key is not None:
-            openai.api_key = openai_api_key
-        else:
-            try:
-                openai.api_key = os.environ["OPENAI_API_KEY"]
-            except KeyError:
-                raise Exception(
-                    "OPENAI_API_KEY is not given or set in the environment!"
-                )
+    def __init__(self):
+        pass
 
     # ! extend this method later.
     def initialize(self, prompt_dir: str = None, prompt_load_order: List[str] = None):
-        self.encoder = tiktoken.get_encoding("cl100k_base")
         script_dir = os.path.dirname(__file__)
         if prompt_dir is not None:
             self.prompt_dir = os.path.join(script_dir, prompt_dir)
@@ -88,17 +87,18 @@ class KiosLLM:
         if prompt_load_order is not None:
             self.prompt_load_order = prompt_load_order
         else:
-            self.prompt_load_order = [
-                "prompt_role",  # your are a good interpreter ... Done
-                "prompt_domain",  # domain knowledge ... Done
-                "prompt_problem",  # how the problem is provided ... Done
-                "prompt_environment",  # how to express the environment ... Done
-                # "prompt_behaviortree",  # how to construct the behavior tree ... Done
-                "prompt_bt_skeleton",  # how to construct the skeleton behavior tree ... Done
-                "prompt_bt_skeleton_example",  # some skeleton examples ... Done
-                "prompt_output_format",  # the output format ... Done
-                # "prompt_example",  # some examples ... Done
-            ]
+            # self.prompt_load_order = [
+            #     "prompt_role",  # your are a good interpreter ... Done
+            #     "prompt_domain",  # domain knowledge ... Done
+            #     "prompt_problem",  # how the problem is provided ... Done
+            #     "prompt_environment",  # how to express the environment ... Done
+            #     # "prompt_behaviortree",  # how to construct the behavior tree ... Done
+            #     "prompt_bt_skeleton",  # how to construct the skeleton behavior tree ... Done
+            #     "prompt_bt_skeleton_example",  # some skeleton examples ... Done
+            #     "prompt_output_format",  # the output format ... Done
+            #     # "prompt_example",  # some examples ... Done
+            # ]
+            raise Exception("prompt_load_order is not given!")
 
         # history directory
         if not os.path.exists(os.path.join(script_dir, "query_history")):
@@ -119,8 +119,7 @@ class KiosLLM:
         # system
         fp_system = os.path.join(self.prompt_directories["system"], "system.txt")
         with open(fp_system) as f:
-            data = f.read()
-        self.system_message = {"role": "system", "content": data}
+            self.system_message = f.read()
 
         # prompt for domain knowledge, user: brabrabra, assistant: do nothing and wait for the next prompt
         for prompt_name in self.prompt_load_order:
@@ -133,95 +132,76 @@ class KiosLLM:
             data_spilit = [item for item in data_spilit if len(item) != 0]
             assert len(data_spilit) % 2 == 0
             # load sparately to user and assistant
+            message = {}
             for i, item in enumerate(data_spilit):
                 if i % 2 == 0:
-                    self.messages.append({"sender": "user", "text": item})
+                    message["input"] = item
                 else:
-                    self.messages.append({"sender": "assistant", "text": item})
+                    message["output"] = item
+                    self.messages.append(message)
+                    message = {}
 
         # load the query template
         fp_query = os.path.join(self.prompt_directories["query"], "query.txt")
         with open(fp_query) as f:
             self.query = f.read()
 
-        # print("KiosLLM initialized")
-        # print(self.query)
-        # print(self.messages)
-
-    def setup_model(self):
-        pass
-
-    def model_query(self) -> json:
-        pass
-
-    def parse_response(self, response: json) -> Any:
-        pass
-
     def create_prompt(self):
         """
         create the prompt from messages for gpt api.
         if too long, truncate the prompt and call this recursively
         """
-        prompt = []  # list of prompt entries
-        # load the system prompt
-        prompt.append(self.system_message)
-        # load the knowledge and the last response
-        for message in self.messages:
-            prompt.append({"role": message["sender"], "content": message["text"]})
 
-        # * truncate the prompt if it is too long
-        prompt_content = ""  # this is only for checking the length of the prompt
-        for message in prompt:
-            prompt_content += message["content"]
-        print("prompt length: " + str(len(self.encoder.encode(prompt_content))))
-        if (
-            len(self.encoder.encode(prompt_content))
-            > self.max_token_length - self.max_completion_length
-        ):
-            print("prompt too long. truncated.")
-            # * truncate the prompt by removing the oldest two messages from front
-            self.messages = self.messages[2:]
-            prompt = self.create_prompt()
-        return prompt
+        example_template = ChatPromptTemplate.from_messages(
+            [
+                ("human", "{input}"),
+                ("ai", "{output}"),
+            ]
+        )
+
+        few_shot_prompt = FewShotChatMessagePromptTemplate(
+            example_prompt=example_template,
+            examples=self.messages,
+        )
+
+        system_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", self.system_message),
+            ]
+        )
+
+        query_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("human", self.query),
+            ]
+        )
+
+        final_prompt = ChatPromptTemplate.from_messages(
+            [
+                system_prompt,
+                few_shot_prompt,
+                query_prompt,
+            ]
+        )
+
+        return final_prompt
 
     def query_llm(self, problem: str, problem_name: str, model: str = None) -> dict:
         """
         runtime_instruction: the instruction from the problem/user
         """
 
-        # get the query template
-        text_base = self.query
-
-        # replace problem part
-        if text_base.find("[PROBLEM]") != -1:
-            text_base = text_base.replace("[PROBLEM]", json.dumps(problem))
-
-        # finally, add the text_base to the user query message
-        self.messages.append({"sender": "user", "text": text_base})
-
-        print("messages:")
-        # print(self.messages)
-        for message in self.create_prompt():
-            print(message.get("role"))
-
-        # * Substitue the openai.Client() with wrap_openai(openai.Client()) to enable tracing
-        client = wrap_openai(openai.Client())
-
-        # * request the gpt to response
         if model is None:
             model = "gpt-4-1106-preview"
 
-        response = client.chat.completions.create(
-            # model="gpt-3.5-turbo-16k-0613",
-            # model="gpt-4-0613", # not this
-            model=model,
-            messages=self.create_prompt(),
+        # * Substitue the openai.Client() with wrap_openai(openai.Client()) to enable tracing
+        llm = ChatOpenAI(
+            model_name=model,
             temperature=0.0,
             max_tokens=self.max_completion_length,
-            top_p=0.3,
-            frequency_penalty=0.0,
-            presence_penalty=0.3,
         )
+
+        # * request the gpt to response
 
         text = response.choices[0].message.content
         print(text)

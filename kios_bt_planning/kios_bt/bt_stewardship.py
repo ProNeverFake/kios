@@ -241,7 +241,8 @@ class BehaviorTreeStewardship:
         return TreeResult(
             result="timeout",
             summary="Behavior tree tick returns timeout!",
-            defect_node=self.extract_node_metadata(tip_node),
+            final_node=self.extract_node_metadata(tip_node),
+            world_state=self.world_interface.get_world_to_json(),
         )
 
     def extract_node_metadata(

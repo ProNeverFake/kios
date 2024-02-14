@@ -34,4 +34,4 @@ after refinement:
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
-Understood. I will wait for further instructions before starting to work.
+Understood. Waiting for next input.

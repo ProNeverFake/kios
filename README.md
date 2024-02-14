@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/LOGO.jpg" alt="LOGO" width="30%">
+  <img src="/kios_logo.png" alt="LOGO" width="30%">
 </div>
 
 # KIOS --- Knowledge-based Intelligent Operation System

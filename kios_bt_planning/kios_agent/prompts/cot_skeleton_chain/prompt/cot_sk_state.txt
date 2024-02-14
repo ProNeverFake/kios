@@ -1,9 +1,5 @@
 [user]
-The initial state in the input is explained as follows:
-    - "objects": the objects and their properties (as lists of strings) in the world. The properties can be changed by robot actions.
-    - "constraints": the constraint relations that are enforced and should not be changed. They are knowledge about the world or some constraints set by the user.
-    - "relations": the relations in the world. They can be changed by robot actions.
-following is another example:
+Information about world states should be in json dictionary format. Example:
 """
 {
     "objects": [
@@ -19,9 +15,14 @@ following is another example:
     ],
 }
 """
+It contains three lists: 
+    - "objects": the objects and their properties (as lists of strings) in the world. The properties can be changed by robot actions.
+    - "constraints": the constraint relations that are enforced and should not be changed. They are knowledge about the world or some constraints set by the user.
+    - "relations": the relations in the world. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.
 Only concentrate on the objects, constraints and relations that are related to the current task.
 
 -------------------------------------------------------
 The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
-Understood. Waiting for next input.
+Understood. I will wait for further instructions before starting to work.

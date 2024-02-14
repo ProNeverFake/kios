@@ -94,24 +94,24 @@ def main():
     #                 )\
     #                 "
 
-    problem_name = "gearset3"  # ! updated default initial states
-    problem = "(define (problem robot_assembly_problem-problem)\
-                    (:domain robot_assembly_problem-domain)\
-                    (:objects\
-                    parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-                    gear1 gear2 gear3 shaft1 shaft2 base - part\
-                    left_hand - hand\
-                    )\
-                    (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_inserted_to shaft2 base))\
-                    (:goal (and (is_inserted_to gear3 shaft2)))\
-                    )"
+    # problem_name = "gearset3"  # ! updated default initial states
+    # problem = "(define (problem robot_assembly_problem-problem)\
+    #                 (:domain robot_assembly_problem-domain)\
+    #                 (:objects\
+    #                 parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
+    #                 gear1 gear2 gear3 shaft1 shaft2 base - part\
+    #                 left_hand - hand\
+    #                 )\
+    #                 (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_inserted_to shaft2 base))\
+    #                 (:goal (and (is_inserted_to gear3 shaft2)))\
+    #                 )"
 
-    # # * refine problem
-    # problem_name = "gearset3_spsk"  # super skeleton
-    # file_dir = os.path.dirname(os.path.abspath(__file__))
-    # problem_dir = os.path.join(file_dir, "gearset3_spsk.txt")
-    # with open(problem_dir, "r") as f:
-    #     problem = f.read()
+    # * refine problem
+    problem_name = "gearset3_sk"  # super skeleton
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    problem_dir = os.path.join(file_dir, "gearset3_cot_sk.txt")
+    with open(problem_dir, "r") as f:
+        problem = f.read()
 
     llm_model = KiosLLM()
 
@@ -133,26 +133,26 @@ def main():
     # ]
     ### *
 
-    # ### * refine_super_sk
-    # feature = "re_sp_sk"
-    # model = "gpt-4-1106-preview"
-    # # model = "gpt-3.5-turbo-16k-0613"
-    # ver = "v1"
+    ### * refine_sk
+    feature = "re_sk"
+    model = "gpt-4-1106-preview"
+    # model = "gpt-3.5-turbo-16k-0613"
+    ver = "v1"
 
-    # prompt_dir = "prompts/spsk_refine"
-    # prompt_load_order = [
-    #     "refine_role",  # your are a good interpreter
-    #     "refine_input_format",  # about the input
-    #     "refine_state",  # about the state
-    #     # "refine_domain", # domain knowledge
-    #     "refine_help",  # tips about how to refine the nodes
-    #     "refine_controlflow",  # how to refine controlflow nodes
-    #     "refine_condition",  # how to refine condition nodes
-    #     "refine_action",  # how to refine action nodes
-    #     "refine_output_format",  # the output format
-    #     # "refine_chain",  # COT
-    # ]
-    # ### *
+    prompt_dir = "prompts/sk_refine"
+    prompt_load_order = [
+        "refine_role",  # your are a good interpreter
+        "refine_input_format",  # about the input
+        "refine_state",  # about the state
+        # "refine_domain", # domain knowledge
+        "refine_help",  # tips about how to refine the nodes
+        "refine_controlflow",  # how to refine controlflow nodes
+        "refine_condition",  # how to refine condition nodes
+        "refine_action",  # how to refine action nodes
+        "refine_output_format",  # the output format
+        # "refine_chain",  # COT
+    ]
+    ### *
 
     ### *skeleton
     # feature = "skeleton"
@@ -192,26 +192,26 @@ def main():
     # ]
     ### *
 
-    ## *COT skeleton
-    feature = "cot_skeleton"
-    model = "gpt-4-1106-preview"
-    ver = "v1"
-    """
-    add chain, try to solve state inconsistency by applying COT
-    use skeleton
-    """
-    prompt_dir = "prompts/cot_skeleton"
-    prompt_load_order = [
-        "cot_sk_role",  # your are a good interpreter
-        "cot_sk_output_format",  # how to generate the output
-        "cot_sk_domain",  # domain knowledge
-        "cot_sk_problem",  # the problem format
-        "cot_sk_state",  # hot to describe the state
-        "cot_sk_bt",  # how to build tree
-        "cot_sk_chain",  # COT
-        "cot_sk_example",  # some skeleton examples ... Done
-    ]
-    ## *
+    # ## *COT skeleton
+    # feature = "cot_skeleton"
+    # model = "gpt-4-1106-preview"
+    # ver = "v1"
+    # """
+    # add chain, try to solve state inconsistency by applying COT
+    # use skeleton
+    # """
+    # prompt_dir = "prompts/cot_skeleton"
+    # prompt_load_order = [
+    #     "cot_sk_role",  # your are a good interpreter
+    #     "cot_sk_output_format",  # how to generate the output
+    #     "cot_sk_domain",  # domain knowledge
+    #     "cot_sk_problem",  # the problem format
+    #     "cot_sk_state",  # hot to describe the state
+    #     "cot_sk_bt",  # how to build tree
+    #     "cot_sk_chain",  # COT
+    #     "cot_sk_example",  # some skeleton examples ... Done
+    # ]
+    # ## *
 
     llm_model.initialize(
         prompt_dir=prompt_dir,

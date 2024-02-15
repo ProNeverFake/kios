@@ -21,6 +21,8 @@ from langchain_core.prompts import (
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 
+from kios_agent.data_types import AgentResponse, KiosPromptSkeleton
+
 
 """
 the langchain version of the kios llm
@@ -41,6 +43,8 @@ class KiosLLMSupporter:
     last_response: str = None
 
     ######################################## * prompts
+    prompt_skeleton: KiosPromptSkeleton = None
+
     prompt_dir: str = None
     prompt_load_order: List[str] = None
 
@@ -66,13 +70,26 @@ class KiosLLMSupporter:
     def __init__(self):
         pass
 
+    def initialize_from_prompt_skeleton(self, prompt_skeleton: KiosPromptSkeleton):
+
+        self.prompt_skeleton = prompt_skeleton
+        self.initialize(
+            prompt_dir=prompt_skeleton.prompt_dir,
+            prompt_load_order=prompt_skeleton.prompt_load_order,
+        )
+
     # ! extend this method later.
     def initialize(self, prompt_dir: str = None, prompt_load_order: List[str] = None):
+
+        # * relative location.
         script_dir = os.path.dirname(__file__)
+
         if prompt_dir is not None:
             self.prompt_dir = os.path.join(script_dir, prompt_dir)
         else:
-            self.prompt_dir = os.path.join(script_dir, "prompts")
+            # self.prompt_dir = os.path.join(script_dir, "prompts")
+            raise Exception("prompt_dir is not given!")
+
         self.prompt_directories = {
             "system": os.path.join(self.prompt_dir, "system"),
             "query": os.path.join(self.prompt_dir, "query"),
@@ -186,7 +203,6 @@ class KiosLLMSupporter:
         )
 
         return final_prompt
-
 
     def extract_json_part(self, text):
         """

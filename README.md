@@ -166,8 +166,6 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
 
 1. Set up your openai api-key.
 
-...
-
 ### Testing
 
 For module testing please check the test folder in `kios_bt_planning`.

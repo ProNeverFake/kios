@@ -105,7 +105,21 @@ class MiosObject:
             ["geometry", str(self.geometry)],
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
-
+    @staticmethod
+    def generate_dummy(object_name: str) -> "MiosObject":
+        return MiosObject(
+            name=object_name,
+            O_T_OB=np.eye(4),
+            O_T_TCP=np.eye(4),
+            OB_T_gp=np.eye(4),
+            OB_T_TCP=np.eye(4),
+            OB_I=np.eye(3),
+            q=[0, 0, 0, 0, 0, 0, 0],
+            grasp_width=0.0,
+            grasp_force=0.0,
+            mass=0.0,
+            geometry=None,
+        )
 
 @dataclass
 class MiosInterfaceResponse:

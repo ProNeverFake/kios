@@ -3,8 +3,11 @@ from unified_planning.shortcuts import *
 ######################################## Type ########################################
 
 Thing = UserType("Thing")
+
 Tool = UserType("Tool", father=Thing)
 Part = UserType("Part", father=Thing)
+# Feature = UserType("Feature", father=Part)
+
 Hand = UserType("Hand", father=Thing)
 
 ######################################## Fluent ########################################

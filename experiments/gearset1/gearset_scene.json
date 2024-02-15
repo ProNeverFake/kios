@@ -68,7 +68,7 @@
             "source": "mios"
         },
         {
-            "object_name": "gearbase_hole3",
+            "object_name": "gearbase_hole2",
             "source": "mios"
         }
     ],
@@ -131,7 +131,7 @@
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.025],
+                [0, 0, 1, 0.0],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.08,

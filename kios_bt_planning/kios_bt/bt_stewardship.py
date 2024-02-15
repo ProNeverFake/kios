@@ -27,6 +27,8 @@ import py_trees
 
 import functools
 import copy
+import sched
+import time
 
 
 class BehaviorTreeStewardship:
@@ -145,6 +147,60 @@ class BehaviorTreeStewardship:
 
         print("\n")
 
+    def tick_1000HZ_test(self):
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
+
+        tick_count = 0
+
+        def tick():
+            nonlocal tick_count
+            self.behavior_tree.tick()
+            tick_count += 1
+            if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
+                print("\033[94mTree finished with success\033[0m")
+            elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
+                print("\033[91mTree finished with failure\033[0m")
+            elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
+                scheduler.enter(1 / 1000, 1, tick)
+            else:
+                raise Exception("Unknown status!")
+
+        scheduler = sched.scheduler(time.time, time.sleep)
+        scheduler.enter(0, 1, tick)
+        scheduler.run()
+
+
+    def tick_frequency_test(self):
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
+
+        tick_count = 0
+        start_time = time.time()
+
+        def tick():
+            nonlocal tick_count
+            self.behavior_tree.tick()
+            tick_count += 1
+            if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
+                print("\033[94mTree finished with success\033[0m")
+            elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
+                print("\033[91mTree finished with failure\033[0m")
+            elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
+                scheduler.enter(1 / 1000, 1, tick)
+            else:
+                raise Exception("Unknown status!")
+
+        scheduler = sched.scheduler(time.time, time.sleep)
+        scheduler.enter(0, 1, tick)
+        scheduler.run()
+
+        end_time = time.time()
+        run_time = end_time - start_time
+        frequency = tick_count / run_time
+
+        print(f"Tick count: {tick_count}")
+        print(f"Run time: {run_time} seconds")
+        print(f"Running frequency: {frequency} Hz")
+
     def tick_until_success(
         self,
         bt: py_trees.trees.BehaviourTree,
@@ -214,7 +270,8 @@ class BehaviorTreeStewardship:
                 return TreeResult(
                     result="success",
                     summary="Behavior tree tick returns success",
-                    defect_node=None,
+                    final_node=None,
+                    world_state=self.world_interface.get_world_to_json(),
                 )
             elif bt.root.status == py_trees.common.Status.FAILURE:
                 tip_node = bt.root.tip()
@@ -222,13 +279,15 @@ class BehaviorTreeStewardship:
                     return TreeResult(
                         result="failure",
                         summary="Behavior tree tick returns failure with the defect node unknown",
-                        defect_node=None,
+                        final_node=None,
+                        world_state=self.world_interface.get_world_to_json(),
                     )
 
                 return TreeResult(
                     result="failure",
                     summary="Behavior tree tick returns failure",  # ! the exceptions should be caught and handled!
-                    defect_node=self.extract_node_metadata(tip_node),
+                    final_node=self.extract_node_metadata(tip_node),
+                    world_state=self.world_interface.get_world_to_json(),
                 )
             elif bt.root.status == py_trees.common.Status.RUNNING:
                 continue
@@ -236,7 +295,8 @@ class BehaviorTreeStewardship:
                 return TreeResult(
                     result="invalid",
                     summary="Behavior tree tick returns invalid status!",
-                    defect_node=None,
+                    final_node=None,
+                    world_state=self.world_interface.get_world_to_json(),
                 )
 
         # default timeout

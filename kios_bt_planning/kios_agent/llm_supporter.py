@@ -1,5 +1,4 @@
 from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
-from deprecated import deprecated
 
 import openai
 import tiktoken
@@ -188,35 +187,6 @@ class KiosLLMSupporter:
 
         return final_prompt
 
-    @deprecated(reason="use chain now")
-    def query_llm(self, problem: str, problem_name: str, model: str = None) -> dict:
-
-        if model is None:
-            model = "gpt-4-1106-preview"
-
-        # * Substitue the openai.Client() with wrap_openai(openai.Client()) to enable tracing
-        llm = ChatOpenAI(
-            model_name=model,
-            temperature=0.0,
-            max_tokens=self.max_completion_length,
-        )
-
-        # * request the gpt to response
-
-        text = response.choices[0].message.content
-        print(text)
-
-        self.last_response = text
-        self.last_response = self.extract_json_part(self.last_response)
-        self.last_response = self.last_response.replace("'", '"')
-
-        self.record_history(
-            query=text_base, response=self.last_response, problem_name=problem_name
-        )
-
-        self.json_dict = json.loads(self.last_response, strict=False)
-
-        return self.json_dict
 
     def extract_json_part(self, text):
         """

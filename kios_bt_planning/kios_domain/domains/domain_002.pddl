@@ -3,6 +3,7 @@
  (:types
     thing - object
     tool part hand - thing
+    feature - part
  )
  (:predicates (is_free ?p - thing) (is_equippable ?tool - tool) (can_manipulate ?tool - tool ?part - part) (can_insert_to ?part1 - part ?part2 - part) (can_screw_to ?part1 - part ?part2 - part) (can_place_to ?part1 - part ?part2 - part) (hold ?thing1 - thing ?thing2 - thing) (is_inserted_to ?part1 - part ?part2 - part) (is_screwed_to ?part1 - part ?part2 - part) (is_placed_to ?part1 - part ?part2 - part))
  (:action pick_up

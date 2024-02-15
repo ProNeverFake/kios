@@ -53,7 +53,7 @@ seat = unified_planning.model.Object("seat", Part)
 back = unified_planning.model.Object("back", Part)
 
 # * lamp
-lamp_base = unified_planning.model.Object("base", Part)
+lampbase = unified_planning.model.Object("lampbase", Part)
 blub = unified_planning.model.Object("blub", Part)
 lamp = unified_planning.model.Object("lamp", Part)
 
@@ -61,19 +61,26 @@ lamp = unified_planning.model.Object("lamp", Part)
 gear1 = unified_planning.model.Object("gear1", Part)
 gear2 = unified_planning.model.Object("gear2", Part)
 gear3 = unified_planning.model.Object("gear3", Part)
+
 shaft1 = unified_planning.model.Object("shaft1", Part)
 shaft2 = unified_planning.model.Object("shaft2", Part)
-gearset_base = unified_planning.model.Object("base", Part)
+shaft3 = unified_planning.model.Object("shaft3", Part)
+
+gearbase = unified_planning.model.Object("gearbase", Part)
+
+gearbase_hole1 = unified_planning.model.Object("gearbase_hole1", Part)
+gearbase_hole3 = unified_planning.model.Object("gearbase_hole3", Part)
+
 
 
 ########################## * problem constraints ##########################
 
 ############ * tools' manipulability
-problem.set_initial_value(can_manipulate(parallel_box1, gear1), True)
+problem.set_initial_value(can_manipulate(parallel_box2, gear1), True)
 problem.set_initial_value(can_manipulate(outward_claw, gear2), True)
-problem.set_initial_value(can_manipulate(inward_claw, gear3), True)
-problem.set_initial_value(can_manipulate(parallel_box2, shaft1), True)
-problem.set_initial_value(can_manipulate(no_tool, shaft2), True)
+problem.set_initial_value(can_manipulate(outward_claw, gear3), True)
+problem.set_initial_value(can_manipulate(no_tool, shaft3), True)
+problem.set_initial_value(can_manipulate(parallel_box1, shaft1), True)
 
 ############ * assembly constraints
 # * chair
@@ -84,12 +91,12 @@ problem.set_initial_value(can_screw_to(nut1, seat), True)
 problem.set_initial_value(can_screw_to(nut2, seat), True)
 
 # * lamp
-problem.set_initial_value(can_screw_to(blub, lamp_base), True)
+problem.set_initial_value(can_screw_to(blub, lampbase), True)
 problem.set_initial_value(can_place_to(lamp, blub), True)
 
 # * gearset
-problem.set_initial_value(can_insert_to(shaft1, gearset_base), True)
-problem.set_initial_value(can_insert_to(shaft2, gearset_base), True)
-problem.set_initial_value(can_insert_to(gear3, shaft2), True)
-problem.set_initial_value(can_insert_to(gear2, gearset_base), True)
+problem.set_initial_value(can_insert_to(shaft1, gearbase_hole1), True)
+problem.set_initial_value(can_insert_to(shaft3, gearbase_hole3), True)
+problem.set_initial_value(can_insert_to(gear3, shaft3), True)
+problem.set_initial_value(can_insert_to(gear2, shaft2), True)
 problem.set_initial_value(can_insert_to(gear1, shaft1), True)

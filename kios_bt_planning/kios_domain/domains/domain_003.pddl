@@ -3,13 +3,14 @@
  (:types
     thing - object
     tool part hand - thing
+    feature - part
  )
  (:predicates (is_free ?p - thing) (is_equippable ?tool - tool) (can_manipulate ?tool - tool ?part - part) (can_insert_to ?part1 - part ?part2 - part) (can_screw_to ?part1 - part ?part2 - part) (can_place_to ?part1 - part ?part2 - part) (hold ?thing1 - thing ?thing2 - thing) (is_inserted_to ?part1 - part ?part2 - part) (is_screwed_to ?part1 - part ?part2 - part) (is_placed_to ?part1 - part ?part2 - part))
- (:action pickup
-  :parameters ( ?hand - hand ?part - part ?tool - tool)
+ (:action pick_up
+  :parameters ( ?hand - hand ?tool - tool ?part - part)
   :precondition (and (is_free ?tool) (hold ?hand ?tool) (can_manipulate ?tool ?part))
   :effect (and (hold ?tool ?part) (not (is_free ?tool))))
- (:action putdown
+ (:action put_down
   :parameters ( ?hand - hand ?tool - tool ?part - part)
   :precondition (and (hold ?tool ?part) (hold ?hand ?tool))
   :effect (and (not (hold ?hand ?part)) (is_free ?tool)))

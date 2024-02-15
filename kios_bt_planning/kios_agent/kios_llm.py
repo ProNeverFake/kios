@@ -200,10 +200,10 @@ class KiosLLM:
         # finally, add the text_base to the user query message
         self.messages.append({"sender": "user", "text": text_base})
 
-        print("messages:")
-        # print(self.messages)
-        for message in self.create_prompt():
-            print(message.get("role"))
+        # print("messages:")
+        # # print(self.messages)
+        # for message in self.create_prompt():
+        #     print(message.get("role"))
 
         # * Substitue the openai.Client() with wrap_openai(openai.Client()) to enable tracing
         client = wrap_openai(openai.Client())

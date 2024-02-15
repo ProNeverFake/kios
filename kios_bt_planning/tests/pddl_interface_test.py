@@ -4,7 +4,8 @@ from kios_domain.pddl_interface import PddlInterface
 
 # from kios_domain.problem2 import problem as problem2
 
-from kios_domain.problem3 import problem as problem3
+# from kios_domain.problem3 import problem as problem3
+from kios_domain.problem4 import problem as problem4
 
 import os
 
@@ -13,7 +14,7 @@ def test_from_up():
     print("test_from_up ----------------------------------")
     pddl_interface = PddlInterface()
 
-    pddl_interface.setup_from_up(problem3)
+    pddl_interface.setup_from_up(problem4)
 
     pddl_interface.write_pddl()
 

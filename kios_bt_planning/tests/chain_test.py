@@ -9,7 +9,7 @@ from kios_utils.pybt_test import (
     render_dot_tree,
     tick_loop_test,
 )
-from kios_agent.kios_llm_chain import KiosLLMSupporter
+from kios_agent.llm_supporter import KiosLLMSupporter
 
 
 from typing import List, Dict, Any

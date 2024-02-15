@@ -1,4 +1,6 @@
 from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
+from deprecated import deprecated
+
 import openai
 import tiktoken
 import json
@@ -186,10 +188,8 @@ class KiosLLMSupporter:
 
         return final_prompt
 
+    @deprecated(reason="use chain now")
     def query_llm(self, problem: str, problem_name: str, model: str = None) -> dict:
-        """
-        runtime_instruction: the instruction from the problem/user
-        """
 
         if model is None:
             model = "gpt-4-1106-preview"
@@ -239,11 +239,13 @@ class KiosLLMSupporter:
 
     def record_history(self, query: str, response: str, problem_name: str):
 
+        # * setup the problem directory
         while not os.path.exists(os.path.join(self.history_dir, problem_name)):
             os.makedirs(os.path.join(self.history_dir, problem_name))
 
         problem_dir = os.path.join(self.history_dir, problem_name)
 
+        # * the try number under it
         i = 0
         while os.path.exists(os.path.join(problem_dir, str(i))):
             i = i + 1
@@ -264,26 +266,6 @@ class KiosLLMSupporter:
         # copy the prompts
         with open(os.path.join(this_problem_dir, "message.txt"), "w") as f:
             f.write(str(self.messages))
-
-
-def test_llm():
-    problem_name = "gearset_skeleton_v1"
-    problem = "(define (problem robot_assembly_problem-problem)\
-                    (:domain robot_assembly_problem-domain)\
-                    (:objects\
-                        parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-                        gear1 gear2 gear3 shaft1 shaft2 base - part\
-                        left_hand - hand\
-                    )\
-                    (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft1 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_free gear1) (is_free gear2) (is_free gear3) (is_free shaft1) (is_free shaft2) (is_free base) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
-                    (:goal (and (is_inserted_to gear1 shaft1)))\
-                    )"  # ! CHEAT
-
-    llm_model = KiosLLM()
-    llm_model.initialize()
-
-    # run the instructions one by one
-    response = llm_model.query_llm(problem, problem_name)
 
 
 if __name__ == "__main__":

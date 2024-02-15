@@ -49,8 +49,10 @@ class BehaviorTreeStewardship:
             self.robot_interface = robot_interface
 
         if world_interface is None:
-            self.world_interface = WorldInterface()
-            self.world_interface.initialize()
+            # self.world_interface = WorldInterface()
+            # self.world_interface.initialize()
+            # ! now the world interface is a required parameter
+            raise Exception("world_interface is not set")
         else:
             self.world_interface = world_interface
 
@@ -58,6 +60,7 @@ class BehaviorTreeStewardship:
             self.behaviortree_factory = BehaviorTreeFactory(
                 None,
                 world_interface=self.world_interface,
+                robot_interface=self.robot_interface,
             )
             self.behaviortree_factory.initialize()
         else:
@@ -68,7 +71,7 @@ class BehaviorTreeStewardship:
 
         pass
 
-    def setup_bt_json(self, bt_json: dict) -> None:
+    def load_bt_json(self, bt_json: dict) -> None:
         self.bt_json = bt_json
 
     def generate_behavior_tree(self) -> None:
@@ -303,6 +306,7 @@ class BehaviorTreeStewardship:
         self.behavior_tree.prune_subtree(to_remove_node_id)
 
     ##########################################################
+    # * the behavior tree simulator tool
     def simulate_behavior_tree(self) -> TreeResult:
         # ! maybe it is better to imp a new class for the simulation
         """
@@ -339,3 +343,8 @@ class BehaviorTreeStewardship:
                 stw.replace_subtree(child.id, sim_node)
             # recursively replace the children
             self.replace_action_node_with_sim(stw, child)
+
+    ##########################################################
+
+    def query_world_state(self):
+        return self.world_interface.get_world_to_json()

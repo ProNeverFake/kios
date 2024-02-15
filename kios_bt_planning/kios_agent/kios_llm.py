@@ -14,6 +14,7 @@ from langsmith.wrappers import wrap_openai
 
 """
 the llm class for prompt testing.
+# ! now use chain.
 """
 
 # langsmith tracing

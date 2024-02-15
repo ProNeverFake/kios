@@ -16,7 +16,7 @@ from kios_utils.pybt_test import (
 )
 
 # from kios_agent.kios_llm import KiosLLM
-from kios_agent.kios_llm_chain import KiosLLM # ! TESTING NOW
+from kios_agent.llm_supporter import KiosLLM # ! TESTING NOW
 
 from typing import List, Dict, Any
 

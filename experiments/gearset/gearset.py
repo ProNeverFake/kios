@@ -70,7 +70,7 @@ def core_loop():
 
     with open(bt_json_file_path, "r") as file:
         json_object = json.load(file)
-        behavior_tree_stewardship.setup_bt_json(json_object)
+        behavior_tree_stewardship.load_bt_json(json_object)
 
     behavior_tree_stewardship.generate_behavior_tree()
     behavior_tree_stewardship.setup_behavior_tree()

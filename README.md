@@ -4,7 +4,13 @@
 
 # KIOS --- Knowledge-based Intelligent Operation System
 
-This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle).
+This is the package for robot task planning and execution based on langchain agent (langgraph), LLM, behavior tree and robot expert skills.
+
+> BB: I'm now finishing my master thesis and the project is still under development. The LLM planning functionality has been fully tested and the behavior tree executor has also been proven to be working well. 
+
+> BB: I'm now concentrating on building the agent using langchain. Most of the test scripts are now actively used for the development of the project.
+
+> BB: To save your time, the tutorial part of the project is still unter construction. You may jump to the "something to try" part to see if there are any updates. BB will fill up the tutorial part as soon as possible.
 
 - About the old version: 
 The behavior tree executor is implemented based on project BehaviorTree.CPP. See `kios_cpp`.
@@ -15,6 +21,9 @@ Some of the components are implemented in python. See `kios_py`.
 - About the new version:
 The no-ros version, which aims at simplizing the system structure, is now actively developed.
 For this part see `kios_bt_planning`.
+
+- About robot interface:
+For people who don't have access to mios, you may deploy your own methods to generate robot commands in "mios_task_factory.py" and your own methods to execute the commands in "robot_command.py".
 
 ## Intro
 
@@ -35,7 +44,7 @@ The usecases are from the siemens robot assembly challenge and the furniture-ben
   * [Packages](#packages)
   * [Usage](#usage)
   * [System Structure](#system-structure)
-  * [Running Process](#running-process)
+  * [Something to try](#something-to-try)
   * [Testing](#testing)
   * [Development Log](#development-log)
 * [Contribute](#contribute)
@@ -93,8 +102,7 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
 
 3. Set up the mios (branch = kios) and the robot.
 
-> BB: Go to check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. GL.
-
+> BB: Go to check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. The docker image's name is "mirmi/mios", but is not compatible with this project. The skills necessary for the robot manipulation in kios are still being actively developed. A new docker image will be released as soon as possible. 
 
 > BB: The project is still under development. Please feel free to start an issue if you have any question or suggestion. 
 
@@ -154,7 +162,9 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
   <img src="/TRI.png" alt="The Concept" width="90%">
 </div>
 
-### Running Process
+### Something to try
+
+1. Set up your openai api-key.
 
 ...
 

@@ -1,0 +1,89 @@
+[user]
+Following is the domain knowledge you need in pddl domain format, which includes:
+- the object types in the world,
+- the predicates for describing the states of the world,
+- the actions that the robot can apply, with their precondtions and effects defined.
+"""
+(define (domain robot_assembly_problem-domain)
+ (:requirements :strips :typing)
+ (:types
+    thing - object
+    tool part hand - thing
+ )
+ (:predicates (is_free ?p - thing) (is_equippable ?tool - tool) (can_manipulate ?tool - tool ?part - part) (can_insert_to ?part1 - part ?part2 - part) (can_screw_to ?part1 - part ?part2 - part) (can_place_to ?part1 - part ?part2 - part) (hold ?thing1 - thing ?thing2 - thing) (is_inserted_to ?part1 - part ?part2 - part) (is_screwed_to ?part1 - part ?part2 - part) (is_placed_to ?part1 - part ?part2 - part))
+ (:action pick_up
+  :parameters ( ?hand - hand ?tool - tool ?part - part)
+  :precondition (and (is_free ?tool) (hold ?hand ?tool) (can_manipulate ?tool ?part))
+  :effect (and (hold ?tool ?part) (not (is_free ?tool))))
+ (:action put_down
+  :parameters ( ?hand - hand ?tool - tool ?part - part)
+  :precondition (and (hold ?tool ?part) (hold ?hand ?tool))
+  :effect (and (not (hold ?hand ?part)) (is_free ?tool)))
+ (:action place
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (hold ?tool ?part1) (can_place_to ?part1 ?part2))
+  :effect (and (not (hold ?tool ?part1)) (is_free ?tool) (is_placed_to ?part1 ?part2)))
+ (:action detach
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (is_free ?tool) (can_manipulate ?tool ?part1) (is_placed_to ?part1 ?part2))
+  :effect (and (hold ?tool ?part1) (not (is_free ?tool)) (not (is_placed_to ?part1 ?part2))))
+ (:action insert
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (hold ?tool ?part1) (can_insert_to ?part1 ?part2))
+  :effect (and (not (hold ?tool ?part1)) (is_free ?tool) (is_inserted_to ?part1 ?part2)))
+ (:action pull
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (is_free ?tool) (is_inserted_to ?part1 ?part2) (can_manipulate ?tool ?part1))
+  :effect (and (hold ?tool ?part1) (not (is_free ?tool)) (not (is_inserted_to ?part1 ?part2))))
+ (:action screw
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (hold ?tool ?part1) (can_screw_to ?part1 ?part2))
+  :effect (and (not (hold ?tool ?part1)) (is_free ?tool) (is_screwed_to ?part1 ?part2)))
+ (:action unscrew
+  :parameters ( ?hand - hand ?tool - tool ?part1 - part ?part2 - part)
+  :precondition (and (hold ?hand ?tool) (is_free ?tool) (is_screwed_to ?part1 ?part2) (can_manipulate ?tool ?part1))
+  :effect (and (hold ?tool ?part1) (not (is_free ?tool)) (not (is_screwed_to ?part1 ?part2))))
+ (:action load_tool
+  :parameters ( ?hand - hand ?tool - tool)
+  :precondition (and (is_equippable ?tool) (is_free ?hand))
+  :effect (and (not (is_free ?hand)) (not (is_equippable ?tool)) (hold ?hand ?tool)))
+ (:action unload_tool
+  :parameters ( ?hand - hand ?tool - tool)
+  :precondition (and (hold ?hand ?tool) (is_free ?tool))
+  :effect (and (is_free ?hand) (is_equippable ?tool) (not (hold ?hand ?tool))))
+)
+"""
+The precidates are explained as follows:
+"""
+"PREDICATE_LIST"
+- is_free(<thing>): <thing> is free and can hold something. (default: true)
+- is_equippable(<tool>): <tool> is ready to be eqquipped by a robot hand. (default: true)
+- can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint) (default: false)
+- can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint) (default: false)
+- can_screw_to(<part1>, <part2>): <part1> can be screwed into <part2> (screw assembly constraint) (default: false)
+- can_place_to(<part1>, <part2>): <part1> can be placed into <part2> (placement assembly constraint) (default: false)
+- hold(<thing1>, <thing2>): <thing1> is holding <thing2> (default: false)
+- is_inserted_to(<part1>, <part2>): <part1> is inserted into <part2> (insertion assembly constraint is satisfied) (default: false)
+- is_screwed_to(<part1>, <part2>): <part1> is screwed into <part2> (screw assembly constraint is satisfied) (default: false)
+- is_placed_to(<part1>, <part2>): <part1> is placed into <part2> (placement assembly constraint is satisfied) (default: false)
+"""
+
+The actions are explained as follows:
+"""
+"ROBOT_ACTION_LIST"
+- pick_up(<hand>, <tool>, <part>): <hand> use <tool> to pick up <part>
+- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>
+- place(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to place <part1> to <part2> (to satisfy the placement assembly constraint)
+- detach(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to detach <part1> from <part2> (to lift the existing placement assembly constraint)
+- insert(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to insert <part1> into <part2> (to satisfy the insertion assembly constraint)
+- pull(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to pull <part1> from <part2> (to lift the existing insertion assembly constraint)
+- screw(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to screw <part1> into <part2> (to satisfy the screw assembly constraint)
+- unscrew(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to unscrew <part1> from <part2> (to lift the existing screw assembly constraint)
+- load_tool(<hand>, <tool>): <hand> equips <tool> to manipulate other objects
+- unload_tool(<hand>, <tool>): <hand> unloads <tool> to manipulate other objects
+"""
+the items in <> indicate the type of the instances needed for the predicates and actions.
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. I will wait for further instructions before starting to work.

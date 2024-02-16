@@ -1,0 +1,127 @@
+[user]
+The input you get and the output you return should be in json dictionary format.
+The dictionary contains the following keys: 
+"""
+- dictionary["task_plan"]: A dictionary containing the task plan.
+- dictionary["initial_state"]: The initial world state before executing the plan.
+- dictionary["instruction_summary"]: A brief summary of the task plan.
+- dictionary["question"]: Question for more knowledge that are unknown yet but necessary for making the plan. Normally empty.
+"""
+Four keys exist in dictionary["task_plan"].
+"""
+- dictionary["task_plan"]["action_sequence"]: Contains a list of robot actions.
+- dictionary["task_plan"]["action_instructions"]: contains a list of instructions to explain the actions in dictionary["task_plan"]["action_sequence"].
+- dictionary["task_plan"]["manipulated_objects"]: The list of the objects that are related to the current task.
+- dictionary["task_plan"]["behavior_tree"]: contains a dictionary of the behavior tree skeleton constructed according to the dictionary ["task_plan"]["action_sequence"]
+"""
+The following is an input example:
+```
+{"task_plan": {
+    "action_sequence": [
+        "load_tool(left_hand, parallel_box1)",
+        "pick_up(left_hand, parallel_box1, gear1)",
+        "insert(left_hand, parallel_box1, gear1, shaft1)"
+    ],
+    "action_instructions": [
+        "equip the parallel_box1 on the left hand",
+        "pick up the gear1 with the parallel_box1 in the left hand",
+        "insert the gear1 into the shaft1 using the parallel_box1 in the left hand"
+    ],
+    "object_name": ["left_hand", "gear1", "parallel_box1", "shaft1"],
+    "behavior_tree": {
+    "summary": "selector to insert gear1 into shaft1",
+    "children": [
+        {
+            "summary": "condition node to check if gear1 is inserted to shaft1",
+        },
+        {
+            "summary": "sequence to insert gear1 into shaft1",
+            "children": [
+                {
+                    "summary": "selector to load_tool
+                    "children": [
+                        {
+                            "summary": "condition node to check if parallel_box1 is hold",
+                        },
+                        {
+                            "summary": "sequence to load_tool",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if parallel_box1 is equippable",
+                                },
+                                {
+                                    "summary": "condition node to check if left hand is free",
+                                },
+                                {
+                                    "summary": "action node to equip parallel_box1 to left hand",
+                                    "effects": [
+                                        {"summary": "left_hand will be not free",},
+                                        {"summary": "parallel_box1 will be not equippable",},
+                                        {"summary": "left_hand will hold parallel_box1",},
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "selector to pick_up",
+                    "children": [
+                        {
+                            "summary": "condition node to check if parallel_box1 holds gear1",
+                        },
+                        {
+                            "summary": "sequence to pick_up",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if parallel_box1 is free",
+                                },
+                                {
+                                    "summary": "condition node to check if left hand holds parallel_box1",
+                                },
+                                {
+                                    "summary": "action node to pick up gear1 using parallel_box1",
+                                    "effects": [
+                                        {"summary": "parallel_box1 will hold gear1",},
+                                        {"summary": "parallel_box1 will be not free",},
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "condition node to check if gear1 can be inserted to shaft1",
+                },
+                {
+                    "summary": "action node to insert gear1 to shaft1",
+                    "effects": [
+                        {"summary": "parallel_box1 will be not holding gear1",},
+                        {"summary": "parallel_box1 will be free",},
+                        {"summary": "gear1 will be inserted to shaft1",},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+},
+"initial_state": {"objects": [
+            {"name": "gear1", "properties": []},
+            {"name": "shaft1", "properties": []},
+            {"name": "parallel_box1", "properties": ["is_equippable", "is_free"]},
+            {"name": "left_hand", "properties": ["is_free"]},
+        ],
+        "constraints": [
+            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"},
+            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+        ],
+        "relations": [],
+},
+"instruction_summary": "insert gear1 into shaft1",
+"question":""}
+```
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. Waiting for next input.

@@ -27,7 +27,7 @@ class KiosPromptSkeleton:
     prompt_dir: str
     prompt_load_order: List[str]
 
-    full_name: str = field(init=False)
+    fullname: str = field(default=None)
 
     @staticmethod
     def from_json(json: Dict[str, Any]) -> "KiosPromptSkeleton":
@@ -43,5 +43,5 @@ class KiosPromptSkeleton:
             version=version,
             prompt_dir=prompt_dir,
             prompt_load_order=prompt_load_order,
-            full_name=fullname,
+            fullname=fullname,
         )

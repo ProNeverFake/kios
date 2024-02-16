@@ -9,6 +9,7 @@ from kios_utils.pybt_test import (
     render_dot_tree,
     tick_loop_test,
 )
+
 from kios_agent.llm_supporter import KiosLLMSupporter
 from kios_agent.data_types import AgentResponse, KiosPromptSkeleton
 
@@ -19,6 +20,8 @@ import os
 import logging
 
 import py_trees
+
+from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
@@ -69,8 +72,11 @@ def main():
     # with open(problem_dir, "r") as f:
     #     problem = f.read()
 
-    file_dir = os.path.dirname(__file__)
-    prompt_sk_dir = os.path.join(file_dir, "prompt_skeletons")
+    load_dotenv()
+
+    data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
+    print(data_dir)
+    prompt_sk_dir = os.path.join(data_dir, "prompt_skeletons")
 
     llm_spt_cot_sk = KiosLLMSupporter()
 
@@ -85,13 +91,7 @@ def main():
         model_name=llm_spt_cot_sk.prompt_skeleton.model_name, temperature=0
     )
 
-    chain = cot_sk_ppt | cot_sk_llm | JsonOutputParser()
-
-    # response = chain.invoke(
-    #     {
-    #         "problem": problem,
-    #     }
-    # )
+    cot_sk_chain = cot_sk_ppt | cot_sk_llm | JsonOutputParser()
 
     llm_spt_re_sk = KiosLLMSupporter()
 
@@ -119,6 +119,74 @@ def main():
     # test_bt(bt)
 
     # print(response)
+
+    llm_spt_skeleton_generator = KiosLLMSupporter()
+
+    with open(os.path.join(prompt_sk_dir, "skeleton_generator.json"), "r") as f:
+        skeleton_generator_pptsk_json = json.load(f)
+        skeleton_generator_pptsk = KiosPromptSkeleton.from_json(
+            skeleton_generator_pptsk_json
+        )
+        llm_spt_skeleton_generator.initialize_from_prompt_skeleton(
+            skeleton_generator_pptsk
+        )
+
+    skeleton_generator_ppt = llm_spt_skeleton_generator.create_prompt()
+
+    skeleton_generator_llm = ChatOpenAI(
+        model_name=llm_spt_skeleton_generator.prompt_skeleton.model_name, temperature=0
+    )
+
+    skeleton_generator_chain = (
+        skeleton_generator_ppt | skeleton_generator_llm | JsonOutputParser()
+    )
+
+    problem = """
+    (define (problem robot_assembly_problem-problem)
+     (:domain robot_assembly_problem-domain)
+     (:objects
+         parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool
+         gear1 gear2 gear3 shaft1 shaft2 shaft3 gearbase gearbase_hole1 gearbase_hole3 - part
+         left_hand - hand
+     )
+     (:init (can_manipulate parallel_box2 gear1) (can_manipulate outward_claw gear2) (can_manipulate outward_claw gear3) (can_manipulate no_tool shaft3) (can_manipulate parallel_box1 shaft1) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub lampbase) (can_place_to lamp blub) (can_insert_to shaft1 gearbase_hole1) (can_insert_to shaft3 gearbase_hole3) (can_insert_to gear3 shaft3) (can_insert_to gear2 shaft2) (can_insert_to gear1 shaft1))
+     (:goal (and ))
+    )
+    """
+
+    world_state = {
+        "objects": [
+            {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
+            {"name": "parallel_box2", "properties": ["is_free", "is_equippable"]},
+            {"name": "inward_claw", "properties": ["is_free", "is_equippable"]},
+            {"name": "outward_claw", "properties": ["is_free", "is_equippable"]},
+            {"name": "no_tool", "properties": ["is_free", "is_equippable"]},
+            {"name": "gear1", "properties": []},
+            {"name": "gear2", "properties": []},
+            {"name": "gear3", "properties": []},
+            {"name": "shaft1", "properties": []},
+            {"name": "shaft2", "properties": []},
+            {"name": "shaft3", "properties": []},
+            {"name": "gearbase", "properties": []},
+            {"name": "gearbase_hole1", "properties": []},
+            {"name": "gearbase_hole3", "properties": []},
+            {"name": "left_hand", "properties": ["is_free"]},
+        ],
+        "constraints": [],
+        "relations": [],
+    }
+
+    response = skeleton_generator_chain.invoke(
+        {
+            "problem": problem,
+            "world_state": world_state,
+            "instructions": "insert shaft1 into gearbase_hole1",
+        }
+    )
+
+    bt_skeleton = response.get("task_plan").get("behavior_tree")
+
+    test_bt(bt_skeleton)
 
 
 if __name__ == "__main__":

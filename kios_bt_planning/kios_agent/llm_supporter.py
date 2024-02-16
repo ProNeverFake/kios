@@ -1,5 +1,7 @@
 from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
 
+from dotenv import load_dotenv
+
 import openai
 import tiktoken
 import json
@@ -33,6 +35,8 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
+load_dotenv()
+
 
 class KiosLLMSupporter:
     prompt_directories: Dict[str, str] = None
@@ -41,6 +45,8 @@ class KiosLLMSupporter:
     max_token_length: int
     max_completion_length: int
     last_response: str = None
+
+    model_name: str = None
 
     ######################################## * prompts
     prompt_skeleton: KiosPromptSkeleton = None
@@ -71,7 +77,7 @@ class KiosLLMSupporter:
         pass
 
     def initialize_from_prompt_skeleton(self, prompt_skeleton: KiosPromptSkeleton):
-
+        self.model_name = prompt_skeleton.model_name
         self.prompt_skeleton = prompt_skeleton
         self.initialize(
             prompt_dir=prompt_skeleton.prompt_dir,
@@ -81,11 +87,10 @@ class KiosLLMSupporter:
     # ! extend this method later.
     def initialize(self, prompt_dir: str = None, prompt_load_order: List[str] = None):
 
-        # * relative location.
-        script_dir = os.path.dirname(__file__)
+        data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
 
         if prompt_dir is not None:
-            self.prompt_dir = os.path.join(script_dir, prompt_dir)
+            self.prompt_dir = os.path.join(data_dir, prompt_dir)
         else:
             # self.prompt_dir = os.path.join(script_dir, "prompts")
             raise Exception("prompt_dir is not given!")
@@ -119,9 +124,9 @@ class KiosLLMSupporter:
             raise Exception("prompt_load_order is not given!")
 
         # history directory
-        if not os.path.exists(os.path.join(script_dir, "query_history")):
-            os.makedirs(os.path.join(script_dir, "query_history"))
-        self.history_dir = os.path.join(script_dir, "query_history")
+        if not os.path.exists(os.path.join(data_dir, "query_history")):
+            os.makedirs(os.path.join(data_dir, "query_history"))
+        self.history_dir = os.path.join(data_dir, "query_history")
 
         # default
         self.max_token_length: int = 16000

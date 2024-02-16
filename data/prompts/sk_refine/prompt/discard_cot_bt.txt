@@ -1,0 +1,68 @@
+[user]
+The behavior tree should be in json dictionary format and have a structure like the following example:
+"""
+{
+    "summary": "selector to load inward_claw to left hand",
+    "children": [
+        {
+            "summary": "condition node to check if inward_claw is held by left hand",
+        },
+        {
+            "summary": "sequence to load inward_claw to left hand",
+            "children": [
+                {
+                    "summary": "condition node to check if inward_claw is equippable",
+                },
+                {
+                    "summary": "condition node to check if left hand is free",
+                },
+                {
+                    "summary": "action node to equip inward_claw to left hand",
+                    "effects": [
+                        {"summary": "left hand will be not free anymore",},
+                        {"summary": "inward_claw will be not equippable anymore",},
+                        {"summary": "left_hand will hold inward_claw",},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+"""
+Follow these rules:
+1. Every node are described by a summary, which is a short interpretive description of the node. It should include the type of the node and the purpose of the node.
+2. The control flow nodes, "selector" and "sequence", can have "children", which is a list of children nodes.
+3. The "condition" nodes that are children of "selectors" are "targets". Those that are children of "sequences" are preconditions. 
+4. The "action" nodes should have a key "effects" with a list of dictionaries, which describes the to-be-exerted effects of the action. The effects are shortly described under the key "summary".
+5. All the subtrees always have their corresponding action in ROBOT_ACTION_LIST. They are used to represent the actions in the action sequence. The recommended structure is:
+    - A selector as the root node.
+    - (Usually one) target condition node as the first child of the selector to check if the target of the action has been fulfilled.
+    - A sequence node as the last child of the selector node to achieve the target.
+    - (Usually a number of) precondition nodes as the front children of the sequence node to check the preconditions for executing the action. 
+    - One action node as the last child of the sequence node, whose preconditions are checked before and will immediate start the job when being ticked.
+    - The action will exert its defined effects after finishing the job successfully. Those effects should fulfilled all the target conditions in the selector node.
+    A brief example is as follows:
+{
+    selector: load_tool selector,
+    children: [
+        {
+            target: check if inward_claw is equipped by left hand,
+        },
+        {
+            sequence: load_tool,
+            children: [               
+                    precondition: check if inward_claw is equippable,
+                    precondition: check if left hand is free,
+                    {action: equip inward_claw to left hand, effects: [left hand not free, inward_claw not equippable, left_hand holds inward_claw]},
+            ],
+        },
+    ],
+}
+
+6. When performing a new action to fulfill a unsatisfied precondition, you can construct a subtree to replace the precondition and take that unfulfilled precondition as the target of the subtree. Then you construct the sequence of the subtree according to the new action you want to perform. 
+7. All of the control flow nodes, namely selectors and sequences, are without memory. A new behavior tree tick will always start from the root and traverse all the nodes even if they are ticked in the last tick.
+
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. I will wait for further instructions before starting to work.

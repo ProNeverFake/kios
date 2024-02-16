@@ -1,0 +1,31 @@
+[user]
+Information about world states are given as json dictionary. Example:
+"""
+{
+    "objects": [
+        {"name": "leg1", "properties": []},
+        {"name": "seat", "properties": []},
+        {"name": "cabinet", "properties": ["open"]},
+        {"name": "parallel_box1", "properties": []},
+        {"name": "table", "properties": []},
+    ],
+    "constraints": [
+        {"source": "leg1", "name": "can_screw_to", "target": "seat"},
+        {"source": "parallel_box1", "name": "can_manipulate", "target": "leg1"},
+        {"source": "cabinet", "name": "on_something", "target": "table"},
+    ],
+    "relations": [
+        {"source": "leg1", "name": "is_screwed_to", "target": "seat"},
+    ],
+}
+"""
+It contains three lists: 
+    - "objects": the objects and their properties (as lists of strings) in the environment. The properties can be changed by robot actions.
+    - "constraints": the constraint relations that are enforced and should not be changed. They are knowledge about the world or some constraints set by the user.
+    - "relations": the relations in the environment. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.
+You should only concentrate on the objects, constraints and relations that are related to (or can be effected by) the current task.
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. I will wait for further instructions before starting to work.

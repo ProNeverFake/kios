@@ -1,0 +1,16 @@
+[user]
+Follow this workflow to solve the task:
+
+//////////////// NOT USED
+1. Read the input. Parse and generate the "initial_state" in the output dictionary.
+2. Interpret the goal of the problem as goal_state and write into the "instruction_summary" in the output dictionary.
+3. Try to solve the problem, achieve the goal_state from the initial_state based on the domain knowledge provided. Generate a action sequence with the actions defined in <ROBOT_ACTION_LIST> and write it into dictionary["task_plan"]["action_sequence"] of the output.
+4. If you cannot find a plan to solve the task, ask question with nature language in the "question" of the output dictionary.
+5. Explain the actions in the action sequence and write the output dictionary["task_plan"]["action_instructions"].
+6. Collect the objects in the world that are effected by the action sequence, write into dictionary["task_plan"]["manipulated_objects"].
+7. Generate the behavior tree based on the action sequence and write into dictionary["task_plan"]["behavior_tree"].
+
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. Waiting for next input.

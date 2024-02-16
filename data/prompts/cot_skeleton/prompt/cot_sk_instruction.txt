@@ -1,0 +1,10 @@
+[user]
+User's instruction may have different forms.
+it can be one instruction string or a list of instruction strings.
+You interpret the user instruction into goal state based on the domain knowledge.
+Then you make the plan to achieve it.
+
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
+[assistant]
+Understood. Waiting for next input.

@@ -35,22 +35,22 @@ problem.add_object(gearbase_hole3)
 ########################## * initial world state ##########################
 # ! BBNOTE: LLM CONSENTRATION FOR STATE KEEPING LOAD SAVING
 # ! Default initial value: hand is free, tools are equippable and free, parts are not assembled
-problem.set_initial_value(is_free(left_hand), True)
-problem.set_initial_value(is_free(parallel_box1), True)
-problem.set_initial_value(is_free(parallel_box2), True)
-problem.set_initial_value(is_free(inward_claw), True)
-problem.set_initial_value(is_free(outward_claw), True)
-problem.set_initial_value(is_free(no_tool), True)
+# problem.set_initial_value(is_free(left_hand), True)
+# problem.set_initial_value(is_free(parallel_box1), True)
+# problem.set_initial_value(is_free(parallel_box2), True)
+# problem.set_initial_value(is_free(inward_claw), True)
+# problem.set_initial_value(is_free(outward_claw), True)
+# problem.set_initial_value(is_free(no_tool), True)
 
-problem.set_initial_value(is_equippable(parallel_box1), True)
-problem.set_initial_value(is_equippable(parallel_box2), True)
-problem.set_initial_value(is_equippable(inward_claw), True)
-problem.set_initial_value(is_equippable(outward_claw), True)
-problem.set_initial_value(is_equippable(no_tool), True)
+# problem.set_initial_value(is_equippable(parallel_box1), True)
+# problem.set_initial_value(is_equippable(parallel_box2), True)
+# problem.set_initial_value(is_equippable(inward_claw), True)
+# problem.set_initial_value(is_equippable(outward_claw), True)
+# problem.set_initial_value(is_equippable(no_tool), True)
 
 ########################## * goal ##########################################
-problem.add_goal(is_inserted_to(shaft1, gearbase_hole1))
-# print(problem)
+# problem.add_goal(is_inserted_to(shaft1, gearbase_hole1))
+print(problem)
 
 ########################## * planning ######################################
 # with OneshotPlanner(name="pyperplan") as planner:

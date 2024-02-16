@@ -10,6 +10,7 @@ from langchain.callbacks.manager import (
 )
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
+from kios_bt.data_types import TreeResult
 
 
 class BehaviorTreeInput(BaseModel):
@@ -43,9 +44,10 @@ class BehaviorTreeExecutorTool(BaseTool):
 
 
 class BehaviorTreeInput(BaseModel):
-    json_data: dict = Field(
+    behavior_tree: dict = Field(
         description="json data for the robot task plan, including the task plan in behavior tree and the initial state of the world."
     )
+    world_state: dict = Field(description="json data for the current world state.")
 
 
 class BehaviorTreeSimulatorTool(BaseTool):
@@ -53,23 +55,31 @@ class BehaviorTreeSimulatorTool(BaseTool):
     description = "useful for simulating the behavior tree plan to see if the plan can achieve the task goal in the ideal case"
     args_schema: Type[BaseModel] = BehaviorTreeInput
 
-    bt_stw: BehaviorTreeStewardship
-
-    def __init__(self, bt_stw: BehaviorTreeStewardship):
-        self.bt_stw = bt_stw
-        super().__init__()
-
     def _run(
-        self, json_data: dict, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
+        self,
+        behavior_tree: dict,
+        world_state: dict,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> TreeResult:
         """Use the tool."""
-        return "LangChain"
+
+        bt_stw: BehaviorTreeStewardship = self.metadata["bt_stw"]
+        tree_result = bt_stw.fake_run(bt_json=behavior_tree, world_state=world_state)
+
+        return tree_result
 
     async def _arun(
-        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-    ) -> str:
+        self,
+        behavior_tree: dict,
+        world_state: dict,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> TreeResult:
         """Use the tool asynchronously."""
-        raise NotImplementedError("custom_search does not support async")
+
+        bt_stw: BehaviorTreeStewardship = self.metadata["bt_stw"]
+        tree_result = bt_stw.fake_run(bt_json=behavior_tree, world_state=world_state)
+
+        return tree_result
 
 
 class WorldStateQuery(BaseModel):
@@ -91,7 +101,7 @@ class WorldStateQueryTool(BaseTool):
         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        return "LangChain"
+        return
 
     async def _arun(
         self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None

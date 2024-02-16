@@ -86,6 +86,13 @@ class BehaviorTreeStewardship:
             self.behaviortree_factory.from_json_to_behavior_tree(json_data)
         )
 
+    def load_world_state(self, world_state: dict) -> None:
+        self.world_interface.load_world_from_json(world_state)
+
+    def set_world_state(self, world_state: dict) -> None:
+        self.world_interface.clear_world()
+        self.world_interface.load_world_from_json(world_state)
+
     # * tick handlers
     def post_tick_handler(
         self,
@@ -168,7 +175,6 @@ class BehaviorTreeStewardship:
         scheduler = sched.scheduler(time.time, time.sleep)
         scheduler.enter(0, 1, tick)
         scheduler.run()
-
 
     def tick_frequency_test(self):
         py_trees.logging.level = py_trees.logging.Level.DEBUG
@@ -403,6 +409,26 @@ class BehaviorTreeStewardship:
                 stw.replace_subtree(child.id, sim_node)
             # recursively replace the children
             self.replace_action_node_with_sim(stw, child)
+
+    def fake_run(self, world_state: dict, bt_json: dict):
+        """
+        fake run for graph testing
+        """
+        self.set_world_state(world_state)
+
+        roster, sim_bt = self.behaviortree_factory.from_json_to_behavior_tree(bt_json)
+        root = sim_bt.root
+
+        self.replace_action_node_with_sim(sim_bt, root)
+
+        self.setup_behavior_tree(sim_bt)
+
+        tree_result = self.tick_loop_until_success(sim_bt, loop_max=20)
+
+        # # * restore world check point
+        # self.world_interface.restore_check_point()
+
+        return tree_result
 
     ##########################################################
 

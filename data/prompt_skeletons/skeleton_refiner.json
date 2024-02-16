@@ -1,0 +1,16 @@
+{
+    "skeleton_name": "skeleton_refiner",
+    "model_name": "gpt-4-1106-preview",
+    "version": "V0",
+    "prompt_dir": "prompts/skeleton_refiner",
+    "prompt_load_order": [
+        "refine_role",
+        "refine_input_format",
+        "refine_state",
+        "refine_help",
+        "refine_controlflow",
+        "refine_condition",
+        "refine_action",
+        "refine_output_format"
+    ]
+}

@@ -54,6 +54,12 @@ class WorldInterface:
         """
         self.graph_interface.from_json(json_data)
 
+    def clear_world(self):
+        """
+        clear the world
+        """
+        self.graph_interface.clear()
+
     def get_world_to_json(self) -> dict:
         """
         return the world state in json dict

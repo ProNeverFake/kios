@@ -117,6 +117,11 @@ class GraphInterface:
         rel = Relationship(source, name, target)
         self.relations.discard(rel)
 
+    def clear(self):
+        self.nodes = {}
+        self.relations = set()
+        # self.graph = nx.DiGraph()
+
     def from_json(self, json_data: Dict[str, Any]):
         # * add nodes
         for node in json_data["objects"]:

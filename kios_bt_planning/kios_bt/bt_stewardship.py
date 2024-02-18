@@ -23,6 +23,12 @@ from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
 from kios_bt.data_types import TreeResult, Action, Condition
 
+from kios_utils.pddl_problem_parser import (
+    parse_problem_objects,
+    parse_problem_init,
+    parse_problem,
+)
+
 import py_trees
 
 import functools
@@ -434,3 +440,12 @@ class BehaviorTreeStewardship:
 
     def query_world_state(self):
         return self.world_interface.get_world_to_json()
+
+    def update_world_state_with_pddl_problem(self, pddl_problem: str):
+        """
+        bb problem parser
+        """
+
+        world_state = parse_problem(pddl_problem)
+
+        self.world_interface.update_world(world_state)

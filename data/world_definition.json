@@ -1,0 +1,18 @@
+{
+    "properties": [
+        "is_free",
+        "is_equippable"
+    ],
+    "constraints": [
+        "can_manipulate",
+        "can_screw_to",
+        "can_insert_to",
+        "can_place_to"
+    ],
+    "relations": [
+        "hold",
+        "is_inserted_to",
+        "is_screwed_to",
+        "is_placed_to"
+    ]
+}

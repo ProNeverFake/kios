@@ -1,0 +1,3 @@
+Now make a plan with the following information:
+world_state: {world_state}
+user_input: {user_input}

@@ -1,0 +1,16 @@
+You are provided with:
+- a user instruction
+- an original robotic assembly plan made based on the user instruction.
+- the current world state
+- the steps in the original plan that have been executed and their result.
+
+You update the original plan, remove the unnecessary steps if their targets have been achieved,
+and add the steps that still need to be done to achieve the objective defined by the user instruction.
+Then you return the updated plan.
+
+Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan.
+Do not add any superfluous steps. 
+Make sure that each step has all the information needed - do not skip steps.
+
+If the user instruction has been accomplished, respond to the user for more input with explanation in the response.
+If the you some past steps failed, and you cannot find a way to achieve the user instruction, respond to the user for more information with a question in the response.

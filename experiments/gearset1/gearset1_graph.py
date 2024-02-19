@@ -52,6 +52,17 @@ from langsmith import traceable
 
 load_dotenv()
 
+from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+
+
+def test_bt(bt_json: json):
+    test_class = BehaviorTreeFactory()
+    bt = test_class.from_json_to_simple_bt(bt_json)
+    # bt = test_class.from_json_to_tree_root(bt_json)
+    bt_stewardship = generate_bt_stewardship(bt)
+    # bt_stewardship.setup(timeout=15)
+    render_dot_tree(bt_stewardship)
+
 
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -364,6 +375,15 @@ async def behavior_tree_generate_step(state: PlanExecuteState):
             "instructions": instruction,
         }
     )
+
+    # sk_json = JsonOutputParser().invoke(skeleton)
+    sk_json = skeleton
+
+    behavior_tree_sk = sk_json["task_plan"]["behavior_tree"]
+
+    test_bt(behavior_tree_sk)
+
+    pause = input("paused here")
 
     # ! OBJECT CONCENTRATION
 

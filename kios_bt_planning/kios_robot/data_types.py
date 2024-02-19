@@ -105,6 +105,7 @@ class MiosObject:
             ["geometry", str(self.geometry)],
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
+
     @staticmethod
     def generate_dummy(object_name: str) -> "MiosObject":
         return MiosObject(
@@ -120,6 +121,7 @@ class MiosObject:
             mass=0.0,
             geometry=None,
         )
+
 
 @dataclass
 class MiosInterfaceResponse:
@@ -385,7 +387,7 @@ class TaskScene:
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:
-            return self.tool_map.get("default_tool")
+            return self.tool_map.get("no_tool")
         tool = self.tool_map.get(tool_name)
         if tool is None:
             raise Exception(f"Tool {tool_name} is not in the scene!")

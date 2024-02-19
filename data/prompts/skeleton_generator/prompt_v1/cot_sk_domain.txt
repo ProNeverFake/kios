@@ -1,5 +1,4 @@
 [user]
-///////////////////// nNOT USED
 Following is the domain knowledge you need in pddl domain format, which includes:
 - the object types in the world,
 - the predicates for describing the states of the world,
@@ -84,5 +83,7 @@ The actions are explained as follows:
 - unload_tool(<hand>, <tool>): <hand> unloads <tool> to manipulate other objects. As preconditions, <hand> should be holding <tool> and <tool> should be free.
 """
 the items in <> indicate the type of the instances needed for the predicates and actions.
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
-Understood. Waiting for next input.
+Understood. I will wait for further instructions before starting to work.

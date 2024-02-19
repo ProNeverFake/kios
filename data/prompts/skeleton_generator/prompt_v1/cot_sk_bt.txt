@@ -42,20 +42,16 @@ Follow these rules:
 2. The control flow nodes, "selector" and "sequence", can have "children", which is a list of children nodes.
 3. The "condition" nodes that are children of "selectors" are targets. Those that are children of "sequences" are preconditions. 
 4. The "action" nodes should have a key "effects" with a list of dictionaries, which describes the to-be-exerted effects of the action. The effects are shortly described under the key "summary".
-5. All the subtrees always have their corresponding action in ROBOT_ACTION_LIST. 
-This is how their structure is:
+5. All the subtrees always have their corresponding action in ROBOT_ACTION_LIST. The recommended structure is:
     - A selector as the root node. 
     - (Usually one) target condition node as the first child of the selector to check if the target of the action has been fulfilled.
     - A sequence node as the last child of the selector node to achieve the target.
     - (Usually a number of) precondition nodes as the front children of the sequence node to check the preconditions for executing the action. 
     - One action node as the last child of the sequence node, whose preconditions are checked before and will immediate start the job when being ticked.
     - The action will exert its defined effects after finishing the job successfully. Those effects should fulfilled all the target conditions in the selector node.
-6. To perform a action to fulfill a unsatisfied precondition, you can construct a subtree to replace the precondition at where it is and take that unfulfilled precondition as the target of the subtree. 
-7. All of the control flow nodes, namely selectors and sequences, are without memory. A new behavior tree tick will always start from the root and traverse all the nodes even if they are ticked in the last tick.
-
-An example:
+    A brief example is as follows:
 The action constructed based on the "load_tool" from ROBOT_ACTION_LIST:
-load_tool(left_hand, parallel_box1)
+load_tool(left_hand, inward_claw)
 The bahavior tree constructed according to its definition in ROBOT_ACTION_LIST:
 {
     "summary": "selector to load left_hand with parallel_box1",
@@ -91,5 +87,10 @@ The bahavior tree constructed according to its definition in ROBOT_ACTION_LIST:
     ],
 }
 
+6. When performing a new action to fulfill a unsatisfied precondition, you can construct a subtree to replace the precondition and take that unfulfilled precondition as the target of the subtree. Then you construct the sequence of the subtree according to the new action you want to perform. 
+7. All of the control flow nodes, namely selectors and sequences, are without memory. A new behavior tree tick will always start from the root and traverse all the nodes even if they are ticked in the last tick.
+
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
 Understood. I will wait for further instructions before starting to work.

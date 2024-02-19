@@ -8,13 +8,12 @@ instructions: {instructions}
 ---------------
 The dictionary that you return should be formatted as json file. Follow these rules:
 1. Always equip the proper tools before performing specific object manipulaion.
-2. Make sure that each element of the ["action_instructions"] explains corresponding element of the ["action_sequence"]. Refer to the "ROBOT ACTION LIST" to understand the elements of ["action_sequence"].
-3, The length of the ["action_instructions"] list and the ["action_sequence"] list should be the same.
-4. Never left ',' at the end of the list. Use json boolean values, "true" or "false", instead of "True" or "False".
-5. Keep track of all the objects, constraints and relations in the "initial_state" field.
-6. The ["initial_state"] should be generated based on "PREDICATE_LIST". 
-7. All keys of the dictionary should be double-quoted.
-8. Return the json dictionary without adding anything at the beginning and the end of it. You return should be ready to be parsed as a json object directly.
-9. Make sure that you output a consistent manipultation as a single arm robot. For example, grasping an object should not occur in successive steps.
-10. When generating the behavior tree, make sure the tree has the asked structure. 
+2. Refer to the "ROBOT ACTION LIST" to understand the elements of ["action_sequence"].
+3. Never left ',' at the end of the list. Use json boolean values, "true" or "false", instead of "True" or "False".
+4. Keep track of all the objects, constraints and relations in the "initial_state" field.
+5. The ["initial_state"] should be generated based on "PREDICATE_LIST". 
+6. All keys of the dictionary should be double-quoted.
+7. Return the json dictionary without adding anything at the beginning and the end of it. You return should be ready to be parsed as a json object directly.
+8. Make sure that you output a consistent manipultation as a single arm robot.
+9. When generating the behavior tree, make sure the tree has the asked structure. 
 Adhere to the output format I defined above. Follow the rules above. Think step by step.

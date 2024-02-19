@@ -10,7 +10,5 @@ Follow this workflow to solve the task:
 6. Collect the objects in the world that are effected by the action sequence, write into dictionary["task_plan"]["manipulated_objects"].
 7. Generate the behavior tree based on the action sequence and write into dictionary["task_plan"]["behavior_tree"].
 
--------------------------------------------------------
-The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
 Understood. Waiting for next input.

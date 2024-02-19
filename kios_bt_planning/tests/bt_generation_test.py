@@ -16,6 +16,7 @@ from kios_utils.pybt_test import (
 )
 
 from kios_agent.kios_llm import KiosLLM
+
 # from kios_agent.llm_supporter import KiosLLM # ! TESTING NOW
 
 from typing import List, Dict, Any
@@ -28,10 +29,10 @@ import py_trees
 
 def test_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
-    # bt = test_class.from_json_to_simple_bt(bt_json)
-    bt = test_class.from_json_to_tree_root(bt_json)
+    bt = test_class.from_json_to_simple_bt(bt_json)
+    # bt = test_class.from_json_to_tree_root(bt_json)
     bt_stewardship = generate_bt_stewardship(bt)
-    bt_stewardship.setup(timeout=15)
+    # bt_stewardship.setup(timeout=15)
     render_dot_tree(bt_stewardship)
 
     # tick_loop_test(bt_stewardship)
@@ -120,14 +121,12 @@ def main():
     #                 )\
     #                 '
 
-
     # * refine problem
     problem_name = "gearset1_sk"  # super skeleton
     file_dir = os.path.dirname(os.path.abspath(__file__))
     problem_dir = os.path.join(file_dir, "cot_sk.txt")
     with open(problem_dir, "r") as f:
         problem = f.read()
-
 
     ### * end_to_end
     # feature = "e2e"

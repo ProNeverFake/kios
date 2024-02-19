@@ -14,7 +14,7 @@
       },
       {
         "name": "outward_claw",
-        "properties": ["is_free", "is_equippable"]
+        "properties": ["is_free"]
       },
       {
         "name": "no_tool",
@@ -58,7 +58,7 @@
       },
       {
         "name": "left_hand",
-        "properties": ["is_free"]
+        "properties": []
       }
     ],
     "constraints": [
@@ -103,6 +103,12 @@
         "target": "shaft3"
       }
     ],
-    "relations": []
+    "relations": [
+      {
+        "source": "left_hand",
+        "name": "hold",
+        "target": "outward_claw"
+      }
+    ]
 }
 

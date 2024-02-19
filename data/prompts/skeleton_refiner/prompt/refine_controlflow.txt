@@ -1,10 +1,14 @@
 [user]
+For each node, you should: 
+- add an identifier field to the node, which is a unique integer number.
+- add a type_name field to the node, which is a string that represents the type of the node.
+
 For control flow nodes, namely selectors and sequences, an example is shown as follows:
 the skeleton:
 """
 {
     "summary": "selector to load no_tool to hand",
-    "name": "selector: load_tool",
+    "name": "selector: load_tool(left_hand, no_tool)",
     "children": [...],
 }
 
@@ -20,7 +24,5 @@ after refinement:
 }
 """
 
--------------------------------------------------------
-The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
 Understood. Waiting for next input.

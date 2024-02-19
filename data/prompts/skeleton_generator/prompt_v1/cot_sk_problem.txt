@@ -18,5 +18,7 @@ An example:
 )
 """
 
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
 Understood. Waiting for next input.

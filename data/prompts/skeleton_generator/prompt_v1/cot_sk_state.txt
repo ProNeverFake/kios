@@ -21,5 +21,7 @@ It contains three lists:
     - "relations": the relations in the world. They can be changed by robot actions. Refer to input world state for them.
 The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.
 
+-------------------------------------------------------
+The texts above are part of the overall instruction. Do not start working yet:
 [assistant]
 Understood. Waiting for next input.

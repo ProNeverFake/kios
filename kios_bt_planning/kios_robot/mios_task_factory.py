@@ -59,7 +59,7 @@ class MiosTaskFactory:
             Dict[str, Any]: action_name: str, args: List[str]
         """
         # use re to parse the action
-        pattern = r"(?:action:\s)?(\w+):?\s*\(([\w\s,]+)\)" # ! alarm
+        pattern = r"(?:action:\s)?(\w+):?\s*\(([\w\s,]+)\)"  # ! alarm
         action_string = action.name
         match = re.match(pattern, action_string)
         if match:
@@ -308,7 +308,7 @@ class MiosTaskFactory:
                         "ddX_d": [0.5, 1],
                         # "O_T_OB":
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
-                        "F_ff": [0,0,0,0,0,2],
+                        "F_ff": [0, 0, 0, 0, 0, 2],
                     },
                     "objects": {"Container": object_name},
                 },
@@ -320,9 +320,16 @@ class MiosTaskFactory:
                     "p0": {
                         "dX_d": [0.1, 0.3],
                         "ddX_d": [0.5, 0.5],
-                        "K_x": [1000, 1000, 1000, 500, 500, 100], # ! is EE_k_x if you don't set frame!!!
+                        "K_x": [
+                            1000,
+                            1000,
+                            1000,
+                            500,
+                            500,
+                            100,
+                        ],  # ! is EE_k_x if you don't set frame!!!
                         "O_T_OB": O_T_OB.T.flatten().tolist(),
-                        "F_ff": [0,0,3,0,0,-10],
+                        "F_ff": [0, 0, 3, 0, 0, -10],
                     },
                     # "objects": {"GoalPose": "NullObject"},
                 },
@@ -346,7 +353,7 @@ class MiosTaskFactory:
         """
         # get the tool from the scene
         if tool_name is None:
-            tool = self.task_scene.get_tool("default_tool")
+            tool = self.task_scene.get_tool("no_tool")  # ! BBCHANGE
         else:
             tool = self.task_scene.get_tool(tool_name)
         # get the EE_T_TCP

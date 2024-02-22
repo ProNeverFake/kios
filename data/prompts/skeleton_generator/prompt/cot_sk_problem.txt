@@ -1,4 +1,6 @@
 [user]
+
+/// discarded now
 Information about the problem is given as a pddl problem.
 It includes the following information:
 - objects: all the objects in the world. They should be of a type defined in the domain knowledge. For example, "parallel_box1" is an instance of the type "tool", while "gear1" is an instance of the type "part".

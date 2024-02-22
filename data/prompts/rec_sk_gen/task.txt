@@ -1,0 +1,12 @@
+The input are:
+objects: a list of objects in the world.
+runtime_world_state: the world state when the last behaior tree stopped.
+last_behavior_tree: the last executed behavior tree.
+last_failed_node: the last node that failed in the last behavior tree.
+action_sequence: the action_sequence that your behavior tree should align with.
+
+You analyze the failure reason, then fix the behavior tree.
+If no last_behavior_tree is given, you generate a behavior tree based on the action sequence. The behavior tree should follow the regulated format.
+Learn from the examples to understand the regulated format of the behavior tree.
+The identifiers of the nodes are not necessary when generating the behavior tree.
+You only return the behavior tree as a json object that is ready to be parsed.

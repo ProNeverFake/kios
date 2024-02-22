@@ -1,0 +1,13 @@
+Follow these rules:
+1. Every node has:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal name of the node according to the domain knowledge.
+2. Selector nodes and sequence nodes can have child nodes.
+3. Refer to PREDICATE_LIST to understand condition nodes
+4. Refer to ROBOT_ACTION_LIST to understand action nodes.
+4. Make sure for each action node, its preconditions are checked by condition nodes before it is ticked.
+5. One condition node can only check one condition.
+6. An action node will return RUNNING immediately even if it is ticked. 
+7. The action node will execute the action when it is ticked again, even if it has been executed and returned success before. Use selector nodes with a condition node to avoid this.
+8. Don't put two action nodes in one sequence node because in this case the first action node will be executed repeatedly and the second one will never get executed.
+9. Due to the same reason, don't put two sequence nodes in one sequence node.

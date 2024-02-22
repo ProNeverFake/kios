@@ -1,0 +1,22 @@
+The behavior tree should be in json dictionary format.
+Follow these rules:
+1. Every node are described by a summary and a name:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal form of the node according to the domain knowledge.
+2. The control flow nodes, namely "selector" and "sequence", can have "children", which is a list of children nodes.
+3. The "condition" nodes that are children of "selectors" are targets. Those that are children of "sequences" are preconditions. 
+4. All the node always have their corresponding actions/precidates in the domain knowledge. 
+5. Control flow nodes in behavior trees don't have memory. Each tick starts from the root and traverses all nodes, regardless of their previous state.
+6. The basic structure template of a unit subtree is:
+    - A selector as the root node. 
+    - One target condition node as the first child of the selector to check if the target of the action has been fulfilled.
+    - A sequence node as the last child of the selector node to achieve the target.
+    - A number of precondition nodes as the first children of the sequence node to check the action's preconditions.
+    - One action node as the last child of the sequence node, whose preconditions are checked before and will immediate start its action when being ticked.
+    - The action should have effects that can fulfill the target condition node in the selector.
+7. This is how you generate and use a new unit subtree:
+    - First, find the failed condition node. Refer to runtime world state to understand its failure reason.
+    - Find the corresponding action from domain knowledge that can fulfill that condition node.
+    - Create a subtree to fulfill that condition node, with that condition node as target node.
+    - Create the sequence in this subtree with the action's preconditions and the action.
+    - Replace the failed condition node with the subtree in the original tree.

@@ -62,46 +62,6 @@
       }
     ],
     "constraints": [
-      {
-        "source": "parallel_box1",
-        "name": "can_manipulate",
-        "target": "shaft1"
-      },
-      {
-        "source": "parallel_box2",
-        "name": "can_manipulate",
-        "target": "gear1"
-      },
-      {
-        "source": "outward_claw",
-        "name": "can_manipulate",
-        "target": "gear2"
-      },
-      {
-        "source": "outward_claw",
-        "name": "can_manipulate",
-        "target": "gear3"
-      },
-      {
-        "source": "no_tool",
-        "name": "can_manipulate",
-        "target": "shaft3"
-      },
-      {
-        "source": "shaft1",
-        "name": "can_insert_to",
-        "target": "gearbase_hole1"
-      },
-      {
-        "source": "shaft3",
-        "name": "can_insert_to",
-        "target": "gearbase_hole3"
-      },
-      {
-        "source": "gear3",
-        "name": "can_insert_to",
-        "target": "shaft3"
-      }
     ],
     "relations": [
       {

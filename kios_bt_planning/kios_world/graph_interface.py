@@ -154,7 +154,10 @@ class GraphInterface:
 
         # * add nodes
         for node_name, node in self.nodes.items():
-            node_data = {"name": node_name, "properties": node.properties}
+            node_data = {
+                "name": node_name,
+                "properties": list(node.properties),
+            }  # ! BBFIX 20022024
             json_data["objects"].append(node_data)
 
         # * add constraints and relations (unchangeable relations)

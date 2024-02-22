@@ -1,43 +1,35 @@
 [user]
-I will give you some examples of the input and the output you will generate. 
+Following are some examples of the input and output.
+Learn how to expand behavior tree from the examples.
 Example 1:
 """
 - Input:
-problem: 
-(define (problem robot_assembly_problem-problem)
- (:domain robot_assembly_problem-domain)
- (:objects
-   parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool
-   gear1 gear2 gear3 shaft1 shaft2 base - part
-   left_hand - hand
- )
- (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1))
-)
+objects:
+{
+    "tool": ["parallel_box1", "inward_claw", "outward_claw"],
+    "part": ["gear1", "shaft1", "gearbase_hole1", "gearbase_hole3"]
+    "hand": ["left_hand"]
+} 
 world_state: 
 {
     "objects": [
         {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
-        {"name": "parallel_box2", "properties": ["is_free", "is_equippable"]},
         {"name": "inward_claw", "properties": ["is_free", "is_equippable"]},
         {"name": "outward_claw", "properties": ["is_free"]},
-        {"name": "no_tool", "properties": ["is_free", "is_equippable"]},
         {"name": "gear1", "properties": []},
-        {"name": "gear2", "properties": []},
-        {"name": "gear3", "properties": []},
         {"name": "shaft1", "properties": []},
-        {"name": "shaft2", "properties": []},
-        {"name": "shaft3", "properties": []},
-        {"name": "gearbase", "properties": []},
         {"name": "gearbase_hole1", "properties": []},
-        {"name": "gearbase_hole3", "properties": []},
         {"name": "left_hand", "properties": []}
     ],
-    "constraints": [],
+    "constraints": [
+        {"name": "can_manipulate", "args": ["parallel_box1", "gear1"]},
+        {"name": "can_insert_to", "args": ["gear1", "shaft1"]},
+    ],
     "relations": [
       {"source": "left_hand","name": "hold","target": "outward_claw"}
     ]
 }
-instructions: insert gear1 into shaft1
+instructions: "insert gear1 into shaft1"
 
 - Output:
 ```
@@ -100,11 +92,6 @@ instructions: insert gear1 into shaft1
                                                 {
                                                     "summary": "action node to make left hand unload outward_claw",
                                                     "name": "action: unload_tool(left_hand, outward_claw)",
-                                                    "effects": [
-                                                        {"summary": "left_hand will be free",},
-                                                        {"summary": "outward_claw will be equippable",},
-                                                        {"summary": "left_hand will not hold outward_claw",},
-                                                    ],
                                                 },
                                             ],
                                         },
@@ -113,11 +100,6 @@ instructions: insert gear1 into shaft1
                                 {
                                     "summary": "action node to equip parallel_box1 to left hand",
                                     "name": "action: load_tool(left_hand, parallel_box1)",
-                                    "effects": [
-                                        {"summary": "left_hand will be not free",},
-                                        {"summary": "parallel_box1 will be not equippable",},
-                                        {"summary": "left_hand will hold parallel_box1",},
-                                    ],
                                 },
                             ],
                         },
@@ -146,10 +128,6 @@ instructions: insert gear1 into shaft1
                                 {
                                     "summary": "action node to use left hand with parallel_box1 to pick up gear1",
                                     "name": "action: pick_up(left_hand, parallel_box1, gear1)",
-                                    "effects": [
-                                        {"summary": "parallel_box1 will hold gear1",},
-                                        {"summary": "parallel_box1 will be not free",},
-                                    ],
                                 },
                             ],
                         },
@@ -162,31 +140,11 @@ instructions: insert gear1 into shaft1
                 {
                     "summary": "action node to use left_hand with parallel_box1 to insert gear1 to shaft1",
                     "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)",
-                    "effects": [
-                        {"summary": "parallel_box1 will be not holding gear1",},
-                        {"summary": "parallel_box1 will be free",},
-                        {"summary": "gear1 will be inserted to shaft1",},
-                    ],
                 },
             ],
         },
     ],
 }
-},
-"initial_state": {"objects": [
-            {"name": "gear1", "properties": []},
-            {"name": "shaft1", "properties": []},
-            {"name": "outward_claw", "properties": ["is_free"]},
-            {"name": "parallel_box1", "properties": ["is_equippable", "is_free"]},
-            {"name": "left_hand", "properties": []},
-        ],
-        "constraints": [
-            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"},
-            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
-        ],
-        "relations": [
-            {"source": "left_hand", "name": "hold", "target": "outward_claw"},
-        ],
 },
 "question":""}
 ```

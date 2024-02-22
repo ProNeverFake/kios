@@ -73,11 +73,12 @@ class WorldInterface:
                 item.get("name"), item.get("properties")
             )
 
+        # ! BBFIX 20022024
         for item in constraint_list:
             self.graph_interface.add_relation(
                 source=item.get("source"),
                 target=item.get("target"),
-                relation=item.get("relation"),
+                name=item.get("name"),
                 isConstraint=True,
             )
 
@@ -85,7 +86,7 @@ class WorldInterface:
             self.graph_interface.add_relation(
                 source=item.get("source"),
                 target=item.get("target"),
-                relation=item.get("relation"),
+                name=item.get("name"),
                 isConstraint=False,
             )
 

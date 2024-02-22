@@ -7,7 +7,9 @@ from kios_bt.data_types import (
 )
 import copy
 import py_trees
+import json
 import re
+from pprint import pprint
 from typing import List, Dict, Any, Tuple
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
@@ -16,7 +18,13 @@ from kios_bt.pybt_io import BehaviorTreeTemplates
 from kios_world.world_interface import WorldInterface
 from kios_robot.robot_interface import RobotInterface
 
-from kios_utils.skeleton_parser import parse_node_name
+from kios_utils.skeleton_parser import (
+    parse_node_name,
+    ParsedNode,
+    ground_action,
+    parse_node_type,
+)
+
 
 """
 bt_stewardship: the stewardship of the behavior tree, kios class.
@@ -25,12 +33,23 @@ tree_root: py_trees.behaviour.Behaviour, the root of the tree
 """
 
 
+def id_generator(limit=1000):
+    """Generate unique IDs from 0 up to limit-1."""
+    for id in range(limit):
+        yield id
+
+
+generator = id_generator()  # Create a generator
+
+
 class BehaviorTreeFactory:
     visualization_only: bool
     roster: Dict[int, Any] = {}  # * roster hasn't be tested yet.
 
     world_interface: WorldInterface = None
     robot_interface: RobotInterface = None
+
+    id_generator = id_generator()
 
     def __init__(
         self,
@@ -260,14 +279,117 @@ class BehaviorTreeFactory:
         return condition_node
 
     ################################* new parse method ################################
-    def from_skeleton_to_bt(self, skeleton: dict):
+    # * json to bt_stw
+    def from_skeleton_to_behavior_tree(
+        self, json_data: dict
+    ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree]:
+
+        # ! clear roster here
+        self.roster = {}
+
+        tree_root = self.from_skeleton_to_tree_root(json_data)
+        behavior_tree = py_trees.trees.BehaviourTree(tree_root)
+        return [self.roster, behavior_tree]
+
+    def from_skeleton_to_tree_root(self, skeleton: dict):
         """
-        generate a simple bt based on a skeleton
+        generate a bt based on a skeleton
         """
-        if "type" not in skeleton:
-            raise ValueError("Type is missing in the skeleton.")
-        parsed_dict = parse_node_name(name=skeleton["name"])
-        # TODO
+        if "name" not in skeleton.keys():
+            raise ValueError("name is missing in the skeleton.")
+        parsed_type = parse_node_type(skeleton["name"])
+        if parsed_type == "selector":
+            control_flow_node = py_trees.composites.Selector(
+                name=skeleton["name"], memory=False
+            )
+
+            if "identifier" not in skeleton.keys():
+                skeleton["identifier"] = next(self.id_generator)
+
+            self.roster[skeleton["identifier"]] = control_flow_node
+
+            for child in skeleton["children"]:
+                child_node = self.from_skeleton_to_tree_root(child)
+                control_flow_node.add_child(child_node)
+            return control_flow_node
+        elif parsed_type == "sequence":
+            control_flow_node = py_trees.composites.Sequence(
+                name=skeleton["name"], memory=False
+            )
+            if "identifier" not in skeleton.keys():
+                skeleton["identifier"] = next(self.id_generator)
+            self.roster[skeleton["identifier"]] = control_flow_node
+            for child in skeleton["children"]:
+                child_node = self.from_skeleton_to_tree_root(child)
+                control_flow_node.add_child(child_node)
+            return control_flow_node
+        elif parsed_type in ["precondition", "condition", "target"]:
+            parsed_node = parse_node_name(skeleton["name"])
+            return self.from_skeleton_to_condition_node(skeleton, parsed_node)
+        elif parsed_type == "action":
+            parsed_node = parse_node_name(skeleton["name"])
+            return self.from_skeleton_to_action_node(skeleton, parsed_node)
+        else:
+            raise ValueError(f"unknown type name {parsed_node.typename}")
+
+    def from_skeleton_to_condition_node(
+        self, skeleton: dict, parsed_node: ParsedNode
+    ) -> ConditionNode:
+        """
+        from skeleton to condition node
+        """
+        pprint(skeleton)
+        # ! here we cheat. all the condition check are now only true.
+        op = ObjectProperty(
+            object_name=parsed_node.params[0],
+            property_name=parsed_node.itemname,
+            property_value=(
+                parsed_node.params[1] if len(parsed_node.params) == 2 else None
+            ),
+            status=True,
+        )
+        if "identifier" not in skeleton.keys():
+            skeleton["identifier"] = next(self.id_generator)
+
+        condition = Condition(
+            summary=skeleton["summary"],
+            identifier=skeleton["identifier"],
+            name=skeleton["name"],
+            conditions=[op],
+        )
+        condition_node = ConditionNode(
+            condition,
+            self.world_interface,
+            self.robot_interface,
+        )
+        self.roster[skeleton["identifier"]] = condition_node
+
+        return condition_node
+
+    def from_skeleton_to_action_node(
+        self, skeleton: dict, parsed_node: ParsedNode
+    ) -> ActionNode:
+        """
+        from skeleton to action node
+        """
+        _, effects = ground_action(parsed_node.itemname, parsed_node.params)
+        if "identifier" not in skeleton.keys():
+            skeleton["identifier"] = next(self.id_generator)
+
+        action = Action(
+            summary=skeleton["summary"],
+            identifier=skeleton["identifier"],
+            name=skeleton["name"],
+            effects=effects,
+        )
+        action_node = ActionNode(
+            action,
+            self.world_interface,
+            self.robot_interface,
+        )
+        self.roster[skeleton["identifier"]] = action_node
+
+        return action_node
 
     ##########################################################
     # # ! FOLLOWING FUNCTIONS ARE NOT IN USE. SHOULD BE MODIFIED LATER FOR TREE MODIFICATION

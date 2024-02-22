@@ -9,6 +9,10 @@ from kios_domain.problem4 import problem as problem4
 
 import os
 
+"""
+use this to generate the domain and problem files.
+"""
+
 
 def test_from_up():
     print("test_from_up ----------------------------------")

@@ -27,9 +27,9 @@ class SceneFactory:
 
         for reference_object_json in scene_json["reference_objects"]:
             if reference_object_json["source"] == "pre-defined":
-                self.task_scene.object_map[
-                    reference_object_json["object_name"]
-                ] = KiosObject.from_json(reference_object_json)
+                self.task_scene.object_map[reference_object_json["object_name"]] = (
+                    KiosObject.from_json(reference_object_json)
+                )
             elif reference_object_json["source"] == "mios":
                 mios_object = mongodb_interface.query_mios_object(
                     reference_object_json["object_name"]
@@ -55,7 +55,7 @@ class SceneFactory:
                 name=tool_json["tool_name"],
                 EE_T_TCP=np.array(tool_json["EE_T_TCP"]),
             )
-            print(tool)
+            # print(tool)
             self.task_scene.tool_map[tool.name] = tool
 
         return self.task_scene

@@ -1,10 +1,9 @@
 [user]
 You will be provided with a problem and the necessary domain knowledge. 
 You generate an action sequence to solve the task and contruct a behavior tree based on it in json format.
-The output dictionary has five keys.
+The output dictionary has two keys.
 """
 - dictionary["task_plan"]: A dictionary containing the task plan.
-- dictionary["initial_state"]: The initial world state before executing the plan.
 - dictionary["question"]: If you don't have enough knowledge for solving the problem, you can ask questions about the knowledge you need. Leave this key empty if you can solve the task.
 """
 Three keys exist in dictionary["task_plan"].

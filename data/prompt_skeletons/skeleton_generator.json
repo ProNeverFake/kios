@@ -7,7 +7,7 @@
         "cot_sk_role",
         "cot_sk_output_format",
         "cot_sk_domain",
-        "cot_sk_problem",
+        "cot_sk_objects",
         "cot_sk_instruction",
         "cot_sk_state",
         "cot_sk_bt",

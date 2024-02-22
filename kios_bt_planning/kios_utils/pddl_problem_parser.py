@@ -174,10 +174,15 @@ def test(problem: str):
     # parsed_init = parse_problem_init(problem)
     # print(parsed_init)
     world_state = parse_problem(problem)
-    for key, value in world_state.items():
-        print(f"{key}:")
-        for item in value:
-            print(item)
+    # for key, value in world_state.items():
+    #     print(f"{key}:")
+    #     for item in value:
+    #         print(item)
+    from pprint import pprint
+
+    pprint(world_state)
+
+    pprint(parse_problem_objects(problem))
 
 
 if __name__ == "__main__":

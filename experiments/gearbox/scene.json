@@ -1,0 +1,93 @@
+{
+    "reference_objects":
+    [
+        {
+            "object_name": "inwardgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "outwardgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "parallelgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "yawgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "defaultgripper",
+            "source": "mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "parallelgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.085],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "yawgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.07],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "inwardgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.095],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "outwardgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.125],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "defaultgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.025],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
+        }
+    ]
+}

@@ -150,6 +150,7 @@ def tool_test():
 
     robot_command.execute_task_list_sync()
 
+
 def load_tool_test(tool_name: str):
     parsed_action = {
         "action_name": "load_tool",
@@ -164,9 +165,12 @@ def load_tool_test(tool_name: str):
         robot_interface=ri,
     )
 
-    robot_command.add_tasks(ri.mios_task_factory.generate_load_tool_skill(parsed_action))
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_load_tool_skill(parsed_action)
+    )
 
     robot_command.execute_task_list_sync()
+
 
 def pick_test():
     sf = SceneFactory()
@@ -279,7 +283,32 @@ def drive_test():
     robot_command.execute_task_list_sync()
 
 
-if __name__ == "__main__":
-    # tool_test()
-    # pick_test()
-    pass
+def change_gripper(current_tool: str, new_tool: str):
+
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    unload_tool_parsed_action = {
+        "action_name": "unload_tool",
+        "args": ["left_hand", current_tool],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_unload_tool_skill(unload_tool_parsed_action)
+    )
+
+    load_tool_parsed_action = {
+        "action_name": "load_tool",
+        "args": ["left_hand", new_tool],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_load_tool_skill(load_tool_parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()

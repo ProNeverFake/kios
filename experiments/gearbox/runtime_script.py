@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import json
 from spatialmath import *
 from spatialmath.base import trnorm
 
@@ -19,7 +20,8 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 scene_file = os.path.join(current_dir, "scene.json")
 
 with open(scene_file, "r") as f:
-    scene_json = f.read()
+    scene_string= f.read()
+    scene_json = json.loads(scene_string)
 
 scene = sf.create_scene_from_json(scene_json)
 ri.setup_scene(scene)
@@ -43,12 +45,27 @@ def show_backups():
 
 def restore_to_mios_environment(backup_name: str):
     ltm_manipulator.restore_to_mios_environment(backup_name)
+    # ! you need to update the memory of mios.
+    update_mios_memory_environment()
+    # ! you also need to update the scene object in robot_interface.
+    scene = sf.create_scene_from_json(scene_json)
+    ri.setup_scene(scene)
 
 
 def teach_object_TCP(object_name: str):
     ri.proprioceptor.teach_object_TCP(object_name)
     ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
 
+def update_mios_memory_environment():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    robot_command.add_task(ri.mios_task_factory.generate_update_mios_memory_environment_call())
+    robot_command.execute_task_list_sync()
 
 def get_object(object: str):
     ri.proprioceptor.get_object(object)
@@ -172,14 +189,11 @@ def load_tool_test(tool_name: str):
     robot_command.execute_task_list_sync()
 
 
-def pick_test():
-    sf = SceneFactory()
-    scene = sf.create_test_scene()
-    ri.setup_scene(scene)
+def pick_test(object_name: str):
 
     parsed_action = {
         "action_name": "pick",
-        "args": [None, None, "test_object"],
+        "args": [None, None, object_name],
     }
 
     robot_command = RobotCommand(
@@ -190,15 +204,11 @@ def pick_test():
         robot_interface=ri,
     )
 
-    robot_command.add_mios_task(ri.mios_task_factory.generate_gripper_home_mp())
+    # robot_command.add_mios_task(ri.mios_task_factory.generate_gripper_home_mp())
 
-    pick_up_tasks = ri.mios_task_factory.generate_pick_up_skill(
-        parsed_action=parsed_action
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_pick_up_skill(parsed_action)
     )
-    for task in pick_up_tasks:
-        robot_command.add_task(task)
-
-    robot_command.task_list.append(ri.mios_task_factory.generate_gripper_release_mp())
 
     robot_command.execute_task_list_sync()
 
@@ -293,22 +303,62 @@ def change_gripper(current_tool: str, new_tool: str):
         robot_interface=ri,
     )
 
-    unload_tool_parsed_action = {
-        "action_name": "unload_tool",
-        "args": ["left_hand", current_tool],
-    }
+    if current_tool != "defaultgripper":
+        unload_tool_parsed_action = {
+            "action_name": "unload_tool",
+            "args": ["left_hand", current_tool],
+        }
 
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_unload_tool_skill(unload_tool_parsed_action)
+        robot_command.add_tasks(
+            ri.mios_task_factory.generate_unload_tool_skill(unload_tool_parsed_action)
+        )
+
+    if new_tool != "defaultgripper":
+
+        load_tool_parsed_action = {
+            "action_name": "load_tool",
+            "args": ["left_hand", new_tool],
+        }
+
+        robot_command.add_tasks(
+            ri.mios_task_factory.generate_load_tool_skill(load_tool_parsed_action)
+        )
+
+    robot_command.execute_task_list_sync()
+
+
+def insert_task(part1: str, part2: str):
+    """
+    part1: the location name of the part to be inserted
+    part2: the location name of the part (usually a feature name) to be inserted into
+    """
+    # * first pickup, then insert
+
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
     )
 
-    load_tool_parsed_action = {
-        "action_name": "load_tool",
-        "args": ["left_hand", new_tool],
+    pick_up_parsed_action = {
+        "action_name": "pick",  # ! maybe this should be "pick_up"
+        "args": [None, None, part1],
     }
 
     robot_command.add_tasks(
-        ri.mios_task_factory.generate_load_tool_skill(load_tool_parsed_action)
+        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [None, None, part1, part2],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill(insert_parsed_action)
     )
 
     robot_command.execute_task_list_sync()

@@ -14,11 +14,51 @@
             "source": "mios"
         },
         {
-            "object_name": "yawgripper",
+            "object_name": "clampgripper",
             "source": "mios"
         },
         {
             "object_name": "defaultgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "outerring",
+            "source": "mios"
+        },
+        {
+            "object_name": "cone",
+            "source": "mios"
+        },
+        {
+            "object_name": "housingringhole",
+            "source": "mios"
+        },
+        {
+            "object_name": "outputshaftandgearstage2",
+            "source": "mios"
+        },
+        {
+            "object_name": "housinginternalgear",
+            "source": "mios"
+        },
+        {
+            "object_name": "ringgear",
+            "source": "mios"
+        },
+        {
+            "object_name": "designring",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearstage1",
+            "source": "mios"
+        },
+        {
+            "object_name": "driveflange",
+            "source": "mios"
+        },
+        {
+            "object_name": "inputpinion",
             "source": "mios"
         }
     ],
@@ -38,7 +78,7 @@
             "unload_width": 0.08
         },
         {
-            "tool_name": "yawgripper",
+            "tool_name": "clampgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],

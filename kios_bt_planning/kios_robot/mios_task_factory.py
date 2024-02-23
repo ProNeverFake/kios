@@ -148,6 +148,11 @@ class MiosTaskFactory:
         }
         return MiosCall(method_name="teach_object", method_payload=payload)
 
+    # ! this doesn't make sense if you use the object in the scene. turn to the scene method.
+    def generate_update_mios_memory_environment_call(self) -> MiosCall:
+        payload = {}
+        return MiosCall(method_name="update_memory_environment", method_payload=payload)
+
     def generate_move_above_mp(self, object_name: str) -> MiosSkill:
         """
         move to 15cm above the object in the z axis of the object coordinate system.
@@ -170,6 +175,20 @@ class MiosTaskFactory:
 
         # generate the cartesian move
         return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_TCP)
+    
+    def generate_reach_mp(self, object_name: str) -> MiosSkill:
+        """
+        move to the object.
+        """
+        # get the object from the scene
+        kios_object = self.task_scene.get_object(object_name)
+        if kios_object is None:
+            raise Exception(f'object "{object_name}" is not found in the scene!')
+        # get the O_T_EE and modify it to be 5cm above the object
+        object_O_T_TCP = kios_object.O_T_TCP
+
+        # generate the cartesian move
+        return self.generate_cartesian_move_mp(O_T_TCP=object_O_T_TCP)
 
     def generate_cartesian_move_mp(
         self, object_name: str = None, O_T_TCP: np.ndarray = None
@@ -486,13 +505,15 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
-        update_tool = self.generate_update_tool_call(tool_name=None)
+        # ! name changed
+        update_tool = self.generate_update_tool_call(tool_name="defaultgripper")
 
         return [
             unload_tool,
             update_tool,
         ]
 
+    # ! BUG
     def generate_pick_up_skill(
         self, parsed_action: Dict[str, Any]
     ) -> List[MiosCall | MiosSkill]:
@@ -508,7 +529,9 @@ class MiosTaskFactory:
         move_above = self.generate_move_above_mp(object_name)
         task_list.append(move_above)
         # move in
-        reach = self.generate_cartesian_move_mp(object_name=object_name)
+        # ! BUG
+        # reach = self.generate_cartesian_move_mp(object_name=object_name)
+        reach = self.generate_reach_mp(object_name)
         task_list.append(reach)
         # grasp
         grasp = self.generate_gripper_grasp_mp()
@@ -590,6 +613,7 @@ class MiosTaskFactory:
         # get the container from the scene
         kios_object = self.task_scene.get_object(container)
         if kios_object is not None:
+            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
@@ -599,20 +623,20 @@ class MiosTaskFactory:
                     "time_max": 20,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.1, 0.3],
-                        "ddX_d": [0.5, 4],
+                        "dX_d": [0.05, 0.3],
+                        "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.03, 0.1],
+                        "dX_d": [0.05, 0.1],
                         "ddX_d": [0.05, 0.05],
                         "K_x": [500, 500, 500, 600, 600, 600],
                     },
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [5, 5, 0, 2, 2, 0],
+                        "search_a": [10, 10, 0, 2, 2, 0],
                         "search_f": [1, 1, 0, 1.2, 1.2, 0],
                         "search_phi": [
                             0,
@@ -626,8 +650,8 @@ class MiosTaskFactory:
                         "f_push": [0, 0, 7, 0, 0, 0],
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
-                        "dX_d": [0.08, 0.5],
-                        "ddX_d": [0.3, 0.5],
+                        "dX_d": [0.1, 0.5],
+                        "ddX_d": [0.5, 1],
                     },
                     "p3": {
                         "dX_d": [0.1, 0.5],
@@ -640,7 +664,7 @@ class MiosTaskFactory:
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                    "F_ext_contact": [7.0, 2.0],
+                    "F_ext_contact": [10.0, 2.0],
                 },
             }
         else:
@@ -658,7 +682,7 @@ class MiosTaskFactory:
                     },
                     "p1": {
                         "dX_d": [0.03, 0.1],
-                        "ddX_d": [0.5, 0.1],
+                        "ddX_d": [0.05, 0.01],
                         "K_x": [500, 500, 500, 600, 600, 600],
                     },
                     "p2": {
@@ -675,7 +699,7 @@ class MiosTaskFactory:
                             0,
                         ],
                         "K_x": [500, 500, 500, 800, 800, 800],
-                        "f_push": [0, 0, 7, 0, 0, 0],
+                        "f_push": [0, 0, 3, 0, 0, 0],
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
                         "dX_d": [0.08, 0.5],
@@ -692,9 +716,13 @@ class MiosTaskFactory:
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                    "F_ext_contact": [3.0, 2.0],
+                    "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
                 },
             }
+
+        # ! 
+        from pprint import pprint
+        pprint(payload)
         insert = MiosSkill(
             skill_name="insert",
             skill_type="KiosInsertion",

@@ -1,6 +1,7 @@
 from typing import List, Any, Dict
 import re
 import numpy as np
+from pprint import pprint
 
 from kios_scene.mongodb_interface import MongoDBInterface
 
@@ -175,7 +176,7 @@ class MiosTaskFactory:
 
         # generate the cartesian move
         return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_TCP)
-    
+
     def generate_reach_mp(self, object_name: str) -> MiosSkill:
         """
         move to the object.
@@ -385,6 +386,7 @@ class MiosTaskFactory:
             "EE_finger_width_max": EE_finger_width_max,
             "EE_finger_width_min": EE_finger_width_min,
         }
+        pprint(payload)
         return MiosCall(method_name="change_tool", method_payload=payload)
 
     ###################################################################
@@ -620,7 +622,7 @@ class MiosTaskFactory:
                     "objects": {
                         # "Container": container,
                     },
-                    "time_max": 20,
+                    "time_max": 25,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
                         "dX_d": [0.05, 0.3],
@@ -630,14 +632,14 @@ class MiosTaskFactory:
                     },
                     "p1": {
                         "dX_d": [0.05, 0.1],
-                        "ddX_d": [0.05, 0.05],
-                        "K_x": [500, 500, 500, 600, 600, 600],
+                        "ddX_d": [0.1, 0.05],
+                        "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [10, 10, 0, 2, 2, 0],
-                        "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_a": [2, 2, 1, 1, 1, 0],
+                        "search_f": [1, 1, 1, 1.5, 1.5, 0],
                         "search_phi": [
                             0,
                             3.14159265358979323846 / 2,
@@ -646,12 +648,12 @@ class MiosTaskFactory:
                             0,
                             0,
                         ],
-                        "K_x": [500, 500, 500, 800, 800, 800],
-                        "f_push": [0, 0, 7, 0, 0, 0],
+                        "K_x": [300, 300, 500, 500, 500, 800],
+                        "f_push": [0, 0, 5, 0, 0, 0],
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
-                        "dX_d": [0.1, 0.5],
-                        "ddX_d": [0.5, 1],
+                        "dX_d": [0.03, 0.3],
+                        "ddX_d": [0.3, 1],
                     },
                     "p3": {
                         "dX_d": [0.1, 0.5],
@@ -667,29 +669,141 @@ class MiosTaskFactory:
                     "F_ext_contact": [10.0, 2.0],
                 },
             }
-        else:
+        # else:
+        #     payload = {
+        #         "skill": {
+        #             "objects": {
+        #                 "Container": container,
+        #             },
+        #             "time_max": 20,
+        #             "p0": {  # ! approach should be move above in mios skill. mod it
+        #                 "dX_d": [0.1, 0.3],
+        #                 "ddX_d": [0.5, 4],
+        #                 "DeltaX": [0, 0, 0, 0, 0, 0],
+        #                 "K_x": [1500, 1500, 1500, 600, 600, 600],
+        #             },
+        #             "p1": {
+        #                 "dX_d": [0.03, 0.1],
+        #                 "ddX_d": [0.05, 0.01],
+        #                 "K_x": [500, 500, 500, 600, 600, 600],
+        #             },
+        #             "p2": {
+        #                 # "search_a": [10, 10, 0, 2, 2, 0],
+        #                 # "search_f": [1, 1, 0, 1.2, 1.2, 0],
+        #                 "search_a": [5, 5, 0, 2, 2, 0],
+        #                 "search_f": [1, 1, 0, 1.2, 1.2, 0],
+        #                 "search_phi": [
+        #                     0,
+        #                     3.14159265358979323846 / 2,
+        #                     0,
+        #                     3.14159265358979323846 / 2,
+        #                     0,
+        #                     0,
+        #                 ],
+        #                 "K_x": [500, 500, 500, 800, 800, 800],
+        #                 "f_push": [0, 0, 3, 0, 0, 0],
+        #                 # "dX_d": [0.1, 0.5],
+        #                 # "ddX_d": [0.5, 1],
+        #                 "dX_d": [0.08, 0.5],
+        #                 "ddX_d": [0.3, 1],
+        #             },
+        #             "p3": {
+        #                 "dX_d": [0.1, 0.5],
+        #                 "ddX_d": [0.5, 1],
+        #                 "f_push": 7,
+        #                 "K_x": [500, 500, 0, 800, 800, 800],
+        #             },
+        #         },
+        #         "control": {"control_mode": 0},
+        #         "user": {
+        #             "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+        #             "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+        #             "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
+        #         },
+        #     }
+
+        # !
+        from pprint import pprint
+
+        pprint(payload)
+        insert = MiosSkill(
+            skill_name="insert",
+            skill_type="KiosInsertion",
+            skill_parameters=payload,
+        )
+        update_object_in_mios = self.generate_teach_object_call(insertable)
+        update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
+
+        release = self.generate_gripper_release_mp(width=0.042)
+
+        retreat = self.generate_move_above_mp(container)
+
+        return [
+            insert,
+            update_object_in_mios,
+            update_object_in_kios,
+            release,
+            retreat,
+        ]
+
+    def generate_insert_skill_mod(
+        self, parsed_action: Dict[str, Any], param: Dict[str, Any] = None
+    ) -> List[MiosCall | MiosSkill]:
+        insertable = parsed_action["args"][2]
+        container = parsed_action["args"][3]
+        if container is None:
+            raise Exception("container is not set!")
+
+        # get the container from the scene
+        kios_object = self.task_scene.get_object(container)
+
+        if param is None:
+            param = {
+                "search_a": [2, 2, 1, 1, 1, 0],
+                "search_f": [1, 1, 1, 1.5, 1.5, 0],
+                "F_ext_contact": [13.0, 2.0],
+                "f_push": [0, 0, 5, 0, 0, 0],
+                "K_x": [300, 300, 500, 500, 500, 800],
+            }
+
+        search_a = (
+            param["search_a"] if "search_a" in param.keys() else [2, 2, 1, 1, 1, 0]
+        )
+        search_f = (
+            param["search_f"] if "search_f" in param.keys() else [1, 1, 1, 1.5, 1.5, 0]
+        )
+        F_ext_contact = (
+            param["F_ext_contact"] if "F_ext_contact" in param.keys() else [13.0, 2.0]
+        )
+        f_push = param["f_push"] if "f_push" in param.keys() else [0, 0, 5, 0, 0, 0]
+        K_x = param["K_x"] if "K_x" in param.keys() else [300, 300, 500, 500, 500, 800]
+
+        if kios_object is not None:
+            print(f'object "{container}" is found in the scene!')
+            O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
                     "objects": {
-                        "Container": container,
+                        # "Container": container,
                     },
-                    "time_max": 20,
-                    "p0": {  # ! approach should be move above in mios skill. mod it
-                        "dX_d": [0.1, 0.3],
-                        "ddX_d": [0.5, 4],
+                    "time_max": 25,
+                    "p0": {
+                        "O_T_TCP": O_T_TCP.T.flatten().tolist(),
+                        "dX_d": [0.05, 0.3],
+                        "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.03, 0.1],
-                        "ddX_d": [0.05, 0.01],
-                        "K_x": [500, 500, 500, 600, 600, 600],
+                        "dX_d": [0.05, 0.1],
+                        "ddX_d": [0.1, 0.05],
+                        "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [5, 5, 0, 2, 2, 0],
-                        "search_f": [1, 1, 0, 1.2, 1.2, 0],
+                        "search_a": search_a,
+                        "search_f": search_f,
                         "search_phi": [
                             0,
                             3.14159265358979323846 / 2,
@@ -698,11 +812,11 @@ class MiosTaskFactory:
                             0,
                             0,
                         ],
-                        "K_x": [500, 500, 500, 800, 800, 800],
-                        "f_push": [0, 0, 3, 0, 0, 0],
+                        "K_x": K_x,
+                        "f_push": f_push,
                         # "dX_d": [0.1, 0.5],
                         # "ddX_d": [0.5, 1],
-                        "dX_d": [0.08, 0.5],
+                        "dX_d": [0.03, 0.3],
                         "ddX_d": [0.3, 1],
                     },
                     "p3": {
@@ -716,12 +830,65 @@ class MiosTaskFactory:
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-                    "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
+                    "F_ext_contact": F_ext_contact,
                 },
             }
+        # else:
+        #     payload = {
+        #         "skill": {
+        #             "objects": {
+        #                 "Container": container,
+        #             },
+        #             "time_max": 20,
+        #             "p0": {  # ! approach should be move above in mios skill. mod it
+        #                 "dX_d": [0.1, 0.3],
+        #                 "ddX_d": [0.5, 4],
+        #                 "DeltaX": [0, 0, 0, 0, 0, 0],
+        #                 "K_x": [1500, 1500, 1500, 600, 600, 600],
+        #             },
+        #             "p1": {
+        #                 "dX_d": [0.03, 0.1],
+        #                 "ddX_d": [0.05, 0.01],
+        #                 "K_x": [500, 500, 500, 600, 600, 600],
+        #             },
+        #             "p2": {
+        #                 # "search_a": [10, 10, 0, 2, 2, 0],
+        #                 # "search_f": [1, 1, 0, 1.2, 1.2, 0],
+        #                 "search_a": [5, 5, 0, 2, 2, 0],
+        #                 "search_f": [1, 1, 0, 1.2, 1.2, 0],
+        #                 "search_phi": [
+        #                     0,
+        #                     3.14159265358979323846 / 2,
+        #                     0,
+        #                     3.14159265358979323846 / 2,
+        #                     0,
+        #                     0,
+        #                 ],
+        #                 "K_x": [500, 500, 500, 800, 800, 800],
+        #                 "f_push": [0, 0, 3, 0, 0, 0],
+        #                 # "dX_d": [0.1, 0.5],
+        #                 # "ddX_d": [0.5, 1],
+        #                 "dX_d": [0.08, 0.5],
+        #                 "ddX_d": [0.3, 1],
+        #             },
+        #             "p3": {
+        #                 "dX_d": [0.1, 0.5],
+        #                 "ddX_d": [0.5, 1],
+        #                 "f_push": 7,
+        #                 "K_x": [500, 500, 0, 800, 800, 800],
+        #             },
+        #         },
+        #         "control": {"control_mode": 0},
+        #         "user": {
+        #             "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+        #             "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+        #             "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
+        #         },
+        #     }
 
-        # ! 
+        # !
         from pprint import pprint
+
         pprint(payload)
         insert = MiosSkill(
             skill_name="insert",

@@ -20,7 +20,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 scene_file = os.path.join(current_dir, "scene.json")
 
 with open(scene_file, "r") as f:
-    scene_string= f.read()
+    scene_string = f.read()
     scene_json = json.loads(scene_string)
 
 scene = sf.create_scene_from_json(scene_json)
@@ -56,6 +56,7 @@ def teach_object_TCP(object_name: str):
     ri.proprioceptor.teach_object_TCP(object_name)
     ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
 
+
 def update_mios_memory_environment():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
@@ -64,8 +65,11 @@ def update_mios_memory_environment():
         task_scene=scene,
         robot_interface=ri,
     )
-    robot_command.add_task(ri.mios_task_factory.generate_update_mios_memory_environment_call())
+    robot_command.add_task(
+        ri.mios_task_factory.generate_update_mios_memory_environment_call()
+    )
     robot_command.execute_task_list_sync()
+
 
 def get_object(object: str):
     ri.proprioceptor.get_object(object)
@@ -206,9 +210,7 @@ def pick_test(object_name: str):
 
     # robot_command.add_mios_task(ri.mios_task_factory.generate_gripper_home_mp())
 
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_pick_up_skill(parsed_action)
-    )
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
 
     robot_command.execute_task_list_sync()
 
@@ -358,7 +360,50 @@ def insert_task(part1: str, part2: str):
 
     # ! warning: the location of part1 will be refreshed after the insertion!
     robot_command.add_tasks(
-        ri.mios_task_factory.generate_insert_skill(insert_parsed_action)
+        ri.mios_task_factory.generate_insert_skill_mod(insert_parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()
+
+
+def insert_outputshaftandgearstage2():
+
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    pick_up_parsed_action = {
+        "action_name": "pick",  # ! maybe this should be "pick_up"
+        "args": [None, None, "outputshaftandgearstage2"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [None, None, "outputshaftandgearstage2", "housinginternalgear"],
+    }
+
+    param = {
+        "search_a": [5, 5, 0, 2, 2, 0],
+        "search_f": [1, 1, 0, 1.5, 1.5, 0],
+        "F_ext_contact": [13.0, 2.0],
+        "f_push": [0, 0, 5, 0, 0, 0],
+        "K_x": [500, 500, 0, 800, 800, 800],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            parsed_action=insert_parsed_action,
+            param=param,
+        )
     )
 
     robot_command.execute_task_list_sync()

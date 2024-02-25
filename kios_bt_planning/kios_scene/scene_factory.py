@@ -54,6 +54,17 @@ class SceneFactory:
             tool = Toolbox(
                 name=tool_json["tool_name"],
                 EE_T_TCP=np.array(tool_json["EE_T_TCP"]),
+                EE_finger_width_max=(
+                    tool_json["EE_finger_width_max"]
+                    if "EE_finger_width_max" in tool_json.keys()
+                    else 0.08
+                ),
+                EE_finger_width_min=(
+                    tool_json["EE_finger_width_min"]
+                    if "EE_finger_width_min" in tool_json.keys()
+                    else 0.01
+                ),
+                # ! BBCHANGE
             )
             # print(tool)
             self.task_scene.tool_map[tool.name] = tool

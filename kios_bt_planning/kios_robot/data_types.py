@@ -85,7 +85,7 @@ class MiosObject:
             "OB_I": mios_object.OB_I.T.flatten().tolist(),
             "q": mios_object.q,
             "grasp_width": mios_object.grasp_width,
-            "grasp_forch": mios_object.grasp_forch,
+            "grasp_force": mios_object.grasp_force,
             "mass": mios_object.mass,
             "geometry": mios_object.geometry,
         }
@@ -138,6 +138,13 @@ class MiosInterfaceResponse:
         """
         # instantiate the task result first
         task_result = None
+        if isinstance(json_response, str):
+            print(f"mios response: {json_response}")
+            return MiosInterfaceResponse(
+                has_finished="???",
+                error_message="mios response is not a dictionary!",
+                task_result=None,
+            )
         if json_response.get("task_result") is not None:
             task_result = MiosTaskResult.from_json(json_response["task_result"])
 

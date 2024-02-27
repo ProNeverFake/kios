@@ -109,6 +109,7 @@ class RobotCommand:
                     return False
 
             elif isinstance(task_item, MiosCall):  # * use general call
+                print(f"\033[92mStart the call: {task_item.method_name}\033[0m")
                 result = call_method(
                     self.robot_address,
                     self.robot_port,

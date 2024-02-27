@@ -1,6 +1,10 @@
 {
     "reference_objects":
     [
+        {   
+            "object_name": "test",
+            "source": "mios"
+        },
         {
             "object_name": "inwardgripper",
             "source": "mios"
@@ -19,6 +23,10 @@
         },
         {
             "object_name": "defaultgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition",
             "source": "mios"
         },
         {
@@ -42,7 +50,15 @@
             "source": "mios"
         },
         {
+            "object_name": "outputshaftandgearstage2push",
+            "source": "mios"
+        },
+        {
             "object_name": "ringgear",
+            "source": "mios"
+        },
+        {
+            "object_name": "housingringgearhole",
             "source": "mios"
         },
         {
@@ -59,6 +75,10 @@
         },
         {
             "object_name": "inputpinion",
+            "source": "mios"
+        },
+        {
+            "object_name": "inputpinionhole",
             "source": "mios"
         }
     ],

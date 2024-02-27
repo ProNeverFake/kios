@@ -3,7 +3,7 @@ import os
 import json
 from spatialmath import *
 from spatialmath.base import trnorm
-
+from pprint import pprint
 
 from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.robot_command import RobotCommand
@@ -27,6 +27,10 @@ scene = sf.create_scene_from_json(scene_json)
 ri.setup_scene(scene)
 
 ltm_manipulator = LangTermMemoryManipulator()
+
+
+def show_scene():
+    pprint(scene)
 
 
 # def teach_object(object: str):
@@ -54,6 +58,11 @@ def restore_to_mios_environment(backup_name: str):
 
 def teach_object_TCP(object_name: str):
     ri.proprioceptor.teach_object_TCP(object_name)
+    ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
+
+
+def align_object(object_name: str, **kwargs):
+    ri.proprioceptor.align_object(object_name, **kwargs)
     ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
 
 
@@ -366,6 +375,88 @@ def insert_task(part1: str, part2: str):
     robot_command.execute_task_list_sync()
 
 
+def insert_outerring():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    pick_up_parsed_action = {
+        "action_name": "pick",  # ! maybe this should be "pick_up"
+        "args": [None, None, "outerring"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [None, None, "outerring", "housingringhole"],
+    }
+
+    param = {
+        "search_a": [2, 2, 1, 1, 1, 0],
+        "search_f": [1, 1, 1, 1.5, 1.5, 0],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 5, 0, 0, 0],
+        "K_x": [500, 500, 0, 500, 500, 800],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            insert_parsed_action, param=param
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+
+def insert_cone():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    pick_up_parsed_action = {
+        "action_name": "pick",  # ! maybe this should be "pick_up"
+        "args": [None, None, "cone"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [None, None, "cone", "outerring"],
+    }
+
+    param = {
+        "search_a": [2, 2, 1, 1, 1, 0],
+        "search_f": [1, 1, 1, 1.5, 1.5, 0],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 5, 0, 0, 0],
+        "K_x": [500, 500, 0, 500, 500, 800],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            insert_parsed_action, param=param
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+
 def insert_outputshaftandgearstage2():
 
     robot_command = RobotCommand(
@@ -391,11 +482,12 @@ def insert_outputshaftandgearstage2():
     }
 
     param = {
-        "search_a": [5, 5, 0, 2, 2, 0],
-        "search_f": [1, 1, 0, 1.5, 1.5, 0],
+        "release_width": 0.04,
+        "search_a": [10, 10, 2, 3, 3, 1],
+        "search_f": [1, 1, 1, 1.5, 1.5, 1],
         "F_ext_contact": [13.0, 2.0],
-        "f_push": [0, 0, 5, 0, 0, 0],
-        "K_x": [500, 500, 0, 800, 800, 800],
+        "f_push": [0, 0, 7, 0, 0, 0],
+        "K_x": [500, 500, 0, 500, 500, 800],
     }
 
     # ! warning: the location of part1 will be refreshed after the insertion!
@@ -403,6 +495,229 @@ def insert_outputshaftandgearstage2():
         ri.mios_task_factory.generate_insert_skill_mod(
             parsed_action=insert_parsed_action,
             param=param,
+        )
+    )
+
+    result = robot_command.execute_task_list_sync()
+    if result == False:
+        pause = input("failed to insert outputshaftandgearstage2")
+
+    move_gripper(0.08)
+
+    change_gripper("defaultgripper", "inwardgripper")
+
+    robot_command.clear_tasks()
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [
+            None,
+            None,
+            "outputshaftandgearstage2",
+            "outputshaftandgearstage2push",
+        ],
+    }
+
+    param = {
+        "search_a": [1, 1, 0, 2, 2, 40],
+        "search_f": [1, 1, 0, 1, 1, 0.25],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 20, 0, 0, 0],
+        "K_x": [500, 500, 0, 800, 800, 70],
+        "D_x": [0.7, 0.7, 1.2, 0.7, 0.7, 1.2],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            parsed_action=insert_parsed_action,
+            param=param,
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+    change_gripper("inwardgripper", "defaultgripper")
+
+
+def push_outputshaftandgearstage2():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [
+            None,
+            None,
+            "outputshaftandgearstage2",
+            "outputshaftandgearstage2push",
+        ],
+    }
+
+    param = {
+        "search_a": [1, 1, 0, 2, 2, 40],
+        "search_f": [1, 1, 0, 1, 1, 0.25],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 18, 0, 0, 0],
+        "K_x": [500, 500, 0, 800, 800, 70],
+        "D_x": [0.7, 0.7, 1.2, 0.7, 0.7, 1.2],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            parsed_action=insert_parsed_action,
+            param=param,
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+
+def insert_ringgear():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_gripper_grasp_mp(),
+    )
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_move_above_mp("ringgear"),
+    )
+    # !
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [
+            None,
+            None,
+            None,
+            "ringgear",
+        ],
+    }
+
+    param = {
+        "search_a": [8, 8, 0, 0, 0, 0],
+        "search_f": [1, 1, 0, 0, 0, 0],
+        "F_ext_contact": [13.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [300, 300, 0, 600, 600, 500],
+        "D_x": [0.7, 0.7, 0.7, 0.7, 0.7, 0.7],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_standalone_mod(
+            parsed_action=insert_parsed_action,
+            param=param,
+        )
+    )
+
+    # robot_command.add_task(
+    #     ri.mios_task_factory.generate_reach_mp("ringgear"),
+    # )
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_gripper_release_mp(width=0.023),
+    )
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_move_above_mp("ringgear"),
+    )
+
+    # * skip teach new pose for ringgear
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [
+            None,
+            None,
+            "ringgear",
+            "housingringgearhole",
+        ],
+    }
+
+    param = {
+        "search_a": [8, 8, 1, 1, 1, 0],
+        "search_f": [1, 1, 1, 1, 1, 0],
+        "F_ext_contact": [13.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [300, 300, 0, 600, 600, 500],
+        "D_x": [0.7, 0.7, 0.7, 0.7, 0.7, 0.7],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_standalone_mod(
+            parsed_action=insert_parsed_action,
+            param=param,
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_gripper_grasp_mp(),
+    )
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_move_above_mp("housingringgearhole"),
+    )
+
+    robot_command.execute_task_list_sync()
+
+    move_gripper(0.042)
+
+    robot_command.clear_tasks()
+
+
+def insert_inputpinion():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    pick_up_parsed_action = {
+        "action_name": "pick",  # ! maybe this should be "pick_up"
+        "args": [None, None, "inputpinion"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
+    )
+
+    insert_parsed_action = {
+        "action_name": "insert",
+        "args": [None, None, "inputpinion", "inputpinionhole"],
+    }
+
+    param = {
+        "search_a": [8, 8, 1, 2, 2, 0],
+        "search_f": [1, 1, 1, 1.5, 1.5, 0],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 10, 0, 0, 0],
+        "K_x": [500, 500, 0, 500, 500, 800],
+    }
+
+    # ! warning: the location of part1 will be refreshed after the insertion!
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_insert_skill_mod(
+            insert_parsed_action, param=param
         )
     )
 

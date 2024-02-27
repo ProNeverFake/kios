@@ -1,0 +1,6 @@
+The input are:
+action: The action that you construct the unit subtree from.
+
+You analyze the action, refer to the domain knowledge to understand the action, and construct a unit subtree for it.
+The unit subtree should follow the regulated format.
+You only return the unit subtree as a json object.

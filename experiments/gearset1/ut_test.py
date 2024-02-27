@@ -1,11 +1,13 @@
 import json
 import os
+import re
 from pprint import pprint
 from typing import List, Tuple, Annotated, TypedDict
 import operator
+import logging
 
 """
-recursive generation + sequence guidance + simulation
+unit tree generation
 """
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -69,7 +71,7 @@ from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
 from kios_utils.pddl_problem_parser import parse_problem_init, parse_problem_objects
 
 
-def render_bt(bt_json: json):
+def render_bt(bt_json: dict):
     test_class = BehaviorTreeFactory()
     bt = test_class.from_json_to_simple_bt(bt_json)
     # bt = test_class.from_json_to_tree_root(bt_json)
@@ -266,7 +268,7 @@ full_template_ppt = ChatPromptTemplate.from_template(
     {template}
     """
 )
-# * recureive_sk_generator
+
 re_sk_gen_ppt_ppl = PipelinePromptTemplate(
     final_prompt=full_template_ppt,
     pipeline_prompts=[
@@ -664,6 +666,134 @@ inputs = {
     "objects": objects,
 }
 
+# * unit tree generator ppl
+system_file = os.path.join(prompt_dir, "rec_sk_gen/system.txt")
+task_file = os.path.join(prompt_dir, "ut_gen/task.txt")
+domain_file = os.path.join(prompt_dir, "ut_gen/domain.txt")
+behaviortree_file = os.path.join(prompt_dir, "ut_gen/behaviortree.txt")
+template_file = os.path.join(prompt_dir, "ut_gen/template.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(behaviortree_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    behaviortree_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {behaviortree}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+ut_gen_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("behaviortree", behaviortree_ppt),
+        ("format_instructions", format_instructions),
+    ],
+)
+
+ut_gen_chain = (
+    ut_gen_ppt_ppl
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+# * sequence planner estimation ppl
+system_file = os.path.join(prompt_dir, "seq_planner_est/system.txt")
+task_file = os.path.join(prompt_dir, "seq_planner_est/task.txt")
+domain_file = os.path.join(prompt_dir, "seq_planner_est/domain.txt")
+state_file = os.path.join(prompt_dir, "seq_planner_est/state.txt")
+output_format_file = os.path.join(prompt_dir, "seq_planner_est/output_format.txt")
+template_file = os.path.join(prompt_dir, "seq_planner_est/template.txt")
+example_file = os.path.join(prompt_dir, "seq_planner_est/example.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+with open(state_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    state_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+seq_planner_est_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("state", state_ppt),
+        ("output_format", output_format_ppt),
+        ("format_instructions", format_instructions),
+        ("example", example_ppt),
+    ],
+)
+
+seq_planner_est_chain = (
+    seq_planner_est_ppt_ppl
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
 
 async def core_run():
     async for event in app.astream(
@@ -675,8 +805,362 @@ async def core_run():
                 print(v)
 
 
+def ut_gen_test():
+    return ut_gen_chain.invoke(
+        {
+            "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
+        }
+    )
+
+
+def seq_planner_est_test():
+    return seq_planner_est_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            # "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+# * sequence action planner
+system_file = os.path.join(prompt_dir, "seq_action_plan/system.txt")
+task_file = os.path.join(prompt_dir, "seq_action_plan/task.txt")
+domain_file = os.path.join(prompt_dir, "seq_action_plan/domain_nl.txt")
+state_file = os.path.join(prompt_dir, "seq_action_plan/state.txt")
+output_format_file = os.path.join(prompt_dir, "seq_action_plan/output_format.txt")
+template_file = os.path.join(prompt_dir, "seq_action_plan/template.txt")
+example_file = os.path.join(prompt_dir, "seq_action_plan/example.txt")
+chain_file = os.path.join(prompt_dir, "seq_action_plan/chain.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+with open(state_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    state_ppt = ppt_tmp.partial(input=f.read())
+# # * this is for gpt 3.5
+# with open(chain_file, "r") as f:
+#     chain_ppt = PromptTemplate.from_template(f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+seq_ac_pl_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("state", state_ppt),
+        ("output_format", output_format_ppt),
+        ("format_instructions", format_instructions),
+        ("example", example_ppt),
+        # ("chain", chain_ppt),
+    ],
+)
+
+seq_ac_pl_chain = (
+    seq_ac_pl_ppt_ppl
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", t
+    # emperature=0)
+    | JsonOutputParser()
+)
+
+# * state estimater
+system_file = os.path.join(prompt_dir, "state_est/system.txt")
+task_file = os.path.join(prompt_dir, "state_est/task.txt")
+domain_file = os.path.join(prompt_dir, "state_est/domain.txt")
+state_file = os.path.join(prompt_dir, "state_est/state.txt")
+output_format_file = os.path.join(prompt_dir, "state_est/output_format.txt")
+template_file = os.path.join(prompt_dir, "state_est/template.txt")
+example_file = os.path.join(prompt_dir, "state_est/example.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+with open(state_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    state_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+state_est_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("state", state_ppt),
+        ("output_format", output_format_ppt),
+        ("format_instructions", format_instructions),
+        ("example", example_ppt),
+    ],
+)
+
+
+state_est_ppt_ppl_chain = (
+    state_est_ppt_ppl
+    | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+
+async def core_run():
+    async for event in app.astream(
+        inputs,
+        config=config,
+    ):
+        for k, v in event.items():
+            if k != "__end__":
+                print(v)
+
+
+def ut_gen_test():
+    return ut_gen_chain.invoke(
+        {
+            "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
+        }
+    )
+
+
+def seq_planner_est_test():
+    return seq_planner_est_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            # "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+def seq_action_plan_test():
+    return seq_ac_pl_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            # "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+def state_est_test():
+    return state_est_ppt_ppl_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "action_plan": [
+                "unload_tool(left_hand, outward_claw)",
+                "load_tool(left_hand, parallel_box1)",
+                "pick_up(left_hand, parallel_box1, shaft1)",
+                "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+            ],
+        }
+    )
+
+
+##################################### * speed imp
+def make_plan(state: dict, goal: str) -> list[str]:
+    print(f"----------start to make plan for the goal {goal}")
+    response = seq_ac_pl_chain.invoke(
+        {
+            "start_world_state": state,
+            "target": goal,
+        }
+    )
+    print(f"finished making plan for the goal {goal}.")
+    pprint(f'LLM thought flow: {response["explanation"]}')
+    return response["task_plan"]
+
+
+def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
+    print("----------start to estimate the state after the action plan:")
+    pprint(action_plan)
+    response = state_est_ppt_ppl_chain.invoke(
+        {
+            "start_world_state": start_world_state,
+            "action_plan": action_plan,
+        }
+    )
+    print(f"finished estimating the state after the action plan {action_plan}.")
+    return response["estimated_world_state"]
+
+
+def generate_unit_subtree(action: str) -> dict:
+    print("----------start to generate the unit subtree for the action")
+    pprint(action)
+    response = ut_gen_chain.invoke(
+        {
+            "action": action,
+        }
+    )
+    print(f"finished generating the unit subtree for the action {action}.")
+    return response
+
+
+def get_node_list_from_tree(unit_subtree: dict) -> list[dict]:
+    children = unit_subtree["children"][1][
+        "children"
+    ]  # * the second child is a sequence
+    return children
+
+
+def extract_goal(node: dict) -> str:
+    name = node["name"]
+
+
+def match_type(node: dict) -> tuple[str, str]:
+    node_name = node["name"]
+    match = re.search(r"(action|precondition|condition|target):\s*(.+)", node_name)
+    if match:
+        node_type = match.group(1)
+        node_body = match.group(2)
+        return node_type, node_body
+    else:
+        raise ValueError("The node name does not match any type.")
+
+
+def expand_nodes(
+    node_list: list[dict],
+    start_state: dict,
+    overall_tree: list[dict] = None,
+):
+    """
+    in order to monitor the tree generation, the overall tree and the node list should be the same variable when being passed in.
+    """
+    pprint("----------check the entire tree:")
+    if overall_tree is not None:
+        render_bt(overall_tree[0])
+    pprint("----------start to expand the node list:")
+    pprint(node_list)
+    pause = input("paused here! check the tree.")
+
+    assert len(node_list) > 0
+    state = start_state
+
+    for i in range(len(node_list)):
+        type_name, body = match_type(node_list[i])
+        # if match_type(node_list[i]) == "action":
+        if type_name == "action":
+            print(f"the node {node_list[i]['name']} is an action node. skip it.")
+            pause = input("paused here! check!")
+        # elif match_type(node_list[i]) == "precondition" or "target":
+        elif type_name in ["precondition", "target"]:
+            # ! this step is problematisch.
+            # goal = node_list[i]["name"]
+            goal = body
+            plan = make_plan(state, goal)
+            if len(plan) == 0:
+                logging.warning(f"No action should be performed for the goal {goal}.")
+                logging.warning(f'the node {node_list[i]["name"]} has been skipped.')
+                pause = input("paused here! check!")
+            else:
+                logging.info(f"Actions have been planed for the goal {goal}.")
+                pprint(f"the plan for the goal {goal} is {plan}")
+                pause = input("paused here! check!")
+                last_action = plan[-1]
+                unit_subtree = generate_unit_subtree(last_action)
+                # insert the subtree into the node_list
+                node_list[i] = unit_subtree
+                new_node_list = get_node_list_from_tree(unit_subtree)
+                expand_nodes(
+                    node_list=new_node_list,
+                    start_state=state,
+                    overall_tree=overall_tree,
+                )
+                state = estimate_state(state, plan)
+
+
+def test_expand_nodes():
+    start_state = world_state_json
+    # node_list = [
+    #     {
+    #         "summary": "insert shaft1 into gearbase hole1",
+    #         "name": "target: insert shaft1 into gearbase hole1",
+    #     }
+    # ]
+    node_list = [
+        {
+            "summary": "pick up the shaft1",
+            "name": "target: pick up the shaft1",
+        },
+    ]
+    expand_nodes(node_list, start_state, node_list)
+    pprint(node_list)
+
+
 if __name__ == "__main__":
+    pass
     # import asyncio
 
     # asyncio.run(core_run())
-    pass
+    # pprint(ut_gen_test())
+    # pprint(seq_action_plan_test())
+    # pprint(state_est_test())
+    test_expand_nodes()

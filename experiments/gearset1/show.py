@@ -967,6 +967,99 @@ example2 = {
     ],
 }
 
+result = {
+    "summary": "Selector to insert shaft1 into gearbase_hole1 using parallel_box1 in the left hand",
+    "name": "selector: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+    "children": [
+        {
+            "summary": "Check the target that shaft1 is inserted into gearbase_hole1",
+            "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
+        },
+        {
+            "summary": "Sequence to insert shaft1 into gearbase_hole1 using parallel_box1 in the left hand",
+            "name": "sequence: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+            "children": [
+                {
+                    "summary": "Selector to load the parallel_box1 in the left hand",
+                    "name": "selector: load_tool(left_hand, parallel_box1)",
+                    "children": [
+                        {
+                            "summary": "Check the target that the left hand is free",
+                            "name": "target: is_free(left_hand)",
+                        },
+                        {
+                            "summary": "Sequence to load the tool in the left hand",
+                            "name": "sequence: load_tool(left_hand, parallel_box1)",
+                            "children": [
+                                {
+                                    "summary": "Check the precondition that the parallel_box1 is equippable",
+                                    "name": "precondition: is_equippable(parallel_box1)",
+                                },
+                                {
+                                    "summary": "Selector to unload the outward_claw in the left hand",
+                                    "name": "selector: unload_tool(left_hand, outward_claw)",
+                                    "children": [
+                                        {
+                                            "summary": "Check the target that the left hand is free",
+                                            "name": "target: is_free(left_hand)",
+                                        },
+                                        {
+                                            "summary": "Sequence to unload the tool in the left hand",
+                                            "name": "sequence: unload_tool(left_hand, outward_claw)",
+                                            "children": [
+                                                {
+                                                    "summary": "Check the precondition that the left hand is holding a outward_claw",
+                                                    "name": "precondition: hold(left_hand, outward_claw)",
+                                                },
+                                                {
+                                                    "summary": "Unload the outward_claw in the left hand",
+                                                    "name": "action: unload_tool(left_hand, outward_claw)",
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    "summary": "Load the parallel_box1 in the left hand",
+                                    "name": "action: load_tool(left_hand, parallel_box1)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "Selector to pick up the shaft1 with the parallel_box1 in the left hand",
+                    "name": "selector: pick_up(left_hand, parallel_box1, shaft1)",
+                    "children": [
+                        {
+                            "summary": "Check the target that the parallel_box1 is holding the shaft1",
+                            "name": "target: hold(parallel_box1, shaft1)",
+                        },
+                        {
+                            "summary": "Sequence to pick up the shaft1 with the parallel_box1 in the left hand",
+                            "name": "sequence: pick_up(left_hand, parallel_box1, shaft1)",
+                            "children": [
+                                {
+                                    "summary": "Check the precondition that the left hand is holding the parallel_box1",
+                                    "name": "precondition: hold(left_hand, parallel_box1)",
+                                },
+                                {
+                                    "summary": "Pick up the shaft1 with the parallel_box1 in the left hand",
+                                    "name": "action: pick_up(left_hand, parallel_box1, shaft1)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "Insert shaft1 into gearbase_hole1 using parallel_box1",
+                    "name": "action: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+                },
+            ],
+        },
+    ],
+}
+
 
 def test_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
@@ -980,4 +1073,5 @@ def test_bt(bt_json: json):
 # test_bt(result_1["behavior_tree"])
 # test_bt(example1)
 # test_bt(result3)
-test_bt(example2)
+# test_bt(example2)
+test_bt(result)

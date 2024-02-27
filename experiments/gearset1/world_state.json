@@ -2,23 +2,23 @@
     "objects": [
       {
         "name": "parallel_box1",
-        "properties": ["is_free", "is_equippable"]
+        "properties": ["is_empty", "is_equippable"]
       },
       {
         "name": "parallel_box2",
-        "properties": ["is_free", "is_equippable"]
+        "properties": ["is_empty", "is_equippable"]
       },
       {
         "name": "inward_claw",
-        "properties": ["is_free", "is_equippable"]
+        "properties": ["is_empty", "is_equippable"]
       },
       {
         "name": "outward_claw",
-        "properties": ["is_free"]
+        "properties": ["is_empty", "is_equippable"]
       },
       {
         "name": "no_tool",
-        "properties": ["is_free", "is_equippable"]
+        "properties": ["is_empty", "is_equippable"]
       },
       {
         "name": "gear1",
@@ -58,17 +58,12 @@
       },
       {
         "name": "left_hand",
-        "properties": []
+        "properties": ["is_empty"]
       }
     ],
     "constraints": [
     ],
     "relations": [
-      {
-        "source": "left_hand",
-        "name": "hold",
-        "target": "outward_claw"
-      }
     ]
 }
 

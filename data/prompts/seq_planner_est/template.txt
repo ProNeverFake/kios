@@ -1,0 +1,3 @@
+Now make a plan with the following information:
+start_world_state: {start_world_state}
+target: {target}

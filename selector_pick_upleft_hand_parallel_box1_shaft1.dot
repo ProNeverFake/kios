@@ -1,0 +1,19 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: pick_up(left_hand, parallel_box1, shaft1)", shape=octagon, style=filled];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: hold(parallel_box1, shaft1)", shape=ellipse, style=filled];
+"selector: pick_up(left_hand, parallel_box1, shaft1)" -> "target: hold(parallel_box1, shaft1)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: pick_up(left_hand, parallel_box1, shaft1)", shape=box, style=filled];
+"selector: pick_up(left_hand, parallel_box1, shaft1)" -> "sequence: pick_up(left_hand, parallel_box1, shaft1)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: is_empty(parallel_box1)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, parallel_box1, shaft1)" -> "precondition: is_empty(parallel_box1)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, parallel_box1)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, parallel_box1, shaft1)" -> "precondition: hold(left_hand, parallel_box1)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: can_manipulate(parallel_box1, shaft1)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, parallel_box1, shaft1)" -> "precondition: can_manipulate(parallel_box1, shaft1)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: pick_up(left_hand, parallel_box1, shaft1)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, parallel_box1, shaft1)" -> "action: pick_up(left_hand, parallel_box1, shaft1)";
+}

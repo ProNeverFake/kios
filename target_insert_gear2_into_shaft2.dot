@@ -1,0 +1,7 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: insert gear2 into shaft2", shape=ellipse, style=filled];
+}

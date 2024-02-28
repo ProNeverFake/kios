@@ -1,0 +1,44 @@
+The behavior tree should be in json dictionary format.
+When building a unit subtree, follow these rules:
+1. Every node are described by a summary and a name:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal form of the node according to the domain knowledge. Legal node types are "selector", "sequence", "condition" ("target", "precondition"), "action".
+2. The control flow nodes, namely "selector" and "sequence", can have "children", which is a list of children nodes.
+3. The "condition" nodes that are children of "selectors" are targets. Those that are children of "sequences" are preconditions. 
+4. All the node should always have their corresponding actions/precidates in the domain knowledge. 
+5. Control flow nodes in behavior trees don't have memory. Each tick starts from the root and traverses all nodes, regardless of their previous state.
+6. The basic structure template of a unit subtree is:
+    - A selector as the root node. 
+    - One target condition node as the first child of the selector to check if the target of this subtree has been satisfied.
+    - A sequence node as the last child of the selector node to achieve the target condition node.
+    - A number of precondition nodes as the first child nodes of the sequence node to check the action's preconditions.
+    - One action node as the last child of the sequence node, whose preconditions are checked in the child condition nodes before.
+    - The action should have effects that can fulfill the target condition node in the selector.
+Following is an example:
+action: unload_tool(left_hand, outwardgripper)
+unit subtree:
+{
+    "summary": "Selector to unload the outwardgripper in the left hand",
+    "name": "selector: unload_tool(left_hand, outwardgripper)"
+    "children": [
+        {
+            "summary": "Check the target that the left hand is empty",
+            "name": "target: is_empty(left_hand)"
+        },
+        {
+            "summary": "Sequence to unload the tool in the left hand",
+            "name": "sequence: unload_tool(left_hand, outwardgripper)",
+            "children": [
+                {
+                    "summary": "check the precondition that the left hand is holding a outwardgripper",
+                    "name": "precondition: hold(left_hand, outwardgripper)"
+                },
+                {
+                    "summary": "Unload the outwardgripper in the left hand",
+                    "name": "action: unload_tool(left_hand, outwardgripper)"
+                }
+            ]
+        }
+    ]
+}
+

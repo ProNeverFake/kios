@@ -1,0 +1,41 @@
+Following is the domain knowledge you need, which includes:
+- the object types in the world,
+- the predicates for describing the states of the world,
+- the actions that the robot can apply, with their precondtions and effects defined.
+
+The object types are explained as follows:
+"""
+thing: The base class for all objects in the world. Its subclasses are: hand, tool, part.
+hand: The robot hand. A empty <hand> can only hold one <tool> at a time.
+tool: The tool to manipulate <part>. A empty <tool> can hold one <part> at a time.
+part: The part to be manipulated.
+"""
+
+The precidates are explained as follows:
+"""
+"PREDICATE_LIST"
+- is_empty(<tool>): <tool> is empty and can hold something.
+- can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint). This regulates the compatibility between <tool> and <part>.
+- can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint)
+- can_screw_to(<part1>, <part2>): <part1> can be screwed into <part2> (screw assembly constraint)
+- can_place_to(<part1>, <part2>): <part1> can be placed into <part2> (placement assembly constraint)
+- hold(<thing1>, <thing2>): <thing1> is holding <thing2>. It can be <hand> holding <tool> or <tool> holding <part>.
+- is_inserted_to(<part1>, <part2>): <part1> is inserted into <part2> (insertion assembly constraint is satisfied)
+- is_screwed_to(<part1>, <part2>): <part1> is screwed into <part2> (screw assembly constraint is satisfied)
+- is_placed_to(<part1>, <part2>): <part1> is placed into <part2> (placement assembly constraint is satisfied)
+"""
+
+The actions are explained as follows:
+"""
+"ROBOT_ACTION_LIST"
+- pick_up(<hand>, <tool>, <part>): <hand> use <tool> to pick up <part>. As preconditions, <hand> should be holding <tool> and <tool> should be empty in order to hold the <part>. The <part> will be held by the <tool> as a result of this action.
+- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>. As preconditions, <hand> should be holding <tool> and <tool> should be holding <part>. The <tool> will be empty and will not hold the <part> anymore as a result of this action.
+- place(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to place <part1> to <part2> (to satisfy the placement assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.
+- detach(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to detach <part1> from <part2> (to lift the existing placement assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be empty to manipulate <part1>, and <part1> should be placed into <part2>.
+- insert(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to insert <part1> into <part2> (to satisfy the insertion assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.
+- pull(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to pull <part1> from <part2> (to lift the existing insertion assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be empty to manipulate <part1>, and <part1> should be inserted into <part2>.
+- screw(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to screw <part1> into <part2> (to satisfy the screw assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.
+- unscrew(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to unscrew <part1> from <part2> (to lift the existing screw assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be empty to manipulate <part1>, and <part1> should be screwed into <part2>.
+- change_tool(<hand>, <tool1>, <tool2>): <hand> change the equipped tool from <tool1> to <tool2> in order to manipulate specific parts. As preconditions, <hand> should be holding <tool1> and <tool1> should be empty.
+"""
+the items in <> indicate the type of the instances needed for the predicates and actions.

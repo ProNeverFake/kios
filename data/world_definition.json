@@ -1,6 +1,6 @@
 {
     "properties": [
-        "is_free",
+        "is_empty",
         "is_equippable"
     ],
     "constraints": [
@@ -18,13 +18,13 @@
     "actions": {
         "pick_up": {
             "precondition": [
-                "is_free ?tool",
+                "is_empty ?tool",
                 "hold ?hand ?tool",
                 "can_manipulate ?tool ?part"
             ],
             "effect": [
                 "hold ?tool ?part",
-                "(not (is_free ?tool))"
+                "(not (is_empty ?tool))"
             ],
             "template": "pick_up(?hand, ?tool, ?part)"
         },
@@ -35,7 +35,7 @@
             ],
             "effect": [
                 "(not (hold ?hand ?part))",
-                "is_free ?tool"
+                "is_empty ?tool"
             ],
             "template": "put_down(?hand, ?tool, ?part)"
         },
@@ -47,7 +47,7 @@
             ],
             "effect": [
                 "(not (hold ?tool ?part1))",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "is_placed_to ?part1 ?part2"
             ],
             "template": "place(?hand, ?tool, ?part1, ?part2)"
@@ -55,13 +55,13 @@
         "detach": {
             "precondition": [
                 "hold ?hand ?tool",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "can_manipulate ?tool ?part1",
                 "is_placed_to ?part1 ?part2"
             ],
             "effect": [
                 "hold ?tool ?part1",
-                "(not (is_free ?tool))",
+                "(not (is_empty ?tool))",
                 "(not (is_placed_to ?part1 ?part2))"
             ],
             "template": "detach(?hand, ?tool, ?part1, ?part2)"
@@ -74,7 +74,7 @@
             ],
             "effect": [
                 "(not (hold ?tool ?part1))",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "is_inserted_to ?part1 ?part2"
             ],
             "template": "insert(?hand, ?tool, ?part1, ?part2)"
@@ -82,13 +82,13 @@
         "pull": {
             "precondition": [
                 "hold ?hand ?tool",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "is_inserted_to ?part1 ?part2",
                 "can_manipulate ?tool ?part1"
             ],
             "effect": [
                 "hold ?tool ?part1",
-                "(not (is_free ?tool))",
+                "(not (is_empty ?tool))",
                 "(not (is_inserted_to ?part1 ?part2))"
             ],
             "template": "pull(?hand, ?tool, ?part1, ?part2)"
@@ -101,7 +101,7 @@
             ],
             "effect": [
                 "(not (hold ?tool ?part1))",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "is_screwed_to ?part1 ?part2"
             ],
             "template": "screw(?hand, ?tool, ?part1, ?part2)"
@@ -109,13 +109,13 @@
         "unscrew": {
             "precondition": [
                 "hold ?hand ?tool",
-                "is_free ?tool",
+                "is_empty ?tool",
                 "is_screwed_to ?part1 ?part2",
                 "can_manipulate ?tool ?part1"
             ],
             "effect": [
                 "hold ?tool ?part1",
-                "(not (is_free ?tool))",
+                "(not (is_empty ?tool))",
                 "(not (is_screwed_to ?part1 ?part2))"
             ],
             "template": "unscrew(?hand, ?tool, ?part1, ?part2)"
@@ -123,10 +123,10 @@
         "load_tool": {
             "precondition": [
                 "is_equippable ?tool",
-                "is_free ?hand"
+                "is_empty ?hand"
             ],
             "effect": [
-                "(not (is_free ?hand))",
+                "(not (is_empty ?hand))",
                 "(not (is_equippable ?tool))",
                 "hold ?hand ?tool"
             ],
@@ -135,14 +135,25 @@
         "unload_tool": {
             "precondition": [
                 "hold ?hand ?tool",
-                "is_free ?tool"
+                "is_empty ?tool"
             ],
             "effect": [
-                "is_free ?hand",
+                "is_empty ?hand",
                 "is_equippable ?tool",
                 "(not (hold ?hand ?tool))"
             ],
             "template": "unload_tool(?hand, ?tool)"
+        },
+        "change_tool":{
+            "precondition":[
+                "hold ?hand ?tool1",
+                "is_empty ?tool1"
+            ],
+            "effect":[
+                "hold ?hand ?tool2",
+                "(not (hold ?hand ?tool1))"
+            ],
+            "template": "change_tool(?hand, ?tool1, ?tool2)"
         }
     }
 }

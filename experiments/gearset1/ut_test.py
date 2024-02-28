@@ -667,11 +667,11 @@ inputs = {
 }
 
 # * unit tree generator ppl
-system_file = os.path.join(prompt_dir, "rec_sk_gen/system.txt")
-task_file = os.path.join(prompt_dir, "ut_gen/task.txt")
-domain_file = os.path.join(prompt_dir, "ut_gen/domain.txt")
-behaviortree_file = os.path.join(prompt_dir, "ut_gen/behaviortree.txt")
-template_file = os.path.join(prompt_dir, "ut_gen/template.txt")
+system_file = os.path.join(prompt_dir, "new/ut_gen/system.txt")
+task_file = os.path.join(prompt_dir, "new/ut_gen/task.txt")
+domain_file = os.path.join(prompt_dir, "new/ut_gen/new_domain_nl.txt")
+behaviortree_file = os.path.join(prompt_dir, "new/ut_gen/new_behaviortree.txt")
+template_file = os.path.join(prompt_dir, "new/ut_gen/template.txt")
 with open(template_file, "r") as f:
     template_ppt = PromptTemplate.from_template(f.read())
 with open(task_file, "r") as f:
@@ -719,8 +719,8 @@ ut_gen_ppt_ppl = PipelinePromptTemplate(
 
 ut_gen_chain = (
     ut_gen_ppt_ppl
-    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
-    | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
 
@@ -790,7 +790,8 @@ seq_planner_est_ppt_ppl = PipelinePromptTemplate(
 
 seq_planner_est_chain = (
     seq_planner_est_ppt_ppl
-    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     | JsonOutputParser()
 )
 
@@ -824,14 +825,14 @@ def seq_planner_est_test():
 
 
 # * sequence action planner
-system_file = os.path.join(prompt_dir, "seq_action_plan/system.txt")
-task_file = os.path.join(prompt_dir, "seq_action_plan/task.txt")
-domain_file = os.path.join(prompt_dir, "seq_action_plan/domain_nl.txt")
-state_file = os.path.join(prompt_dir, "seq_action_plan/state.txt")
-output_format_file = os.path.join(prompt_dir, "seq_action_plan/output_format.txt")
-template_file = os.path.join(prompt_dir, "seq_action_plan/template.txt")
-example_file = os.path.join(prompt_dir, "seq_action_plan/example.txt")
-chain_file = os.path.join(prompt_dir, "seq_action_plan/chain.txt")
+system_file = os.path.join(prompt_dir, "new/seq_plan/system.txt")
+task_file = os.path.join(prompt_dir, "new/seq_plan/task.txt")
+domain_file = os.path.join(prompt_dir, "new/seq_plan/new_domain_nl.txt")
+state_file = os.path.join(prompt_dir, "new/seq_plan/state.txt")
+output_format_file = os.path.join(prompt_dir, "new/seq_plan/output_format.txt")
+template_file = os.path.join(prompt_dir, "new/seq_plan/template.txt")
+example_file = os.path.join(prompt_dir, "new/seq_plan/new_example.txt")
+chain_file = os.path.join(prompt_dir, "new/seq_plan/chain.txt")
 with open(template_file, "r") as f:
     template_ppt = PromptTemplate.from_template(f.read())
 with open(task_file, "r") as f:
@@ -894,20 +895,19 @@ seq_ac_pl_ppt_ppl = PipelinePromptTemplate(
 
 seq_ac_pl_chain = (
     seq_ac_pl_ppt_ppl
-    | ChatOpenAI(model="gpt-4", temperature=0)
-    # | ChatOpenAI(model="gpt-3.5-turbo-0125", t
-    # emperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     | JsonOutputParser()
 )
 
 # * state estimater
-system_file = os.path.join(prompt_dir, "state_est/system.txt")
-task_file = os.path.join(prompt_dir, "state_est/task.txt")
-domain_file = os.path.join(prompt_dir, "state_est/domain.txt")
-state_file = os.path.join(prompt_dir, "state_est/state.txt")
-output_format_file = os.path.join(prompt_dir, "state_est/output_format.txt")
-template_file = os.path.join(prompt_dir, "state_est/template.txt")
-example_file = os.path.join(prompt_dir, "state_est/example.txt")
+system_file = os.path.join(prompt_dir, "new/state_est/system.txt")
+task_file = os.path.join(prompt_dir, "new/state_est/task.txt")
+domain_file = os.path.join(prompt_dir, "new/state_est/new_domain_nl.txt")
+state_file = os.path.join(prompt_dir, "new/state_est/state.txt")
+output_format_file = os.path.join(prompt_dir, "new/state_est/output_format.txt")
+template_file = os.path.join(prompt_dir, "new/state_est/template.txt")
+example_file = os.path.join(prompt_dir, "new/state_est/new_example.txt")
 with open(template_file, "r") as f:
     template_ppt = PromptTemplate.from_template(f.read())
 with open(task_file, "r") as f:
@@ -1147,10 +1147,16 @@ def test_expand_nodes():
     # ]
     node_list = [
         {
-            "summary": "pick up the shaft1",
-            "name": "target: pick up the shaft1",
-        },
+            "summary": "insert gear2 into shaft2",
+            "name": "target: insert gear2 into shaft2",
+        }
     ]
+    # node_list = [
+    #     {
+    #         "summary": "pick up the shaft1",
+    #         "name": "target: pick up the shaft1",
+    #     },
+    # ]
     expand_nodes(node_list, start_state, node_list)
     pprint(node_list)
 

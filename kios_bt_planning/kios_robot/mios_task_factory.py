@@ -214,8 +214,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.06, 0.4],
-                        "ddX_d": [0.2, 0.8],
+                        "dX_d": [0.03, 0.4],
+                        "ddX_d": [0.05, 0.8],
                         "K_x": [1500, 1500, 1000, 150, 150, 150],
                     },
                     "objects": {"GoalPose": object_name},
@@ -226,8 +226,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.1, 0.5],
-                        "ddX_d": [0.5, 1],
+                        "dX_d": [0.5, 0.4],
+                        "ddX_d": [0.3, 0.8],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),  # ! TTEE IS ACTUALLY O_T_TCP!
                     },
@@ -242,31 +242,30 @@ class MiosTaskFactory:
             skill_parameters=context,
         )
 
-    # # ! don't use this
-    # def generate_joint_move(self, joint_location: str) -> MiosSkill:
-    #     """
-    #         * available. debug: task context error, "skill", "control" and "user" are on the same level.
-    #         move to a joint position.
-    #     Args:
-    #         joint_location (str): the stored Taskframe_HomogeneousT_EE_goal in mongo DB
-    #     """
-    #     context = {
-    #         "skill": {
-    #             "speed": 0.5,
-    #             "acc": 1,
-    #             "q_g": [0, 0, 0, 0, 0, 0, 0],
-    #             "q_g_offset": [0, 0, 0, 0, 0, 0, 0],
-    #             "objects": {"goal_pose": joint_location},
-    #         },
-    #         "control": {"control_mode": 3},
-    #         "user": {"env_X": [0.005, 0.005, 0.005, 0.0175, 0.0175, 0.0175]},
-    #     }
+    def generate_joint_move_mp(self, joint_location: str) -> MiosSkill:
+        """
+            * available. debug: task context error, "skill", "control" and "user" are on the same level.
+            move to a joint position.
+        Args:
+            joint_location (str): the stored Taskframe_HomogeneousT_EE_goal in mongo DB
+        """
+        context = {
+            "skill": {
+                "speed": 1,
+                "acc": 0.8,
+                "q_g": [0, 0, 0, 0, 0, 0, 0],
+                "q_g_offset": [0, 0, 0, 0, 0, 0, 0],
+                "objects": {"goal_pose": joint_location},
+            },
+            "control": {"control_mode": 3},
+            "user": {"env_X": [0.005, 0.005, 0.005, 0.0175, 0.0175, 0.0175]},
+        }
 
-    #     return MiosSkill(
-    #         skill_name="joint_move",
-    #         skill_type="MoveToPoseJoint",
-    #         skill_parameters=context,
-    #     )
+        return MiosSkill(
+            skill_name="joint_move",
+            skill_type="MoveToPoseJoint",
+            skill_parameters=context,
+        )
 
     def generate_gripper_grasp_mp(
         self, width=0.01, speed=0.2, force=50, epsilon_inner=0.05, epsilon_outer=0.05
@@ -298,6 +297,7 @@ class MiosTaskFactory:
             "width": width,
             "speed": speed,
         }
+        pprint(payload)
         return MiosCall(method_name="move_gripper", method_payload=payload)
 
     def generate_gripper_home_mp(self) -> MiosCall:
@@ -408,8 +408,8 @@ class MiosTaskFactory:
                 },
                 "time_max": 30,
                 "MoveAbove": {
-                    "dX_d": [0.1, 0.4],
-                    "ddX_d": [0.1, 0.1],
+                    "dX_d": [0.5, 1.2],
+                    "ddX_d": [0.3, 1],
                     "DeltaX": [0, 0, 0, 0, 0, 0],
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
                 },
@@ -468,8 +468,8 @@ class MiosTaskFactory:
                 },
                 "time_max": 30,
                 "MoveAbove": {
-                    "dX_d": [0.2, 0.2],
-                    "ddX_d": [0.2, 0.2],
+                    "dX_d": [0.5, 1.2],
+                    "ddX_d": [0.3, 1],
                     "DeltaX": [0, 0, 0, 0, 0, 0],
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
                 },
@@ -788,7 +788,7 @@ class MiosTaskFactory:
                     "objects": {
                         # "Container": container,
                     },
-                    "time_max": 25,
+                    # "time_max": 35,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
                         "dX_d": [0.05, 0.3],
@@ -831,7 +831,11 @@ class MiosTaskFactory:
                 },
                 "control": {"control_mode": 0},
                 "user": {
-                    "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                    "env_X": (
+                        param["env_X"]
+                        if "env_X" in param.keys()
+                        else [0.01, 0.01, 0.002, 0.05, 0.05, 0.05]
+                    ),
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
                     "F_ext_contact": F_ext_contact,
                 },
@@ -991,7 +995,11 @@ class MiosTaskFactory:
                 },
                 "control": {"control_mode": 0},
                 "user": {
-                    "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                    "env_X": (
+                        param["env_X"]
+                        if "env_X" in param.keys()
+                        else [0.01, 0.01, 0.002, 0.05, 0.05, 0.05]
+                    ),
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
                     "F_ext_contact": F_ext_contact,
                 },
@@ -1002,8 +1010,8 @@ class MiosTaskFactory:
             skill_type="KiosInsertion",
             skill_parameters=payload,
         )
-        # update_object_in_mios = self.generate_teach_object_call(insertable)
-        # update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
+        update_object_in_mios = self.generate_teach_object_call(insertable)
+        update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
 
         return [
             insert,

@@ -66,11 +66,27 @@
             "source": "mios"
         },
         {
+            "object_name": "designringhole",
+            "source": "mios"
+        },
+        {
             "object_name": "gearstage1",
             "source": "mios"
         },
         {
+            "object_name": "gearstage1hole",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearstage1push",
+            "source": "mios"
+        },
+        {
             "object_name": "driveflange",
+            "source": "mios"
+        },
+        {
+            "object_name": "driveflangehole",
             "source": "mios"
         },
         {
@@ -102,7 +118,7 @@
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.07],
+                [0, 0, 1, 0.096],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.042,
@@ -115,7 +131,7 @@
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.095],
+                [0, 0, 1, 0.125],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.042,
@@ -141,7 +157,7 @@
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.025],
+                [0, 0, 1, 0.03],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.08,

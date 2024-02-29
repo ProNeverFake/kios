@@ -1,6 +1,18 @@
 import time
 
 
+def bb_result_test(func):
+
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        if result == False:
+            pause = input("Failed. Press enter to continue")
+
+        return result
+
+    return wrapper
+
+
 def execution_timer(func):
     """
     be careful with this since the return value is suppressed

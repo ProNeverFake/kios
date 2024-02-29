@@ -724,7 +724,7 @@ ut_gen_chain = (
     | JsonOutputParser()
 )
 
-# * sequence planner estimation ppl
+# ! sequence planner estimation ppl
 system_file = os.path.join(prompt_dir, "seq_planner_est/system.txt")
 task_file = os.path.join(prompt_dir, "seq_planner_est/task.txt")
 domain_file = os.path.join(prompt_dir, "seq_planner_est/domain.txt")
@@ -806,14 +806,6 @@ async def core_run():
                 print(v)
 
 
-def ut_gen_test():
-    return ut_gen_chain.invoke(
-        {
-            "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
-        }
-    )
-
-
 def seq_planner_est_test():
     return seq_planner_est_chain.invoke(
         {
@@ -865,7 +857,7 @@ full_template_ppt = ChatPromptTemplate.from_template(
     {output_format}
 
     {example}
-
+    
     {template}
 
     {format_instructions}
@@ -895,8 +887,8 @@ seq_ac_pl_ppt_ppl = PipelinePromptTemplate(
 
 seq_ac_pl_chain = (
     seq_ac_pl_ppt_ppl
-    # | ChatOpenAI(model="gpt-4", temperature=0)
-    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     | JsonOutputParser()
 )
 
@@ -967,8 +959,8 @@ state_est_ppt_ppl = PipelinePromptTemplate(
 
 state_est_ppt_ppl_chain = (
     state_est_ppt_ppl
-    | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-    # | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
 
@@ -986,7 +978,9 @@ async def core_run():
 def ut_gen_test():
     return ut_gen_chain.invoke(
         {
-            "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
+            # "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
+            # "action": "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+            "action": "change_tool(left_hand, parallel_box1, defaultgripper)",
         }
     )
 
@@ -1026,6 +1020,7 @@ def state_est_test():
 
 
 ##################################### * speed imp
+@traceable(name="make_plan")
 def make_plan(state: dict, goal: str) -> list[str]:
     print(f"----------start to make plan for the goal {goal}")
     response = seq_ac_pl_chain.invoke(
@@ -1039,6 +1034,7 @@ def make_plan(state: dict, goal: str) -> list[str]:
     return response["task_plan"]
 
 
+@traceable(name="estimate_state")
 def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
     print("----------start to estimate the state after the action plan:")
     pprint(action_plan)
@@ -1052,6 +1048,7 @@ def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
     return response["estimated_world_state"]
 
 
+@traceable(name="generate_unit_subtree")
 def generate_unit_subtree(action: str) -> dict:
     print("----------start to generate the unit subtree for the action")
     pprint(action)
@@ -1077,20 +1074,22 @@ def extract_goal(node: dict) -> str:
 
 def match_type(node: dict) -> tuple[str, str]:
     node_name = node["name"]
-    match = re.search(r"(action|precondition|condition|target):\s*(.+)", node_name)
+    match = re.search(
+        r"(selector|sequence|action|precondition|condition|target):\s*(.+)", node_name
+    )
     if match:
         node_type = match.group(1)
         node_body = match.group(2)
         return node_type, node_body
     else:
-        raise ValueError("The node name does not match any type.")
+        raise ValueError(f"the node name {node_name} does not match any type.")
 
 
 def expand_nodes(
     node_list: list[dict],
     start_state: dict,
     overall_tree: list[dict] = None,
-):
+) -> dict:
     """
     in order to monitor the tree generation, the overall tree and the node list should be the same variable when being passed in.
     """
@@ -1112,7 +1111,6 @@ def expand_nodes(
             pause = input("paused here! check!")
         # elif match_type(node_list[i]) == "precondition" or "target":
         elif type_name in ["precondition", "target"]:
-            # ! this step is problematisch.
             # goal = node_list[i]["name"]
             goal = body
             plan = make_plan(state, goal)
@@ -1135,6 +1133,43 @@ def expand_nodes(
                     overall_tree=overall_tree,
                 )
                 state = estimate_state(state, plan)
+
+    return node_list[0]
+
+
+def embed_ut_nl(unit_subtree: dict) -> str:
+    """
+    embed the unit subtree into the overall tree
+    """
+    selector_children = unit_subtree["children"]
+    target = ""
+    # * target
+    for node in selector_children:
+        if match_type(node)[0] == "target":
+            target += node["summary"]
+
+    sequence_children = selector_children[1]["children"]
+    preconditions = []
+    action = ""
+    for node in sequence_children:
+        if match_type(node)[0] == "precondition":
+            preconditions.append(node["summary"])
+        if match_type(node)[0] == "action":
+            action = node["summary"]
+
+    embedding = f"if {' and '.join(preconditions)} then {action}, {target}"
+
+    return embedding
+
+def embed_ft_nl(fulltree: dict) -> str:
+    pass
+
+
+def test_embedding_nl():
+    unit_tree = ut_gen_test()
+    pprint(unit_tree)
+    nl = embed_ut_nl(unit_tree)
+    print(nl)
 
 
 def test_expand_nodes():
@@ -1169,4 +1204,7 @@ if __name__ == "__main__":
     # pprint(ut_gen_test())
     # pprint(seq_action_plan_test())
     # pprint(state_est_test())
-    test_expand_nodes()
+
+    # test_expand_nodes()
+
+    test_embedding_nl()

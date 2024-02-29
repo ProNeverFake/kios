@@ -1,6 +1,5 @@
 Following is an input/output example:
-input:
-'''
+INPUT:
 start_world_state: 
 {
 "objects": [
@@ -17,13 +16,11 @@ start_world_state:
 ]
 }
 target: "change the tool from the parallel_box1 to the outward_claw"
-'''
-output:
-'''
+
+OUTPUT:
 {   
     "explanation": "The left_hand is holding the parallel_box1 now and the parallel_box1 is empty, so the change_tool action can be conducted to change the tool in the hand from the parallel_box1 to outward_claw.",
     "task_plan": [
         "change_tool(left_hand, parallel_box1, outward_claw)"
     ]
 }
-'''

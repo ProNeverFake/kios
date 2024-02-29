@@ -22,7 +22,7 @@ unit subtree:
     "name": "selector: change_tool(left_hand, outwardgripper, defaultgripper)"
     "children": [
         {
-            "summary": "Check the target that the left hand is holding the default gripper",
+            "summary": "The target is to make the left hand hold the default gripper",
             "name": "target: hold(left_hand, defaultgripper)"
         },
         {
@@ -30,15 +30,15 @@ unit subtree:
             "name": "sequence: change_tool(left_hand, outwardgripper, defaultgripper)",
             "children": [
                 {
-                    "summary": "check the precondition that the left hand is holding the outwardgripper",
+                    "summary": "A precondition is that the left hand is holding the outwardgripper",
                     "name": "precondition: hold(left_hand, outwardgripper)"
                 },
                 {
-                    "summary": "check the precondition that the outwardgripper is empty",
+                    "summary": "A precondition is that the outwardgripper is empty",
                     "name": "precondition: is_empty(outwardgripper)"
                 },
                 {
-                    "summary": "Action to change the tool in the left hand from outwardgripper to defaultgripper",
+                    "summary": "Take the action to change the tool in the left hand from outwardgripper to defaultgripper",
                     "name": "action: change_tool(left_hand, outwardgripper, defaultgripper)"
                 }
             ]

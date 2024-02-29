@@ -1,6 +1,5 @@
 Following is an input/output example:
-input:
-'''
+INPUT:
 start_world_state: 
 {
 "objects": [
@@ -24,8 +23,7 @@ action_plan:
     "pick_up(left_hand, outwardgripper, shaft1)",
     "insert(left_hand, outwardgripper, gear1, hole1)",
 ]
-'''
-output:
+OUTPUT:
 {
     "estimated_world_state": {
         "objects": [
@@ -33,7 +31,7 @@ output:
             {"name": "shaft1", "properties": []},
             {"name": "hole1", "properties": []},
             {"name": "defaultgripper", "properties": ["is_empty"]},
-            {"name": "left_hand", "properties": [""]}
+            {"name": "left_hand", "properties": []}
         ],
         "constraints": [
             {"source": "outwardgripper", "name": "can_manipulate", "target": "shaft1"},

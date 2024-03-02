@@ -361,7 +361,8 @@ def change_gripper(current_tool: str, new_tool: str):
 def initialize_gripper():
 
     robot_command = RobotCommand(
-        robot_address="127.0.0.1",
+        # robot_address="127.0.0.1",
+        robot_address="10.157.174.230",
         robot_port=12000,
         shared_data=None,
         task_scene=scene,

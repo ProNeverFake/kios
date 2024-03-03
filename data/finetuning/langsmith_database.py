@@ -62,43 +62,10 @@ finetuning_messages = [convert_openai_ft_msg(msg) for msg in messages]
 # pprint(finetuning_messages[0])
 
 # ! just try
-finetuning_messages = finetuning_messages[:10]
+# finetuning_messages = finetuning_messages[:10]
 
 # Write finetuning_messages to a jsonl file
-with open("/home/blackbird/kios/data/finetuning/finetuning_messages.jsonl", "w") as f:
+with open("/home/blackbird/kios/data/finetuning/finetuning_messages_20240303.jsonl", "w") as f:
     for msg in finetuning_messages:
         json.dump(msg, f)
         f.write("\n")
-
-from openai import OpenAI
-import os
-
-openai_client = OpenAI()
-
-training_file = openai_client.files.create(
-    file=open(
-        os.path.join(os.path.dirname(__file__), "finetuning_messages.jsonl"),
-        "rb",
-    ),
-    purpose="fine-tune",
-)
-
-# # Wait while the file is processed
-status = openai_client.files.retrieve("file-EhbEPGHSCMj1bD6TGi6WQMxT").status
-
-
-
-
-
-# start_time = time.time()
-# while status != "processed":
-#     print(f"Status=[{status}]... {time.time() - start_time:.2f}s", end="\r", flush=True)
-#     time.sleep(5)
-#     status = openai.File.retrieve(training_file.id).status
-# print(f"File {training_file.id} ready after {time.time() - start_time:.2f} seconds.")
-
-# from openai import OpenAI
-
-# client = OpenAI()
-
-# client.fine_tuning.jobs.create(training_file="UT_gen_test", model="gpt-3.5-turbo")

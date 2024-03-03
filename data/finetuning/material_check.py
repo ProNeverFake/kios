@@ -4,14 +4,16 @@ import numpy as np
 from collections import defaultdict
 import os
 
-data_path = os.path.join(os.path.dirname(__file__), "finetuning_messages.jsonl")
+file_name = "finetuning_messages_20240303.jsonl"
+
+data_path = os.path.join(os.path.dirname(__file__), file_name)
 
 # Load the dataset
 with open(data_path, "r", encoding="utf-8") as f:
     dataset = [json.loads(line) for line in f]
 
 # # Initial dataset stats
-# print("Num examples:", len(dataset))
+print("Num examples:", len(dataset))
 # print("First example:")
 # for message in dataset[0]["messages"]:
 #     print(message)
@@ -122,7 +124,7 @@ print(
 # * Pricing and default n_epochs estimate
 MAX_TOKENS_PER_EXAMPLE = 4096
 
-TARGET_EPOCHS = 3
+TARGET_EPOCHS = 10
 MIN_TARGET_EXAMPLES = 100
 MAX_TARGET_EXAMPLES = 25000
 MIN_DEFAULT_EPOCHS = 1

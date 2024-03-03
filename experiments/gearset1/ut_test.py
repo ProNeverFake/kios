@@ -719,7 +719,8 @@ ut_gen_ppt_ppl = PipelinePromptTemplate(
 
 ut_gen_chain = (
     ut_gen_ppt_ppl
-    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
     # | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
@@ -1161,6 +1162,7 @@ def embed_ut_nl(unit_subtree: dict) -> str:
 
     return embedding
 
+
 def embed_ft_nl(fulltree: dict) -> str:
     pass
 
@@ -1201,10 +1203,10 @@ if __name__ == "__main__":
     # import asyncio
 
     # asyncio.run(core_run())
-    # pprint(ut_gen_test())
+    pprint(ut_gen_test())
     # pprint(seq_action_plan_test())
     # pprint(state_est_test())
 
     # test_expand_nodes()
 
-    test_embedding_nl()
+    # test_embedding_nl()

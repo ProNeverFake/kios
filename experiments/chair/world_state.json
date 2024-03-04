@@ -1,0 +1,71 @@
+{
+    "objects": [
+      {
+        "name": "clampgripper",
+        "properties": ["is_empty"]
+      },
+      {
+        "name": "parallelgripper",
+        "properties": ["is_empty"]
+      },
+      {
+        "name": "inwardgripper",
+        "properties": ["is_empty"]
+      },
+      {
+        "name": "outwardgripper",
+        "properties": ["is_empty"]
+      },
+      {
+        "name": "defaultgripper",
+        "properties": ["is_empty"]
+      },
+      {
+        "name": "chairnut1",
+        "properties": []
+      },
+      {
+        "name": "chairnut2",
+        "properties": []
+      },
+      {
+        "name": "chairseat",
+        "properties": []
+      },
+      {
+        "name": "chairback",
+        "properties": []
+      },
+      {
+        "name": "chairleg1",
+        "properties": []
+      },
+      {
+        "name": "chairleg2",
+        "properties": []
+      },
+      {
+        "name": "left_hand",
+        "properties": []
+      }
+    ],
+    "constraints": [
+      {"source": "clampgripper", "name": "can_manipulate", "target": "chairback"},
+      {"source": "inwardgripper", "name": "can_manipulate", "target": "chairnut1"},
+      {"source": "inwardgripper", "name": "can_manipulate", "target": "chairnut2"},
+      {"source": "defaultgripper", "name": "can_manipulate", "target": "chairleg1"},
+      {"source": "defaultgripper", "name": "can_manipulate", "target": "chairleg2"},
+      {"source": "defaultgripper", "name": "can_manipulate", "target": "chairseat"},
+      {"source": "chairnut1", "name": "can_screw_to", "target": "chairseat"},
+      {"source": "chairnut2", "name": "can_screw_to", "target": "chairseat"},
+      {"source": "chairback", "name": "can_insert_to", "target": "chairseat"},
+      {"source": "chairleg1", "name": "can_insert_to", "target": "chairseat"},
+      {"source": "chairleg2", "name": "can_insert_to", "target": "chairseat"}
+    ],
+    "relations": [
+      {"source": "left_hand", "name": "hold", "target": "defaultgripper"},
+      {"source": "defaultgripper", "name": "hold", "target": "chairleg1"},
+      {"source": "chairback", "name": "is_inserted_to", "target": "chairseat"}
+    ]
+}
+

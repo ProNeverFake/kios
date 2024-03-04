@@ -5,6 +5,7 @@ from pprint import pprint
 from typing import List, Tuple, Annotated, TypedDict
 import operator
 import logging
+import asyncio
 
 """
 unit tree generation
@@ -720,7 +721,11 @@ ut_gen_ppt_ppl = PipelinePromptTemplate(
 ut_gen_chain = (
     ut_gen_ppt_ppl
     # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
-    | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    | ChatOpenAI(
+        model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+        temperature=0,
+    )
     # | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
@@ -977,13 +982,16 @@ async def core_run():
 
 
 def ut_gen_test():
-    return ut_gen_chain.invoke(
+    ut = ut_gen_chain.invoke(
         {
             # "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
             # "action": "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
-            "action": "change_tool(left_hand, parallel_box1, defaultgripper)",
+            # "action": "change_tool(left_hand, parallel_box1, defaultgripper)",
+            "action": "insert(left_hand, clampgripper, gear2, shaft2)",
         }
     )
+
+    render_bt(ut)
 
 
 def seq_planner_est_test():
@@ -1163,10 +1171,6 @@ def embed_ut_nl(unit_subtree: dict) -> str:
     return embedding
 
 
-def embed_ft_nl(fulltree: dict) -> str:
-    pass
-
-
 def test_embedding_nl():
     unit_tree = ut_gen_test()
     pprint(unit_tree)
@@ -1176,18 +1180,18 @@ def test_embedding_nl():
 
 def test_expand_nodes():
     start_state = world_state_json
-    # node_list = [
-    #     {
-    #         "summary": "insert shaft1 into gearbase hole1",
-    #         "name": "target: insert shaft1 into gearbase hole1",
-    #     }
-    # ]
     node_list = [
         {
-            "summary": "insert gear2 into shaft2",
-            "name": "target: insert gear2 into shaft2",
+            "summary": "insert shaft1 into gearbase hole1",
+            "name": "target: insert shaft1 into gearbase hole1",
         }
     ]
+    # node_list = [
+    #     {
+    #         "summary": "insert gear2 into shaft2",
+    #         "name": "target: insert gear2 into shaft2",
+    #     }
+    # ]
     # node_list = [
     #     {
     #         "summary": "pick up the shaft1",
@@ -1200,13 +1204,12 @@ def test_expand_nodes():
 
 if __name__ == "__main__":
     pass
-    # import asyncio
 
     # asyncio.run(core_run())
-    pprint(ut_gen_test())
+    # pprint(ut_gen_test())
     # pprint(seq_action_plan_test())
     # pprint(state_est_test())
 
-    # test_expand_nodes()
+    test_expand_nodes()
 
     # test_embedding_nl()

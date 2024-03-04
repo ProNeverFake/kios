@@ -1,0 +1,37 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: screw(left_hand, clampgripper, lampbulb, lampbase)", shape=octagon, style=filled];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: is_screwed_to(lampbulb, lampbase)", shape=ellipse, style=filled];
+"selector: screw(left_hand, clampgripper, lampbulb, lampbase)" -> "target: is_screwed_to(lampbulb, lampbase)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: screw(left_hand, clampgripper, lampbulb, lampbase)", shape=box, style=filled];
+"selector: screw(left_hand, clampgripper, lampbulb, lampbase)" -> "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)";
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: change_tool(left_hand, defaultgripper, clampgripper)", shape=octagon, style=filled];
+"sequence: screw(left_hand, clampgripper, lampbulb, lampbase)" -> "selector: change_tool(left_hand, defaultgripper, clampgripper)";
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"selector: change_tool(left_hand, defaultgripper, clampgripper)" -> "target: hold(left_hand, clampgripper)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: change_tool(left_hand, defaultgripper, clampgripper)", shape=box, style=filled];
+"selector: change_tool(left_hand, defaultgripper, clampgripper)" -> "sequence: change_tool(left_hand, defaultgripper, clampgripper)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, defaultgripper, clampgripper)" -> "precondition: hold(left_hand, defaultgripper)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: is_empty(defaultgripper)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, defaultgripper, clampgripper)" -> "precondition: is_empty(defaultgripper)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: change_tool(left_hand, defaultgripper, clampgripper)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, defaultgripper, clampgripper)" -> "action: change_tool(left_hand, defaultgripper, clampgripper)";
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: pick_up(left_hand, clampgripper, lampbulb)", shape=octagon, style=filled];
+"sequence: screw(left_hand, clampgripper, lampbulb, lampbase)" -> "selector: pick_up(left_hand, clampgripper, lampbulb)";
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: hold(clampgripper, lampbulb)", shape=ellipse, style=filled];
+"selector: pick_up(left_hand, clampgripper, lampbulb)" -> "target: hold(clampgripper, lampbulb)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: pick_up(left_hand, clampgripper, lampbulb)", shape=box, style=filled];
+"selector: pick_up(left_hand, clampgripper, lampbulb)" -> "sequence: pick_up(left_hand, clampgripper, lampbulb)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, clampgripper, lampbulb)" -> "precondition: hold(left_hand, clampgripper)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: is_empty(clampgripper)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, clampgripper, lampbulb)" -> "precondition: is_empty(clampgripper)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: pick_up(left_hand, clampgripper, lampbulb)", shape=ellipse, style=filled];
+"sequence: pick_up(left_hand, clampgripper, lampbulb)" -> "action: pick_up(left_hand, clampgripper, lampbulb)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: screw(left_hand, clampgripper, lampbulb, lampbase)", shape=ellipse, style=filled];
+"sequence: screw(left_hand, clampgripper, lampbulb, lampbase)" -> "action: screw(left_hand, clampgripper, lampbulb, lampbase)";
+}

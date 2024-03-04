@@ -1,0 +1,17 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: change_tool(left_hand, parallel_box1, defaultgripper)", shape=octagon, style=filled];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"selector: change_tool(left_hand, parallel_box1, defaultgripper)" -> "target: hold(left_hand, defaultgripper)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: change_tool(left_hand, parallel_box1, defaultgripper)", shape=box, style=filled];
+"selector: change_tool(left_hand, parallel_box1, defaultgripper)" -> "sequence: change_tool(left_hand, parallel_box1, defaultgripper)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, parallel_box1)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, parallel_box1, defaultgripper)" -> "precondition: hold(left_hand, parallel_box1)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: is_empty(parallel_box1)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, parallel_box1, defaultgripper)" -> "precondition: is_empty(parallel_box1)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: change_tool(left_hand, parallel_box1, defaultgripper)", shape=ellipse, style=filled];
+"sequence: change_tool(left_hand, parallel_box1, defaultgripper)" -> "action: change_tool(left_hand, parallel_box1, defaultgripper)";
+}

@@ -1,0 +1,7 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: assemble the chairnut1 to the seat of the chair", shape=ellipse, style=filled];
+}

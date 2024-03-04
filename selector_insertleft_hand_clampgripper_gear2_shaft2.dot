@@ -1,0 +1,17 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: insert(left_hand, clampgripper, gear2, shaft2)", shape=octagon, style=filled];
+target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: is_inserted_to(gear2, shaft2)", shape=ellipse, style=filled];
+"selector: insert(left_hand, clampgripper, gear2, shaft2)" -> "target: is_inserted_to(gear2, shaft2)";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: insert(left_hand, clampgripper, gear2, shaft2)", shape=box, style=filled];
+"selector: insert(left_hand, clampgripper, gear2, shaft2)" -> "sequence: insert(left_hand, clampgripper, gear2, shaft2)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence: insert(left_hand, clampgripper, gear2, shaft2)" -> "precondition: hold(left_hand, clampgripper)";
+precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(clampgripper, gear2)", shape=ellipse, style=filled];
+"sequence: insert(left_hand, clampgripper, gear2, shaft2)" -> "precondition: hold(clampgripper, gear2)";
+action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: insert(left_hand, clampgripper, gear2, shaft2)", shape=ellipse, style=filled];
+"sequence: insert(left_hand, clampgripper, gear2, shaft2)" -> "action: insert(left_hand, clampgripper, gear2, shaft2)";
+}

@@ -1,4 +1,4 @@
-from kios_domain.domain import *
+from kios_domain.domain_v1 import *
 
 problem = Problem("robot_assembly_problem")
 
@@ -6,8 +6,7 @@ problem = Problem("robot_assembly_problem")
 
 # * property
 # ! BBMOD
-problem.add_fluent(is_free, default_initial_value=False)
-problem.add_fluent(is_equippable, default_initial_value=False)
+problem.add_fluent(is_empty, default_initial_value=False)
 
 # * relation
 problem.add_fluent(can_manipulate, default_initial_value=False)
@@ -29,19 +28,18 @@ problem.add_action(insert)
 problem.add_action(pullout)
 problem.add_action(screw)
 problem.add_action(unscrew)
-problem.add_action(load_tool)
-problem.add_action(unload_tool)
+problem.add_action(change_tool)
 
 ########################* instances ########################################
 # hand instances
 left_hand = unified_planning.model.Object("left_hand", Hand)
 
 # tool instances
-parallel_box1 = unified_planning.model.Object("parallel_box1", Tool)
-parallel_box2 = unified_planning.model.Object("parallel_box2", Tool)
-inward_claw = unified_planning.model.Object("inward_claw", Tool)
-outward_claw = unified_planning.model.Object("outward_claw", Tool)
-no_tool = unified_planning.model.Object("no_tool", Tool)
+clampgripper = unified_planning.model.Object("clampgripper", Tool)
+parallelgripper = unified_planning.model.Object("parallelgripper", Tool)
+inwardgripper = unified_planning.model.Object("inwardgripper", Tool)
+outwardgripper = unified_planning.model.Object("outwardgripper", Tool)
+defaultgripper = unified_planning.model.Object("defaultgripper", Tool)
 
 # part instances
 # * chair
@@ -50,12 +48,18 @@ leg2 = unified_planning.model.Object("leg2", Part)
 nut1 = unified_planning.model.Object("nut1", Part)
 nut2 = unified_planning.model.Object("nut2", Part)
 seat = unified_planning.model.Object("seat", Part)
-back = unified_planning.model.Object("back", Part)
+chairback = unified_planning.model.Object("chairback", Part)
 
 # * lamp
 lampbase = unified_planning.model.Object("lampbase", Part)
-blub = unified_planning.model.Object("blub", Part)
-lamp = unified_planning.model.Object("lamp", Part)
+lampblub = unified_planning.model.Object("lampblub", Part)
+lampshade = unified_planning.model.Object("lampshade", Part)
+
+# * cabinet
+
+# * square table
+
+# * round table
 
 # * gearset
 gear1 = unified_planning.model.Object("gear1", Part)
@@ -72,27 +76,26 @@ gearbase_hole1 = unified_planning.model.Object("gearbase_hole1", Part)
 gearbase_hole3 = unified_planning.model.Object("gearbase_hole3", Part)
 
 
-
 ########################## * problem constraints ##########################
 
 ############ * tools' manipulability
-problem.set_initial_value(can_manipulate(parallel_box2, gear1), True)
-problem.set_initial_value(can_manipulate(outward_claw, gear2), True)
-problem.set_initial_value(can_manipulate(outward_claw, gear3), True)
-problem.set_initial_value(can_manipulate(no_tool, shaft3), True)
-problem.set_initial_value(can_manipulate(parallel_box1, shaft1), True)
+problem.set_initial_value(can_manipulate(parallelgripper, gear1), True)
+problem.set_initial_value(can_manipulate(outwardgripper, gear2), True)
+problem.set_initial_value(can_manipulate(outwardgripper, gear3), True)
+problem.set_initial_value(can_manipulate(defaultgripper, shaft3), True)
+problem.set_initial_value(can_manipulate(clampgripper, shaft1), True)
 
 ############ * assembly constraints
 # * chair
 problem.set_initial_value(can_screw_to(leg1, seat), True)
 problem.set_initial_value(can_screw_to(leg2, seat), True)
-problem.set_initial_value(can_insert_to(back, seat), True)
+problem.set_initial_value(can_insert_to(chairback, seat), True)
 problem.set_initial_value(can_screw_to(nut1, seat), True)
 problem.set_initial_value(can_screw_to(nut2, seat), True)
 
 # * lamp
-problem.set_initial_value(can_screw_to(blub, lampbase), True)
-problem.set_initial_value(can_place_to(lamp, blub), True)
+problem.set_initial_value(can_screw_to(lampblub, lampbase), True)
+problem.set_initial_value(can_place_to(lampshade, lampblub), True)
 
 # * gearset
 problem.set_initial_value(can_insert_to(shaft1, gearbase_hole1), True)

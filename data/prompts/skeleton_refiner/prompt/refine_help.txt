@@ -1,0 +1,8 @@
+[user]
+You should refine the behavior tree skeleton into a full behavior tree in json dictionary format.
+
+1. Refer to "initial_state" of input to find the objects, properties, constraints and relationships.
+2. The name of the node provides information for its refinement.
+
+[assistant]
+Understood. Waiting for next input.

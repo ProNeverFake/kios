@@ -1,0 +1,80 @@
+{
+    "os": "Linux-5.15.0-92-generic-x86_64-with-glibc2.31",
+    "python": "3.10.0",
+    "heartbeatAt": "2024-03-04T13:13:07.700363",
+    "startedAt": "2024-03-04T13:13:07.152586",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/blackbird/kios/data/finetuning/visualize.py",
+    "codePathLocal": "data/finetuning/visualize.py",
+    "codePath": "data/finetuning/visualize.py",
+    "git": {
+        "remote": "git@gitlab.lrz.de:bblab/ma/kios.git",
+        "commit": "bd7f44195e793e386f8713bf2d213783c079685a"
+    },
+    "email": "jicong.ao@tum.de",
+    "root": "/home/blackbird/kios",
+    "host": "bblab-laptop",
+    "username": "blackbird",
+    "executable": "/home/blackbird/miniconda3/envs/kios/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2505.405125,
+        "min": 400.0,
+        "max": 4200.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1963.008,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2400.0,
+            "min": 400.0,
+            "max": 4200.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 467.8895797729492,
+            "used": 173.5617332458496
+        }
+    },
+    "memory": {
+        "total": 15.418136596679688
+    }
+}

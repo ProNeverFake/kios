@@ -1,0 +1,1 @@
+You check the input behavior tree, find it's inappropiate parts, and summarize your findings as your output.

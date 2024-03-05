@@ -15,8 +15,9 @@ from kios_utils.pybt_test import (
     tick_loop_test,
 )
 
-# from kios_agent.kios_llm import KiosLLM
-from kios_agent.kios_llm_chain import KiosLLM # ! TESTING NOW
+from kios_agent.kios_llm import KiosLLM
+
+# from kios_agent.llm_supporter import KiosLLM # ! TESTING NOW
 
 from typing import List, Dict, Any
 
@@ -31,30 +32,20 @@ def test_bt(bt_json: json):
     bt = test_class.from_json_to_simple_bt(bt_json)
     # bt = test_class.from_json_to_tree_root(bt_json)
     bt_stewardship = generate_bt_stewardship(bt)
-    bt_stewardship.setup(timeout=15)
+    # bt_stewardship.setup(timeout=15)
     render_dot_tree(bt_stewardship)
 
-    tick_loop_test(bt_stewardship)
+    # tick_loop_test(bt_stewardship)
 
 
-# def test_llm():
-#     problem_name = "gearset_skeleton_v1"
-#     problem = "(define (problem robot_assembly_problem-problem)\
-#                     (:domain robot_assembly_problem-domain)\
-#                     (:objects\
-#                         parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
-#                         gear1 gear2 gear3 shaft1 shaft2 base - part\
-#                         left_hand - hand\
-#                     )\
-#                     (:init (can_manipulate parallel_box1 gear1) (can_manipulate outward_claw gear2) (can_manipulate inward_claw gear3) (can_manipulate parallel_box2 shaft1) (can_manipulate no_tool shaft2) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub base) (can_place_to lamp blub) (can_insert_to shaft1 base) (can_insert_to shaft2 base) (can_insert_to gear3 shaft2) (can_insert_to gear2 base) (can_insert_to gear1 shaft1) (is_inserted_to shaft1 base) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_free gear1) (is_free gear2) (is_free gear3) (is_free shaft1) (is_free shaft2) (is_free base) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
-#                     (:goal (and (is_inserted_to gear1 shaft1)))\
-#                     )"  # ! CHEAT
+def test_skeleton_generation(bt_json: json):
+    test_class = BehaviorTreeFactory()
+    bt = test_class.from_skeleton_to_tree_root(bt_json)
+    bt_stewardship = generate_bt_stewardship(bt)
+    # bt_stewardship.setup(timeout=15)
+    render_dot_tree(bt_stewardship)
 
-#     llm_model = KiosLLM()
-#     llm_model.initialize()
-
-#     # run the instructions one by one
-#     response = llm_model.query_llm(problem, problem_name)
+    # tick_loop_test(bt_stewardship)
 
 
 def visualize_bt(bt_json: json):
@@ -107,14 +98,25 @@ def main():
     #                 (:goal (and (is_inserted_to gear3 shaft2)))\
     #                 )"
 
+    # problem_name = "gearset1"  # ! updated domain
+    # problem = '(define (problem robot_assembly_problem-problem)\
+    #                 (:domain robot_assembly_problem-domain)\
+    #                 (:objects\
+    #                 parallel_box1 parallel_box2 inward_claw outward_claw no_tool - tool\
+    #                 gear1 gear2 gear3 shaft1 shaft2 shaft3 gearbase gearbase_hole1 gearbase_hole3 - part\
+    #                 left_hand - hand\
+    #                 )\
+    #                 (:init (can_manipulate parallel_box2 gear1) (can_manipulate outward_claw gear2) (can_manipulate outward_claw gear3) (can_manipulate no_tool shaft3) (can_manipulate parallel_box1 shaft1) (can_screw_to leg1 seat) (can_screw_to leg2 seat) (can_insert_to back seat) (can_screw_to nut1 seat) (can_screw_to nut2 seat) (can_screw_to blub lampbase) (can_place_to lamp blub) (can_insert_to shaft1 gearbase_hole1) (can_insert_to shaft3 gearbase_hole3) (can_insert_to gear3 shaft3) (can_insert_to gear2 shaft2) (can_insert_to gear1 shaft1) (is_free left_hand) (is_free parallel_box1) (is_free parallel_box2) (is_free inward_claw) (is_free outward_claw) (is_free no_tool) (is_equippable parallel_box1) (is_equippable parallel_box2) (is_equippable inward_claw) (is_equippable outward_claw) (is_equippable no_tool))\
+    #                 (:goal (and (is_inserted_to shaft1 gearbase_hole1)))\
+    #                 )\
+    #                 '
+
     # * refine problem
-    problem_name = "gearset3_sk"  # super skeleton
+    problem_name = "gearset1_sk"  # super skeleton
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    problem_dir = os.path.join(file_dir, "gearset3_cot_sk.txt")
+    problem_dir = os.path.join(file_dir, "cot_sk.txt")
     with open(problem_dir, "r") as f:
         problem = f.read()
-
-    llm_model = KiosLLM()
 
     ### * end_to_end
     # feature = "e2e"
@@ -138,7 +140,7 @@ def main():
     feature = "re_sk"
     model = "gpt-4-1106-preview"
     # model = "gpt-3.5-turbo-16k-0613"
-    ver = "v1"
+    ver = "v0"
 
     prompt_dir = "prompts/sk_refine"
     prompt_load_order = [
@@ -193,10 +195,10 @@ def main():
     # ]
     ### *
 
-    # ## *COT skeleton
+    ## *COT skeleton
     # feature = "cot_skeleton"
     # model = "gpt-4-1106-preview"
-    # ver = "v1"
+    # ver = "v0"
     # """
     # add chain, try to solve state inconsistency by applying COT
     # use skeleton
@@ -212,7 +214,9 @@ def main():
     #     "cot_sk_chain",  # COT
     #     "cot_sk_example",  # some skeleton examples ... Done
     # ]
-    # ## *
+    ## *
+
+    llm_model = KiosLLM()
 
     llm_model.initialize(
         prompt_dir=prompt_dir,
@@ -236,12 +240,23 @@ def main():
     test_bt(bt)
 
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(current_dir, "gearset3_cot_sk.txt"), "r") as f:
+    sk_bt = json.load(f)
+
+bt_skeleton = sk_bt["task_plan"]["behavior_tree"]
+
+
 if __name__ == "__main__":
-    main()
+    # main()
 
     # test_bt(result_bt_json)
     # test_bt(bt_skeleton)
     # visualize_bt(bt_skeleton)
+
+    test_skeleton_generation(bt_skeleton)
+
 
 # ! should the is_free has a default true? or false?
 # ! can I explain the knowledge differently from the pddl domain?

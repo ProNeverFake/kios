@@ -1,0 +1,169 @@
+{
+    "reference_objects":
+    [
+        {   
+            "object_name": "test",
+            "source": "mios"
+        },
+        {
+            "object_name": "inwardgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "outwardgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "parallelgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "clampgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "defaultgripper",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition",
+            "source": "mios"
+        },
+        {
+            "object_name": "outerring",
+            "source": "mios"
+        },
+        {
+            "object_name": "cone",
+            "source": "mios"
+        },
+        {
+            "object_name": "housingringhole",
+            "source": "mios"
+        },
+        {
+            "object_name": "outputshaftandgearstage2",
+            "source": "mios"
+        },
+        {
+            "object_name": "housinginternalgear",
+            "source": "mios"
+        },
+        {
+            "object_name": "outputshaftandgearstage2push",
+            "source": "mios"
+        },
+        {
+            "object_name": "ringgear",
+            "source": "mios"
+        },
+        {
+            "object_name": "housingringgearhole",
+            "source": "mios"
+        },
+        {
+            "object_name": "designring",
+            "source": "mios"
+        },
+        {
+            "object_name": "designringhole",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearstage1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearstage1hole",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearstage1push",
+            "source": "mios"
+        },
+        {
+            "object_name": "driveflange",
+            "source": "mios"
+        },
+        {
+            "object_name": "driveflangehole",
+            "source": "mios"
+        },
+        {
+            "object_name": "inputpinion",
+            "source": "mios"
+        },
+        {
+            "object_name": "inputpinionhole",
+            "source": "mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "parallelgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.085],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "clampgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.096],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "inwardgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.125],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "outwardgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.125],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.042,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.042,
+            "unload_width": 0.08
+        },
+        {
+            "tool_name": "defaultgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.03],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
+        }
+    ]
+}

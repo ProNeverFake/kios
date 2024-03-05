@@ -1,0 +1,69 @@
+[user]
+The input you get and the output you return should be in json dictionary format.
+The dictionary contains the following keys: 
+"""
+- dictionary["task_plan"]: A dictionary containing the task plan.
+- dictionary["initial_state"]: The initial world state before executing the plan.
+- dictionary["question"]: Question for more knowledge that are unknown yet but necessary for making the plan. Normally empty.
+"""
+Three keys exist in dictionary["task_plan"].
+"""
+- dictionary["task_plan"]["action_sequence"]: Contains a list of robot actions.
+- dictionary["task_plan"]["manipulated_objects"]: The list of the objects that are related to the current task.
+- dictionary["task_plan"]["behavior_tree"]: contains a dictionary of the behavior tree skeleton constructed according to the dictionary ["task_plan"]["action_sequence"]
+"""
+The following is an input example:
+```
+{"task_plan": {
+    "action_sequence": [
+        "load_tool(left_hand, parallel_box1)",
+    ],
+    "object_name": ["left_hand", "parallel_box1"],
+    "behavior_tree": {
+    "summary": "selector to load left hand with parallel_box1",
+    "name": "selector: load_tool(left_hand, parallel_box1)",
+    "children": [
+        {
+            "summary": "condition node to check if left hand holds parallel_box1",
+            "name": "target: hold(left_hand, parallel_box1)"
+        },
+        {
+            "summary": "sequence to load left hand with parallel_box1",
+            "name": "sequence: load_tool(left_hand, parallel_box1)",
+            "children": [
+                {
+                    "summary": "condition node to check if parallel_box1 is equippable",
+                    "name": "precondition: is_equippable(parallel_box1)"
+                },
+                {
+                    "summary": "condition node to check if left hand is free",
+                    "name": "precondition: is_free(left_hand)"
+                },
+                {
+                    "summary": "action node to equip parallel_box1 to left hand",
+                    "name": "action: load_tool(left_hand, parallel_box1)",
+                    "effects": [
+                        {"summary": "left_hand will be not free",},
+                        {"summary": "parallel_box1 will be not equippable",},
+                        {"summary": "left_hand will hold parallel_box1",},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+},
+"initial_state": {
+    "objects": [
+        {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
+        {"name": "left_hand", "properties": ["is_free"]}
+    ],
+    "constraints": [
+    ],
+    "relations": []
+},
+"question":""}
+```
+
+[assistant]
+Understood. Waiting for next input.

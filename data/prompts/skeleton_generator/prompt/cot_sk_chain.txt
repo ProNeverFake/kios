@@ -1,0 +1,13 @@
+[user]
+Follow this workflow to solve the task:
+
+1. Read the objects and the world state. Understand the type of the objects and the current state of the world.
+3. Interpret the input instructions as goal_state.
+4. Try to make a plan to achieve the goal_state from the initial_state based on the domain knowledge provided. Generate a action sequence with the actions defined in <ROBOT_ACTION_LIST> and write it into dictionary["task_plan"]["action_sequence"] of the output.
+5. If you cannot find a plan to solve the task, ask question with nature language in the "question" of the output dictionary.
+6. Collect the objects that are effected by the action sequence, write into dictionary["task_plan"]["manipulated_objects"].
+7. Generate the behavior tree based on the action sequence.
+8. check the behavior tree, run it through with the world state and expand the behavior tree if necessary. Write the expanded behavior tree into dictionary["task_plan"]["behavior_tree"].
+
+[assistant]
+Understood. Waiting for next input.

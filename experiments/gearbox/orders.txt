@@ -1,0 +1,6 @@
+change_tool("defaultgripper", "outwardgripper")
+insert("outerring", "housingringhole")
+insert("cone", "outerring")
+change_tool("outwardgripper", "defaultgripper")
+insert("outputshaftandgearstage2", "housinginternalgear")
+insert("ringgear outputshaftandgearstage2)

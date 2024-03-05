@@ -1,0 +1,19 @@
+About behavior tree:
+1. Every node has:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal name of the node according to the domain knowledge.
+2. Selector nodes and sequence nodes can have a list "children" of child nodes.
+3. Refer to the domain knowledge to understand the condition nodes and action nodes.
+4. Make sure the preconditions of an action node are checked before the action is executed.
+5. One condition node can only check one condition.
+6. The child node of a sequence node will not be ticked unless all other child nodes in front of it return success.
+7. The action node will execute the action when it is ticked again, even if it has been executed and returned success before. Use selector nodes with a condition node to avoid this.
+8. Don't put two action nodes in one sequence node because in this case the first action node will be executed repeatedly and the second one will never get executed.
+
+Possible reasons for non-successful execution:
+1. Nodes that conflict with the domain knowledge will never return success. For example, wrongly applying a predicate to an object of the wrong type.
+2. A condition node is not fulfilled and the action to fulfill it doesn't exist.
+3. Two action nodes are in one sequence node. The first action node is ticked repeatedly and the second one never gets ticked.
+4. Live lock between two actions.
+5. An action node failed and no alternative action is available.
+6. The tree is not well-structured.

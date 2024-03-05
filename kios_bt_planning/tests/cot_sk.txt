@@ -1,0 +1,239 @@
+{
+  "task_plan": {
+    "action_sequence": [
+      "load_tool(left_hand, parallel_box1)",
+      "pick_up(left_hand, parallel_box1, shaft1)",
+      "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)"
+    ],
+    "action_instructions": [
+      "Equip the parallel_box1 on the left hand to manipulate shaft1.",
+      "Pick up shaft1 using the parallel_box1 equipped on the left hand.",
+      "Insert shaft1 into gearbase_hole1 using the parallel_box1 equipped on the left hand."
+    ],
+    "manipulated_objects": [
+      "left_hand",
+      "parallel_box1",
+      "shaft1",
+      "gearbase_hole1"
+    ],
+    "behavior_tree": {
+      "summary": "selector to insert shaft1 into gearbase_hole1",
+      "name": "selector: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+      "children": [
+        {
+          "summary": "condition node to check if shaft1 is inserted to gearbase_hole1",
+          "name": "target: is_inserted_to(shaft1, gearbase_hole1)"
+        },
+        {
+          "summary": "sequence to insert shaft1 into gearbase_hole1",
+          "name": "sequence: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+          "children": [
+            {
+              "summary": "selector to load parallel_box1",
+              "name": "selector: load_tool(left_hand, parallel_box1)",
+              "children": [
+                {
+                  "summary": "condition node to check if left_hand holds parallel_box1",
+                  "name": "target: hold(left_hand, parallel_box1)"
+                },
+                {
+                  "summary": "sequence to load parallel_box1",
+                  "name": "sequence: load_tool(left_hand, parallel_box1)",
+                  "children": [
+                    {
+                      "summary": "condition node to check if parallel_box1 is equippable",
+                      "name": "precondition: is_equippable(parallel_box1)"
+                    },
+                    {
+                      "summary": "condition node to check if left hand is free",
+                      "name": "precondition: is_free(left_hand)"
+                    },
+                    {
+                      "summary": "action node to equip parallel_box1 to left hand",
+                      "name": "action: load_tool(left_hand, parallel_box1)",
+                      "effects": [
+                        {
+                          "summary": "left_hand will be not free"
+                        },
+                        {
+                          "summary": "parallel_box1 will be not equippable"
+                        },
+                        {
+                          "summary": "left_hand will hold parallel_box1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "summary": "selector to use left_hand with parallel_box1 to pick up shaft1",
+              "name": "selector: pick_up(left_hand, parallel_box1, shaft1)",
+              "children": [
+                {
+                  "summary": "condition node to check if parallel_box1 holds shaft1",
+                  "name": "target: hold(parallel_box1, shaft1)"
+                },
+                {
+                  "summary": "sequence to use left hand with parallel_box1 to pick up shaft1",
+                  "name": "sequence: pick_up(left_hand, parallel_box1, shaft1)",
+                  "children": [
+                    {
+                      "summary": "condition node to check if parallel_box1 is free",
+                      "name": "precondition: is_free(parallel_box1)"
+                    },
+                    {
+                      "summary": "condition node to check if left hand holds parallel_box1",
+                      "name": "precondition: hold(left_hand, parallel_box1)"
+                    },
+                    {
+                      "summary": "action node to use left hand with parallel_box1 to pick up shaft1",
+                      "name": "action: pick_up(left_hand, parallel_box1, shaft1)",
+                      "effects": [
+                        {
+                          "summary": "parallel_box1 will hold shaft1"
+                        },
+                        {
+                          "summary": "parallel_box1 will be not free"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "summary": "condition node to check if shaft1 can be inserted to gearbase_hole1",
+              "name": "precondition: can_insert_to(shaft1, gearbase_hole1)"
+            },
+            {
+              "summary": "action node to use left_hand with parallel_box1 to insert shaft1 to gearbase_hole1",
+              "name": "action: insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+              "effects": [
+                {
+                  "summary": "parallel_box1 will be not holding shaft1"
+                },
+                {
+                  "summary": "parallel_box1 will be free"
+                },
+                {
+                  "summary": "shaft1 will be inserted to gearbase_hole1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "initial_state": {
+    "objects": [
+      {
+        "name": "parallel_box1",
+        "properties": ["is_free", "is_equippable"]
+      },
+      {
+        "name": "parallel_box2",
+        "properties": ["is_free", "is_equippable"]
+      },
+      {
+        "name": "inward_claw",
+        "properties": ["is_free", "is_equippable"]
+      },
+      {
+        "name": "outward_claw",
+        "properties": ["is_free", "is_equippable"]
+      },
+      {
+        "name": "no_tool",
+        "properties": ["is_free", "is_equippable"]
+      },
+      {
+        "name": "gear1",
+        "properties": []
+      },
+      {
+        "name": "gear2",
+        "properties": []
+      },
+      {
+        "name": "gear3",
+        "properties": []
+      },
+      {
+        "name": "shaft1",
+        "properties": []
+      },
+      {
+        "name": "shaft2",
+        "properties": []
+      },
+      {
+        "name": "shaft3",
+        "properties": []
+      },
+      {
+        "name": "gearbase",
+        "properties": []
+      },
+      {
+        "name": "gearbase_hole1",
+        "properties": []
+      },
+      {
+        "name": "gearbase_hole3",
+        "properties": []
+      },
+      {
+        "name": "left_hand",
+        "properties": ["is_free"]
+      }
+    ],
+    "constraints": [
+      {
+        "source": "parallel_box1",
+        "name": "can_manipulate",
+        "target": "shaft1"
+      },
+      {
+        "source": "parallel_box2",
+        "name": "can_manipulate",
+        "target": "gear1"
+      },
+      {
+        "source": "outward_claw",
+        "name": "can_manipulate",
+        "target": "gear2"
+      },
+      {
+        "source": "outward_claw",
+        "name": "can_manipulate",
+        "target": "gear3"
+      },
+      {
+        "source": "no_tool",
+        "name": "can_manipulate",
+        "target": "shaft3"
+      },
+      {
+        "source": "shaft1",
+        "name": "can_insert_to",
+        "target": "gearbase_hole1"
+      },
+      {
+        "source": "shaft3",
+        "name": "can_insert_to",
+        "target": "gearbase_hole3"
+      },
+      {
+        "source": "gear3",
+        "name": "can_insert_to",
+        "target": "shaft3"
+      }
+    ],
+    "relations": []
+  },
+  "instruction_summary": "Insert shaft1 into gearbase_hole1.",
+  "question": ""
+}

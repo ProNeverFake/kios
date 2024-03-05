@@ -1,0 +1,14 @@
+Start working. Resume from the input below.
+"""
+{"input": [PROBLEM]}
+"""
+The dictionary that you return should be formatted as json file. Follow these rules:
+1. Only refine the skeleton behavior tree in the "behavior_tree" field. Refine the tree according to rules provided before. Replace the old behavior tree with the refined behavior tree.
+2. Refer to the domain knowledge, namely "ROBOT_ACTION_LIST" and "PREDICATE_LIST", to understand and refine the skeleton behavior tree.
+3. Do not change other fields of the dictionary and return the new dictionary as json file.
+4. Never left ',' at the end of the list. 
+5. Use json boolean values, "true" or "false", instead of "True" or "False".
+6. All keys of the dictionary should be double-quoted.
+7. Insert ``` at the beginning and the end of the dictionary to separate it from the rest of your response. Don't write any additional things.
+8. When generating the behavior tree, make sure the tree has the asked structure. 
+Adhere to the output format I defined above. Follow the rules above. Think step by step.

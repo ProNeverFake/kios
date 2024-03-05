@@ -1,0 +1,38 @@
+Following is an input/output example:
+input:
+'''
+start_world_state: 
+{
+"objects": [
+    {"name": "outward_claw", "properties": ["is_empty"]},
+    {"name": "shaft1", "properties": []},
+    {"name": "left_hand", "properties": ["is_empty"]}
+],
+"constraints": [
+    {"source": "outward_claw", "name": "can_manipulate", "target": "gear1"}
+],
+"relations": []
+}
+target: "hold(left_hand, outward_claw)"
+'''
+output:
+'''
+{
+    "task_plan": [
+        "load_tool(left_hand, outward_claw)"
+    ],
+    "estimated_world_state": {
+        "objects": [
+            {"name": "outward_claw", "properties": ["is_empty"]},
+            {"name": "shaft1", "properties": []},
+            {"name": "left_hand", "properties": [""]}
+        ],
+        "constraints": [
+            {"source": "outward_claw", "name": "can_manipulate", "target": "gear1"}
+        ],
+        "relations": [
+            {"source": "left_hand", "name": "hold", "target": "outward_claw"}
+        ]
+    }
+}
+'''

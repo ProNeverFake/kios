@@ -1,8 +1,8 @@
 from typing import Any, Dict
 import py_trees
 from kios_bt.data_types import (
-    GroundedAction,
-    GroundedCondition,
+    # GroundedAction,
+    # GroundedCondition,
     Action,
     Condition,
     ObjectProperty,
@@ -53,6 +53,42 @@ class WorldInterface:
         load the world from a json file, but you need to parse it first
         """
         self.graph_interface.from_json(json_data)
+
+    def clear_world(self):
+        """
+        clear the world
+        """
+        self.graph_interface.clear()
+
+    def update_world(self, world: dict[str, list[dict[str, Any]]]):
+        """
+        update the world state, add new, do not remove any.
+        """
+        object_list = world.get("objects")
+        constraint_list = world.get("constraints")
+        relation_list = world.get("relations")
+        for item in object_list:
+            # self.graph_interface.add_node(item.get("name"))
+            self.graph_interface.add_properties(
+                item.get("name"), item.get("properties")
+            )
+
+        # ! BBFIX 20022024
+        for item in constraint_list:
+            self.graph_interface.add_relation(
+                source=item.get("source"),
+                target=item.get("target"),
+                name=item.get("name"),
+                isConstraint=True,
+            )
+
+        for item in relation_list:
+            self.graph_interface.add_relation(
+                source=item.get("source"),
+                target=item.get("target"),
+                name=item.get("name"),
+                isConstraint=False,
+            )
 
     def get_world_to_json(self) -> dict:
         """

@@ -1,0 +1,2 @@
+The output json object has the following keys.
+- "estimated_world_state": The world state after executing the plan.

@@ -1,0 +1,21 @@
+Information about world states is in json dictionary format. Example:
+"""
+{
+    "objects": [
+        {"name": "leg1", "properties": []}, # leg1 is an object with no properties
+        {"name": "seat", "properties": []}, # seat is an object with no properties
+        {"name": "hand", "properties": ["is_free"]}, # hand is an object with a property "is_free"
+    ],
+    "constraints": [
+        {"source": "leg1", "name": "can_screw_to", "target": "seat"}, # means leg1 can be screwed to seat
+    ],
+    "relations": [
+        {"source": "leg1", "name": "is_screwed_to", "target": "seat"}, # means leg1 is screwed to seat
+    ],
+}
+"""
+It contains three lists: 
+    - "objects": the objects in the world and their properties. The properties can be changed by robot actions.
+    - "constraints": the constraint relations that are enforced and should not be changed. 
+    - "relations": the relations in the world. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.

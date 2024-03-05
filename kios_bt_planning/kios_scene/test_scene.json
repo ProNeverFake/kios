@@ -16,7 +16,31 @@
             "source": "mios"
         },
         {
-            "object_name": "test_object1",
+            "object_name": "inward_claw",
+            "source": "mios"
+        },
+        {
+            "object_name": "outward_claw",
+            "source": "mios"
+        },
+        {
+            "object_name": "parallel_box1",
+            "source": "mios"
+        },
+        {
+            "object_name": "parallel_box2",
+            "source": "mios"
+        },
+        {
+            "object_name": "no_tool",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear2",
             "source": "mios"
         },
         {
@@ -24,15 +48,27 @@
             "source": "mios"
         },
         {
+            "object_name": "shaft1",
+            "source": "mios"
+        },
+        {
             "object_name": "shaft2",
             "source": "mios"
         },
         {
-            "object_name": "inward_claw",
+            "object_name": "shaft3",
             "source": "mios"
         },
         {
-            "object_name": "test",
+            "object_name": "gearbase",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearbase_hole1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gearbase_hole3",
             "source": "mios"
         }
     ],
@@ -82,7 +118,7 @@
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.095],
+                [0, 0, 1, 0.125],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.042,
@@ -96,15 +132,6 @@
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
                 [0, 0, 1, 0.025],
-                [0, 0, 0, 1]
-            ]
-        },
-        {
-            "tool_name": "default_tool",
-            "EE_T_TCP": [
-                [1, 0, 0, 0.0],
-                [0, 1, 0, 0.0],
-                [0, 0, 1, 0.0],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.08,

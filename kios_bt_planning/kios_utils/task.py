@@ -51,6 +51,7 @@ class Task:
         }
         # ceased. 13022024
         # print(self.skill_context)
+        print(f"\033[92mStart the skill: {self.skill_names[0]}\033[0m")
         response = start_task(self.robot, "GenericTask", parameters)
         self.task_start_response = response
 
@@ -60,6 +61,7 @@ class Task:
         return response
 
     def wait(self):
+        print(f"\033[92mWait for skill {self.skill_names[0]} to finish\033[0m")
         result = wait_for_task(self.robot, self.task_uuid)
         print("Task execution took " + str(time.time() - self.t_0) + " s.")
         self.task_wait_response = result

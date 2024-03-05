@@ -1,0 +1,14 @@
+Start working. Resume from the input below.
+---------------
+objects: {objects}
+
+runtime_world_state: {runtime_world_state}
+
+last_behavior_tree: {last_behavior_tree}
+
+last_failed_node: {last_failed_node}
+
+summary: {summary}
+
+action_sequence: {action_sequence}
+---------------

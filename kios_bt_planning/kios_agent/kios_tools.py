@@ -1,71 +1,37 @@
+from typing import Optional, Type, List
+
 # Import things that are needed generically
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.tools import BaseTool, StructuredTool, tool
-
-from typing import Optional, Type
 
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
 
-
-# * tool decorator
-@tool
-def search(query: str) -> str:
-    """Look up things online."""
-    return "LangChain"
+from kios_bt.bt_stewardship import BehaviorTreeStewardship
+from kios_bt.data_types import TreeResult
 
 
-# print(search.name)
-# print(search.description)
-# print(search.args)
+class BehaviorTreeInput(BaseModel):
+    json_data: dict = Field(
+        description="json data for the robot task plan, including the task plan in behavior tree and the initial state of the world."
+    )
 
 
-@tool
-def multiply(a: int, b: int) -> int:
-    """Multiply two numbers."""
-    return a * b
+class BehaviorTreeExecutorTool(BaseTool):
+    name = "behavior tree executor"
+    description = "useful for make the robot execute the behavior tree plan when it is verified and ready to be executed to achieve the task goal"
+    args_schema: Type[BaseModel] = BehaviorTreeInput
 
+    bt_stw: BehaviorTreeStewardship
 
-# print(multiply.name)
-# print(multiply.description)
-# print(multiply.args)
-
-
-class SearchInput(BaseModel):
-    query: str = Field(description="should be a search query")
-
-
-@tool("search-tool", args_schema=SearchInput, return_direct=True)
-def search(query: str) -> str:
-    """Look up things online."""
-    return "LangChain"
-
-
-# print(search.name)
-# print(search.description)
-# print(search.args)
-# print(search.return_direct)
-
-
-# * BaseTool
-class SearchInput(BaseModel):
-    query: str = Field(description="should be a search query")
-
-
-class CalculatorInput(BaseModel):
-    a: int = Field(description="first number")
-    b: int = Field(description="second number")
-
-
-class CustomSearchTool(BaseTool):
-    name = "custom_search"
-    description = "useful for when you need to answer questions about current events"
-    args_schema: Type[BaseModel] = SearchInput
+    def __init__(self, bt_stw: BehaviorTreeStewardship):
+        self.bt_stw = bt_stw
+        super().__init__()
 
     def _run(
-        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
+        self, json_data: dict, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
         return "LangChain"
@@ -77,89 +43,68 @@ class CustomSearchTool(BaseTool):
         raise NotImplementedError("custom_search does not support async")
 
 
-class CustomCalculatorTool(BaseTool):
-    name = "Calculator"
-    description = "useful for when you need to answer questions about math"
-    args_schema: Type[BaseModel] = CalculatorInput
-    return_direct: bool = True
+class BehaviorTreeInput(BaseModel):
+    behavior_tree: dict = Field(
+        description="json data for the robot task plan, including the task plan in behavior tree and the initial state of the world."
+    )
+    world_state: dict = Field(description="json data for the current world state.")
+
+
+class BehaviorTreeSimulatorTool(BaseTool):
+    name = "behavior tree simulator tool"
+    description = "useful for simulating the behavior tree plan to see if the plan can achieve the task goal in the ideal case"
+    args_schema: Type[BaseModel] = BehaviorTreeInput
 
     def _run(
-        self, a: int, b: int, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
+        self,
+        behavior_tree: dict,
+        world_state: dict,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> TreeResult:
         """Use the tool."""
-        return a * b
+
+        bt_stw: BehaviorTreeStewardship = self.metadata["bt_stw"]
+        tree_result = bt_stw.fake_run(bt_json=behavior_tree, world_state=world_state)
+
+        return tree_result
 
     async def _arun(
         self,
-        a: int,
-        b: int,
+        behavior_tree: dict,
+        world_state: dict,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> TreeResult:
+        """Use the tool asynchronously."""
+
+        bt_stw: BehaviorTreeStewardship = self.metadata["bt_stw"]
+        tree_result = bt_stw.fake_run(bt_json=behavior_tree, world_state=world_state)
+
+        return tree_result
+
+
+class WorldStateQuery(BaseModel):
+    query: str = Field(description="a string to explain the purpose of this query.")
+
+
+class WorldStateQueryTool(BaseTool):
+    name = "world state query tool"
+    description = "useful for querying the current world state"
+    args_schema: Type[BaseModel] = WorldStateQuery
+
+    bt_stw: BehaviorTreeStewardship
+
+    def __init__(self, bt_stw: BehaviorTreeStewardship):
+        self.bt_stw = bt_stw
+        super().__init__()
+
+    def _run(
+        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return
+
+    async def _arun(
+        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool asynchronously."""
-        raise NotImplementedError("Calculator does not support async")
-
-
-# search = CustomSearchTool()
-# print(search.name)
-# print(search.description)
-# print(search.args)
-
-# multiply = CustomCalculatorTool()
-# print(multiply.name)
-# print(multiply.description)
-# print(multiply.args)
-# print(multiply.return_direct)
-
-
-# * StructuredTool
-def search_function(query: str):
-    return "LangChain"
-
-
-search = StructuredTool.from_function(
-    func=search_function,
-    name="Search",
-    args_schema=SearchInput,
-    description="useful for when you need to answer questions about current events",
-    # * coroutine= ... <- you can specify an async method if desired as well
-)
-
-# print(search.name)
-# print(search.description)
-# print(search.args)
-
-# * handling errors
-from langchain_core.tools import ToolException
-
-
-def search_tool1(s: str):
-    raise ToolException("The search tool1 is not available.")
-
-
-search = StructuredTool.from_function(
-    func=search_tool1,
-    name="Search_tool1",
-    description="A bad tool",
-    handle_tool_error=True,
-)
-
-# search.run("test")
-
-
-def _handle_error(error: ToolException) -> str:
-    return (
-        "The following errors occurred during tool execution:"
-        + error.args[0]
-        + "Please try another tool."
-    )
-
-
-search = StructuredTool.from_function(
-    func=search_tool1,
-    name="Search_tool1",
-    description="A bad tool",
-    handle_tool_error=_handle_error,
-)
-
-# print(search.run("test"))
-# search.run("test")
+        raise NotImplementedError("custom_search does not support async")

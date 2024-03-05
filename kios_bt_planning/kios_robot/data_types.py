@@ -85,7 +85,7 @@ class MiosObject:
             "OB_I": mios_object.OB_I.T.flatten().tolist(),
             "q": mios_object.q,
             "grasp_width": mios_object.grasp_width,
-            "grasp_forch": mios_object.grasp_forch,
+            "grasp_force": mios_object.grasp_force,
             "mass": mios_object.mass,
             "geometry": mios_object.geometry,
         }
@@ -106,6 +106,22 @@ class MiosObject:
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
+    @staticmethod
+    def generate_dummy(object_name: str) -> "MiosObject":
+        return MiosObject(
+            name=object_name,
+            O_T_OB=np.eye(4),
+            O_T_TCP=np.eye(4),
+            OB_T_gp=np.eye(4),
+            OB_T_TCP=np.eye(4),
+            OB_I=np.eye(3),
+            q=[0, 0, 0, 0, 0, 0, 0],
+            grasp_width=0.0,
+            grasp_force=0.0,
+            mass=0.0,
+            geometry=None,
+        )
+
 
 @dataclass
 class MiosInterfaceResponse:
@@ -122,6 +138,13 @@ class MiosInterfaceResponse:
         """
         # instantiate the task result first
         task_result = None
+        if isinstance(json_response, str):
+            print(f"mios response: {json_response}")
+            return MiosInterfaceResponse(
+                has_finished="???",
+                error_message="mios response is not a dictionary!",
+                task_result=None,
+            )
         if json_response.get("task_result") is not None:
             task_result = MiosTaskResult.from_json(json_response["task_result"])
 
@@ -371,7 +394,7 @@ class TaskScene:
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:
-            return self.tool_map.get("default_tool")
+            return self.tool_map.get("no_tool")
         tool = self.tool_map.get(tool_name)
         if tool is None:
             raise Exception(f"Tool {tool_name} is not in the scene!")

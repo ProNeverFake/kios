@@ -1,6 +1,8 @@
 from kios_utils.task import *
 import numpy as np
 from typing import Any, List, Dict
+from termcolor import colored
+from pprint import pprint
 
 from kios_robot.data_types import (
     MiosObject,
@@ -129,7 +131,7 @@ class RobotProprioceptor:
             payload,
         )
 
-    def get_object(self, object: str):
+    def get_object(self, object: str) -> MiosObject | None:
         response = call_method(
             self.robot_address,
             self.robot_port,
@@ -141,6 +143,50 @@ class RobotProprioceptor:
         if mios_response.has_finished:
             mios_object = MiosObject.from_json(response["result"])
             print(mios_object)
+            return mios_object
+
+    def align_object(self, object_name: str, **kwargs: Dict[str, Any]):
+        """
+        cheat method for BB usecase
+        """
+        self.modify_object_position(
+            object_name=object_name,
+            x=kwargs["x"] if "x" in kwargs.keys() else 0,
+            y=kwargs["y"] if "y" in kwargs.keys() else 0,
+            z=kwargs["z"] if "z" in kwargs.keys() else 0,
+            R=[1, 0, 0, 0, -1, 0, 0, 0, -1],
+        )
+
+    def modify_object_position(self, object_name: str, **kwargs: Dict[str, Any]):
+        this_object = self.get_object(object_name)
+        O_T_EE = this_object.O_T_OB
+        O_T_TCP = this_object.O_T_TCP
+        if "x" in kwargs.keys():
+            O_T_EE[0, 3] += kwargs["x"]
+            O_T_TCP[0, 3] += kwargs["x"]
+        if "y" in kwargs.keys():
+            O_T_EE[1, 3] += kwargs["y"]
+            O_T_TCP[1, 3] += kwargs["y"]
+        if "z" in kwargs.keys():
+            O_T_EE[2, 3] += kwargs["z"]
+            O_T_TCP[2, 3] += kwargs["z"]
+        if "R" in kwargs.keys():
+            R = np.reshape(kwargs["R"], (3, 3)).T
+            O_T_EE[0:3, 0:3] = R
+            O_T_TCP[0:3, 0:3] = R
+
+        this_object_json = this_object.to_json(this_object)
+        this_object_json["object"] = object_name
+
+        response = call_method(
+            self.robot_address,
+            self.robot_port,
+            "set_object",
+            this_object_json,
+        )
+
+        mios_response = MiosInterfaceResponse.from_json(response["result"])
+        print(colored(f"mios replied:\n {mios_response}", "green"))
 
     def get_object_O_T_OB(self, object_name: str):
         """
@@ -155,7 +201,7 @@ class RobotProprioceptor:
 
         return np.reshape(np.array(response["result"]["O_T_OB"]), (4, 4)).T
 
-    def get_dummy_object(self) -> MiosObject or None:
+    def get_dummy_object(self) -> MiosObject | None:
         response = call_method(
             self.robot_address,
             self.robot_port,

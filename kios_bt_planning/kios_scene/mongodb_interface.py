@@ -1,5 +1,6 @@
 from pymongo import MongoClient, database, collection
 from typing import Dict, List
+import logging
 
 from kios_robot.data_types import MiosObject
 
@@ -82,7 +83,10 @@ class MongoDBInterface:
         if count > 1:
             raise Exception("Duplicated object name!")
         elif count == 0:
-            raise Exception(f'object "{object_name}" not found in the database')
+            # raise Exception(f'object "{object_name}" not found in the database')
+            logging.warning(f'object "{object_name}" not found in the database')
+            # ! HACK
+            return MiosObject.generate_dummy(object_name=object_name) 
         for document in result:
             return MiosObject.from_json(document)
 

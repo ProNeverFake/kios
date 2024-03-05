@@ -1,0 +1,55 @@
+[user]
+The behavior tree should be in json dictionary format.
+Follow these rules:
+1. Every node are described by a summary and a name:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal form of the node according to the domain knowledge.
+2. The control flow nodes, "selector" and "sequence", can have "children", which is a list of children nodes.
+3. The "condition" nodes that are children of "selectors" are targets. Those that are children of "sequences" are preconditions. 
+4. All the subtrees always have their corresponding action in ROBOT_ACTION_LIST. 
+Their structure is:
+    - A selector as the root node. 
+    - (Usually one) target condition node as the first child of the selector to check if the target of the action has been fulfilled.
+    - A sequence node as the last child of the selector node to achieve the target.
+    - (Usually a number of) precondition nodes as the front children of the sequence node to check the preconditions for executing the action. 
+    - One action node as the last child of the sequence node, whose preconditions are checked before and will immediate start the job when being ticked.
+    - The action will exert its defined effects after finishing the job successfully. Those effects should fulfilled all the target conditions in the selector node.
+6. To fulfill an unsatisfied precondition, you can replace it with a subtree that treats the precondition as the target.
+7. Control flow nodes in behavior trees don't have memory. Each tick starts from the root and traverses all nodes, regardless of their previous state.
+8. The selector node can only be used to replace an existing unsatisfied condition node. When using a selector node, you should check if  success. If not, it should return failure.
+
+An example:
+The action based on the "load_tool" from <ROBOT_ACTION_LIST>:
+load_tool(left_hand, parallel_box1)
+The bahavior tree constructed according to its definition in <ROBOT_ACTION_LIST>:
+{
+    "summary": "selector to load left_hand with parallel_box1",
+    "name": "selector: load_tool(left_hand, parallel_box1)",
+    "children": [
+        {
+            "summary": "condition node to check if left_hand holds parallel_box1",
+            "name": "target: hold(left_hand, parallel_box1)"
+        },
+        {
+            "summary": "sequence to load left_hand with parallel_box1",
+            "name": "sequence: load_tool(left_hand, parallel_box1)",
+            "children": [
+                {
+                    "summary": "condition node to check if left_hand is free,
+                    "name": "precondition: is_free(left_hand)"
+                },
+                {
+                    "summary": "condition node to check if parallel_box1 is equippable",
+                    "name": "precondition: is_equippable(parallel_box1)"
+                },
+                {
+                    "summary": "action node to equip left hand with parallel_box1",
+                    "name": "action: load_tool(left_hand, parallel_box1)",
+                }
+            ],
+        },
+    ],
+}
+
+[assistant]
+Understood. I will wait for further instructions before starting to work.

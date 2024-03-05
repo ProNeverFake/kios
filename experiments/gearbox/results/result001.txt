@@ -1,0 +1,21 @@
+0.0003: (initialize defaultgripper) [d:1.0000; c:1.0000], 4.808458777999476
+1.0005: (change_gripper defaultgripper outwardgripper) [d:10.0000; c:1.0000], 11.688009651000357
+11.0007: (initialize outwardgripper) [d:10.0000; c:1.0000], 3.4573092000000543
+21.0010: (insert outwardgripper outerring housing) [d:23.0000; c:1.0000], 22.860556831000395
+44.0013: (insert outwardgripper cone outerring) [d:19.0000; c:1.0000], 22.659663784999793
+63.0015: (change_gripper outwardgripper defaultgripper) [d:10.0000; c:1.0000], 11.377012515999922
+73.0017: (initialize defaultgripper) [d:1.0000; c:1.0000], 3.3935505210001793
+74.0020: (insert defaultgripper outputshaftandgearstage2 cone) [d:40.0000; c:1.0000], 71.41381259900027
+114.0023: (change_gripper defaultgripper parallelgripper) [d:10.0000; c:1.0000], 11.916867539000123
+124.0025: (initialize parallelgripper) [d:10.0000; c:1.0000], 4.814801288999661
+134.0027: (insert parallelgripper ringgear outputshaftandgearstage2) [d:25.0000; c:1.0000], 25.5688664850004
+159.0030: (change_gripper parallelgripper inwardgripper) [d:25.0000; c:1.0000], 23.267643426000177
+184.0033: (initialize inwardgripper) [d:10.0000; c:1.0000], 3.546634418999929
+194.0035: (insert inwardgripper gearstage1 ringgear) [d:25.0000; c:1.0000], 45.24948094299998
+219.0038: (change_gripper inwardgripper clampgripper) [d:30.0000; c:1.0000], 24.02283685799921
+249.0040: (initialize clampgripper) [d:10.0000; c:1.0000], 4.694307449000007
+259.0042: (insert clampgripper designring ringgear) [d:13.0000; c:1.0000], 23.04564223700072
+272.0045: (change_gripper clampgripper defaultgripper) [d:15.0000; c:1.0000], 11.74245431899999
+287.0048: (initialize defaultgripper) [d:1.0000; c:1.0000], 4.906379768000079
+288.0050: (insert defaultgripper driveflange gearstage1) [d:25.0000; c:1.0000], 26.625840525999593
+313.0052: (insert defaultgripper inputpinion driveflange) [d:25.0000; c:1.0000], 29.195681523999156

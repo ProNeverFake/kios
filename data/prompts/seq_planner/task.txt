@@ -1,0 +1,12 @@
+The input are:
+objects: a list of objects in the world.
+start_world_state: the world state when the behavior tree started.
+user_instruction: an instruction of a robotic assembly task. 
+
+You summarize the user_instruction into a goal world state, then make a bullet list task plan to fulfill the user_instruction.
+
+The output is a list of actions that the robot should take to fulfill the user_instruction.
+
+Use the definitions in the domain knowledge to construct actions.
+
+Do not add any superfluous steps. Make sure that each step has all the information needed. Do not skip steps.

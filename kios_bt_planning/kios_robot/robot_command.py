@@ -10,6 +10,8 @@ from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
 from kios_robot.data_types import MiosSkill, MiosCall, KiosCall
 from kios_robot.data_types import TaskScene
 
+from kios_utils.bblab_utils import bb_result_test
+
 
 class RobotCommand:
     robot_address: str = None
@@ -72,6 +74,7 @@ class RobotCommand:
         }
         call_method(self.robot_address, self.robot_port, "stop_task", payload=payload)
 
+    @bb_result_test
     def execute_task_list_sync(self) -> bool:
         self.show_tasks()
         for task_item in self.task_list:
@@ -109,6 +112,7 @@ class RobotCommand:
                     return False
 
             elif isinstance(task_item, MiosCall):  # * use general call
+                print(f"\033[92mStart the call: {task_item.method_name}\033[0m")
                 result = call_method(
                     self.robot_address,
                     self.robot_port,

@@ -10,7 +10,7 @@ import py_trees
 import json
 import re
 from pprint import pprint
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
 from kios_bt.pybt_io import BehaviorTreeTemplates
@@ -45,6 +45,7 @@ generator = id_generator()  # Create a generator
 class BehaviorTreeFactory:
     visualization_only: bool
     roster: Dict[int, Any] = {}  # * roster hasn't be tested yet.
+    node_skeleton_dict: dict[any, str] = {}
 
     world_interface: WorldInterface = None
     robot_interface: RobotInterface = None
@@ -282,14 +283,15 @@ class BehaviorTreeFactory:
     # * json to bt_stw
     def from_skeleton_to_behavior_tree(
         self, json_data: dict
-    ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree]:
+    ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree, Optional[Dict[int, str]]]:
 
         # ! clear roster here
         self.roster = {}
+        self.node_skeleton_dict = {}
 
         tree_root = self.from_skeleton_to_tree_root(json_data)
         behavior_tree = py_trees.trees.BehaviourTree(tree_root)
-        return [self.roster, behavior_tree]
+        return [self.roster, behavior_tree, self.node_skeleton_dict]
 
     def from_skeleton_to_tree_root(self, skeleton: dict):
         """
@@ -307,6 +309,11 @@ class BehaviorTreeFactory:
                 skeleton["identifier"] = next(self.id_generator)
 
             self.roster[skeleton["identifier"]] = control_flow_node
+            # * summary
+            self.node_skeleton_dict[control_flow_node.id] = {
+                "summary": skeleton["summary"],
+                "name": skeleton["name"],
+            }
 
             for child in skeleton["children"]:
                 child_node = self.from_skeleton_to_tree_root(child)
@@ -319,6 +326,11 @@ class BehaviorTreeFactory:
             if "identifier" not in skeleton.keys():
                 skeleton["identifier"] = next(self.id_generator)
             self.roster[skeleton["identifier"]] = control_flow_node
+            # * summary
+            self.node_skeleton_dict[control_flow_node.id] = {
+                "summary": skeleton["summary"],
+                "name": skeleton["name"],
+            }
             for child in skeleton["children"]:
                 child_node = self.from_skeleton_to_tree_root(child)
                 control_flow_node.add_child(child_node)
@@ -363,6 +375,11 @@ class BehaviorTreeFactory:
             self.robot_interface,
         )
         self.roster[skeleton["identifier"]] = condition_node
+        # * summary
+        self.node_skeleton_dict[condition_node.id] = {
+            "summary": skeleton["summary"],
+            "name": skeleton["name"],
+        }
 
         return condition_node
 
@@ -388,6 +405,11 @@ class BehaviorTreeFactory:
             self.robot_interface,
         )
         self.roster[skeleton["identifier"]] = action_node
+        # * summary
+        self.node_skeleton_dict[action_node.id] = {
+            "summary": skeleton["summary"],
+            "name": skeleton["name"],
+        }
 
         return action_node
 

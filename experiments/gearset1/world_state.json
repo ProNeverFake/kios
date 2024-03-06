@@ -1,23 +1,23 @@
 {
     "objects": [
       {
-        "name": "parallel_box1",
+        "name": "clampgripper",
         "properties": ["is_empty"]
       },
       {
-        "name": "parallel_box2",
+        "name": "parallelgripper",
         "properties": ["is_empty"]
       },
       {
-        "name": "inward_claw",
+        "name": "inwardgripper",
         "properties": ["is_empty"]
       },
       {
-        "name": "outward_claw",
+        "name": "outwardgripper",
         "properties": ["is_empty"]
       },
       {
-        "name": "no_tool",
+        "name": "defaultgripper",
         "properties": ["is_empty"]
       },
       {
@@ -62,12 +62,62 @@
       }
     ],
     "constraints": [
+      {
+        "source": "clampgripper",
+        "name": "can_manipulate",
+        "target": "shaft1"
+      },
+      {
+        "source": "parallelgripper",
+        "name": "can_manipulate",
+        "target": "gear1"
+      },
+      {
+        "source": "outwardgripper",
+        "name": "can_manipulate",
+        "target": "gear2"
+      },
+      {
+        "source": "outwardgripper",
+        "name": "can_manipulate",
+        "target": "gear3"
+      },
+      {
+        "source": "defaultgripper",
+        "name": "can_manipulate",
+        "target": "shaft3"
+      },
+      {
+        "source": "shaft1",
+        "name": "can_insert_to",
+        "target": "gearbase_hole1"
+      },
+      {
+        "source": "shaft3",
+        "name": "can_insert_to",
+        "target": "gearbase_hole3"
+      },
+      {
+        "source": "gear3",
+        "name": "can_insert_to",
+        "target": "shaft3"
+      },
+      {
+        "source": "gear2",
+        "name": "can_insert_to",
+        "target": "shaft2"
+      },
+      {
+        "source": "gear1",
+        "name": "can_insert_to",
+        "target": "shaft1"
+      }
     ],
     "relations": [
       {
         "source": "left_hand",
         "name": "hold",
-        "target": "parallel_box1"
+        "target": "outwardgripper"
       }
     ]
 }

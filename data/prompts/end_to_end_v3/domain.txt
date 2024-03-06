@@ -29,7 +29,7 @@ The actions are explained as follows:
 """
 "ROBOT_ACTION_LIST"
 - pick_up(<hand>, <tool>, <part>): <hand> use <tool> to pick up <part>. As preconditions, <hand> should be holding <tool> and <tool> should be empty in order to hold the <part>. The <part> will be held by the <tool> as a result of this action.
-- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>. As preconditions, <hand> should be holding <tool> and <tool> should be holding <part>. The purpose is to make the tool <tool> empty. The tool <tool> and will be empty and not hold the <part> anymore as the effects of this action.
+- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>. As preconditions, <hand> should be holding <tool> and <tool> should be holding <part>. The target is to make the tool <tool> empty. The <tool> will be empty and will not hold the <part> anymore as a result of this action.
 - place(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to place <part1> to <part2> (to satisfy the placement assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.
 - detach(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to detach <part1> from <part2> (to lift the existing placement assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be empty to manipulate <part1>, and <part1> should be placed into <part2>.
 - insert(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to insert <part1> into <part2> (to satisfy the insertion assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.

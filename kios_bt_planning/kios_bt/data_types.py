@@ -22,6 +22,7 @@ class TreeResult:
     summary: str
     final_node: Optional[dict]  # ! alaerm
     world_state: Dict[str, List[Dict[str, str]]]
+    # raw_node: Optional[py_trees.behaviour.Behaviour]
 
     def to_json(self):
         return {
@@ -222,6 +223,12 @@ class ObjectProperty:  # for indicating the conditions and the effects in an obj
             "status": self.status,
         }
 
+    def to_string(self):
+        if self.property_value is None:
+            return f"{self.property_name}({self.object_name})"
+        else:
+            return f"{self.property_name}({self.object_name}, {self.property_value})"
+
 
 @dataclass
 class Condition:  # for generating a condition node
@@ -237,6 +244,10 @@ class Condition:  # for generating a condition node
             "name": self.name,
             "conditions": [condition.to_json() for condition in self.conditions],
         }
+
+    def to_string(self):
+        # ! this is a temporary solution
+        return self.conditions[0].to_string()
 
 
 @dataclass

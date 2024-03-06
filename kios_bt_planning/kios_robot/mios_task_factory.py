@@ -97,6 +97,8 @@ class MiosTaskFactory:
             return self.generate_load_tool_skill(parsed_action)
         elif parsed_action["name"] == "unload_tool":
             return self.generate_unload_tool_skill(parsed_action)
+        elif parsed_action["name"] == "change_tool":
+            return self.generate_change_tool_skill(parsed_action)
         elif parsed_action["name"] == "pick_up":
             return self.generate_pick_up_skill(parsed_action)
         elif parsed_action["name"] == "insert":
@@ -393,6 +395,20 @@ class MiosTaskFactory:
 
     ###################################################################
     # * methods to generate a sequence of mios tasks
+
+    def generate_change_tool_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
+        tool1 = parsed_action["args"][1]
+        tool2 = parsed_action["args"][2]
+        if tool1 is None or tool2 is None:
+            raise Exception("tool_name is not set!")
+
+        action1 = {"args": ["xxxx", tool1]}
+        unload_skill = self.generate_unload_tool_skill(action1)
+        action2 = {"args": ["xxxx", tool2]}
+        load_skill = self.generate_load_tool_skill(action2)
+        return unload_skill + load_skill
 
     def generate_load_tool_skill(
         self, parsed_action: Dict[str, Any]

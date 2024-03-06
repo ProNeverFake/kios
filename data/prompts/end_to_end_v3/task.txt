@@ -1,0 +1,6 @@
+The input are:
+target: The Target that you make the sequential plan and construct the behavior tree from.
+initial_state: The initial state that you start from.
+
+You analyze the target, refer to the domain knowledge to understand it, make an action sequence and construct a behavior tree based on it.
+Your output should follow the regulated format and you return it as a json object.

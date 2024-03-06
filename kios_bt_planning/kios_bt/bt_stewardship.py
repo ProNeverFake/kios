@@ -17,6 +17,7 @@ from kios_bt.behavior_nodes import (
     ConditionNode,
     ActionNodeTest,
     ActionNodeSim,
+    ActionNodeOnlySuccess,
 )
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_world.world_interface import WorldInterface
@@ -45,6 +46,7 @@ class BehaviorTreeStewardship:
     world_interface: WorldInterface = None  # for world states
     robot_interface: RobotInterface = None  # for robot actions
     roster: Dict[int, Any] = {}  # for tree mod
+    skeleton_dict = {}  # for tree to dict
 
     def __init__(
         self,
@@ -58,8 +60,6 @@ class BehaviorTreeStewardship:
             self.robot_interface = robot_interface
 
         if world_interface is None:
-            # self.world_interface = WorldInterface()
-            # self.world_interface.initialize()
             # ! now the world interface is a required parameter
             raise Exception("world_interface is not set")
         else:
@@ -425,6 +425,17 @@ class BehaviorTreeStewardship:
             # recursively replace the children
             self.replace_action_node_with_sim(stw, child)
 
+    def replace_action_node_with_only_success(self, stw, root):
+        for child in root.children:
+            # replace the action node with sim node
+            if isinstance(child, ActionNode):
+                sim_node = ActionNodeOnlySuccess.from_action_node(child)
+                stw.replace_subtree(child.id, sim_node)
+                # * update the skeleton dict, add the new replacement node
+                self.skeleton_dict[sim_node.id] = self.skeleton_dict[child.id]
+            # recursively replace the children
+            self.replace_action_node_with_only_success(stw, child)
+
     def fake_run(self, world_state: dict, bt_json: dict):
         """
         fake run for graph testing
@@ -488,6 +499,106 @@ class BehaviorTreeStewardship:
         self.world_interface.restore_check_point()
 
         return tree_result, skeleton_json
+
+    def sk_baseline(self, world_state: dict, skeleton_json: dict) -> dict:
+        """baseline expanding, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
+
+
+        Args:
+            world_state (dict): ws to start with
+            skeleton_json (dict): the condition sk node to achieve. should be a condition node in sk form with summary and a legal name.
+
+        Raises:
+            Exception: see the code
+
+        Returns:
+            dict: the solution bt sk json.
+        """
+        from kios_plan.dynamic_planning import gearset_ut_dict
+        from pprint import pprint
+
+        self.set_world_state(world_state)
+        self.world_interface.record_check_point("baseline_start")
+
+        _, sim_bt, self.skeleton_dict = (
+            self.behaviortree_factory.from_skeleton_to_behavior_tree(skeleton_json)
+        )
+        self.replace_action_node_with_only_success(sim_bt, sim_bt.root)
+        self.setup_behavior_tree(sim_bt)
+
+        from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+
+        while True:
+            sim_bt.tick()
+            if sim_bt.root.status == py_trees.common.Status.SUCCESS:
+                pprint("Behavior tree tick returns success!")
+                break
+            elif sim_bt.root.status == py_trees.common.Status.FAILURE:
+                tip_node = sim_bt.root.tip()
+                if tip_node is None:
+                    raise Exception(
+                        "Behavior tree tick returns failure with the defect node unknown"
+                    )
+                assert isinstance(tip_node, ConditionNode)
+                new_target = tip_node.condition.to_string()
+                new_ut = gearset_ut_dict.get(new_target, None)
+                if new_ut is None:
+                    pprint(f"cannot find a solution ut for the condtiion {new_target}!")
+                    pprint("the available targets are:")
+                    pprint(gearset_ut_dict.keys())
+                    break
+                _, new_subtree, new_sk_dict = (
+                    self.behaviortree_factory.from_skeleton_to_behavior_tree(new_ut)
+                )
+                self.skeleton_dict.update(new_sk_dict)
+                self.replace_action_node_with_only_success(
+                    new_subtree, new_subtree.root
+                )
+                # render_dot_tree(new_subtree)
+                # pause = input("paused here! check the tree.")
+                if sim_bt.root.id == tip_node.id:
+                    sim_bt = new_subtree
+                else:
+                    sim_bt.replace_subtree(tip_node.id, new_subtree.root)
+                render_dot_tree(sim_bt)
+                # pause = input("paused here! check the tree.")
+
+                sim_bt.setup(timeout=15)
+
+                self.world_interface.restore_check_point("baseline_start")
+            elif sim_bt.root.status == py_trees.common.Status.RUNNING:
+                print("Behavior tree is running")
+            else:
+                raise Exception("Unknown status!")
+
+        # * restore world check point
+        self.world_interface.restore_check_point("baseline_start")
+        return self.from_tree_root_to_sk_json(sim_bt.root)
+
+    def from_tree_root_to_sk_json(
+        self, tree_root: py_trees.behaviour.Behaviour
+    ) -> dict:
+        """
+        convert the tree root to sk_json
+        """
+        if isinstance(tree_root, py_trees.composites.Selector):
+            compound_sk = self.skeleton_dict[tree_root.id]
+            compound_sk["children"] = [
+                self.from_tree_root_to_sk_json(child) for child in tree_root.children
+            ]
+            return compound_sk
+        elif isinstance(tree_root, py_trees.composites.Sequence):
+            compound_sk = self.skeleton_dict[tree_root.id]
+            compound_sk["children"] = [
+                self.from_tree_root_to_sk_json(child) for child in tree_root.children
+            ]
+            return compound_sk
+        elif isinstance(tree_root, ActionNode):
+            return self.skeleton_dict[tree_root.id]
+        elif isinstance(tree_root, ConditionNode):
+            return self.skeleton_dict[tree_root.id]
+        else:
+            raise Exception("Unknown node type!")
 
     ##########################################################
 

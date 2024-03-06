@@ -397,6 +397,9 @@ class TaskScene:
             return self.tool_map.get("no_tool")
         tool = self.tool_map.get(tool_name)
         if tool is None:
+            from pprint import pprint
+            pprint("current available tools are:")
+            pprint(self.tool_map.keys())
             raise Exception(f"Tool {tool_name} is not in the scene!")
         return tool
 

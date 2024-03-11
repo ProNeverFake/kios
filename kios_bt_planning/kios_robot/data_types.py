@@ -390,7 +390,7 @@ class TaskScene:
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     def get_object(self, object_name: str) -> Optional[KiosObject]:
-        return self.object_map.get(object_name)
+        return self.object_map.get(object_name, None)
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:

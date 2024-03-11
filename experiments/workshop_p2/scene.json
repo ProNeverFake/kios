@@ -1,0 +1,33 @@
+{
+    "reference_objects":
+    [
+        {
+            "object_name": "initialposition",
+            "source": "mios"
+        },
+        {
+            "object_name": "screwbolt",
+            "source": "mios"
+        },
+        {
+            "object_name": "screwhole",
+            "source": "mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "defaultgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.03],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
+        }
+    ]
+}

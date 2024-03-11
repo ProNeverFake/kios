@@ -397,6 +397,10 @@ class TaskScene:
             return self.tool_map.get("no_tool")
         tool = self.tool_map.get(tool_name)
         if tool is None:
+            from pprint import pprint
+
+            pprint("current available tools are:")
+            pprint(self.tool_map.keys())
             raise Exception(f"Tool {tool_name} is not in the scene!")
         return tool
 
@@ -431,6 +435,7 @@ class RobotState:
             ["status", self.status],
             ["current_task", self.current_task],
             ["gripper_width", self.gripper_width],
+            # ? what is this?
             # ["q_d", self.q_d],
             # ["TF_T_EE_d", "\n".join(["\t".join(map(str, row)) for row in self.TF_T_EE_d.tolist()])],
         ]

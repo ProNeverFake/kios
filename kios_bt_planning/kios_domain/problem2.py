@@ -1,4 +1,4 @@
-from kios_domain.knowledge import *
+from kios_domain.knowledge_v0 import *
 
 ########################## * current problem context ######################
 # add all the related instances to the problem here

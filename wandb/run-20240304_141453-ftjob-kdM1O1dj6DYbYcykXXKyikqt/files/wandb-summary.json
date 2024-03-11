@@ -1,0 +1,1 @@
+{"train_loss": 0.01838, "train_accuracy": 0.99588, "_timestamp": 1709558098.328243, "_runtime": 4.571851015090942, "_step": 20, "fine_tuned_model": "ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr", "_wandb": {"runtime": 4}}

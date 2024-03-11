@@ -24,12 +24,8 @@ import py_trees.common
 import py_trees.console as console
 
 # kios
-from backups.kios_utils import ActionPhase
 from kios_utils.task import *
 from kios_bt.data_types import (
-    # ActionInstance,
-    # GroundedAction,
-    # GroundedCondition,
     Action,
     Condition,
 )
@@ -38,15 +34,9 @@ from kios_robot.robot_interface import RobotInterface
 from kios_robot.robot_command import RobotCommand
 from kios_robot.mios_async import fake_robot_command_monitor, robot_command_monitor
 
-# from kios_bt.mios_async import mios_monitor, fake_monitor
-
-
 ##############################################################################
 # Classes
 ##############################################################################
-
-# * mios server address: localhost
-MIOS = "127.0.0.1"
 
 
 class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
@@ -346,6 +336,7 @@ class ActionNodeSim(ActionNode):
             return
         self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
         self.world_interface.take_effect(self.action)
+        self.hasTakenEffect = True  # ! warning
 
     def update(self) -> py_trees.common.Status:
         """
@@ -365,6 +356,53 @@ class ActionNodeSim(ActionNode):
             self.tick_times += 1
             new_status = py_trees.common.Status.RUNNING
 
+        return new_status
+
+
+class ActionNodeOnlySuccess(ActionNode):
+
+    @staticmethod
+    def from_action_node(action_node: ActionNode) -> "ActionNodeSim":
+        return ActionNodeSim(action_node.action, action_node.world_interface)
+
+    def __init__(
+        self,
+        action: Action,
+        world_interface: WorldInterface,
+        robot_interface: RobotInterface = None,  #  not needed for simulation
+    ):
+        self.success_flag = False
+        self.tick_times = 0
+        self.tick_times_target = 3
+        self.hasTakenEffect = False
+        self.action = action
+        """Configure the name of the behaviour."""
+        self.identifier = action.identifier
+        self.behavior_name = self.action.name
+        super(ActionNode, self).__init__(world_interface, robot_interface)
+        self.logger.debug("%s.__init__()" % (self.__class__.__name__))
+
+    def setup(self, **kwargs: int) -> None:
+        self.logger.debug("%s.setup()" % (self.__class__.__name__))
+
+    def initialise(self) -> None:
+        self.logger.debug("%s.initialise()" % (self.__class__.__name__))
+        self.tick_times = 0
+        self.hasTakenEffect = False
+        self.logger.info(f"Sim action node {self.behavior_name} started.")
+
+    def take_effect(self):
+        """
+        interact with the world interface to exert the effects
+        """
+        if self.hasTakenEffect:
+            return
+        self.logger.info(f"Try to exert the effects of action {self.behavior_name}.")
+        self.world_interface.take_effect(self.action)
+        self.hasTakenEffect = True
+
+    def update(self) -> py_trees.common.Status:
+        new_status = py_trees.common.Status.SUCCESS
         return new_status
 
 

@@ -1,6 +1,7 @@
 # basics
 numpy
 websockets
+tabulate
 
 # behavior tree
 py_trees==2.2.3

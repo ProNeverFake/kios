@@ -1,4 +1,4 @@
-Start working. Resume from the input below.
+Resume from the input below.
 ---------------
 action: {action}
 ---------------

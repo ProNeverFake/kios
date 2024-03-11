@@ -1,4 +1,4 @@
-1231231231230.0003: (initialize defaultgripper) [d:1.0000; c:1.0000], 2.950111394000487
+0.0003: (initialize defaultgripper) [d:1.0000; c:1.0000], 2.950111394000487
 1.0005: (change_gripper defaultgripper outwardgripper) [d:10.0000; c:1.0000], 11.625277318999906
 11.0007: (initialize outwardgripper) [d:10.0000; c:1.0000], 3.4732212919998346
 21.0010: (insert outwardgripper outerring housing) [d:23.0000; c:1.0000], 23.451959666999755

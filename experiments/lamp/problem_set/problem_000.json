@@ -1,0 +1,158 @@
+{
+    "target": "target: is_screwed_to(lampbulb, lampbase)",
+    "initial_world_state": {
+        "objects": [
+            {
+                "name": "clampgripper",
+                "properties": [
+                    "is_empty"
+                ]
+            },
+            {
+                "name": "parallelgripper",
+                "properties": [
+                    "is_empty"
+                ]
+            },
+            {
+                "name": "inwardgripper",
+                "properties": [
+                    "is_empty"
+                ]
+            },
+            {
+                "name": "outwardgripper",
+                "properties": [
+                    "is_empty"
+                ]
+            },
+            {
+                "name": "defaultgripper",
+                "properties": [
+                    "is_empty"
+                ]
+            },
+            {
+                "name": "lampbase",
+                "properties": []
+            },
+            {
+                "name": "lampshade",
+                "properties": []
+            },
+            {
+                "name": "lampbulb",
+                "properties": []
+            },
+            {
+                "name": "left_hand",
+                "properties": []
+            }
+        ],
+        "constraints": [
+            {
+                "source": "clampgripper",
+                "name": "can_manipulate",
+                "target": "lampbulb"
+            },
+            {
+                "source": "outwardgripper",
+                "name": "can_manipulate",
+                "target": "lampshade"
+            },
+            {
+                "source": "lampbulb",
+                "name": "can_screw_to",
+                "target": "lampbase"
+            },
+            {
+                "source": "lampshade",
+                "name": "can_place_to",
+                "target": "lampbulb"
+            }
+        ],
+        "relations": [
+            {
+                "source": "left_hand",
+                "name": "hold",
+                "target": "defaultgripper"
+            }
+        ]
+    },
+    "result": {
+        "summary": "selector to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+        "name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)",
+        "children": [
+            {
+                "summary": "the target is to make the lampbulb be screwed into the lampbase",
+                "name": "target: is_screwed_to(lampbulb, lampbase)"
+            },
+            {
+                "summary": "sequence to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+                "name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)",
+                "children": [
+                    {
+                        "summary": "selector to change tool in left_hand from defaultgripper to clampgripper",
+                        "name": "selector: change_tool(left_hand, defaultgripper, clampgripper)",
+                        "children": [
+                            {
+                                "summary": "the target is to make left_hand hold clampgripper",
+                                "name": "target: hold(left_hand, clampgripper)"
+                            },
+                            {
+                                "summary": "sequence to change tool in left_hand from defaultgripper to clampgripper",
+                                "name": "sequence: change_tool(left_hand, defaultgripper, clampgripper)",
+                                "children": [
+                                    {
+                                        "summary": "a precondition is left_hand is holding defaultgripper",
+                                        "name": "precondition: hold(left_hand, defaultgripper)"
+                                    },
+                                    {
+                                        "summary": "a precondition is defaultgripper is empty",
+                                        "name": "precondition: is_empty(defaultgripper)"
+                                    },
+                                    {
+                                        "summary": "the action to change tool in left_hand from defaultgripper to clampgripper",
+                                        "name": "action: change_tool(left_hand, defaultgripper, clampgripper)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "summary": "selector to pick up the lampbulb with the clampgripper in the left_hand",
+                        "name": "selector: pick_up(left_hand, clampgripper, lampbulb)",
+                        "children": [
+                            {
+                                "summary": "the target is to make the clampgripper hold the lampbulb",
+                                "name": "target: hold(clampgripper, lampbulb)"
+                            },
+                            {
+                                "summary": "sequence to pick up the lampbulb with the clampgripper in the left_hand",
+                                "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)",
+                                "children": [
+                                    {
+                                        "summary": "a precondition is the clampgripper is empty",
+                                        "name": "precondition: is_empty(clampgripper)"
+                                    },
+                                    {
+                                        "summary": "a precondition is the left_hand is holding clampgripper",
+                                        "name": "precondition: hold(left_hand, clampgripper)"
+                                    },
+                                    {
+                                        "summary": "the action to pick up the lampbulb with the clampgripper in the left_hand",
+                                        "name": "action: pick_up(left_hand, clampgripper, lampbulb)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "summary": "the action to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+                        "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"
+                    }
+                ]
+            }
+        ]
+    }
+}

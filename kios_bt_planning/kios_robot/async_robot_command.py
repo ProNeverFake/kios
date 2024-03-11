@@ -1,6 +1,5 @@
 from typing import List, Any
 import time
-import json
 from tabulate import tabulate
 from collections import deque
 import asyncio

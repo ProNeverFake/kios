@@ -20,7 +20,6 @@ class RobotProprioceptor:
     robot_port: int = None
 
     mongodb_interface: MongoDBInterface = None
-    # robot_status: RobotStatus = None
 
     def __init__(self, robot_address: str, robot_port: int):
         if robot_address is not None:
@@ -38,8 +37,6 @@ class RobotProprioceptor:
     def initialize(self):
         pass
         self.mongodb_interface = MongoDBInterface()
-        # self.robot_status = RobotStatus()
-        # self.refresh_robot_status()
 
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")

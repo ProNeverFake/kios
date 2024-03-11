@@ -6,11 +6,11 @@
             "source": "mios"
         },
         {
-            "object_name": "screwbolt",
+            "object_name": "normalpickplace",
             "source": "mios"
         },
         {
-            "object_name": "screwhole",
+            "object_name": "normalcontainer",
             "source": "mios"
         }
     ],

@@ -224,8 +224,6 @@ def pick_test(object_name: str):
         robot_interface=ri,
     )
 
-    # robot_command.add_mios_task(ri.mios_task_factory.generate_gripper_home_mp())
-
     robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
 
     robot_command.execute_task_list_sync()
@@ -470,6 +468,59 @@ def insert_task(part1: str, part2: str):
     robot_command.execute_task_list_sync()
 
 
+def test_insert(location: str):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    param = {
+        "search_a": [2, 2, 0, 0, 0, 0],
+        "search_f": [1, 1, 0, 0, 0, 0],
+        "search_phi": [
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+        ],
+        "F_ext_contact": [8.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [150, 150, 0, 150, 150, 0],
+        "env_X": [0.01, 0.01, -0.004, 0.05, 0.05, 0.05],
+        "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.4],
+    }
+
+    robot_command.add_task(
+        ri.mios_task_factory.generate_insert_mp(
+            insertable="normalbolt",
+            container=location,
+            param=param,
+        )
+    )
+
+    robot_command.execute_task_list_sync()
+
+
+@execution_timer
+def test_drive_in_mp(container: str = "normalcontainer"):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(ri.mios_task_factory.generate_loose_gripper_call())
+    robot_command.add_task(ri.mios_task_factory.generate_drive_in_mp("bolt", container))
+
+    robot_command.execute_task_list_sync()
+
+
 @execution_timer
 def screw_screwbolt():
     robot_command = RobotCommand(
@@ -608,46 +659,6 @@ def insert_outputshaftandgearstage2():
     change_gripper("inwardgripper", "defaultgripper")
 
 
-def push_outputshaftandgearstage2():
-    robot_command = RobotCommand(
-        robot_address="127.0.0.1",
-        robot_port=12000,
-        shared_data=None,
-        task_scene=scene,
-        robot_interface=ri,
-    )
-
-    insert_parsed_action = {
-        "action_name": "insert",
-        "args": [
-            None,
-            None,
-            "outputshaftandgearstage2",
-            "outputshaftandgearstage2push",
-        ],
-    }
-
-    param = {
-        "width": 0.035,
-        "search_a": [1, 1, 0, 2, 2, 40],
-        "search_f": [1, 1, 0, 1, 1, 0.25],
-        "F_ext_contact": [10.0, 2.0],
-        "f_push": [0, 0, 18, 0, 0, 0],
-        "K_x": [500, 500, 0, 800, 800, 70],
-        "D_x": [0.7, 0.7, 1.2, 0.7, 0.7, 1.2],
-    }
-
-    # ! warning: the location of part1 will be refreshed after the insertion!
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_insert_skill_mod(
-            parsed_action=insert_parsed_action,
-            param=param,
-        )
-    )
-
-    robot_command.execute_task_list_sync()
-
-
 @execution_timer
 def insert_ringgear():
     robot_command = RobotCommand(
@@ -754,48 +765,6 @@ def insert_ringgear():
 
 
 @execution_timer
-def insert_designring():
-    robot_command = RobotCommand(
-        robot_address="127.0.0.1",
-        robot_port=12000,
-        shared_data=None,
-        task_scene=scene,
-        robot_interface=ri,
-    )
-
-    pick_up_parsed_action = {
-        "action_name": "pick",  # ! maybe this should be "pick_up"
-        "args": [None, None, "designring"],
-    }
-
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
-    )
-
-    insert_parsed_action = {
-        "action_name": "insert",
-        "args": [None, None, "designring", "designringhole"],
-    }
-
-    param = {
-        "search_a": [12, 12, 1, 2, 2, 0],
-        "search_f": [1, 1, 1, 1.5, 1.5, 0],
-        "F_ext_contact": [10.0, 2.0],
-        "f_push": [0, 0, 10, 0, 0, 0],
-        "K_x": [500, 500, 0, 500, 500, 800],
-    }
-
-    # ! warning: the location of part1 will be refreshed after the insertion!
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_insert_skill_mod(
-            insert_parsed_action, param=param
-        )
-    )
-
-    robot_command.execute_task_list_sync()
-
-
-@execution_timer
 def insert_gearstage1():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
@@ -871,93 +840,6 @@ def insert_gearstage1():
         ri.mios_task_factory.generate_insert_skill_mod(
             parsed_action=insert_parsed_action,
             param=param,
-        )
-    )
-
-    robot_command.execute_task_list_sync()
-
-
-@execution_timer
-def insert_driveflange():
-    robot_command = RobotCommand(
-        robot_address="127.0.0.1",
-        robot_port=12000,
-        shared_data=None,
-        task_scene=scene,
-        robot_interface=ri,
-    )
-
-    pick_up_parsed_action = {
-        "action_name": "pick",  # ! maybe this should be "pick_up"
-        "args": [None, None, "driveflange"],
-    }
-
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
-    )
-
-    insert_parsed_action = {
-        "action_name": "insert",
-        "args": [None, None, "driveflange", "driveflangehole"],
-    }
-
-    param = {
-        "width": 0.08,
-        "search_a": [8, 8, 1, 2, 2, 0],
-        "search_f": [1, 1, 1, 1.5, 1.5, 0],
-        "F_ext_contact": [10.0, 2.0],
-        "f_push": [0, 0, 10, 0, 0, 0],
-        "K_x": [500, 500, 0, 500, 500, 800],
-    }
-
-    # ! warning: the location of part1 will be refreshed after the insertion!
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_insert_skill_mod(
-            insert_parsed_action, param=param
-        )
-    )
-
-    robot_command.execute_task_list_sync()
-
-
-@execution_timer
-def insert_inputpinion():
-    robot_command = RobotCommand(
-        robot_address="127.0.0.1",
-        robot_port=12000,
-        shared_data=None,
-        task_scene=scene,
-        robot_interface=ri,
-    )
-
-    pick_up_parsed_action = {
-        "action_name": "pick",  # ! maybe this should be "pick_up"
-        "args": [None, None, "inputpinion"],
-    }
-
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_pick_up_skill(pick_up_parsed_action)
-    )
-
-    insert_parsed_action = {
-        "action_name": "insert",
-        "args": [None, None, "inputpinion", "inputpinionhole"],
-    }
-
-    param = {
-        "search_a": [3, 3, 0, 2, 2, 20],
-        "search_f": [1.5, 1.5, 0.1, 1.5, 1.5, 0.25],
-        "F_ext_contact": [10.0, 2.0],
-        "f_push": [0, 0, 20, 0, 0, 0],
-        "K_x": [300, 300, 0, 500, 500, 100],
-        "D_x": [0.7, 0.7, 1.2, 0.7, 0.7, 1.2],
-        "env_X": [0.01, 0.01, -0.002, 0.05, 0.05, 0.05],
-    }
-
-    # ! warning: the location of part1 will be refreshed after the insertion!
-    robot_command.add_tasks(
-        ri.mios_task_factory.generate_insert_skill_mod(
-            insert_parsed_action, param=param
         )
     )
 

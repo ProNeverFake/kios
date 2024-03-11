@@ -58,14 +58,8 @@ scene = SceneFactory().create_scene_from_json(scene_json_object)
 ####################### world
 world_interface = WorldInterface()
 with open(world_state_path, "r") as file:
-    world_state_json_object = json.load(file)
-    world_interface.load_world_from_json(world_state_json_object)
-
-from_problem = parse_problem_init(problem=problem)
-objects = parse_problem_objects(problem=problem)
-world_interface.update_world(from_problem)
-
-world_state_json = world_interface.get_world_to_json()
+    world_state_json = json.load(file)
+    world_interface.load_world_from_json(world_state_json)
 
 pprint(world_state_json)
 
@@ -203,7 +197,7 @@ def test_expand_nodes():
     pprint(node_list)
 
 
-def test_baseline():
+def baseline_plan():
     sk = {
         # "summary": "the target is to insert the shaft1 into the gearbase_hole1",
         # "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
@@ -219,8 +213,24 @@ def test_baseline():
     baseline_run(sk, world_state_json)
 
 
+def test_result(problem_id: int):
+    file_dir = os.path.join(current_dir, "baseline_result.jsonl")
+    with open(file_dir, "r") as file:
+        results = file.read()
+        data = [json.loads(line) for line in results.splitlines()]
+    problem = data[problem_id]
+    initial_world_state = problem["initial_world_state"]
+    sk = problem["result"]
+    result, node = behavior_tree_stewardship.sk_sim_run(
+        world_state=initial_world_state, skeleton_json=sk
+    )
+    pprint(result.result)
+    pprint(result.summary)
+
+
 if __name__ == "__main__":
     pass
 
     # test_expand_nodes()
-    test_baseline()
+    # baseline_plan()
+    test_result(15)

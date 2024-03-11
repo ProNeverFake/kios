@@ -4,7 +4,7 @@
 # import py_trees
 
 # import copy
-
+# TODO: abstract the sim methods here later.
 
 # class BTSimulator:
 #     def __init__(

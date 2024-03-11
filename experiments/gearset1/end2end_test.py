@@ -81,6 +81,15 @@ def render_bt(bt_json: dict):
     render_dot_tree(bt_stewardship)
 
 
+def get_problem(problem_id: int) -> dict:
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    problem_dir = os.path.join(
+        file_dir, "problem_set", f"problem_{str(problem_id).zfill(3)}.json"
+    )
+    with open(problem_dir, "r") as file:
+        return json.load(file)
+
+
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))
 scene_path = os.path.join(current_dir, "scene.json")
@@ -802,13 +811,13 @@ e2e_ppt_ppl = PipelinePromptTemplate(
 
 e2e_chain = (
     e2e_ppt_ppl
-    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
     # | ChatOpenAI(
     #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
     #     temperature=0,
     # )
-    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
 
@@ -1076,22 +1085,30 @@ def ut_gen_test():
     render_bt(ut)
 
 
-@traceable(name="e2e_test")
-def e2e_test():
+@traceable(name="e2e_test_baselines")
+def e2e_test(problem_id: int):
+    task = get_problem(problem_id)
     bt = e2e_chain.invoke(
         {
-            "target": "insert the shaft1 into the gearbase_hole1",
-            "initial_state": world_state_json,
+            "target": task["target"],
+            "initial_state": task["initial_world_state"],
         }
     )
 
     result, node = behavior_tree_stewardship.sk_sim_run(
-        world_state_json, bt.get("behavior_tree")
+        task["initial_world_state"],
+        bt.get("behavior_tree"),
     )
+
     pprint(result.to_json())
     pprint(f'LLM thought flow: {bt["thought"]}')
     pprint(f'the action sequence: {bt["action_sequence"]}')
     render_bt(bt.get("behavior_tree"))
+
+
+def e2e_test_baselines():
+    for i in range(17):
+        e2e_test(i)
 
 
 def seq_planner_est_test():
@@ -1313,4 +1330,5 @@ if __name__ == "__main__":
     # test_expand_nodes()
 
     # test_embedding_nl()
-    e2e_test()
+    # e2e_test()
+    e2e_test_baselines()

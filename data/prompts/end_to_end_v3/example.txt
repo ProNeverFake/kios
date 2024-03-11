@@ -30,7 +30,7 @@ OUTPUT:
         "children": [
             {
                 "summary": "check the target that gear1 is inserted to shaft1",
-                "name": "target: is_inserted_to(gear1, shaft1)",
+                "name": "target: is_inserted_to(gear1, shaft1)"
             },
             {
                 "summary": "sequence to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
@@ -38,7 +38,7 @@ OUTPUT:
                 "children": [
                     {
                         "summary": "check the precondition that the left hand is holding the parallel_box1",
-                        "name": "precondition: hold(left_hand, parallel_box1)",
+                        "name": "precondition: hold(left_hand, parallel_box1)"
                     },      
                     {
                         "summary": "selector to pick_up the gear1 with the parallel_box1 in the left hand",
@@ -46,7 +46,7 @@ OUTPUT:
                         "children": [
                             {
                                 "summary": "check the target that the parallel_box1 is holding the gear1",
-                                "name": "target: hold(parallel_box1, gear1)",
+                                "name": "target: hold(parallel_box1, gear1)"
                             },
                             {
                                 "summary": "sequence to pick_up the gear1 with the parallel_box1 in the left hand",
@@ -54,27 +54,27 @@ OUTPUT:
                                 "children": [
                                     {
                                         "summary": "check the precondition that the parallel_box1 is empty",
-                                        "name": "precondition: is_empty(parallel_box1)",
+                                        "name": "precondition: is_empty(parallel_box1)"
                                     },
                                     {
                                         "summary": "check the precondition that the left hand is holding the parallel_box1",
-                                        "name": "precondition: hold(left_hand, parallel_box1)",
+                                        "name": "precondition: hold(left_hand, parallel_box1)"
                                     },
                                     {
                                         "summary": "the action to pick_up the gear1 with the parallel_box1 in the left hand",
-                                        "name": "action: pick_up(left_hand, parallel_box1, gear1)",
-                                    },
-                                ],
-                            },
-                        ],
+                                        "name": "action: pick_up(left_hand, parallel_box1, gear1)"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "summary": "the action to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
                         "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)"
                     }
-                ],
-            },
-        ],
+                ]
+            }
+        ]
     }
 }
 

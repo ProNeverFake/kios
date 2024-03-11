@@ -484,7 +484,7 @@ class BehaviorTreeStewardship:
 
         self.world_interface.record_check_point()
 
-        _, sim_bt = self.behaviortree_factory.from_skeleton_to_behavior_tree(
+        _, sim_bt, _ = self.behaviortree_factory.from_skeleton_to_behavior_tree(
             skeleton_json
         )
         root = sim_bt.root
@@ -500,7 +500,9 @@ class BehaviorTreeStewardship:
 
         return tree_result, skeleton_json
 
-    def sk_baseline(self, world_state: dict, skeleton_json: dict) -> dict:
+    def sk_baseline(
+        self, world_state: dict, skeleton_json: dict, ut_dict: dict
+    ) -> dict:
         """baseline expanding, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
 
 
@@ -514,7 +516,7 @@ class BehaviorTreeStewardship:
         Returns:
             dict: the solution bt sk json.
         """
-        from kios_plan.dynamic_planning import gearset_ut_dict
+
         from pprint import pprint
 
         self.set_world_state(world_state)
@@ -541,11 +543,14 @@ class BehaviorTreeStewardship:
                     )
                 assert isinstance(tip_node, ConditionNode)
                 new_target = tip_node.condition.to_string()
-                new_ut = gearset_ut_dict.get(new_target, None)
+                new_ut = ut_dict.get(new_target, None)
                 if new_ut is None:
                     pprint(f"cannot find a solution ut for the condtiion {new_target}!")
                     pprint("the available targets are:")
-                    pprint(gearset_ut_dict.keys())
+                    pprint(ut_dict.keys())
+                    raise Exception(
+                        f"cannot find a solution ut for the condtiion {new_target}!"
+                    )
                     break
                 _, new_subtree, new_sk_dict = (
                     self.behaviortree_factory.from_skeleton_to_behavior_tree(new_ut)
@@ -560,7 +565,7 @@ class BehaviorTreeStewardship:
                     sim_bt = new_subtree
                 else:
                     sim_bt.replace_subtree(tip_node.id, new_subtree.root)
-                render_dot_tree(sim_bt)
+                # render_dot_tree(sim_bt)
                 # pause = input("paused here! check the tree.")
 
                 sim_bt.setup(timeout=15)
@@ -573,6 +578,7 @@ class BehaviorTreeStewardship:
 
         # * restore world check point
         self.world_interface.restore_check_point("baseline_start")
+        render_dot_tree(sim_bt)
         return self.from_tree_root_to_sk_json(sim_bt.root)
 
     def from_tree_root_to_sk_json(

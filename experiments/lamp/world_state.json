@@ -33,6 +33,14 @@
         "properties": []
       },
       {
+        "name": "cube",
+        "properties": []
+      },
+      {
+        "name": "designring",
+        "properties": []
+      },
+      {
         "name": "left_hand",
         "properties": []
       }
@@ -44,8 +52,9 @@
       {"source": "lampshade", "name": "can_place_to", "target": "lampbulb"}
     ],
     "relations": [
-      {"source": "left_hand", "name": "hold", "target": "defaultgripper"},
-      {"source": "lampbulb", "name": "is_screwed", "target": "lampbase"}
+      {"source": "left_hand", "name": "hold", "target": "inwardgripper"},
+      {"source": "lampbulb", "name": "is_screwed_to", "target": "lampbase"},
+      {"source": "lampshade", "name": "is_placed_to", "target": "lampbulb"}
     ]
 }
 

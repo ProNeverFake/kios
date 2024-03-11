@@ -246,17 +246,54 @@ def create_place(hand: str, tool: str, part1: str, part2: str):
 
 
 gearset_ut_dict: dict[str, dict] = {}
+lamp_ut_dict: dict[str, dict] = {}
+chair_ut_dict: dict[str, dict] = {}
 # * change tool
 # for tool1 in tool_list:
 #     for tool2 in tool_list:
 #         if tool1 != tool2:
 #             target, unit_tree = create_change_tool("left_hand", tool1, tool2)
 #             gearset_ut_dict[target] = unit_tree
-target, unit_tree = create_change_tool("left_hand", "outwardgripper", "clampgripper")
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "parallelgripper")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "parallelgripper")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "parallelgripper")
+# gearset_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "inwardgripper", "parallelgripper")
 gearset_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "clampgripper")
+# gearset_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "defaultgripper", "clampgripper")
+gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "clampgripper")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "clampgripper")
+# gearset_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "outwardgripper")
+# gearset_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "defaultgripper", "outwardgripper")
+gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "outwardgripper")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "outwardgripper")
+# gearset_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "defaultgripper")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "defaultgripper")
+# gearset_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "parallelgripper", "defaultgripper")
+gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "defaultgripper")
+# gearset_ut_dict[target] = unit_tree
 
 # * pick up
 target, unit_tree = create_pick_up("left_hand", "clampgripper", "shaft1")
+gearset_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "defaultgripper", "shaft3")
 gearset_ut_dict[target] = unit_tree
 target, unit_tree = create_pick_up("left_hand", "parallelgripper", "gear1")
 gearset_ut_dict[target] = unit_tree
@@ -264,19 +301,18 @@ target, unit_tree = create_pick_up("left_hand", "outwardgripper", "gear2")
 gearset_ut_dict[target] = unit_tree
 target, unit_tree = create_pick_up("left_hand", "outwardgripper", "gear3")
 gearset_ut_dict[target] = unit_tree
-target, unit_tree = create_pick_up("left_hand", "defaultgripper", "shaft3")
-gearset_ut_dict[target] = unit_tree
+
 # * put down
-target, unit_tree = create_put_down("left_hand", "clampgripper", "shaft1")
-gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "clampgripper", "shaft1")
+# gearset_ut_dict[target] = unit_tree
 target, unit_tree = create_put_down("left_hand", "parallelgripper", "gear1")
 gearset_ut_dict[target] = unit_tree
-target, unit_tree = create_put_down("left_hand", "outwardgripper", "gear2")
-gearset_ut_dict[target] = unit_tree
-target, unit_tree = create_put_down("left_hand", "outwardgripper", "gear3")
-gearset_ut_dict[target] = unit_tree
-target, unit_tree = create_put_down("left_hand", "defaultgripper", "shaft3")
-gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "outwardgripper", "gear2")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "outwardgripper", "gear3")
+# gearset_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "defaultgripper", "shaft3")
+# gearset_ut_dict[target] = unit_tree
 # * insert
 target, unit_tree = create_insert(
     "left_hand", "clampgripper", "shaft1", "gearbase_hole1"
@@ -296,3 +332,172 @@ gearset_ut_dict[target] = unit_tree
 # ! no action
 # * place
 # ! no action
+
+#############################################################################* lamp
+# * change tool
+# for tool1 in tool_list:
+#     for tool2 in tool_list:
+#         if tool1 != tool2:
+#             target, unit_tree = create_change_tool("left_hand", tool1, tool2)
+#             lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "parallelgripper")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "parallelgripper")
+# lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "outwardgripper", "parallelgripper")
+lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "parallelgripper")
+# lamp_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "clampgripper")
+# lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "defaultgripper", "clampgripper")
+lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "clampgripper")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "clampgripper")
+# lamp_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "outwardgripper")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "outwardgripper")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "outwardgripper")
+# lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "inwardgripper", "outwardgripper")
+lamp_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "defaultgripper")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "defaultgripper")
+# lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "parallelgripper", "defaultgripper")
+lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "defaultgripper")
+# lamp_ut_dict[target] = unit_tree
+
+# * pick up
+target, unit_tree = create_pick_up("left_hand", "clampgripper", "lampbulb")
+lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "outwardgripper", "lampshade")
+lamp_ut_dict[target] = unit_tree
+
+
+# * put down
+# target, unit_tree = create_put_down("left_hand", "clampgripper", "lampbulb")
+# lamp_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "outwardgripper", "lampshade")
+# lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_put_down("left_hand", "defaultgripper", "cube")
+lamp_ut_dict[target] = unit_tree
+
+
+# * actions
+target, unit_tree = create_screw("left_hand", "clampgripper", "lampbulb", "lampbase")
+lamp_ut_dict[target] = unit_tree
+target, unit_tree = create_place("left_hand", "outwardgripper", "lampshade", "lampbulb")
+lamp_ut_dict[target] = unit_tree
+
+#############################################################################* chair
+
+# * change tool
+# for tool1 in tool_list:
+#     for tool2 in tool_list:
+#         if tool1 != tool2:
+#             target, unit_tree = create_change_tool("left_hand", tool1, tool2)
+#             chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "parallelgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "parallelgripper")
+# chair_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "outwardgripper", "parallelgripper")
+chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "parallelgripper")
+# chair_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "clampgripper")
+# chair_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "defaultgripper", "clampgripper")
+chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "clampgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "clampgripper")
+# chair_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "outwardgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "outwardgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "outwardgripper")
+# chair_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "inwardgripper", "outwardgripper")
+chair_ut_dict[target] = unit_tree
+
+# target, unit_tree = create_change_tool("left_hand", "clampgripper", "defaultgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "defaultgripper")
+# chair_ut_dict[target] = unit_tree
+target, unit_tree = create_change_tool("left_hand", "parallelgripper", "defaultgripper")
+chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "inwardgripper", "defaultgripper")
+# chair_ut_dict[target] = unit_tree
+
+target, unit_tree = create_change_tool("left_hand", "clampgripper", "inwardgripper")
+chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "outwardgripper", "inwardgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "defaultgripper", "inwardgripper")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_change_tool("left_hand", "parallelgripper", "inwardgripper")
+# chair_ut_dict[target] = unit_tree
+
+# * pick up
+target, unit_tree = create_pick_up("left_hand", "clampgripper", "chairback")
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "inwardgripper", "chairnut1")
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "inwardgripper", "chairnut2")
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "defaultgripper", "chairleg1")
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "defaultgripper", "chairleg2")
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_pick_up("left_hand", "defaultgripper", "chairseat")
+chair_ut_dict[target] = unit_tree
+
+
+# * put down
+# target, unit_tree = create_put_down("left_hand", "clampgripper", "chairback")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "inwardgripper", "chairnut1")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "inwardgripper", "chairnut2")
+# chair_ut_dict[target] = unit_tree
+target, unit_tree = create_put_down("left_hand", "defaultgripper", "chairleg1")
+chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "defaultgripper", "chairleg2")
+# chair_ut_dict[target] = unit_tree
+# target, unit_tree = create_put_down("left_hand", "defaultgripper", "chairseat")
+# chair_ut_dict[target] = unit_tree
+
+
+# * actions
+target, unit_tree = create_screw(
+    "left_hand", "inwardgripper", "chairnut1", "chairseatbolt1"
+)
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_screw(
+    "left_hand", "inwardgripper", "chairnut2", "chairseatbolt2"
+)
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_insert(
+    "left_hand", "clampgripper", "chairback", "chairseatconnector"
+)
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_screw(
+    "left_hand", "defaultgripper", "chairleg1", "chairseatthread1"
+)
+chair_ut_dict[target] = unit_tree
+target, unit_tree = create_screw(
+    "left_hand", "defaultgripper", "chairnut2", "chairseatthread2"
+)

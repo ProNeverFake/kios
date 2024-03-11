@@ -101,6 +101,12 @@ class MiosTaskFactory:
             return self.generate_change_tool_skill(parsed_action)
         elif parsed_action["name"] == "pick_up":
             return self.generate_pick_up_skill(parsed_action)
+        elif parsed_action["name"] == "screw":  # ! mod later
+            return self.generate_screw_skill(parsed_action)
+        elif parsed_action["name"] == "put_down":
+            return self.generate_put_down_skill(parsed_action)
+        elif parsed_action["name"] == "place":
+            return self.generate_place_skill(parsed_action)
         elif parsed_action["name"] == "insert":
             return self.generate_insert_skill(parsed_action)
         else:
@@ -123,6 +129,12 @@ class MiosTaskFactory:
 
     ###################################################################
     # * kios call methods
+    def generate_kios_dummy_call(self) -> KiosCall:
+        return KiosCall(
+            method=print,
+            args=["this is a dummy call from kios!"],
+        )
+
     def generate_update_object_from_mios_call(self, object_name: str) -> KiosCall:
         """update the object in kios from mios.
 
@@ -565,6 +577,22 @@ class MiosTaskFactory:
         task_list.append(update_object_in_kios)
 
         return task_list
+
+    # ! BUG
+    def generate_put_down_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> List[MiosCall | MiosSkill]:
+        return [self.generate_kios_dummy_call()]
+
+    def generate_place_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> List[MiosCall | MiosSkill]:
+        return [self.generate_kios_dummy_call()]
+
+    def generate_screw_skill(
+        self, parsed_action: Dict[str, Any]
+    ) -> List[MiosCall | MiosSkill]:
+        return [self.generate_kios_dummy_call()]
 
     def generate_drive_skill(
         self, parsed_action: Dict[str, Any]

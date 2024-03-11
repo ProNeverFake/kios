@@ -1,5 +1,4 @@
 Follow this workflow to solve the task:
-/////
 1. Read the problem description. Parse the initial state and write into the "initial_state" in the output dictionary.
 2. Interpret the goal of the problem as goal_state and write into the "instruction_summary" in the output dictionary.
 3. Try to solve the problem, achieve the goal_state from the initial_state based on the domain knowledge provided. Generate a action sequence with the actions defined in <ROBOT_ACTION_LIST> and write it into dictionary["task_plan"]["action_sequence"] of the output.

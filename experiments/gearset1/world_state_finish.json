@@ -14,7 +14,7 @@
       },
       {
         "name": "outwardgripper",
-        "properties": []
+        "properties": ["is_empty"]
       },
       {
         "name": "defaultgripper",
@@ -54,14 +54,6 @@
       },
       {
         "name": "gearbase_hole3",
-        "properties": []
-      },
-      {
-        "name": "lampbase",
-        "properties": []
-      },
-      {
-        "name": "chair_leg1",
         "properties": []
       },
       {
@@ -125,9 +117,33 @@
       {
         "source": "left_hand",
         "name": "hold",
-        "target": "outwardgripper"
+        "target": "defaultgripper"
       },
-      {"source": "outwardgripper", "name": "hold", "target": "gear3"}
+      {
+        "source": "shaft1",
+        "name": "is_inserted_to",
+        "target": "gearbase_hole1"
+      },
+      {
+        "source": "shaft3",
+        "name": "is_inserted_to",
+        "target": "gearbase_hole3"
+      },
+      {
+        "source": "gear2",
+        "name": "is_inserted_to",
+        "target": "shaft2"
+      },
+      {
+        "source": "gear1",
+        "name": "is_inserted_to",
+        "target": "shaft1"
+      },
+      {
+        "source": "gear3",
+        "name": "is_inserted_to",
+        "target": "shaft3"
+      }
     ]
 }
 

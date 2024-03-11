@@ -16,66 +16,70 @@
             "source": "mios"
         },
         {
-            "object_name": "inward_claw",
+            "object_name": "inwardgripper",
             "source": "mios"
         },
         {
-            "object_name": "outward_claw",
+            "object_name": "outwardgripper",
             "source": "mios"
         },
         {
-            "object_name": "parallel_box1",
+            "object_name": "clampgripper",
             "source": "mios"
         },
         {
-            "object_name": "parallel_box2",
+            "object_name": "parallelgripper",
             "source": "mios"
         },
         {
-            "object_name": "no_tool",
+            "object_name": "defaultgripper",
             "source": "mios"
         },
         {
-            "object_name": "gear1",
+            "object_name": "chairback",
             "source": "mios"
         },
         {
-            "object_name": "gear2",
+            "object_name": "chairleg1",
             "source": "mios"
         },
         {
-            "object_name": "gear3",
+            "object_name": "chairleg2",
             "source": "mios"
         },
         {
-            "object_name": "shaft1",
+            "object_name": "chairnut1",
             "source": "mios"
         },
         {
-            "object_name": "shaft2",
+            "object_name": "chairnut2",
             "source": "mios"
         },
         {
-            "object_name": "shaft3",
+            "object_name": "chairseat",
             "source": "mios"
         },
         {
-            "object_name": "gearbase",
+            "object_name": "chairseatthread1",
             "source": "mios"
         },
         {
-            "object_name": "gearbase_hole1",
+            "object_name":"chairseatthread2",
             "source": "mios"
         },
         {
-            "object_name": "gearbase_hole3",
+            "object_name": "chairseatbolt1",
+            "source": "mios"
+        },
+        {
+            "object_name": "chairseatbolt2",
             "source": "mios"
         }
     ],
     "tools": 
     [
         {
-            "tool_name": "parallel_box1",
+            "tool_name": "clampgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -88,7 +92,7 @@
             "unload_width": 0.08
         },
         {
-            "tool_name": "parallel_box2",
+            "tool_name": "parallelgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -101,7 +105,7 @@
             "unload_width": 0.08
         },
         {
-            "tool_name": "inward_claw",
+            "tool_name": "inwardgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -114,7 +118,7 @@
             "unload_width": 0.08
         },
         {
-            "tool_name": "outward_claw",
+            "tool_name": "outwardgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
@@ -127,11 +131,11 @@
             "unload_width": 0.08
         },
         {
-            "tool_name": "no_tool",
+            "tool_name": "defaultgripper",
             "EE_T_TCP": [
                 [1, 0, 0, 0.0],
                 [0, 1, 0, 0.0],
-                [0, 0, 1, 0.0],
+                [0, 0, 1, 0.025],
                 [0, 0, 0, 1]
             ],
             "EE_finger_width_max": 0.08,

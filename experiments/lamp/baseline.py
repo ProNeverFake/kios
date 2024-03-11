@@ -46,8 +46,8 @@ problem_path = os.path.join(current_dir, "gearset.problem")
 domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
 
 ####################### problem
-with open(problem_path, "r") as file:
-    problem = file.read()
+# with open(problem_path, "r") as file:
+#     problem = file.read()
 
 ####################### scene
 with open(scene_path, "r") as file:
@@ -58,14 +58,9 @@ scene = SceneFactory().create_scene_from_json(scene_json_object)
 ####################### world
 world_interface = WorldInterface()
 with open(world_state_path, "r") as file:
-    world_state_json_object = json.load(file)
-    world_interface.load_world_from_json(world_state_json_object)
+    world_state_json = json.load(file)
+    world_interface.load_world_from_json(world_state_json)
 
-from_problem = parse_problem_init(problem=problem)
-objects = parse_problem_objects(problem=problem)
-world_interface.update_world(from_problem)
-
-world_state_json = world_interface.get_world_to_json()
 
 pprint(world_state_json)
 
@@ -96,13 +91,11 @@ def baseline_run(tree_root: dict, world_state: dict):
     sk_json = tree_root
     initial_world_state = world_state
 
-    from kios_plan.dynamic_planning import gearset_ut_dict
-
     # * first sim run
+    from kios_plan.dynamic_planning import lamp_ut_dict
+
     solultion = behavior_tree_stewardship.sk_baseline(
-        initial_world_state,
-        sk_json,
-        gearset_ut_dict,
+        initial_world_state, sk_json, lamp_ut_dict
     )
     record = {
         "target": sk_json["name"],
@@ -183,21 +176,15 @@ def test_expand_nodes():
     start_state = world_state_json
     node_list = [
         {
-            "summary": "insert shaft1 into gearbase hole1",
-            "name": "target: insert shaft1 into gearbase hole1",
+            "summary": "screw the lampbulb into the lampbase",
+            "name": "target: screw the lampbulb into the lampbase",
         }
     ]
     # node_list = [
     #     {
-    #         "summary": "insert gear2 into shaft2",
-    #         "name": "target: insert gear2 into shaft2",
+    #         "summary": "place the lampbulb onto the lampbulb",
+    #         "name": "target: place the lampshade onto the lampbulb",
     #     }
-    # ]
-    # node_list = [
-    #     {
-    #         "summary": "pick up the shaft1",
-    #         "name": "target: pick up the shaft1",
-    #     },
     # ]
     expand_nodes(node_list, start_state, node_list)
     pprint(node_list)
@@ -205,16 +192,10 @@ def test_expand_nodes():
 
 def test_baseline():
     sk = {
-        # "summary": "the target is to insert the shaft1 into the gearbase_hole1",
-        # "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
-        # "summary": "the target is to insert the shaft3 into the gearbase_hole3",
-        # "name": "target: is_inserted_to(shaft3, gearbase_hole3)",
-        # "summary": "the target is to insert the gear2 into the shaft2",
-        # "name": "target: is_inserted_to(gear2, shaft2)",
-        # "summary": "the target is to insert gear3 into shaft3",
-        # "name": "target: is_inserted_to(gear3, shaft3)",
-        "summary": "the target is to insert gear1 to shaft1",
-        "name": "target: is_inserted_to(gear1, shaft1)",
+        "summary": "the target is to place the lampshade onto the lampbulb",
+        "name": "target: is_placed_to(lampshade, lampbulb)",
+        # "summary": "the target is to screw the lampbulb into the lampbase",
+        # "name": "target: is_screwed_to(lampbulb, lampbase)",
     }
     baseline_run(sk, world_state_json)
 

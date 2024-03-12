@@ -228,6 +228,20 @@ def pick_test(object_name: str):
 
     robot_command.execute_task_list_sync()
 
+def grasp():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(ri.mios_task_factory.generate_gripper_grasp_mp())
+
+    robot_command.execute_task_list_sync()
+
+
 
 def move_gripper(width: float):
     robot_command = RobotCommand(

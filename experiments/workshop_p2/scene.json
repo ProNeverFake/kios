@@ -12,6 +12,14 @@
         {
             "object_name": "normalcontainer",
             "source": "mios"
+        },
+        {
+            "object_name": "p1_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p1_sp2",
+            "source": "mios"
         }
     ],
     "tools": 

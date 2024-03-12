@@ -28,6 +28,14 @@
         {
             "object_name": "p3_sp1",
             "source": "mios"
+        },
+        {
+            "object_name": "p4_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_sp2",
+            "source": "mios"
         }
     ],
     "tools": 

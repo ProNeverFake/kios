@@ -2,6 +2,7 @@
 numpy
 websockets
 tabulate
+python-dotenv
 
 # behavior tree
 py_trees==2.2.3
@@ -21,6 +22,9 @@ openai # you may need to upgrade this after installing it
 tiktoken
 cohere
 langchain
+langchain-openai
+langgraph
+
 
 # robotics 
 roboticstoolbox-python

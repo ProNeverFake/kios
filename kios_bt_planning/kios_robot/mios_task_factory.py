@@ -789,8 +789,8 @@ class MiosTaskFactory:
                         "K_x": [1500, 1500, 0, 600, 600, 600],
                         "dq_max": 1,
                         "ddq_max": 0.8,
-                        "tighten_torque": 60,
-                        "f_push": [0, 0, 1, 0, 0, 0],
+                        "tighten_torque": 1.5,
+                        "f_push": [0, 0, 8, 0, 0, 0],
                     },
                     "p1": {
                         "K_x": [500, 500, 500, 600, 600, 600],
@@ -818,6 +818,54 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
+    # def generate_drive_out_mp(self, drivable, container) -> MiosSkill:
+
+    #     if container is None:
+    #         raise Exception("container is not set!")
+
+    #     # get the container from the scene
+    #     kios_object = self.task_scene.get_object(container)
+    #     if kios_object is not None:
+    #         payload = {
+    #             "skill": {
+    #                 "objects": {
+    #                     # "Container": container,
+    #                 },
+    #                 # "time_max": 60,
+    #                 "p0": {
+    #                     "K_x": [1500, 1500, 0, 600, 600, 600],
+    #                     "dq_max": 1,
+    #                     "ddq_max": 0.8,
+    #                     "limit_tighten_torque": 60,
+    #                     "f_pull": [0, 0, 8, 0, 0, 0],
+    #                     "z_offset": 0.05,
+    #                 },
+    #                 "p1": {
+    #                     "K_x": [500, 500, 500, 600, 600, 600],
+    #                 },
+    #                 "p2": {
+    #                     "K_x": [500, 500, 500, 800, 800, 800],
+    #                     "dq_max": 1,
+    #                     "ddq_max": 1.0,
+    #                 },
+    #                 "p3": {
+    #                     "grasp_force": 30,
+    #                     "K_x": [500, 500, 500, 800, 800, 800],
+    #                 },
+    #             },
+    #             "control": {"control_mode": 1},
+    #             "user": {
+    #                 "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+    #                 "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+    #             },
+    #         }
+
+    #     return MiosSkill(
+    #         skill_name="driveout",
+    #         skill_type="KiosDriveOut",
+    #         skill_parameters=payload,
+    #     )
+
     def generate_drive_out_mp(self, drivable, container) -> MiosSkill:
 
         if container is None:
@@ -833,9 +881,11 @@ class MiosTaskFactory:
                     },
                     # "time_max": 60,
                     "p0": {
-                        "K_x": [1500, 1500, 0, 600, 600, 600],
-                        "dq_max": 1,
-                        "ddq_max": 0.8,
+                        "K_x": [1500, 1500, 3, 600, 600, 0.5],
+                        "D_x": [0.7, 0.7, 0.7, 0.7, 0.7, 1000],
+                        # "dX_max": 0.3,
+                        # "ddX_max": 0.3,
+                        "f_drive": [0, 0, 0, 0, 0, 1],
                         "limit_tighten_torque": 60,
                         "f_pull": [0, 0, 8, 0, 0, 0],
                         "z_offset": 0.05,
@@ -845,15 +895,15 @@ class MiosTaskFactory:
                     },
                     "p2": {
                         "K_x": [500, 500, 500, 800, 800, 800],
-                        "dq_max": 1,
-                        "ddq_max": 1.0,
+                        "dX_max": [0.1, 0.3],
+                        "ddX_max": [0.5, 1],
                     },
                     "p3": {
                         "grasp_force": 30,
                         "K_x": [500, 500, 500, 800, 800, 800],
                     },
                 },
-                "control": {"control_mode": 1},
+                "control": {"control_mode": 0},
                 "user": {
                     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
                     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
@@ -1249,7 +1299,7 @@ class MiosTaskFactory:
         )
         f_push = param["f_push"] if "f_push" in param.keys() else [0, 0, 5, 0, 0, 0]
         K_x = param["K_x"] if "K_x" in param.keys() else [300, 300, 500, 500, 500, 800]
-        D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 0.7, 0.7, 0.7]
+        D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 1.4, 1.4, 1.4]
 
         if kios_object is not None:
             print(f'object "{container}" is found in the scene!')
@@ -1262,14 +1312,14 @@ class MiosTaskFactory:
                     "time_max": 25,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.05, 0.3],
+                        "dX_d": [0.3, 0.5],
                         "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.05, 0.1],
-                        "ddX_d": [0.1, 0.05],
+                        "dX_d": [0.15, 0.5],
+                        "ddX_d": [0.2, 0.05],
                         "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {

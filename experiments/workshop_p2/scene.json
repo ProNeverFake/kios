@@ -20,6 +20,70 @@
         {
             "object_name": "p1_sp2",
             "source": "mios"
+        },
+        {
+            "object_name": "p2_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p3_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_sp2",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition1",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition2",
+            "source":"mios"
+        },
+        {
+            "object_name": "initialposition3",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition4",
+            "source": "mios"
+        },
+        {
+            "object_name": "p1_n1",
+            "source":"mios"
+        },
+        {
+            "object_name": "p2_n1",
+            "source":"mios"
+        },
+        {
+            "object_name": "p3_n1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_n1",
+            "source": "mios"
+        },
+        {
+            "object_name": "shaft1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear2",
+            "source":"mios"
+        },
+        {
+            "object_name": "shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "gear1",
+            "source":"mios"
         }
     ],
     "tools": 

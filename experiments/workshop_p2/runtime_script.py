@@ -593,7 +593,25 @@ def n3_task():
 
     task_list.append(ri.mios_task_factory.generate_move_above_mp("gear2"))
 
-    task_list.append(ri.mios_task_factory.generate_insert_mp("gear2", "p3_n1"))
+    p1 = {
+        "search_a": [5, 5, 0, 0, 0, 0],
+        "search_f": [2, 2, 0, 0, 0, 0],
+        "search_phi": [
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+        ],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [100, 100, 0, 800, 800, 800],
+        "env_X": [0.01, 0.01, -0.004, 0.05, 0.05, 0.05],
+        # "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.4],
+    }
+
+    task_list.append(ri.mios_task_factory.generate_insert_mp("gear2", "p3_n1", p1))
 
     task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
 

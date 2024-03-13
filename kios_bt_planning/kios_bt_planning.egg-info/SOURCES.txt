@@ -25,13 +25,17 @@ kios_bt_planning.egg-info/requires.txt
 kios_bt_planning.egg-info/top_level.txt
 kios_domain/__init__.py
 kios_domain/domain copy.py
-kios_domain/domain.py
-kios_domain/knowledge.py
+kios_domain/domain_v0.py
+kios_domain/domain_v1.py
+kios_domain/knowledge_v0.py
+kios_domain/knowledge_v1.py
 kios_domain/pddl_interface.py
 kios_domain/problem1.py
 kios_domain/problem2.py
 kios_domain/problem3.py
 kios_domain/problem4.py
+kios_future/__init__.py
+kios_future/embeddings.py
 kios_robot/__init__.py
 kios_robot/async_robot_command.py
 kios_robot/data_types.py
@@ -46,7 +50,9 @@ kios_scene/mios_ltm_manipulator.py
 kios_scene/mongodb_interface.py
 kios_scene/scene_factory.py
 kios_utils/__init__.py
+kios_utils/bblab_utils.py
 kios_utils/math_utils.py
+kios_utils/parsers.py
 kios_utils/pddl_problem_parser.py
 kios_utils/pybt_test.py
 kios_utils/skeleton_parser.py

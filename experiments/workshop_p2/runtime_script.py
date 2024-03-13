@@ -228,6 +228,20 @@ def pick_test(object_name: str):
 
     robot_command.execute_task_list_sync()
 
+def grasp():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    robot_command.add_task(ri.mios_task_factory.generate_gripper_grasp_mp())
+
+    robot_command.execute_task_list_sync()
+
+
 
 def move_gripper(width: float):
     robot_command = RobotCommand(
@@ -468,7 +482,7 @@ def insert_task(part1: str, part2: str):
     robot_command.execute_task_list_sync()
 
 
-def test_insert(location: str):
+def insert_test(location: str):
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
         robot_port=12000,
@@ -477,7 +491,7 @@ def test_insert(location: str):
         robot_interface=ri,
     )
     param = {
-        "search_a": [2, 2, 0, 0, 0, 0],
+        "search_a": [3, 3, 0, 0, 0, 0],
         "search_f": [1, 1, 0, 0, 0, 0],
         "search_phi": [
             0,
@@ -515,8 +529,26 @@ def test_drive_in_mp(container: str = "normalcontainer"):
         robot_interface=ri,
     )
 
-    robot_command.add_task(ri.mios_task_factory.generate_loose_gripper_call())
+    # robot_command.add_task(ri.mios_task_factory.generate_loose_gripper_call())
     robot_command.add_task(ri.mios_task_factory.generate_drive_in_mp("bolt", container))
+
+    robot_command.execute_task_list_sync()
+
+
+@execution_timer
+def test_drive_out_mp(container: str = "normalcontainer"):
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    # robot_command.add_task(ri.mios_task_factory.generate_loose_gripper_call())
+    robot_command.add_task(
+        ri.mios_task_factory.generate_drive_out_mp("bolt", container)
+    )
 
     robot_command.execute_task_list_sync()
 

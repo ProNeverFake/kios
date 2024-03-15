@@ -637,7 +637,7 @@ def n3_task():
 
     robot_command.execute_task_list_sync()
 
-
+@execution_timer
 def n4_task():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
@@ -659,7 +659,27 @@ def n4_task():
 
     task_list.append(ri.mios_task_factory.generate_move_above_mp("gear1"))
 
-    task_list.append(ri.mios_task_factory.generate_insert_mp("gear1", "p4_n1"))
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("p4_n1_above"))
+
+    p1 = {
+        "search_a": [5, 5, 0, 1, 1, 8],
+        "search_f": [2, 2, 0, 1, 1, 1],
+        "search_phi": [
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+        ],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 10, 0, 0, 0],
+        "K_x": [100, 100, 0, 800, 800, 150],
+        "env_X": [0.01, 0.01, -0.008, 0.05, 0.05, 0.05],
+        # "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.4],
+    }
+
+    task_list.append(ri.mios_task_factory.generate_insert_mp("gear1", "p4_n1", p1))
 
     task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
 
@@ -780,3 +800,10 @@ def n2_task():
     robot_command.add_tasks(task_list)
 
     robot_command.execute_task_list_sync()
+
+def n4_loop():
+    while True:
+        n4_task()
+
+# n 51.353612255999906
+# sp 

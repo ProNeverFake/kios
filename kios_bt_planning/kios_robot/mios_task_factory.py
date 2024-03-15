@@ -228,8 +228,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.03, 0.4],
-                        "ddX_d": [0.05, 0.8],
+                        "dX_d": [0.25, 0.4],
+                        "ddX_d": [0.1, 0.8],
                         "K_x": [1500, 1500, 1000, 150, 150, 150],
                     },
                     "objects": {"GoalPose": object_name},
@@ -240,7 +240,7 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.5, 0.4],
+                        "dX_d": [0.25, 0.4],
                         "ddX_d": [0.3, 0.8],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),  # ! TTEE IS ACTUALLY O_T_TCP!
@@ -1309,16 +1309,16 @@ class MiosTaskFactory:
                     "objects": {
                         # "Container": container,
                     },
-                    "time_max": 25,
+                    "time_max": 60,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.3, 0.5],
+                        "dX_d": [0.15, 0.5],
                         "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.15, 0.5],
+                        "dX_d": [0.08, 0.5],
                         "ddX_d": [0.2, 0.05],
                         "K_x": [1500, 1500, 500, 800, 800, 800],
                     },

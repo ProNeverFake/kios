@@ -84,6 +84,18 @@
         {
             "object_name": "gear1",
             "source":"mios"
+        },
+        {
+            "object_name": "observe",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft1",
+            "source":"mios"
         }
     ],
     "tools": 

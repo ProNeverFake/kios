@@ -14,6 +14,8 @@ from kios_scene.scene_factory import SceneFactory
 from kios_scene.mios_ltm_manipulator import LangTermMemoryManipulator
 from kios_utils.bblab_utils import execution_timer
 import socket
+from anran_tag.apriltag_rs import apriltag_rs
+import threading
 
 ri = RobotInterface()
 sf = SceneFactory()
@@ -88,7 +90,7 @@ def update_mios_memory_environment():
 
 
 def get_object(object: str):
-    ri.proprioceptor.get_object(object)
+    return scene.get_object(object)
 
 
 def set_tool(toolbox_name: str):
@@ -320,13 +322,17 @@ def cartesian_move_T():
         ]
     )
 
+    thread = threading.Thread(target=apriltag_rs)
+    thread.start()
+
     cam_T_mark = get_mark()
-    from pprint import pprint
 
-    pprint(cam_T_mark)
-    pause = input("pause")
+    O_T_obj = robot_state.O_T_TCP @ EE_T_cam @ cam_T_mark
 
-    O_T_TCP_g = robot_state.O_T_TCP @ EE_T_cam @ cam_T_mark
+    O_T_TCP_g = robot_state.O_T_TCP
+
+    O_T_TCP_g[0][3] = O_T_obj[0][3]
+    O_T_TCP_g[1][3] = O_T_obj[1][3]
 
     robot_command.add_task(
         ri.mios_task_factory.generate_cartesian_move_mp(
@@ -334,6 +340,8 @@ def cartesian_move_T():
         ),
     )
     robot_command.execute_task_list_sync()
+
+    thread.join()
 
 
 def joint_move(object: str):
@@ -705,7 +713,7 @@ def n4_task():
 
     robot_command.execute_task_list_sync()
 
-
+@execution_timer
 def n1_task():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
@@ -727,7 +735,25 @@ def n1_task():
 
     task_list.append(ri.mios_task_factory.generate_move_above_mp("shaft1"))
 
-    task_list.append(ri.mios_task_factory.generate_insert_mp("shaft1", "p1_n1"))
+    p1 = {
+        "search_a": [5, 5, 0, 0, 0, 0],
+        "search_f": [2, 2, 0, 0, 0, 0],
+        "search_phi": [
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+        ],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [100, 100, 0, 800, 800, 800],
+        "env_X": [0.01, 0.01, -0.004, 0.05, 0.05, 0.05],
+        # "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.4],
+    }
+
+    task_list.append(ri.mios_task_factory.generate_insert_mp("shaft1", "p1_n1", p1))
 
     task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
 
@@ -739,11 +765,16 @@ def n1_task():
 
     task_list.append(ri.mios_task_factory.generate_move_above_mp("p1_n1"))
 
-    task_list.append(ri.mios_task_factory.generate_insert_mp("", "shaft1"))
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("shaft1"))
+
+
+    task_list.append(ri.mios_task_factory.generate_reach_mp("shaft1"))
+
+    # task_list.append(ri.mios_task_factory.generate_insert_mp("", "shaft1"))
 
     task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
 
-    task_list.append(ri.mios_task_factory.generate_move_above_mp("gear1"))
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("shaft1"))
 
     task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
 
@@ -807,3 +838,137 @@ def n4_loop():
 
 # n 51.353612255999906
 # sp 
+def n1_loop():
+    while(True):
+        n1_task()
+
+@execution_timer
+def n1_sp():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        task_scene=scene,
+        shared_data=None,
+        robot_interface=ri,
+    )
+
+    task_list = []
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("sp_shaft1"))
+
+    task_list.append(ri.mios_task_factory.generate_reach_mp("sp_shaft1"))
+
+    task_list.append(ri.mios_task_factory.generate_gripper_grasp_mp())
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("sp_shaft1"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("observe"))
+
+    robot_command.add_tasks(task_list)
+
+    robot_command.execute_task_list_sync()
+
+    # * clear all tasks
+
+    robot_command.clear_tasks()
+
+    task_list = []
+
+    # * p1_sp1
+
+    robot_state = ri.proprioceptor.get_robot_state()
+
+    EE_T_cam = np.array(
+        [
+            [0.0, -1.0, 0.0, 0.0514976],
+            [1.0, 0.0, 0.0, -0.0375164],
+            [0.0, 0.0, 1.0, -0.0467639],
+            [0.0, 0.0, 0.0, 1.0],
+        ]
+    )
+    thread = threading.Thread(target=apriltag_rs)
+    thread.start()
+
+    cam_T_mark = get_mark()
+
+    thread.join()
+
+    O_T_obj = robot_state.O_T_TCP @ EE_T_cam @ cam_T_mark
+
+    p1_sp1 = get_object("p1_sp1")
+
+    p1_sp2 = get_object("p1_sp2")
+
+    p1_sp1.O_T_TCP[0][3] = O_T_obj[0][3]-0.145
+
+    p1_sp1.O_T_TCP[1][3] = O_T_obj[1][3] + 0.045
+
+    p1_sp2.O_T_TCP[0][3] = O_T_obj[0][3] - 0.04
+
+    p1_sp2.O_T_TCP[1][3] = O_T_obj[1][3]-0.085
+
+    p1 = {
+        "search_a": [8, 8, 0, 0, 0, 0],
+        "search_f": [1, 1, 0, 0, 0, 0],
+        "search_phi": [
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+            0,
+            3.14159265358979323846 / 2,
+        ],
+        "F_ext_contact": [10.0, 2.0],
+        "f_push": [0, 0, 8, 0, 0, 0],
+        "K_x": [500, 500, 0, 800, 800, 800],
+        "env_X": [0.04, 0.04, -0.004, 0.05, 0.05, 0.05],
+        # "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.4],
+    }
+
+    task_list.append(ri.mios_task_factory.generate_insert_mp("sp_shaft1", "p1_sp1", p1))
+
+    task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("p1_sp1"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
+
+    # * p1_sp2
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("sp_shaft2"))
+
+    task_list.append(ri.mios_task_factory.generate_reach_mp("sp_shaft2"))
+
+    task_list.append(ri.mios_task_factory.generate_gripper_grasp_mp())
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("sp_shaft2"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("observe"))
+
+    task_list.append(ri.mios_task_factory.generate_insert_mp("sp_shaft2", "p1_sp2", p1))
+
+    task_list.append(ri.mios_task_factory.generate_gripper_move_mp(0.08))
+
+    task_list.append(ri.mios_task_factory.generate_move_above_mp("p1_sp2"))
+
+    task_list.append(ri.mios_task_factory.generate_joint_move_mp("initialposition1"))
+
+    robot_command.add_tasks(task_list)
+
+    robot_command.execute_task_list_sync()
+
+
+if __name__ == "__main__":
+    pass
+    # apriltag_rs()
+    # cartesian_move_T()
+    n1_sp()
+
+# n 44.29451922999942
+# sp 79.95160165699781

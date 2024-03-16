@@ -26,6 +26,10 @@
             "source": "mios"
         },
         {
+            "object_name": "p2_sp1_above",
+            "source": "mios"
+        },
+        {
             "object_name": "p3_sp1",
             "source": "mios"
         },
@@ -62,6 +66,10 @@
             "source":"mios"
         },
         {
+            "object_name": "p2_n2",
+            "source":"mios"
+        },
+        {
             "object_name": "p3_n1",
             "source": "mios"
         },
@@ -79,6 +87,14 @@
         },
         {
             "object_name": "shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2_above",
             "source":"mios"
         },
         {

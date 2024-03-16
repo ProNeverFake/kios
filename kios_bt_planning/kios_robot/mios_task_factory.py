@@ -206,7 +206,7 @@ class MiosTaskFactory:
         return self.generate_cartesian_move_mp(O_T_TCP=object_O_T_TCP)
 
     def generate_cartesian_move_mp(
-        self, object_name: str = None, O_T_TCP: np.ndarray = None
+        self, object_name: str = None, O_T_TCP: np.ndarray = None, dx_d=None, ddx_d=None
     ) -> MiosSkill:
         """make the TCP of the robot move to the pose defined by the mios object or the O_T_TCP.
         IMPORTANT: Here the robot is asked to move to the TCP pose.
@@ -228,8 +228,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.03, 0.4],
-                        "ddX_d": [0.05, 0.8],
+                        "dX_d": dx_d if dx_d is not None else [0.1, 1],
+                        "ddX_d": ddx_d if ddx_d is not None else [0.5, 1],
                         "K_x": [1500, 1500, 1000, 150, 150, 150],
                     },
                     "objects": {"GoalPose": object_name},
@@ -240,8 +240,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.5, 0.4],
-                        "ddX_d": [0.3, 0.8],
+                        "dX_d": dx_d if dx_d is not None else [0.5, 1],
+                        "ddX_d": ddx_d if ddx_d is not None else [0.3, 1],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),  # ! TTEE IS ACTUALLY O_T_TCP!
                     },
@@ -1318,8 +1318,8 @@ class MiosTaskFactory:
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.15, 0.5],
-                        "ddX_d": [0.2, 0.05],
+                        "dX_d": [0.05, 0.5],
+                        "ddX_d": [0.1, 0.05],
                         "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {

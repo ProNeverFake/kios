@@ -990,8 +990,8 @@ class MiosTaskFactory:
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [2, 2, 1, 1, 1, 0],
-                        "search_f": [1, 1, 1, 1.5, 1.5, 0],
+                        "search_a": [4, 4, 0, 1, 1, 0],
+                        "search_f": [1, 1, 0, 1.5, 1.5, 0],
                         "search_phi": [
                             0,
                             3.14159265358979323846 / 2,
@@ -1309,10 +1309,10 @@ class MiosTaskFactory:
                     "objects": {
                         # "Container": container,
                     },
-                    "time_max": 25,
+                    "time_max": 60,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.3, 0.5],
+                        "dX_d": [0.15, 0.5],
                         "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],

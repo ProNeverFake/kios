@@ -228,8 +228,8 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.03, 0.4],
-                        "ddX_d": [0.05, 0.8],
+                        "dX_d": [0.25, 0.4],
+                        "ddX_d": [0.1, 0.8],
                         "K_x": [1500, 1500, 1000, 150, 150, 150],
                     },
                     "objects": {"GoalPose": object_name},
@@ -240,7 +240,7 @@ class MiosTaskFactory:
             context = {
                 "skill": {
                     "p0": {
-                        "dX_d": [0.5, 0.4],
+                        "dX_d": [0.25, 0.4],
                         "ddX_d": [0.3, 0.8],
                         "K_x": [1500, 1500, 1500, 150, 150, 150],
                         "T_T_EE_g": O_T_TCP.T.flatten().tolist(),  # ! TTEE IS ACTUALLY O_T_TCP!
@@ -990,8 +990,8 @@ class MiosTaskFactory:
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [2, 2, 1, 1, 1, 0],
-                        "search_f": [1, 1, 1, 1.5, 1.5, 0],
+                        "search_a": [4, 4, 0, 1, 1, 0],
+                        "search_f": [1, 1, 0, 1.5, 1.5, 0],
                         "search_phi": [
                             0,
                             3.14159265358979323846 / 2,
@@ -1299,7 +1299,7 @@ class MiosTaskFactory:
         )
         f_push = param["f_push"] if "f_push" in param.keys() else [0, 0, 5, 0, 0, 0]
         K_x = param["K_x"] if "K_x" in param.keys() else [300, 300, 500, 500, 500, 800]
-        D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 0.7, 0.7, 0.7]
+        D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 1.4, 1.4, 1.4]
 
         if kios_object is not None:
             print(f'object "{container}" is found in the scene!')
@@ -1309,17 +1309,17 @@ class MiosTaskFactory:
                     "objects": {
                         # "Container": container,
                     },
-                    "time_max": 25,
+                    "time_max": 60,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.05, 0.3],
+                        "dX_d": [0.15, 0.5],
                         "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.05, 0.1],
-                        "ddX_d": [0.1, 0.05],
+                        "dX_d": [0.08, 0.5],
+                        "ddX_d": [0.2, 0.05],
                         "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {

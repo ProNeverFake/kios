@@ -22,7 +22,7 @@ def execution_timer(func):
         start = time.perf_counter()
         func(*args, **kwargs)
         end = time.perf_counter()
-        # print(f"Execution time: {end - start} seconds")
+        print(f"Execution time: {end - start} seconds")
         execution_duration = end - start
         return execution_duration
 

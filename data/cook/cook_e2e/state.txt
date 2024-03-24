@@ -1,0 +1,6 @@
+Information about world states should be in json dictionary format.
+It contains three lists: 
+    - objects: the objects and their properties (as lists of strings) in the world. The properties can be changed by robot actions.
+    - constraints: the constraint relations that are enforced and should not be changed. They are knowledge about the world or some constraints set by the user.
+    - relations: the relations in the world. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in the domain knowledge.

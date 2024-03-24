@@ -1,0 +1,40 @@
+Following is the domain knowledge you need, which includes:
+- the object types in the world,
+- the predicates for describing the states of the world,
+- the actions that the robot can apply, with their precondtions and effects defined.
+
+The object types are explained as follows:
+"""
+thing: The base class for all objects in the world. Its subclasses are: hand, utensil, food.
+hand: The robot hand. A empty <hand> can only hold one <utensil> at a time.
+utensil: The utensil to contain, handle and cook <food>.
+food: The food to be handled and cooked.
+"""
+
+The precidates are explained as follows:
+"""
+"PREDICATE_LIST"
+- is_empty(<tool>): <tool> is empty and can hold something.
+- can_manipulate(<tool>, <part>): <tool> can be used to manipulate <part> (manipulation constraint). This regulates the compatibility between <tool> and <part>.
+- can_insert_to(<part1>, <part2>): <part1> can be inserted into <part2> (insertion assembly constraint)
+- hold(<hand>, <thing2>): <hand> is holding <thing2>. It can be <hand> holding <tool> or <tool> holding <part>.
+- is_inserted_to(<part1>, <part2>): <part1> is inserted into <part2> (insertion assembly constraint is satisfied)
+"""
+
+The actions are explained as follows:
+"""
+"ROBOT_ACTION_LIST"
+- pick_up(<hand>, <tool>, <part>): <hand> use <tool> to pick up <part>. As preconditions, <hand> should be holding <tool> and <tool> should be empty in order to hold the <part>. The <part> will be held by the <tool> as a result of this action.
+- put_down(<hand>, <tool>, <part>): <hand> use <tool> to put down <part>. As preconditions, <hand> should be holding <tool> and <tool> should be holding <part>. The target is to make the tool <tool> empty. The <tool> will be empty and will not hold the <part> anymore as a result of this action.
+- place(<hand>, <tool>, <part1>, <part2>): <hand> use <tool> to place <part1> to <part2> (to satisfy the placement assembly constraint between <part1> and <part2>). As preconditions, <hand> should be holding <tool> and <tool> should be holding <part1>.
+- change_tool(<hand>, <tool1>, <tool2>): <hand> change the equipped tool from <tool1> to <tool2> in order to manipulate specific parts. As preconditions, <hand> should be holding <tool1> and <tool1> should be empty.
+
+- cut(<hand>, <utensil>, <food>): <hand> use <utensil> to cut <food>. As preconditions, <hand> should be holding <utensil> and <utensil> should be empty in order to hold the <food>. The <food> will be cut by the <utensil> as a result of this action.
+
+- cook(<hand>, <utensil>, <food>): <hand> use <utensil> to cook <food>. As preconditions, <hand> should be holding <utensil> and <utensil> should be empty in order to hold the <food>. The <food> will be cooked by the <utensil> as a result of this action.
+- stir_and_fry(<hand>, <utensil>, <food>): <hand> use <utensil> to stir and fry <food>. As preconditions, <hand> should be holding <utensil> and <utensil> should be empty in order to hold the <food>. The <food> will be stirred and fried by the <utensil> as a result of this action.
+- serve(<hand>, <utensil>, <food>): <hand> use <utensil> to serve <food>. As preconditions, <hand> should be holding <utensil> and <utensil> should be empty in order to hold the <food>. The <food> will be served by the <utensil> as a result of this action.
+
+
+"""
+the items in <> indicate the type of the instances needed for the predicates and actions.

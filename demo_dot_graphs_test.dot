@@ -1,0 +1,25 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"Demo Dot Graphs TEST" [fillcolor=cyan, fontcolor=black, fontsize=9, label="Demo Dot Graphs TEST", shape=octagon, style=filled];
+"BlackBox 1" [fillcolor=orange, fontcolor=black, fontsize=9, label="Ⓜ BlackBox 1", shape=box, style=filled];
+"Demo Dot Graphs TEST" -> "BlackBox 1";
+Worker [fillcolor=gray, fontcolor=black, fontsize=9, label=Worker, shape=ellipse, style=filled];
+"BlackBox 1" -> Worker;
+"Worker*" [fillcolor=gray, fontcolor=black, fontsize=9, label="Worker*", shape=ellipse, style=filled];
+"BlackBox 1" -> "Worker*";
+"Worker**" [fillcolor=gray, fontcolor=black, fontsize=9, label="Worker**", shape=ellipse, style=filled];
+"BlackBox 1" -> "Worker**";
+"Blackbox 3" [fillcolor=gray20, fontcolor=dodgerblue, fontsize=9, label="Ⓜ Blackbox 3", shape=box, style=filled];
+"BlackBox 1" -> "Blackbox 3";
+"Blackbox 2" [fillcolor=orange, fontcolor=black, fontsize=9, label="Ⓜ Blackbox 2", shape=box, style=filled];
+"Demo Dot Graphs TEST" -> "Blackbox 2";
+"Worker***" [fillcolor=gray, fontcolor=black, fontsize=9, label="Worker***", shape=ellipse, style=filled];
+"Blackbox 2" -> "Worker***";
+"Worker****" [fillcolor=gray, fontcolor=black, fontsize=9, label="Worker****", shape=ellipse, style=filled];
+"Blackbox 2" -> "Worker****";
+"Worker*****" [fillcolor=gray, fontcolor=black, fontsize=9, label="Worker*****", shape=ellipse, style=filled];
+"Blackbox 2" -> "Worker*****";
+}

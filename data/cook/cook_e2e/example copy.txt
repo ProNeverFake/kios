@@ -1,0 +1,185 @@
+I will give you some examples of the input and the output you will generate. 
+Example 1:
+"""
+- Input:
+
+- Output:
+```
+{"task_plan": {
+    "action_sequence": [
+        "load_tool(left_hand, parallel_box1)",
+        "pick_up(left_hand, parallel_box1, gear1)",
+        "insert(left_hand, parallel_box1, gear1, shaft1)"
+    ],
+    "action_instructions": [
+        "equip the parallel_box1 on the left hand",
+        "pick up the gear1 with the parallel_box1 in the left hand",
+        "insert the gear1 into the shaft1 using the parallel_box1 in the left hand"
+    ],
+    "behavior_tree": {
+    "summary": "selector to insert gear1 into shaft1",
+    "name": "selector: insert gear1 into shaft1",
+    "children": [
+        {
+            "summary": "check if gear1 is inserted to shaft1",
+            "name": "target: is_inserted_to(gear1, shaft1)",
+        },
+        {
+            "summary": "sequence to insert gear1 into shaft1",
+            "name": "sequence: insert(gear1, shaft1)",
+            "children": [
+                {
+                    "summary": "selector to load parallel_box1",
+                    "name": "selector: load_tool(left_hand, parallel_box1)",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 is hold",
+                            "name": "target: hold(left_hand, parallel_box1)",
+                        },
+                        {
+                            "summary": "sequence to load parallel_box1",
+                            "name": "sequence: load_tool(left_hand, parallel_box1)",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is equippable",
+                                    "name": "precondition: is_equippable(parallel_box1)",
+                                },
+                                {
+                                    "summary": "check if left hand is free",
+                                    "name": "precondition: is_free(left_hand)",
+                                },
+                                {
+                                    "summary": "equip parallel_box1 to left hand",
+                                    "name": "action: load_tool(left_hand, parallel_box1)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "selector to pick_up gear1",
+                    "name": "selector: pick_up(left_hand, parallel_box1, gear1)",
+                    "children": [
+                        {
+                            "summary": "check if parallel_box1 holds gear1",
+                            "name": "target: hold(parallel_box1, gear1)",
+                        },
+                        {
+                            "summary": "sequence to pick_up gear1",
+                            "name": "sequence: pick_up(left_hand, parallel_box1, gear1)",
+                            "identifier": 8,
+                            "type_name": "sequence",
+                            "children": [
+                                {
+                                    "summary": "check if parallel_box1 is free",
+                                    "name": "precondition: is_free(parallel_box1)",
+                                    "identifier": 9,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_free",
+                                            "property_value": null,
+                                            "status": true,
+                                        }
+                                    ],
+                                },
+                                {
+                                    "summary": "check if left hand holds parallel_box1",
+                                    "name": "precondition: hold(left_hand, parallel_box1)",
+                                    "identifier": 16,
+                                    "type_name": "condition",
+                                    "conditions": [
+                                        {
+                                            "object_name": "left_hand",
+                                            "property_name": "hold",
+                                            "property_value": "parallel_box1",
+                                            "status": true,
+                                        }
+                                    ],
+                                },
+                                {
+                                   "summary": "pick up gear1 using parallel_box1",
+                                    "name": "action: pick_up(left_hand, parallel_box1, gear1)",
+                                    "identifier": 12,
+                                    "type_name": "action",
+                                    "effects": [
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "hold",
+                                            "property_value": "gear1",
+                                            "status": true,
+                                        },
+                                        {
+                                            "object_name": "parallel_box1",
+                                            "property_name": "is_free",
+                                            "property_value": null,
+                                            "status": false,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                   "summary": "check if gear1 can be inserted to shaft1",
+                    "name": "precondition: can_insert_to(gear1, shaft1)",
+                    "identifier": 18,
+                    "type_name": "condition",
+                    "conditions": [
+                        {
+                            "object_name": "gear1",
+                            "property_name": "can_insert_to",
+                            "property_value": "shaft1",
+                            "status": true,
+                        }
+                    ],
+                },
+                {
+                   "summary": "insert gear1 to shaft1",
+                    "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)",
+                    "identifier": 19,
+                    "type_name": "action",
+                    "effects": [
+                        {
+                            "object_name": "parallel_box1",
+                            "property_name": "hold",
+                            "property_value": "gear1",
+                            "status": false,
+                        },
+                        {
+                            "object_name": "parallel_box1",
+                            "property_name": "is_free",
+                            "property_value": null,
+                            "status": true,
+                        },
+                        {
+                            "object_name": "gear1",
+                            "property_name": "is_inserted_to",
+                            "property_value": "shaft1",
+                            "status": true,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}
+},
+"initial_state": {"objects": [
+            {"name": "gear1", "properties": []},
+            {"name": "shaft1", "properties": []},
+            {"name": "parallel_box1", "properties": ["is_equippable", "is_free"]},
+            {"name": "left_hand", "properties": ["is_free"]},
+        ],
+        "constraints": [
+            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"},
+            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+        ],
+        "relations": [],
+},
+"instruction_summary": "insert gear1 into shaft1"
+}
+```
+"""

@@ -39,15 +39,20 @@ from kios_robot.mios_async import fake_robot_command_monitor, robot_command_moni
 ##############################################################################
 
 
-class BehaviorNode(py_trees.behaviour.Behaviour, ABC):
+class BehaviorNode(
+    py_trees.behaviour.Behaviour,
+    # ABC,
+):
     """kios_bt template node."""
 
     def __init__(
         self,
+        behavior_name: str,
         world_interface: WorldInterface,
         robot_interface: RobotInterface,
     ):
         """Configure the name of the behaviour."""
+        self.behavior_name = behavior_name
         super(BehaviorNode, self).__init__(self.behavior_name)
         self.monitor = None
         self.world_interface = world_interface
@@ -93,7 +98,7 @@ class ActionNode(BehaviorNode):
         """Configure the name of the behaviour."""
         self.identifier = action.identifier
         self.behavior_name = self.action.name
-        super().__init__(world_interface, robot_interface)
+        super().__init__(self.behavior_name, world_interface, robot_interface)
 
         self.monitor = None
 
@@ -195,7 +200,7 @@ class ConditionNode(BehaviorNode):
         """Configure the name of the behaviour."""
         self.identifier = condition.identifier
         self.behavior_name = condition.name
-        super().__init__(world_interface, robot_interface)
+        super().__init__(self.behavior_name, world_interface, robot_interface)
 
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
@@ -244,7 +249,9 @@ class ActionNodeTest(ActionNode):
         """Configure the name of the behaviour."""
         self.identifier = action.identifier
         self.behavior_name = self.action.name
-        super(ActionNode, self).__init__(world_interface, robot_interface)
+        super(ActionNode, self).__init__(
+            self.behavior_name, world_interface, robot_interface
+        )
 
         # * setup the task
         self.multiprocessing_manager = Manager()
@@ -316,7 +323,9 @@ class ActionNodeSim(ActionNode):
         """Configure the name of the behaviour."""
         self.identifier = action.identifier
         self.behavior_name = self.action.name
-        super(ActionNode, self).__init__(world_interface, robot_interface)
+        super(ActionNode, self).__init__(
+            self.behavior_name, world_interface, robot_interface
+        )
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def setup(self, **kwargs: int) -> None:
@@ -379,7 +388,9 @@ class ActionNodeOnlySuccess(ActionNode):
         """Configure the name of the behaviour."""
         self.identifier = action.identifier
         self.behavior_name = self.action.name
-        super(ActionNode, self).__init__(world_interface, robot_interface)
+        super(ActionNode, self).__init__(
+            self.behavior_name, world_interface, robot_interface
+        )
         self.logger.debug("%s.__init__()" % (self.__class__.__name__))
 
     def setup(self, **kwargs: int) -> None:

@@ -79,8 +79,11 @@ class BehaviorTreeFactory:
         pass
 
     ##########################################################
-    # * visualization only, dirty imp.
+    # ! visualization only, dirty imp.
     def parse_name(self, name: str) -> str:
+        """
+        get the type od the node from the name
+        """
         pattern = r"(selector|sequence|target|precondition|condition|action)"
         match = re.search(pattern, name)
         if match:
@@ -96,7 +99,9 @@ class BehaviorTreeFactory:
         if json_data.get("type_name") is None:
             # parse the type from "name"
             if json_data.get("name") is None:
-                raise ValueError("unable to determine the type of the node!")
+                raise ValueError(
+                    f'both "type_name" and "name" are missing for node {json_data}!!!'
+                )
 
             json_data["type_name"] = self.parse_name(json_data["name"])
 
@@ -121,13 +126,13 @@ class BehaviorTreeFactory:
             return control_flow_node
 
         elif json_data["type_name"] in ["precondition", "condition", "target"]:
-            return self.from_json_to_simple_condition_node(json_data)
+            return self.__from_json_to_simple_condition_node(json_data)
         elif json_data["type_name"] == "action":
-            return self.from_json_to_simple_action_node(json_data)
+            return self.__from_json_to_simple_action_node(json_data)
         else:
             raise ValueError(f"unknown type name {json_data['type_name']}")
 
-    def from_json_to_simple_condition_node(self, json_data: dict) -> ConditionNode:
+    def __from_json_to_simple_condition_node(self, json_data: dict) -> ConditionNode:
         """
         from json to condition node, and add it to the roster
         """
@@ -144,7 +149,7 @@ class BehaviorTreeFactory:
         )
         return condition_node
 
-    def from_json_to_simple_action_node(
+    def __from_json_to_simple_action_node(
         self, json_data: Dict[str, Any]
     ) -> ActionNodeTest:
         """
@@ -165,6 +170,8 @@ class BehaviorTreeFactory:
         )
         return action_node
 
+    #############################################################
+    # * this is for a complete json  behavior tree
     # * json to bt_stw
     def from_json_to_behavior_tree(
         self, json_data: dict
@@ -262,7 +269,7 @@ class BehaviorTreeFactory:
         return condition_node
 
     ################################* new parse method ################################
-    # * json to bt_stw
+    # * json skeleton to bt_stw
     def from_skeleton_to_behavior_tree(
         self, json_data: dict
     ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree, Optional[Dict[int, str]]]:
@@ -287,6 +294,7 @@ class BehaviorTreeFactory:
                 name=skeleton["name"], memory=False
             )
 
+            # * skip identifier since it is not a must for a skeleton
             if "identifier" not in skeleton.keys():
                 skeleton["identifier"] = next(self.id_generator)
 

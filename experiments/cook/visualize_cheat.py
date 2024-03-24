@@ -1,3 +1,9 @@
+#
+'''
+script to visualize the tree.
+a good place to go if you don't know how to do the right thing with the btw yourself.
+'''
+# * this is a full tree example.
 result_1 = {
     "behavior_tree": {
         "summary": "selector to insert gear2 into shaft2",
@@ -263,7 +269,7 @@ result_1 = {
     ],
 }
 # --------------------------------------------------------
-
+# * this is a full tree example.
 result = {
     "behavior_tree": {
         "summary": "selector to insert shaft1 into gearbase_hole1",
@@ -623,6 +629,7 @@ import json
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
 
+# * this is a skeleton tree example.
 example1 = {
     "summary": "selector to load left_hand with parallel_box1",
     "name": "selector: load_tool(left_hand, parallel_box1)",
@@ -1061,17 +1068,13 @@ result = {
 }
 
 
-def test_bt(bt_json: json):
+def render_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
-    bt = test_class.from_json_to_simple_bt(bt_json)
-    # bt = test_class.from_json_to_tree_root(bt_json)
+    bt = test_class.from_json_to_simple_bt(bt_json)  # * use this for skeleton tree
+    # bt = test_class.from_json_to_tree_root(bt_json) # * use this for a full tree
     bt_stewardship = generate_bt_stewardship(bt)
     # bt_stewardship.setup(timeout=15)
     render_dot_tree(bt_stewardship)
 
 
-# test_bt(result_1["behavior_tree"])
-# test_bt(example1)
-# test_bt(result3)
-# test_bt(example2)
-test_bt(result)
+render_bt(result)

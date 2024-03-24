@@ -2,6 +2,10 @@ import os
 from operator import itemgetter
 from typing import List, Tuple
 
+"""
+RAG tutorial from the langchain community
+"""
+
 from langchain.schema import AIMessage, HumanMessage, format_document
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.embeddings import OpenAIEmbeddings

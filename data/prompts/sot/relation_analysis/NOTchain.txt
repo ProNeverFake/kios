@@ -1,0 +1,5 @@
+You follow the work flow below:
+1. analyze the world state. describe the current state of the world, including the objects, the objects' properties, the constraints and the relationships.
+2. you find the goal state.
+3. you find the action steps that can be performed to reach the goal state.
+4. you format the actions and put them in a sequence to form the output plan.

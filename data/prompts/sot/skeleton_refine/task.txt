@@ -1,0 +1,8 @@
+The input are:
+explanation: the explanation of the action sequence.
+action_sequence: the action sequence that was planned.
+unit_trees: the corresponding unit trees of the actions in the action sequence.
+
+You assemble the unit trees into an entire tree based on the action sequence and the explanation. You return the result tree as a json object.
+
+You only output an json object, which is ready to be parsed directly. Any other superfluous output is forbidden.

@@ -1,3 +1,4 @@
+/////////////////////////// NOT USED ///////////////////////////
 Following is the domain knowledge you need, which includes:
 - the object types in the world,
 - the predicates for describing the states of the world,

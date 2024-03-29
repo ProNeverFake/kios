@@ -220,6 +220,7 @@ planner = create_structured_output_runnable(
     Plan, ChatOpenAI(model="gpt-4-turbo-preview", temperature=0), planner_ppt_ppl
 )
 
+
 ##################################################### * plan_updaterner
 class UpdaterResponse(BaseModel):
     """used to response to the user for asking for more inputs."""
@@ -313,7 +314,7 @@ async def behavior_tree_generate_step(state: PlanExecuteState):
 
     pause = input("paused here")
 
-    # ! OBJECT CONCENTRATION
+    # TODO OBJECT CONCENTRATION
 
     response = await re_sk_chain.ainvoke(
         {

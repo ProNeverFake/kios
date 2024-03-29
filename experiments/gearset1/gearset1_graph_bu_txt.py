@@ -3,7 +3,12 @@ import os
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
+os.environ["LANGCHAIN_PROJECT"] = "kios_instruction"
+
+
+"""
+...
+"""
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory

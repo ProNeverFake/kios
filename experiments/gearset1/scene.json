@@ -12,7 +12,7 @@
             ]
         },
         {
-            "object_name": "TestObject1",
+            "object_name": "initialposition",
             "source": "mios"
         },
         {
@@ -82,9 +82,9 @@
                 [0, 0, 1, 0.085],
                 [0, 0, 0, 1]
             ],
-            "EE_finger_width_max": 0.042,
+            "EE_finger_width_max": 0.04,
             "EE_finger_width_min": 0.01,
-            "load_width": 0.042,
+            "load_width": 0.04,
             "unload_width": 0.08
         },
         {
@@ -95,9 +95,9 @@
                 [0, 0, 1, 0.07],
                 [0, 0, 0, 1]
             ],
-            "EE_finger_width_max": 0.042,
+            "EE_finger_width_max": 0.04,
             "EE_finger_width_min": 0.01,
-            "load_width": 0.042,
+            "load_width": 0.04,
             "unload_width": 0.08
         },
         {
@@ -108,9 +108,9 @@
                 [0, 0, 1, 0.095],
                 [0, 0, 0, 1]
             ],
-            "EE_finger_width_max": 0.042,
+            "EE_finger_width_max": 0.04,
             "EE_finger_width_min": 0.01,
-            "load_width": 0.042,
+            "load_width": 0.04,
             "unload_width": 0.08
         },
         {
@@ -121,9 +121,9 @@
                 [0, 0, 1, 0.125],
                 [0, 0, 0, 1]
             ],
-            "EE_finger_width_max": 0.042,
+            "EE_finger_width_max": 0.04,
             "EE_finger_width_min": 0.01,
-            "load_width": 0.042,
+            "load_width": 0.04,
             "unload_width": 0.08
         },
         {

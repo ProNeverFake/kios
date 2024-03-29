@@ -607,7 +607,7 @@ class MiosTaskFactory:
                     "K_x": [1500, 1500, 1500, 600, 600, 600],
                 },
                 "GripperMove": {
-                    "width": 0.043,
+                    "width": 0.04,
                     "speed": 0.1,
                     "force": 70,
                     "K_x": [1500, 1500, 1500, 100, 100, 100],

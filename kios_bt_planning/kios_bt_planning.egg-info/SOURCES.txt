@@ -1,14 +1,13 @@
 setup.py
-kios_agent/RAG_chain.py
+kios_agent/RAG_chain_tutorial.py
 kios_agent/__init__.py
 kios_agent/data_types.py
-kios_agent/kios_graph.py
 kios_agent/kios_llm.py
 kios_agent/kios_tools.py
 kios_agent/llama_deploy.py
 kios_agent/llm_agents.py
 kios_agent/llm_supporter.py
-kios_agent/tools_tt.py
+kios_agent/tools_tutorial.py
 kios_bt/__init__.py
 kios_bt/behavior_nodes.py
 kios_bt/bt_factory.py
@@ -17,7 +16,6 @@ kios_bt/bt_stewardship.py
 kios_bt/control_nodes.py
 kios_bt/data_types.py
 kios_bt/mios_async.py
-kios_bt/pybt_io.py
 kios_bt_planning.egg-info/PKG-INFO
 kios_bt_planning.egg-info/SOURCES.txt
 kios_bt_planning.egg-info/dependency_links.txt
@@ -36,6 +34,8 @@ kios_domain/problem3.py
 kios_domain/problem4.py
 kios_future/__init__.py
 kios_future/embeddings.py
+kios_plan/__init__.py
+kios_plan/dynamic_planning.py
 kios_robot/__init__.py
 kios_robot/async_robot_command.py
 kios_robot/data_types.py
@@ -82,3 +82,4 @@ tests/pddl_interface_test.py
 tests/pytrees_blackboard_test.py
 tests/robot_interface_test.py
 tests/scene_test.py
+tests/visualization_debug.py

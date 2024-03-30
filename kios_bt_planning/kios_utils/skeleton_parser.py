@@ -86,10 +86,10 @@ def ground_action(
     precondition = action_data["precondition"]
     effect = action_data["effect"]
 
-    # Extract the placeholders from the template
+    # Extract the placeholders from the template (pattern: ?<name>)
     placeholders = re.findall(r"\?\w+", template)
 
-    # Replace the placeholders in the precondition and effect with the provided parameters
+    # Replace the placeholders one by one with the corresponding parameter value
     for i in range(len(placeholders)):
         escaped_placeholder = re.escape(placeholders[i])
         precondition = [

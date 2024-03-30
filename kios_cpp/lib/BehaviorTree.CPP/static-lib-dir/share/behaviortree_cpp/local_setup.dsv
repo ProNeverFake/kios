@@ -1,3 +1,0 @@
-source;share/behaviortree_cpp/environment/ament_prefix_path.sh
-source;share/behaviortree_cpp/environment/library_path.sh
-source;share/behaviortree_cpp/environment/path.sh

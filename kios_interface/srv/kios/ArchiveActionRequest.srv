@@ -1,4 +1,0 @@
-NodeArchive[] archive_list
----
-bool is_accepted
-string error_message

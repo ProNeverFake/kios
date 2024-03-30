@@ -24,6 +24,8 @@ from kios_agent.kios_graph import (
     human_instruction_chain,
 )
 
+from kios_agent.kios_routers import KiosRouterFactory
+
 from dotenv import load_dotenv
 
 from langchain import hub
@@ -496,6 +498,12 @@ workflow.set_entry_point("user_input_node")
 workflow.add_edge("planner", "sequence_generator")
 workflow.add_edge("sequence_generator", "behavior_tree_generator")
 
+router_factory = KiosRouterFactory()
+
+user_instruction_router = router_factory.create_router_layer(
+    route_names=["rectify", "approve"]
+)
+
 
 def user_instruction_should_end(state: PlanExecuteState):
     """
@@ -505,11 +513,29 @@ def user_instruction_should_end(state: PlanExecuteState):
     user_instruction = input(
         "What should I do to improve the behavior tree?\nPlease give me your hint: "
     )
+    # * you only update the user_instruction here once
     state["user_instruction"] = user_instruction
-    if user_instruction == "":
+
+    if user_instruction == "" or not user_instruction:
+        state["user_instruction"] = None
+        return True
+
+    while True:
+        route = user_instruction_router(user_instruction)
+        if route.name == None:
+            user_instruction = input(
+                "I don't understand your intention. Can you explain do you want me to execute the plan, or improve the behavior tree?"
+            )
+        else:
+            break
+
+    if route.name == "approve":
+        state["user_instruction"] = None  # * clear the user instruction
         return True  # go to exectuor
-    else:
+    elif route.name == "rectify":
         return False  # go back to generator
+    else:
+        raise ValueError(f"Route {route.name} not supported!")
 
 
 workflow.add_conditional_edges(
@@ -519,6 +545,15 @@ workflow.add_conditional_edges(
         True: "behavior_tree_executor",
         False: "behavior_tree_generator",
     },
+)
+
+executor_router = router_factory.create_router_layer(
+    route_names=[
+        "finish",
+        "rectify",
+        "approve",
+        "disapprove",
+    ]
 )
 
 
@@ -531,17 +566,38 @@ def executor_should_end(state: PlanExecuteState):
     if state["BTExecutionHasSucceeded"] == True:
         # ask for user confirmation and end, or go back to the behavior tree generator if the user wants to improve
         user_instruction = input(
-            "the behavior tree has succeeded.\nPress ENTER to confirm:"
+            "the behavior tree has succeeded.\n Is the target of this step satisfied now? Is there anything wrong?"
         )
-        state["user_instruction"] = ""
-        if user_instruction == "":
+        state["user_instruction"] = user_instruction
+
+        if user_instruction == "" or not user_instruction:
+            state["user_instruction"] = None
             state["last_behavior_tree"] = None
             state["BTExecutionHasSucceeded"] = False
             return True
-        else:
+
+        while True:
+            route = executor_router(user_instruction)
+            if route.name == None:
+                user_instruction = input(
+                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?"
+                )
+            else:
+                break
+
+        if route.name in ["finish", "approve"]:
+            # * clear the states for this step
+            state["user_instruction"] = None
+            state["last_behavior_tree"] = None
+            state["BTExecutionHasSucceeded"] = False
+            return True
+        elif route.name in ["rectify", "disapprove"]:
             return False
+        else:
+            raise ValueError(f"Route {route.name} not supported!")
     else:
         # ask for user hint and go back to the behavior tree generator
+        # * router is unnecessary here
         user_instruction = input(
             "The behavior tree has failed in its execution.\nPlease give me a hint to improve it:"
         )
@@ -583,6 +639,10 @@ workflow.add_conditional_edges(
     },
 )
 
+user_input_router = router_factory.create_router_layer(
+    route_names=["finish", "instruction"]
+)
+
 
 def user_input_should_end(state: PlanExecuteState):
     """
@@ -592,8 +652,22 @@ def user_input_should_end(state: PlanExecuteState):
 
     if not state["user_input"] or state["user_input"] == "":
         return True
-    else:
+
+    while True:
+        route = user_input_router(state["user_input"])
+        if route.name == None:
+            user_input = input(
+                "I don't understand your instruction. Can you provide me with a new instruction?"
+            )
+        else:
+            break
+
+    if route.name == "finish":
+        return True
+    elif route.name == "instruction":
         return False
+    else:
+        raise ValueError(f"Route {route.name} not supported!")
 
 
 workflow.add_conditional_edges(

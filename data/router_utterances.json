@@ -22,13 +22,14 @@
     "finish": [
         "Nothing else to do. bye. ",
         "That's all. You did a good job. ",
-        ". "
+        "Thank you for your help."
     ],
     "instruction":
     [
         "I need you to write a program that does the following",
         "You should add pepper to the soup",
         "Now please write a program that deletes the last element of the list",
-        "You do this, then you do that, finally you should finish with this"
+        "You do this, then you do that, finally you should finish with this",
+        "can you try to pick up the apple for me?"
     ]
 }

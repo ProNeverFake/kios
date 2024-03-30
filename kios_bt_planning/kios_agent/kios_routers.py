@@ -23,12 +23,14 @@ class KiosRouterFactory:
             os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY") or getpass(
                 "OpenAI API Key not found, please enter it here or stop here and check your environment variables:"
             )
-            self.encoder = OpenAIEncoder()
+            self.encoder = OpenAIEncoder(score_threshold=0.5)
         elif encoder == "cohere":
             os.environ["COHERE_API_KEY"] = os.getenv("COHERE_API_KEY") or getpass(
                 "Cohere API Key not found, please enter it here or stop here and check your environment variables:"
             )
-            self.encoder = CohereEncoder()
+            self.encoder = (
+                CohereEncoder()
+            )  # * you may need to adjust the score_threshold
         else:
             raise ValueError(f"Encoder {encoder} not supported")
 
@@ -65,11 +67,11 @@ class KiosRouterFactory:
 
 def test():
     factory = KiosRouterFactory()
-    router = factory.create_router_layer(["approve", "disapprove"])
+    router = factory.create_router_layer(["finish", "instruction"])
 
     from pprint import pprint
 
-    pprint(router("I guess you have to modify the plan a bit"))
+    pprint(router("can you insert the shaft1 into hole 1?"))
 
 
 if __name__ == "__main__":

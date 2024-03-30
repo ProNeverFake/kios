@@ -1,8 +1,0 @@
-The input are:
-start_world_state: the world state when the behavior tree started.
-target: the goal that the plan should achieve. 
-
-You summarize the target into a goal world state, then make a bullet list task plan to achieve it from the start_world_state. Use the definitions in the domain knowledge to construct actions.
-If no action needs to be perform, return an empty task plan.
-You estimate the world state after the task plan is executed based on the task plan and the start_world_state.
-You return the task plan and the estimated world state in a json object.

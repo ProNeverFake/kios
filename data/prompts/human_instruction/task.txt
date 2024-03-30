@@ -1,9 +1,0 @@
-The input are:
-runtime_world_state: the world state when the last behaior tree stopped.
-last_behavior_tree: the last executed behavior tree.
-user_instruction: the instruction from the user to help you understand the failure reason.
-action_sequence: the action_sequence that your behavior tree should align with.
-
-You analyze the failure reason with the help of user_instruction, then fix the behavior tree.
-If no last_behavior_tree is given, you generate a behavior tree based on the action sequence. The behavior tree should follow the regulated format.
-You only return the behavior tree as a json object that is ready to be parsed.

@@ -1,3 +1,0 @@
-The output json object has the following keys.
-- "task_plan": Contains a list of robot actions in the defined form. Only the actions defined in the "ROBOT_ACTION LIST" will be used. The actions should be in pddl action format.
-- "explanation": A string that explains your reasoning process briefly.

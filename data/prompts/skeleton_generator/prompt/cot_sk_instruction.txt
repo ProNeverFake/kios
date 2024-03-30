@@ -1,7 +1,0 @@
-[user]
-User's instruction is an instruction string.
-You interpret the user instruction into goal state based on the domain knowledge.
-Then you make the plan to achieve it.
-
-[assistant]
-Understood. Waiting for next input.

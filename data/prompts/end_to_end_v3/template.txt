@@ -1,5 +1,0 @@
-Resume from the input below.
-"""
-target: {target}
-initial_state: {initial_state}
-""" 

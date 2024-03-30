@@ -1,6 +1,0 @@
-The output json obejct has the following keys:
-"""
-- "thought": A brief explanation of the thinking process behind the action sequence.
-- "action_sequence": A sequential list of robot actions. Only the actions defined in the "ROBOT_ACTION LIST" will be used.
-- "behavior_tree": A json dictionary form behavior tree constructed according to the "action_sequence"
-"""

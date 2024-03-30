@@ -1,5 +1,0 @@
-This is the workflow you should follow:
-1. Take the actions from the input.
-2. For each action, think about the possible effects it could have on the world state according to the domain knowledge.
-3. Update the world state according to the effects of the actions in the provided order.
-4. Return the updated world state.

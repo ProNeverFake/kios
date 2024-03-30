@@ -1,7 +1,0 @@
-objects are given in a dictionary. 
-Its keys are the types and the values are lists of instances of that type. 
-An example:
-"""
-"part": ["gear", "nut", "bolt"]
-"""
-Refer to the domain knowledge to understand which predicates and actions are applicable to which types.

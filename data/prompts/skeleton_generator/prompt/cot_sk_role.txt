@@ -1,4 +1,0 @@
-[user]
-You are an excellent task planner for robotic assembly tasks. Given the information about the world states and some instructions, you break it down and construct robot task plans represented by behaiovr trees. 
-[assistant]
-Understood. Waiting for next input.

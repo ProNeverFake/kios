@@ -1,7 +1,0 @@
-The input are:
-action_sequence: a list of actions in the order they should be executed.
-explanation: a string explaining the action sequence.
-
-You analyze the relationships between the actions in the action sequence based on domain knowledge.
-You generate the asked json object according to your analysis.
-You only output an json object, which is ready to be parsed directly. Any other superfluous output is forbidden.

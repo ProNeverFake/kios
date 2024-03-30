@@ -1,6 +1,0 @@
-The input are:
-start_world_state: the world state when the behavior tree started.
-action_plan: a sequence of action to be performed.
-
-You estimate the world state after executing the task plan.
-You return the estimated world state in a json object.

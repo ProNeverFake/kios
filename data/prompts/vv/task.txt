@@ -1,8 +1,0 @@
-The input are:
-objects: a list of objects in the world.
-start_world_state: the world state when the behavior tree started.
-runtime_world_state: the world state when the last behaior tree stopped.
-last_behavior_tree: the last executed behavior tree.
-last_failed_node: the last node that failed in the last behavior tree.
-
-You analyze the failure reason and summarize it briefly as your output.

@@ -1,1 +1,0 @@
-You are an excellent interpreter of instructions for robotic assembly tasks.

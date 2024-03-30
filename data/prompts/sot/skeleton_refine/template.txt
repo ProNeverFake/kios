@@ -1,4 +1,0 @@
-Now start to work with the following inputs:
-explanation: {explanation}
-action_sequence: {action_sequence}
-unit_trees: {unit_trees}

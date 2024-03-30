@@ -1,9 +1,0 @@
-The input are:
-actions: an action sequence with the dependency information between the actions.
-explanation: the explanation of the action sequence.
-
-You assemble a behavior tree according to the information provided and the domain knowledge.
-You construct the behavior tree in the asked format.
-You return the result tree as a json object.
-
-You only output an json object, which is ready to be parsed directly. Any other superfluous output is forbidden.

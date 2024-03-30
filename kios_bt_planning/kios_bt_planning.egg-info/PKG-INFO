@@ -1,6 +1,0 @@
-Metadata-Version: 2.1
-Name: kios-bt-planning
-Version: 0.1.0
-Summary: Behavior Tree Planning for KIOS
-Author: blackbird
-Requires-Dist: py-trees

@@ -1,2 +1,0 @@
-This is how you should work:
-1. If last_behavior_tree doesn't exist, you interpret user_instruction into a target condition. Then you find one action from the domain knowledge that can fulfill the target condition. You finally return the 

@@ -1,3 +1,0 @@
-The output json object has the following keys.
-- "actions": Contains a list of robot actions in the defined form.
-- "explanation": A string that explains your reasoning process briefly.

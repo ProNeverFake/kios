@@ -1,9 +1,0 @@
-[user]
-You should refine the behavior tree skeleton into a full behavior tree in json dictionary format.
-
-1. Refer to "initial_state" of input to find the objects, properties, constraints and relationships.
-2. Refer to the domain knowledge to understand the actions (corresponds to "ROBOT_ACTION_LIST") and conditions (corresponds to "PREDICATE_LIST").
-3. The name of the node (if it has) also provides information for its refinement.
-
-[assistant]
-Understood. Waiting for next input.

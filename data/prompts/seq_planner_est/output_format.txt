@@ -1,4 +1,0 @@
-You generate an action sequence to achieve the goal and estimate the world state after executing the plan.
-The output json object has the following keys.
-- "task_plan": Contains a list of robot actions in the defined form. Only the actions defined in the "ROBOT_ACTION LIST" will be used. The actions should be in pddl action format.
-- "estimated_world_state": The world state after executing the plan.

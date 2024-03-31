@@ -3,7 +3,7 @@
     {"name": "clampgripper", "properties": ["is_empty"]},
     {"name": "parallelgripper", "properties": ["is_empty"]},
     {"name": "inwardgripper", "properties": ["is_empty"]},
-    {"name": "outwardgripper", "properties": ["is_empty"]},
+    {"name": "outwardgripper", "properties": []},
     {"name": "defaultgripper", "properties": ["is_empty"]},
     {"name": "gear1", "properties": []},
     {"name": "gear2", "properties": []},
@@ -31,7 +31,8 @@
     {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
   ],
   "relations": [
-    {"source": "left_hand", "name": "hold", "target": "outwardgripper"}
+    {"source": "left_hand", "name": "hold", "target": "outwardgripper"},
+    {"source": "outwardgripper", "name": "hold", "target": "gear3"}
   ]
 }
 

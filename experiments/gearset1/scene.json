@@ -64,6 +64,10 @@
             "source": "mios"
         },
         {
+            "object_name": "gearbase_hole2",
+            "source": "mios"
+        },
+        {
             "object_name": "gearbase_hole1",
             "source": "mios"
         },

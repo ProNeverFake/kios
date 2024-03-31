@@ -122,7 +122,7 @@ class PlanExecuteState(TypedDict):
         List[Tuple], operator.add
     ]  # this is for update the assembly plan
 
-    user_instruction: str  # this is for improve the behavior tree
+    user_feedback: str  # this is for improve the behavior tree
     last_behavior_tree: dict  # record the last behavior tree for improvement
     last_failed_node: dict  # record the last failed node for improvement
     runtime_world_state: (
@@ -131,9 +131,10 @@ class PlanExecuteState(TypedDict):
 
     BTExecutionHasSucceeded: bool  # this indicates if the last execution has succeeded
 
+
 ##################################################### * graph node functions
 @traceable(name="user_input_node_step")
-async def user_input_step(state: PlanExecuteState):
+def user_input_step(state: PlanExecuteState):
     """
     get the input from the user
     """
@@ -147,7 +148,7 @@ async def user_input_step(state: PlanExecuteState):
 
 
 @traceable(name="sequence_generate_step")
-async def sequence_generate_step(state: PlanExecuteState):
+def sequence_generate_step(state: PlanExecuteState):
     """
     generate the sequence based on the instruction
     """
@@ -156,10 +157,10 @@ async def sequence_generate_step(state: PlanExecuteState):
     plan_goal = state["plan"][0]
     start_world_state = state["world_state"][-1]
 
-    action_sequence = await seq_planner_chain.ainvoke(
+    action_sequence = seq_planner_chain.invoke(
         {
             "start_world_state": start_world_state,
-            "user_instruction": plan_goal,
+            "user_instruction": plan_goal,  # TODO the naming method "user_instruction" is confusing. try to change it later.
         }
     )
 
@@ -169,16 +170,15 @@ async def sequence_generate_step(state: PlanExecuteState):
 
 
 @traceable(name="behavior_tree_generate_step")
-async def behavior_tree_generate_step(state: PlanExecuteState):
+def behavior_tree_generate_step(state: PlanExecuteState):
     """
     generate the behavior tree based on the instruction
     """
     print(f"-----behavior_tree_generate_step-----")
-    user_instruction = state["user_instruction"]
 
-    bt_skeleton = await human_instruction_chain.ainvoke(
+    bt_skeleton = human_instruction_chain.invoke(
         {
-            "user_instruction": state["user_instruction"],
+            "user_instruction": state["user_feedback"],
             "last_behavior_tree": state["last_behavior_tree"],
             "action_sequence": state["action_sequence"],
         }
@@ -192,7 +192,11 @@ async def behavior_tree_generate_step(state: PlanExecuteState):
 
     # pprint(tree_result.to_json())
 
-    render_bt(bt_skeleton)
+    behavior_tree_stewardship.generate_behavior_tree_from_skeleton(bt_skeleton)
+
+    behavior_tree_stewardship.render_dot_tree()
+
+    # render_bt(bt_skeleton)
 
     return {
         "last_behavior_tree": bt_skeleton,
@@ -200,8 +204,22 @@ async def behavior_tree_generate_step(state: PlanExecuteState):
     }
 
 
+@traceable(name="user_feedback_step")
+def user_feedback_step(state: PlanExecuteState):
+    """
+    get the feedback from the user
+    """
+    print(f"-----user_feedback_step-----")
+
+    user_feedback = input("How do you like this? Any feedback from your side?:\n")
+
+    return {
+        "user_feedback": user_feedback,
+    }
+
+
 @traceable(name="behavior_tree_execute_step")
-async def behavior_tree_execute_step(state: PlanExecuteState):
+def behavior_tree_execute_step(state: PlanExecuteState):
     """
     execute the first step of the plan, append the result to the past steps
     """
@@ -217,7 +235,11 @@ async def behavior_tree_execute_step(state: PlanExecuteState):
         behavior_tree_skeleton
     )
 
-    tree_result = behavior_tree_stewardship.tick_tree()
+    behavior_tree_stewardship.setup_behavior_tree()
+
+    behavior_tree_stewardship.tick_tree()
+
+    tree_result = behavior_tree_stewardship.tree_result
 
     pprint(tree_result.to_json())
     pause = input("DEBUG: please check the tree result. Press enter to continue.")
@@ -243,57 +265,55 @@ async def behavior_tree_execute_step(state: PlanExecuteState):
         }
 
 
-# region * sim
-# @traceable(name="behavior_tree_execute_step")
-# async def behavior_tree_execute_step(state: PlanExecuteState):
-#     """
-#     execute the first step of the plan, append the result to the past steps
-#     """
-#     print(f"-----behavior_tree_execute_step-----")
+@traceable(name="behavior_tree_execute_step")
+def behavior_tree_execute_step(state: PlanExecuteState):
+    """
+    execute the first step of the plan, append the result to the past steps
+    """
+    print(f"-----behavior_tree_execute_step-----")
 
-#     this_step = state["plan"][0]
-#     behavior_tree_skeleton = state["last_behavior_tree"]
-#     latest_world_state = state["world_state"][-1]
+    this_step = state["plan"][0]
+    behavior_tree_skeleton = state["last_behavior_tree"]
+    latest_world_state = state["world_state"][-1]
 
-#     # * first sim run
-#     tree_result, skeleton_json = behavior_tree_stewardship.sk_sim_run(
-#         world_state=latest_world_state, skeleton_json=behavior_tree_skeleton
-#     )
+    # * first sim run
+    tree_result, skeleton_json = behavior_tree_stewardship.sk_sim_run(
+        world_state=latest_world_state, skeleton_json=behavior_tree_skeleton
+    )
 
-#     pprint(tree_result.to_json())
-#     pause = input("paused here")
+    pprint(tree_result.to_json())
+    pause = input("paused here")
 
-#     # * check result
-#     if tree_result.result == "success":
-#         return {
-#             "BTExecutionHasSucceeded": True,
-#             "past_steps": (
-#                 this_step,
-#                 tree_result.result,
-#             ),  # * only one because new plan will be generated and old steps are all removed
-#             "world_state": [tree_result.world_state],
-#             # "last_behavior_tree": None, # ! do not change the last behavior tree
-#             "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
-#         }
-#     else:
-#         return {
-#             "BTExecutionHasSucceeded": False,
-#             # ! do not change world state
-#             # "last_behavior_tree": skeleton_json, # * do not change the last behavior tree
-#             "world_state": [tree_result.world_state],
-#             "runtime_world_state": tree_result.world_state,
-#         }
-# endregion
+    # * check result
+    if tree_result.result == "success":
+        return {
+            "BTExecutionHasSucceeded": True,
+            "past_steps": (
+                this_step,
+                tree_result.result,
+            ),  # * only one because new plan will be generated and old steps are all removed
+            "world_state": [tree_result.world_state],
+            # "last_behavior_tree": None, # ! do not change the last behavior tree
+            "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
+        }
+    else:
+        return {
+            "BTExecutionHasSucceeded": False,
+            # ! do not change world state
+            # "last_behavior_tree": skeleton_json, # * do not change the last behavior tree
+            "world_state": [tree_result.world_state],
+            "runtime_world_state": tree_result.world_state,
+        }
 
 
 @traceable(name="planner_step")
-async def planner_step(state: PlanExecuteState):
+def planner_step(state: PlanExecuteState):
     """
     plan the steps based on user input and world state
     """
     print(f"-----plan_step-----")
 
-    plan = await planner.ainvoke(
+    plan = planner.invoke(
         {
             "user_input": state["user_input"],
             "world_state": state["world_state"],
@@ -303,7 +323,7 @@ async def planner_step(state: PlanExecuteState):
 
 
 @traceable(name="plan_updater_step")
-async def plan_updater_step(state: PlanExecuteState):
+def plan_updater_step(state: PlanExecuteState):
     """
     if return a response, then success, response the use, end.
     otherwise, return the updated newplan (normally the same as the old plan with the first step popped out.
@@ -311,7 +331,7 @@ async def plan_updater_step(state: PlanExecuteState):
     print(f"-----plan_updater_step-----")
 
     # ! BOOOM! BUG!
-    output = await plan_updater.ainvoke(
+    output = plan_updater.invoke(
         {
             "user_input": state["user_input"],
             "plan": state["plan"],
@@ -336,6 +356,7 @@ workflow = StateGraph(PlanExecuteState)
 workflow.add_node("planner", planner_step)
 workflow.add_node("sequence_generator", sequence_generate_step)
 workflow.add_node("behavior_tree_generator", behavior_tree_generate_step)
+workflow.add_node("user_feedback", user_feedback_step)
 workflow.add_node("behavior_tree_executor", behavior_tree_execute_step)
 workflow.add_node("plan_updater", plan_updater_step)
 workflow.add_node("user_input_node", user_input_step)
@@ -345,7 +366,7 @@ workflow.add_edge("sequence_generator", "behavior_tree_generator")
 
 router_factory = KiosRouterFactory()
 
-user_instruction_router = router_factory.create_router_layer(
+user_feedback_router = router_factory.create_router_layer(
     route_names=["rectify", "approve"]
 )
 
@@ -358,26 +379,24 @@ def user_instruction_should_end(state: PlanExecuteState):
     user_instruction = input(
         "What should I do to improve the behavior tree?\nPlease give me your hint: "
     )
-    # * you only update the user_instruction here once
-    state["user_instruction"] = user_instruction
 
     if user_instruction == "" or not user_instruction:
         state["user_instruction"] = None
         return True
 
     while True:
-        route = user_instruction_router(user_instruction)
+        route = user_feedback_router(user_instruction)
         if route.name == None:
             user_instruction = input(
                 "I don't understand your intention. Can you explain do you want me to execute the plan, or improve the behavior tree?"
             )
         else:
             break
-
     if route.name == "approve":
         state["user_instruction"] = None  # * clear the user instruction
         return True  # go to exectuor
     elif route.name == "rectify":
+        state["user_instruction"] = user_instruction
         return False  # go back to generator
     else:
         raise ValueError(f"Route {route.name} not supported!")
@@ -521,6 +540,7 @@ workflow.add_conditional_edges(
     {
         True: END,
         False: "planner",
+        None: "user_input_node",
     },
 )
 
@@ -533,17 +553,22 @@ inputs = {
 }
 
 
-async def core_run():
-    async for event in app.astream(
+def core_run():
+    for event in app.stream(
         inputs,
         config=config,
     ):
         for k, v in event.items():
             if k != "__end__":
                 print(v)
+    # for event in app.astream(
+    #     inputs,
+    #     config=config,
+    # ):
+    #     for k, v in event.items():
+    #         if k != "__end__":
+    #             print(v)
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(core_run())
+    core_run()

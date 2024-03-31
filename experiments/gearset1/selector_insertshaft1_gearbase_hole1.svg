@@ -12,50 +12,50 @@
 <!-- selector -->
 <g id="node1" class="node">
 <title>selector</title>
-<polygon fill="cyan" stroke="black" points="1059.78,-298.54 1059.78,-313.46 943.68,-324 779.48,-324 663.38,-313.46 663.38,-298.54 779.48,-288 943.68,-288 1059.78,-298.54"/>
-<text text-anchor="middle" x="861.58" y="-303.8" font-family="Times,serif" font-size="9.00">selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
+<polygon fill="cyan" stroke="black" points="1080.78,-298.54 1080.78,-313.46 964.68,-324 800.48,-324 684.38,-313.46 684.38,-298.54 800.48,-288 964.68,-288 1080.78,-298.54"/>
+<text text-anchor="middle" x="882.58" y="-303.8" font-family="Times,serif" font-size="9.00">selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
 </g>
 <!-- target -->
 <g id="node2" class="node">
 <title>target</title>
-<ellipse fill="gray" stroke="black" cx="1212.58" cy="-306" rx="134.55" ry="18"/>
-<text text-anchor="middle" x="1212.58" y="-303.8" font-family="Times,serif" font-size="9.00">target: is_inserted_to(shaft1, gearbase_hole1)*</text>
+<ellipse fill="gray" stroke="black" cx="1233.58" cy="-306" rx="134.55" ry="18"/>
+<text text-anchor="middle" x="1233.58" y="-303.8" font-family="Times,serif" font-size="9.00">target: is_inserted_to(shaft1, gearbase_hole1)*</text>
 </g>
-<!-- selector: insert shaft1 into gearbase_hole1 -->
+<!-- selector: insert(shaft1, gearbase_hole1) -->
 <g id="node3" class="node">
-<title>selector: insert shaft1 into gearbase_hole1</title>
-<ellipse fill="none" stroke="black" cx="1574.58" cy="-306" rx="209.06" ry="18"/>
-<text text-anchor="middle" x="1574.58" y="-302.3" font-family="Times,serif" font-size="14.00">selector: insert shaft1 into gearbase_hole1</text>
+<title>selector: insert(shaft1, gearbase_hole1)</title>
+<ellipse fill="none" stroke="black" cx="1581.58" cy="-306" rx="194.97" ry="18"/>
+<text text-anchor="middle" x="1581.58" y="-302.3" font-family="Times,serif" font-size="14.00">selector: insert(shaft1, gearbase_hole1)</text>
 </g>
 <!-- target: is_inserted_to(shaft1, gearbase_hole1) -->
 <g id="node4" class="node">
 <title>target: is_inserted_to(shaft1, gearbase_hole1)</title>
-<ellipse fill="none" stroke="black" cx="1346.58" cy="-234" rx="223.66" ry="18"/>
-<text text-anchor="middle" x="1346.58" y="-230.3" font-family="Times,serif" font-size="14.00">target: is_inserted_to(shaft1, gearbase_hole1)</text>
+<ellipse fill="none" stroke="black" cx="1360.58" cy="-234" rx="223.66" ry="18"/>
+<text text-anchor="middle" x="1360.58" y="-230.3" font-family="Times,serif" font-size="14.00">target: is_inserted_to(shaft1, gearbase_hole1)</text>
 </g>
-<!-- selector: insert shaft1 into gearbase_hole1&#45;&gt;target: is_inserted_to(shaft1, gearbase_hole1) -->
+<!-- selector: insert(shaft1, gearbase_hole1)&#45;&gt;target: is_inserted_to(shaft1, gearbase_hole1) -->
 <g id="edge1" class="edge">
-<title>selector: insert shaft1 into gearbase_hole1&#45;&gt;target: is_inserted_to(shaft1, gearbase_hole1)</title>
-<path fill="none" stroke="black" d="M1521.12,-288.59C1487.92,-278.39 1445.06,-265.23 1410.12,-254.51"/>
-<polygon fill="black" stroke="black" points="1411.08,-251.14 1400.49,-251.55 1409.02,-257.83 1411.08,-251.14"/>
+<title>selector: insert(shaft1, gearbase_hole1)&#45;&gt;target: is_inserted_to(shaft1, gearbase_hole1)</title>
+<path fill="none" stroke="black" d="M1529.77,-288.59C1497.72,-278.44 1456.39,-265.35 1422.6,-254.65"/>
+<polygon fill="black" stroke="black" points="1423.43,-251.23 1412.84,-251.55 1421.31,-257.91 1423.43,-251.23"/>
 </g>
-<!-- sequence: insert shaft1 into gearbase_hole1 -->
+<!-- sequence: insert(shaft1, gearbase_hole1) -->
 <g id="node6" class="node">
-<title>sequence: insert shaft1 into gearbase_hole1</title>
-<ellipse fill="none" stroke="black" cx="1803.58" cy="-234" rx="215.56" ry="18"/>
-<text text-anchor="middle" x="1803.58" y="-230.3" font-family="Times,serif" font-size="14.00">sequence: insert shaft1 into gearbase_hole1</text>
+<title>sequence: insert(shaft1, gearbase_hole1)</title>
+<ellipse fill="none" stroke="black" cx="1803.58" cy="-234" rx="201.46" ry="18"/>
+<text text-anchor="middle" x="1803.58" y="-230.3" font-family="Times,serif" font-size="14.00">sequence: insert(shaft1, gearbase_hole1)</text>
 </g>
-<!-- selector: insert shaft1 into gearbase_hole1&#45;&gt;sequence: insert shaft1 into gearbase_hole1 -->
+<!-- selector: insert(shaft1, gearbase_hole1)&#45;&gt;sequence: insert(shaft1, gearbase_hole1) -->
 <g id="edge2" class="edge">
-<title>selector: insert shaft1 into gearbase_hole1&#45;&gt;sequence: insert shaft1 into gearbase_hole1</title>
-<path fill="none" stroke="black" d="M1628.27,-288.59C1661.62,-278.39 1704.67,-265.23 1739.76,-254.51"/>
-<polygon fill="black" stroke="black" points="1740.89,-257.82 1749.43,-251.55 1738.85,-251.13 1740.89,-257.82"/>
+<title>selector: insert(shaft1, gearbase_hole1)&#45;&gt;sequence: insert(shaft1, gearbase_hole1)</title>
+<path fill="none" stroke="black" d="M1633.63,-288.59C1665.94,-278.4 1707.64,-265.25 1741.64,-254.53"/>
+<polygon fill="black" stroke="black" points="1742.99,-257.78 1751.47,-251.43 1740.88,-251.1 1742.99,-257.78"/>
 </g>
 <!-- sequence -->
 <g id="node5" class="node">
 <title>sequence</title>
-<polygon fill="orange" stroke="black" points="2125.08,-324 1802.08,-324 1802.08,-288 2125.08,-288 2125.08,-324"/>
-<text text-anchor="middle" x="1963.58" y="-303.8" font-family="Times,serif" font-size="9.00">sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
+<polygon fill="orange" stroke="black" points="2117.08,-324 1794.08,-324 1794.08,-288 2117.08,-288 2117.08,-324"/>
+<text text-anchor="middle" x="1955.58" y="-303.8" font-family="Times,serif" font-size="9.00">sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
 </g>
 <!-- selector: change_tool(left_hand, outwardgripper, clampgripper) -->
 <g id="node7" class="node">
@@ -63,11 +63,11 @@
 <ellipse fill="none" stroke="black" cx="1049.58" cy="-162" rx="304.65" ry="18"/>
 <text text-anchor="middle" x="1049.58" y="-158.3" font-family="Times,serif" font-size="14.00">selector: change_tool(left_hand, outwardgripper, clampgripper)</text>
 </g>
-<!-- sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: change_tool(left_hand, outwardgripper, clampgripper) -->
+<!-- sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: change_tool(left_hand, outwardgripper, clampgripper) -->
 <g id="edge3" class="edge">
-<title>sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: change_tool(left_hand, outwardgripper, clampgripper)</title>
-<path fill="none" stroke="black" d="M1665.28,-220.16C1538.47,-208.39 1350.44,-190.93 1215.57,-178.41"/>
-<polygon fill="black" stroke="black" points="1215.82,-174.92 1205.54,-177.48 1215.18,-181.89 1215.82,-174.92"/>
+<title>sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: change_tool(left_hand, outwardgripper, clampgripper)</title>
+<path fill="none" stroke="black" d="M1669.21,-220.53C1542.41,-208.75 1351.93,-191.07 1215.65,-178.42"/>
+<polygon fill="black" stroke="black" points="1215.81,-174.92 1205.53,-177.48 1215.16,-181.89 1215.81,-174.92"/>
 </g>
 <!-- selector: pick_up(left_hand, clampgripper, shaft1) -->
 <g id="node15" class="node">
@@ -75,9 +75,9 @@
 <ellipse fill="none" stroke="black" cx="1803.58" cy="-162" rx="241.26" ry="18"/>
 <text text-anchor="middle" x="1803.58" y="-158.3" font-family="Times,serif" font-size="14.00">selector: pick_up(left_hand, clampgripper, shaft1)</text>
 </g>
-<!-- sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: pick_up(left_hand, clampgripper, shaft1) -->
+<!-- sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: pick_up(left_hand, clampgripper, shaft1) -->
 <g id="edge9" class="edge">
-<title>sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: pick_up(left_hand, clampgripper, shaft1)</title>
+<title>sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: pick_up(left_hand, clampgripper, shaft1)</title>
 <path fill="none" stroke="black" d="M1803.58,-215.7C1803.58,-207.98 1803.58,-198.71 1803.58,-190.11"/>
 <polygon fill="black" stroke="black" points="1807.08,-190.1 1803.58,-180.1 1800.08,-190.1 1807.08,-190.1"/>
 </g>
@@ -87,11 +87,11 @@
 <ellipse fill="none" stroke="black" cx="2749.58" cy="-162" rx="311.14" ry="18"/>
 <text text-anchor="middle" x="2749.58" y="-158.3" font-family="Times,serif" font-size="14.00">selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
 </g>
-<!-- sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1) -->
+<!-- sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1) -->
 <g id="edge15" class="edge">
-<title>sequence: insert shaft1 into gearbase_hole1&#45;&gt;selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</title>
-<path fill="none" stroke="black" d="M1959,-221.5C2122.3,-209.42 2379.47,-190.39 2555.88,-177.33"/>
-<polygon fill="black" stroke="black" points="2556.35,-180.81 2566.06,-176.58 2555.83,-173.83 2556.35,-180.81"/>
+<title>sequence: insert(shaft1, gearbase_hole1)&#45;&gt;selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</title>
+<path fill="none" stroke="black" d="M1953.22,-221.93C2116.28,-209.86 2377.69,-190.52 2556.2,-177.31"/>
+<polygon fill="black" stroke="black" points="2556.52,-180.79 2566.24,-176.57 2556.01,-173.81 2556.52,-180.79"/>
 </g>
 <!-- target: hold(left_hand, clampgripper) -->
 <g id="node8" class="node">
@@ -156,14 +156,14 @@
 <!-- precondition -->
 <g id="node10" class="node">
 <title>precondition</title>
-<ellipse fill="gray" stroke="black" cx="2261.58" cy="-306" rx="118.87" ry="18"/>
-<text text-anchor="middle" x="2261.58" y="-303.8" font-family="Times,serif" font-size="9.00">precondition: hold(clampgripper, shaft1)</text>
+<ellipse fill="gray" stroke="black" cx="2253.58" cy="-306" rx="118.87" ry="18"/>
+<text text-anchor="middle" x="2253.58" y="-303.8" font-family="Times,serif" font-size="9.00">precondition: hold(clampgripper, shaft1)</text>
 </g>
 <!-- action -->
 <g id="node13" class="node">
 <title>action</title>
-<ellipse fill="gray" stroke="black" cx="2576.58" cy="-306" rx="177.65" ry="18"/>
-<text text-anchor="middle" x="2576.58" y="-303.8" font-family="Times,serif" font-size="9.00">action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
+<ellipse fill="gray" stroke="black" cx="2568.58" cy="-306" rx="177.65" ry="18"/>
+<text text-anchor="middle" x="2568.58" y="-303.8" font-family="Times,serif" font-size="9.00">action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)</text>
 </g>
 <!-- target: hold(clampgripper, shaft1) -->
 <g id="node16" class="node">

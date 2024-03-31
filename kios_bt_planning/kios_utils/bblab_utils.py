@@ -1,4 +1,6 @@
 import time
+import functools
+import warnings
 
 
 def bb_result_test(func):
@@ -11,6 +13,21 @@ def bb_result_test(func):
         return result
 
     return wrapper
+
+
+def bb_deprecated(reason: str, can_run: bool = False):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                f"Function {func.__name__} is deprecated.\n{reason}",
+                DeprecationWarning,
+            )
+            return func(*args, **kwargs) if can_run else None
+
+        return wrapper
+
+    return decorator
 
 
 def execution_timer(func):

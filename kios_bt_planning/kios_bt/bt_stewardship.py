@@ -29,6 +29,7 @@ from kios_utils.pddl_problem_parser import (
     parse_problem_init,
     parse_problem,
 )
+from kios_utils.bblab_utils import bb_deprecated
 
 import py_trees
 
@@ -94,12 +95,10 @@ class BehaviorTreeStewardship:
         )
 
     def generate_behavior_tree_from_skeleton(self, skeleton: dict) -> None:
+        self.bt_skeleton = skeleton
         self.roster, self.behavior_tree = (
             self.behaviortree_factory.from_skeleton_to_behavior_tree(skeleton)
         )
-
-    def load_world_state(self, world_state: dict) -> None:
-        self.world_interface.load_world_from_json(world_state)
 
     def set_world_state(self, world_state: dict) -> None:
         """
@@ -169,6 +168,64 @@ class BehaviorTreeStewardship:
 
         print("\n")
 
+    def tick_tree(
+        self,
+        period_msec: int = 1,
+        timeout_sec: int = 200,
+    ) -> TreeResult:
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
+        running_time = 0
+
+        def tick():
+            nonlocal running_time
+            # * timeout return
+            if running_time > timeout_sec:
+                print("\033[91mTree finished with timeout\033[0m")
+                tip_node = self.behavior_tree.root.tip()
+                return TreeResult(
+                    result="timeout",
+                    summary="Behavior tree tick returns timeout! The reason could be: an action node is being ticked repeatedly while the condition for the next step can not be satisfied; two actions are in one sequence and the tree got stuck here. the tree is not well-structured.",
+                    final_node=self.extract_node_metadata(tip_node).to_json(),
+                    world_state=self.world_interface.get_world_to_json(),
+                )
+
+            self.behavior_tree.tick()
+
+            if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
+                print("\033[94mTree finished with success\033[0m")
+                return TreeResult(
+                    result="success",
+                    summary="Behavior tree tick returns success",
+                    final_node=None,
+                    world_state=self.world_interface.get_world_to_json(),
+                )
+            elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
+                print("\033[91mTree finished with failure\033[0m")
+                tip_node = self.behavior_tree.root.tip()
+                if tip_node is None:
+                    return TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure with the defect node unknown",
+                        final_node=None,
+                        world_state=self.world_interface.get_world_to_json(),
+                    )
+                else:
+                    return TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure",
+                        final_node=self.extract_node_metadata(tip_node).to_json(),
+                        world_state=self.world_interface.get_world_to_json(),
+                    )
+            elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
+                scheduler.enter(period_msec / 1000, 1, tick)
+                running_time += period_msec / 1000
+            else:
+                raise Exception("Unknown status!")
+
+        scheduler = sched.scheduler(time.time, time.sleep)
+        scheduler.enter(0, 1, tick)
+        scheduler.run()
+
     def tick_1000HZ_test(self):
         py_trees.logging.level = py_trees.logging.Level.DEBUG
 
@@ -192,6 +249,9 @@ class BehaviorTreeStewardship:
         scheduler.run()
 
     def tick_frequency_test(self):
+        """
+        for testing the running frequency of the tree
+        """
         py_trees.logging.level = py_trees.logging.Level.DEBUG
 
         tick_count = 0
@@ -222,6 +282,7 @@ class BehaviorTreeStewardship:
         print(f"Run time: {run_time} seconds")
         print(f"Running frequency: {frequency} Hz")
 
+    @bb_deprecated("TreeResult has been changed!")
     def tick_until_success(
         self,
         bt: py_trees.trees.BehaviourTree,
@@ -436,6 +497,8 @@ class BehaviorTreeStewardship:
             # recursively replace the children
             self.replace_action_node_with_only_success(stw, child)
 
+    ######################################################
+    # * the behavior tree simulator tools
     def fake_run(self, world_state: dict, bt_json: dict):
         """
         fake run for graph testing
@@ -478,7 +541,8 @@ class BehaviorTreeStewardship:
 
     def sk_sim_run(self, world_state: dict, skeleton_json: dict):
         """
-        fake run for graph testing
+        simulation run of behavior tree generated from skeleton json.
+        restore the world state after the simulation.
         """
         self.set_world_state(world_state)
 
@@ -504,7 +568,6 @@ class BehaviorTreeStewardship:
         self, world_state: dict, skeleton_json: dict, ut_dict: dict
     ) -> dict:
         """baseline expanding, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
-
 
         Args:
             world_state (dict): ws to start with

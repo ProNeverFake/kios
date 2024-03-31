@@ -273,7 +273,17 @@ class BehaviorTreeFactory:
     def from_skeleton_to_behavior_tree(
         self, json_data: dict
     ) -> Tuple[Dict[str, Any], py_trees.trees.BehaviourTree, Optional[Dict[int, str]]]:
+        """generate a behavior tree from a json tree skeleton.
 
+        Args:
+            json_data (dict): the skeleton of the tree
+
+        Returns:
+            A tuple of the roster, the behavior tree, and the node skeleton dict.
+            roster: a dict of the nodes with their identifiers as keys. (not used yet)
+            behavior_tree: the behavior tree.
+            node_skeleton_dict: a dict of the skeleton nodes with their ids as keys.
+        """
         # ! clear roster here
         self.roster = {}
         self.node_skeleton_dict = {}
@@ -282,9 +292,11 @@ class BehaviorTreeFactory:
         behavior_tree = py_trees.trees.BehaviourTree(tree_root)
         return [self.roster, behavior_tree, self.node_skeleton_dict]
 
-    def from_skeleton_to_tree_root(self, skeleton: dict):
+    def from_skeleton_to_tree_root(
+        self, skeleton: dict
+    ) -> py_trees.behaviour.Behaviour:
         """
-        generate a bt based on a skeleton
+        generate a bt based on a skeleton recursively
         """
         if "name" not in skeleton.keys():
             raise ValueError("name is missing in the skeleton.")
@@ -341,14 +353,14 @@ class BehaviorTreeFactory:
         from skeleton to condition node
         """
         pprint(skeleton)
-        # ! here we cheat. all the condition check are now only true.
+        # TODO remove the limitation that the preconditions and targets are only true conditions and negative conditions (predicates with "not") only exist in the effects of actions
         op = ObjectProperty(
             object_name=parsed_node.params[0],
             property_name=parsed_node.itemname,
             property_value=(
                 parsed_node.params[1] if len(parsed_node.params) == 2 else None
             ),
-            status=True,
+            status=True,  # only check true for now.
         )
         if "identifier" not in skeleton.keys():
             skeleton["identifier"] = next(self.id_generator)
@@ -364,7 +376,9 @@ class BehaviorTreeFactory:
             self.world_interface,
             self.robot_interface,
         )
+
         self.roster[skeleton["identifier"]] = condition_node
+
         # * summary
         self.node_skeleton_dict[condition_node.id] = {
             "summary": skeleton["summary"],
@@ -379,7 +393,9 @@ class BehaviorTreeFactory:
         """
         from skeleton to action node
         """
+        # ground the action to get the effects
         _, effects = ground_action(parsed_node.itemname, parsed_node.params)
+
         if "identifier" not in skeleton.keys():
             skeleton["identifier"] = next(self.id_generator)
 

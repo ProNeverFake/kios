@@ -28,8 +28,6 @@ from kios_agent.kios_routers import KiosRouterFactory
 
 from dotenv import load_dotenv
 
-from langchain import hub
-
 from langchain_openai import ChatOpenAI
 
 from langchain.chains.openai_functions import (
@@ -67,7 +65,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 scene_path = os.path.join(current_dir, "scene.json")
 # bt_json_file_path = os.path.join(current_dir, "behavior_tree.json")
 world_state_path = os.path.join(current_dir, "world_state.json")
-domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
+# domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
 
 ####################### scene
 with open(scene_path, "r") as file:
@@ -411,13 +409,16 @@ async def behavior_tree_execute_step(state: PlanExecuteState):
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]
 
-    # * first sim run
-    tree_result, skeleton_json = behavior_tree_stewardship.sk_sim_run(
-        world_state=latest_world_state, skeleton_json=behavior_tree_skeleton
+    behavior_tree_stewardship.set_world_state(latest_world_state)
+
+    behavior_tree_stewardship.generate_behavior_tree_from_skeleton(
+        behavior_tree_skeleton
     )
 
+    tree_result = behavior_tree_stewardship.tick_tree()
+
     pprint(tree_result.to_json())
-    pause = input("paused here")
+    pause = input("DEBUG: please check the tree result. Press enter to continue.")
 
     # * check result
     if tree_result.result == "success":
@@ -434,11 +435,53 @@ async def behavior_tree_execute_step(state: PlanExecuteState):
     else:
         return {
             "BTExecutionHasSucceeded": False,
-            # ! do not change world state
             # "last_behavior_tree": skeleton_json, # * do not change the last behavior tree
             "world_state": [tree_result.world_state],
             "runtime_world_state": tree_result.world_state,
         }
+
+
+# region * sim
+# @traceable(name="behavior_tree_execute_step")
+# async def behavior_tree_execute_step(state: PlanExecuteState):
+#     """
+#     execute the first step of the plan, append the result to the past steps
+#     """
+#     print(f"-----behavior_tree_execute_step-----")
+
+#     this_step = state["plan"][0]
+#     behavior_tree_skeleton = state["last_behavior_tree"]
+#     latest_world_state = state["world_state"][-1]
+
+#     # * first sim run
+#     tree_result, skeleton_json = behavior_tree_stewardship.sk_sim_run(
+#         world_state=latest_world_state, skeleton_json=behavior_tree_skeleton
+#     )
+
+#     pprint(tree_result.to_json())
+#     pause = input("paused here")
+
+#     # * check result
+#     if tree_result.result == "success":
+#         return {
+#             "BTExecutionHasSucceeded": True,
+#             "past_steps": (
+#                 this_step,
+#                 tree_result.result,
+#             ),  # * only one because new plan will be generated and old steps are all removed
+#             "world_state": [tree_result.world_state],
+#             # "last_behavior_tree": None, # ! do not change the last behavior tree
+#             "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
+#         }
+#     else:
+#         return {
+#             "BTExecutionHasSucceeded": False,
+#             # ! do not change world state
+#             # "last_behavior_tree": skeleton_json, # * do not change the last behavior tree
+#             "world_state": [tree_result.world_state],
+#             "runtime_world_state": tree_result.world_state,
+#         }
+# endregion
 
 
 @traceable(name="planner_step")

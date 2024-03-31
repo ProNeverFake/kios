@@ -49,6 +49,8 @@ class BehaviorTreeStewardship:
     roster: Dict[int, Any] = {}  # for tree mod
     skeleton_dict = {}  # for tree to dict
 
+    tree_result: TreeResult = None  # to record the result of the tree run
+
     def __init__(
         self,
         behaviortree_factory: BehaviorTreeFactory = None,
@@ -96,7 +98,7 @@ class BehaviorTreeStewardship:
 
     def generate_behavior_tree_from_skeleton(self, skeleton: dict) -> None:
         self.bt_skeleton = skeleton
-        self.roster, self.behavior_tree = (
+        self.roster, self.behavior_tree, self.skeleton_dict = (
             self.behaviortree_factory.from_skeleton_to_behavior_tree(skeleton)
         )
 
@@ -172,7 +174,7 @@ class BehaviorTreeStewardship:
         self,
         period_msec: int = 1,
         timeout_sec: int = 200,
-    ) -> TreeResult:
+    ):
         py_trees.logging.level = py_trees.logging.Level.DEBUG
         running_time = 0
 
@@ -182,7 +184,7 @@ class BehaviorTreeStewardship:
             if running_time > timeout_sec:
                 print("\033[91mTree finished with timeout\033[0m")
                 tip_node = self.behavior_tree.root.tip()
-                return TreeResult(
+                self.tree_result = TreeResult(
                     result="timeout",
                     summary="Behavior tree tick returns timeout! The reason could be: an action node is being ticked repeatedly while the condition for the next step can not be satisfied; two actions are in one sequence and the tree got stuck here. the tree is not well-structured.",
                     final_node=self.extract_node_metadata(tip_node).to_json(),
@@ -193,7 +195,7 @@ class BehaviorTreeStewardship:
 
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
                 print("\033[94mTree finished with success\033[0m")
-                return TreeResult(
+                self.tree_result = TreeResult(
                     result="success",
                     summary="Behavior tree tick returns success",
                     final_node=None,
@@ -203,14 +205,14 @@ class BehaviorTreeStewardship:
                 print("\033[91mTree finished with failure\033[0m")
                 tip_node = self.behavior_tree.root.tip()
                 if tip_node is None:
-                    return TreeResult(
+                    self.tree_result = TreeResult(
                         result="failure",
                         summary="Behavior tree tick returns failure with the defect node unknown",
                         final_node=None,
                         world_state=self.world_interface.get_world_to_json(),
                     )
                 else:
-                    return TreeResult(
+                    self.tree_result = TreeResult(
                         result="failure",
                         summary="Behavior tree tick returns failure",
                         final_node=self.extract_node_metadata(tip_node).to_json(),

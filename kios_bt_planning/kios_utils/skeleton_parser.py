@@ -16,7 +16,7 @@ only skeleton node parser here
 load_dotenv()
 
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
-print(data_dir)
+# print(data_dir)
 world_definition_json = os.path.join(data_dir, "world_definition.json")
 
 with open(world_definition_json, "r") as f:

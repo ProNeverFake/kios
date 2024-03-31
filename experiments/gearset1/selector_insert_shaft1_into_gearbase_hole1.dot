@@ -32,16 +32,16 @@ precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: 
 "sequence: pick_up(left_hand, clampgripper, shaft1)" -> "precondition: is_empty(clampgripper)";
 action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: pick_up(left_hand, clampgripper, shaft1)", shape=ellipse, style=filled];
 "sequence: pick_up(left_hand, clampgripper, shaft1)" -> "action: pick_up(left_hand, clampgripper, shaft1)";
-selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", shape=octagon, style=filled];
-"sequence: insert shaft1 into gearbase_hole1" -> "selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)";
+selector [fillcolor=cyan, fontcolor=black, fontsize=9, label="selector: insert shaft1 into gearbase_hole1 final", shape=octagon, style=filled];
+"sequence: insert shaft1 into gearbase_hole1" -> "selector: insert shaft1 into gearbase_hole1 final";
 target [fillcolor=gray, fontcolor=black, fontsize=9, label="target: is_inserted_to(shaft1, gearbase_hole1)*", shape=ellipse, style=filled];
-"selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)" -> "target: is_inserted_to(shaft1, gearbase_hole1)*";
-sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", shape=box, style=filled];
-"selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)" -> "sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)";
+"selector: insert shaft1 into gearbase_hole1 final" -> "target: is_inserted_to(shaft1, gearbase_hole1)*";
+sequence [fillcolor=orange, fontcolor=black, fontsize=9, label="sequence: insert shaft1 into gearbase_hole1 final", shape=box, style=filled];
+"selector: insert shaft1 into gearbase_hole1 final" -> "sequence: insert shaft1 into gearbase_hole1 final";
 precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(left_hand, clampgripper)*", shape=ellipse, style=filled];
-"sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)" -> "precondition: hold(left_hand, clampgripper)*";
+"sequence: insert shaft1 into gearbase_hole1 final" -> "precondition: hold(left_hand, clampgripper)*";
 precondition [fillcolor=gray, fontcolor=black, fontsize=9, label="precondition: hold(clampgripper, shaft1)", shape=ellipse, style=filled];
-"sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)" -> "precondition: hold(clampgripper, shaft1)";
+"sequence: insert shaft1 into gearbase_hole1 final" -> "precondition: hold(clampgripper, shaft1)";
 action [fillcolor=gray, fontcolor=black, fontsize=9, label="action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", shape=ellipse, style=filled];
-"sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)" -> "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)";
+"sequence: insert shaft1 into gearbase_hole1 final" -> "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)";
 }

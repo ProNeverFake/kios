@@ -153,7 +153,8 @@ class BehaviorTreeStewardship:
             functools.partial(self.post_tick_handler, snapshot_visitor)
         )
         behavior_tree.visitors.append(snapshot_visitor)
-        behavior_tree.setup(timeout=15)
+        # behavior_tree.setup(timeout=15) # ! signal bug
+        behavior_tree.setup()
 
     def render_dot_tree(self):
         py_trees.display.render_dot_tree(

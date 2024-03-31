@@ -52,7 +52,7 @@ def generate_bt_stewardship(bt) -> py_trees.trees.BehaviourTree:
         functools.partial(post_tick_handler, snapshot_visitor)
     )
     behaviour_tree.visitors.append(snapshot_visitor)
-    behaviour_tree.setup(timeout=15)
+    behaviour_tree.setup()
 
     return behaviour_tree
 

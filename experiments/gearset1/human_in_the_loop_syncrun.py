@@ -188,16 +188,16 @@ def behavior_tree_generate_step(state: PlanExecuteState):
         }
     )
 
-    behavior_tree_stewardship.generate_behavior_tree_from_skeleton(bt_skeleton)
-
-    behavior_tree_stewardship.render_dot_tree()
+    render_bt(bt_skeleton)
+    # * here the reason not to use the btw is that the generated bt can be illegal while using btw assumes the bt to be legal and will do assertion.
+    # behavior_tree_stewardship.generate_behavior_tree_from_skeleton(bt_skeleton)
+    # behavior_tree_stewardship.render_dot_tree()
 
     user_feedback = input(
         "What should I do to improve the behavior tree?\nPlease give me your hint: "
     )
 
     return {
-        "user_feedback": user_feedback,
         "last_behavior_tree": bt_skeleton,
         "BTExecutionHasSucceeded": False,
     }

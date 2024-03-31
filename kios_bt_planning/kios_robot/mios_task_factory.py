@@ -409,7 +409,6 @@ class MiosTaskFactory:
         D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 0.7, 0.7, 0.7]
 
         if kios_object is not None:
-            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
@@ -967,7 +966,6 @@ class MiosTaskFactory:
         # get the container from the scene
         kios_object = self.task_scene.get_object(container)
         if kios_object is not None:
-            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
@@ -1133,7 +1131,6 @@ class MiosTaskFactory:
         D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 0.7, 0.7, 0.7]
 
         if kios_object is not None:
-            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
@@ -1302,7 +1299,6 @@ class MiosTaskFactory:
         D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 1.4, 1.4, 1.4]
 
         if kios_object is not None:
-            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {
@@ -1399,7 +1395,6 @@ class MiosTaskFactory:
         D_x = param["D_x"] if "D_x" in param.keys() else [0.7, 0.7, 0.7, 0.7, 0.7, 0.7]
 
         if kios_object is not None:
-            print(f'object "{container}" is found in the scene!')
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {

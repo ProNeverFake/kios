@@ -12,6 +12,7 @@ class MiosSkill:
     skill_name: str
     skill_type: str
     skill_parameters: Dict[str, Any]
+    retry: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.skill_name
@@ -21,6 +22,7 @@ class MiosSkill:
 class MiosCall:
     method_name: str
     method_payload: Dict[str, Any]
+    retry: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.method_name
@@ -30,7 +32,7 @@ class MiosCall:
 class KiosCall:
     method: object
     args: List[Any]
-    call_name: str = field(default="default name")  # ! alarm: test!
+    call_name: str = field(default="default name")
 
     def __str__(self) -> str:
         return self.call_name

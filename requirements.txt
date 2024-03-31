@@ -25,6 +25,8 @@ langchain
 langchain-openai
 langgraph
 
+# semantic-router
+semantic-router
 
 # robotics 
 roboticstoolbox-python

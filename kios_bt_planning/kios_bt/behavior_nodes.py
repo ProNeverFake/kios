@@ -179,7 +179,6 @@ class ActionNode(BehaviorNode):
                 # ! and it should "task effect".
                 # ! the target condition node in the selector will be fulfilled by the "task effect"
                 # ! the action node will be interrupted by the selector, and the tick goes on...
-                # ! YOU WILL UNDERSTAND ME SOONER OR LATER...
             else:
                 self.logger.info(f'Action "{self.behavior_name}" failed with error')
                 new_status = py_trees.common.Status.FAILURE

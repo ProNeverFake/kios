@@ -1,7 +1,8 @@
 from typing import Optional, Type, List
 
 """
-not in use yet. this part will become necessary if you want to implement an agent.
+! not in use yet. 
+this part will become necessary if you want to implement an agent.
 """
 
 # Import things that are needed generically

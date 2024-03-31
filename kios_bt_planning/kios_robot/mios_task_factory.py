@@ -1,14 +1,11 @@
-from typing import List, Any, Dict
+from typing import Any
 import re
 import numpy as np
 from pprint import pprint
 
 from kios_scene.mongodb_interface import MongoDBInterface
+from kios_utils.bblab_utils import bb_deprecated
 
-# from kios_robot.robot_interface import RobotInterface
-# ! circular import
-
-# from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.data_types import (
     MiosCall,
     MiosSkill,
@@ -31,7 +28,6 @@ Anyway, the current implementation is straightforward and easy to understand.
 class MiosTaskFactory:
     task_scene: TaskScene
     robot_interface: Any
-    # robot_proprioceptor: RobotProprioceptor
 
     def __init__(
         self,
@@ -47,7 +43,7 @@ class MiosTaskFactory:
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
 
-    def parse_action(self, action: Action) -> Dict[str, Any]:
+    def parse_action(self, action: Action) -> dict[str, Any]:
         """parse the action string to get the action name and arguments.
 
         Args:
@@ -60,7 +56,7 @@ class MiosTaskFactory:
             Dict[str, Any]: action_name: str, args: List[str]
         """
         # use re to parse the action
-        pattern = r"(?:action:\s)?(\w+):?\s*\(([\w\s,]+)\)"  # ! alarm
+        pattern = r"(?:action:\s)?(\w+):?\s*\(([\w\s,]+)\)"
         action_string = action.name
         match = re.match(pattern, action_string)
         if match:
@@ -81,7 +77,7 @@ class MiosTaskFactory:
     # * BBCORE
     def generate_tasks(
         self, action: Action, shared_data: Any = None
-    ) -> List[MiosCall | MiosSkill]:
+    ) -> list[MiosCall | MiosSkill]:
         """core function.
         generate mios tasks from a kios action and return them in a list.
 
@@ -101,7 +97,7 @@ class MiosTaskFactory:
             return self.generate_change_tool_skill(parsed_action)
         elif parsed_action["name"] == "pick_up":
             return self.generate_pick_up_skill(parsed_action)
-        elif parsed_action["name"] == "screw":  # ! mod later
+        elif parsed_action["name"] == "screw":  # TODO add this skill
             return self.generate_screw_skill(parsed_action)
         elif parsed_action["name"] == "put_down":
             return self.generate_put_down_skill(parsed_action)
@@ -112,14 +108,11 @@ class MiosTaskFactory:
         else:
             raise Exception(f"action {parsed_action['name']} is not supported yet.")
 
-    def generate_fake_mios_tasks(self, action: Action) -> List[MiosCall | MiosSkill]:
+    @bb_deprecated(reason="preserved but not used")
+    def generate_fake_mios_tasks(self, action: Action) -> list[MiosCall | MiosSkill]:
         """
         test function.
         """
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print("generate_fake_mios_tasks, skipped for test.")
-        # print(action)
-        print(self.parse_action(action))
         return [
             MiosCall(
                 method_name="test_method",
@@ -163,7 +156,10 @@ class MiosTaskFactory:
         }
         return MiosCall(method_name="teach_object", method_payload=payload)
 
-    # ! this doesn't make sense if you use the object in the scene. turn to the scene method.
+    @bb_deprecated(
+        reason="this doesn't make sense if you use the object in the scene. turn to the scene method.",
+        can_run=False,
+    )
     def generate_update_mios_memory_environment_call(self) -> MiosCall:
         payload = {}
         return MiosCall(method_name="update_memory_environment", method_payload=payload)
@@ -188,7 +184,6 @@ class MiosTaskFactory:
             ]
         )
 
-        # generate the cartesian move
         return self.generate_cartesian_move_mp(O_T_TCP=above_O_T_TCP)
 
     def generate_reach_mp(self, object_name: str) -> MiosSkill:
@@ -256,6 +251,7 @@ class MiosTaskFactory:
             skill_parameters=context,
         )
 
+    @bb_deprecated(reason="not for task space operation", can_run=True)
     def generate_joint_move_mp(self, joint_location: str) -> MiosSkill:
         """
             * available. debug: task context error, "skill", "control" and "user" are on the same level.
@@ -291,15 +287,10 @@ class MiosTaskFactory:
             "epsilon_inner": epsilon_inner,
             "epsilon_outer": epsilon_outer,
         }
-        # return call_method(self.robot_address, self.robot_port, "grasp", payload)
         return MiosCall(method_name="grasp", method_payload=payload)
 
+    @bb_deprecated(reason="meaningless")
     def generate_gripper_release_mp(self, width=0.08, speed=0.2) -> MiosCall:
-        payload = {
-            "width": width,
-            "speed": speed,
-        }
-        # return call_method(self.robot_address, self.robot_port, "release", payload)
         return self.generate_gripper_move_mp(width=width, speed=speed)
 
     def generate_gripper_move_mp(
@@ -318,20 +309,8 @@ class MiosTaskFactory:
         payload = {}
         return MiosCall(method_name="home_gripper", method_payload=payload)
 
-    # preserved for future use
-    def generate_equip_tool(self) -> MiosCall:
-        # move finger to the right position
-        return self.generate_gripper_move_mp(0.042)
-
-    # preserved for future use
-    def generate_lift_tool(self) -> MiosCall:
-        # move finger to the right position
-        return self.generate_gripper_move_mp(0.08)
-
+    @bb_deprecated(reason="screw is not ready now in mios")
     def generate_screw_in_mp(self, object_name: str = None, O_T_OB=None) -> MiosSkill:
-        """
-        # ! DO NOT USE THIS METHOD
-        """
         if object_name is None and O_T_OB is None:
             raise Exception("Object target is not set!")
         if object_name:
@@ -376,8 +355,9 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
+    @bb_deprecated(reason="demo only")
     def generate_insert_mp_mod(
-        self, insertable: str, container: str, param: Dict[str, Any] = None
+        self, insertable: str, container: str, param: list[str, Any] = None
     ) -> MiosCall:
         if container is None:
             raise Exception("container is not set!")
@@ -474,58 +454,7 @@ class MiosTaskFactory:
             }
         else:
             raise Exception(f'object "{container}" is not found in the scene!')
-        # else:
-        #     payload = {
-        #         "skill": {
-        #             "objects": {
-        #                 "Container": container,
-        #             },
-        #             "time_max": 20,
-        #             "p0": {  # ! approach should be move above in mios skill. mod it
-        #                 "dX_d": [0.1, 0.3],
-        #                 "ddX_d": [0.5, 4],
-        #                 "DeltaX": [0, 0, 0, 0, 0, 0],
-        #                 "K_x": [1500, 1500, 1500, 600, 600, 600],
-        #             },
-        #             "p1": {
-        #                 "dX_d": [0.03, 0.1],
-        #                 "ddX_d": [0.05, 0.01],
-        #                 "K_x": [500, 500, 500, 600, 600, 600],
-        #             },
-        #             "p2": {
-        #                 # "search_a": [10, 10, 0, 2, 2, 0],
-        #                 # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-        #                 "search_a": [5, 5, 0, 2, 2, 0],
-        #                 "search_f": [1, 1, 0, 1.2, 1.2, 0],
-        #                 "search_phi": [
-        #                     0,
-        #                     3.14159265358979323846 / 2,
-        #                     0,
-        #                     3.14159265358979323846 / 2,
-        #                     0,
-        #                     0,
-        #                 ],
-        #                 "K_x": [500, 500, 500, 800, 800, 800],
-        #                 "f_push": [0, 0, 3, 0, 0, 0],
-        #                 # "dX_d": [0.1, 0.5],
-        #                 # "ddX_d": [0.5, 1],
-        #                 "dX_d": [0.08, 0.5],
-        #                 "ddX_d": [0.3, 1],
-        #             },
-        #             "p3": {
-        #                 "dX_d": [0.1, 0.5],
-        #                 "ddX_d": [0.5, 1],
-        #                 "f_push": 7,
-        #                 "K_x": [500, 500, 0, 800, 800, 800],
-        #             },
-        #         },
-        #         "control": {"control_mode": 0},
-        #         "user": {
-        #             "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-        #             "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-        #             "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
-        #         },
-        #     }
+
         insert = MiosSkill(
             skill_name="insert",
             skill_type="KiosInsertion",
@@ -552,22 +481,19 @@ class MiosTaskFactory:
         EE_T_TCP = tool.EE_T_TCP
         EE_finger_width_max = tool.EE_finger_width_max
         EE_finger_width_min = tool.EE_finger_width_min
-        assert isinstance(EE_T_TCP, np.ndarray)
+
         payload = {
             "EE_T_TCP": EE_T_TCP.T.flatten().tolist(),
             "EE_finger_width_max": EE_finger_width_max,
             "EE_finger_width_min": EE_finger_width_min,
         }
-        pprint(payload)
         return MiosCall(method_name="change_tool", method_payload=payload)
-
-    ###################################################################
 
     ###################################################################
     # * methods to generate a sequence of mios tasks
 
     def generate_change_tool_skill(
-        self, parsed_action: Dict[str, Any]
+        self, parsed_action: dict[str, Any]
     ) -> list[MiosCall | MiosSkill]:
         tool1 = parsed_action["args"][1]
         tool2 = parsed_action["args"][2]
@@ -581,18 +507,22 @@ class MiosTaskFactory:
         return unload_skill + load_skill
 
     def generate_load_tool_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosSkill | MiosCall]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosSkill | MiosCall]:
+
         tool_name = parsed_action["args"][1]
         if tool_name is None:
             raise Exception("tool_name is not set!")
+
+        if tool_name is "defaultgripper":
+            return [self.generate_update_tool_call(tool_name)]
 
         payload = {
             "skill": {
                 "objects": {
                     "Tool": tool_name,
                 },
-                "time_max": 30,
+                # "time_max": 30,
                 "MoveAbove": {
                     "dX_d": [0.5, 1.2],
                     "ddX_d": [0.3, 1],
@@ -621,10 +551,10 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            "user": {
-                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            },
+            # "user": {
+            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+            # },
         }
 
         load_tool = MiosSkill(
@@ -641,11 +571,14 @@ class MiosTaskFactory:
         ]
 
     def generate_unload_tool_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosSkill | MiosCall]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosSkill | MiosCall]:
         tool_name = parsed_action["args"][1]
         if tool_name is None:
             raise Exception("tool_name is not set!")
+
+        if tool_name is "defaultgripper":
+            return []
 
         payload = {
             "skill": {
@@ -681,10 +614,10 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            "user": {
-                "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-                "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            },
+            # "user": {
+            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+            # },
         }
 
         unload_tool = MiosSkill(
@@ -693,7 +626,6 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
-        # ! name changed
         update_tool = self.generate_update_tool_call(tool_name="defaultgripper")
 
         return [
@@ -703,8 +635,8 @@ class MiosTaskFactory:
 
     # ! BUG
     def generate_pick_up_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
         # tool_name = parsed_action["args"][1]
         # if tool_name is None:
         #     raise Exception("tool_name is not set!")
@@ -736,20 +668,19 @@ class MiosTaskFactory:
 
         return task_list
 
-    # ! BUG
     def generate_put_down_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
         return [self.generate_kios_dummy_call()]
 
     def generate_place_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
         return [self.generate_kios_dummy_call()]
 
     def generate_screw_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
         return [self.generate_kios_dummy_call()]
 
     # def generate_drive_skill(
@@ -770,6 +701,7 @@ class MiosTaskFactory:
         payload = {}
         return MiosCall(method_name="loose_gripper", method_payload=payload)
 
+    @bb_deprecated(reason="long way to go")
     def generate_drive_in_mp(self, drivable, container) -> MiosSkill:
 
         if container is None:
@@ -817,54 +749,7 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
-    # def generate_drive_out_mp(self, drivable, container) -> MiosSkill:
-
-    #     if container is None:
-    #         raise Exception("container is not set!")
-
-    #     # get the container from the scene
-    #     kios_object = self.task_scene.get_object(container)
-    #     if kios_object is not None:
-    #         payload = {
-    #             "skill": {
-    #                 "objects": {
-    #                     # "Container": container,
-    #                 },
-    #                 # "time_max": 60,
-    #                 "p0": {
-    #                     "K_x": [1500, 1500, 0, 600, 600, 600],
-    #                     "dq_max": 1,
-    #                     "ddq_max": 0.8,
-    #                     "limit_tighten_torque": 60,
-    #                     "f_pull": [0, 0, 8, 0, 0, 0],
-    #                     "z_offset": 0.05,
-    #                 },
-    #                 "p1": {
-    #                     "K_x": [500, 500, 500, 600, 600, 600],
-    #                 },
-    #                 "p2": {
-    #                     "K_x": [500, 500, 500, 800, 800, 800],
-    #                     "dq_max": 1,
-    #                     "ddq_max": 1.0,
-    #                 },
-    #                 "p3": {
-    #                     "grasp_force": 30,
-    #                     "K_x": [500, 500, 500, 800, 800, 800],
-    #                 },
-    #             },
-    #             "control": {"control_mode": 1},
-    #             "user": {
-    #                 "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-    #                 "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-    #             },
-    #         }
-
-    #     return MiosSkill(
-    #         skill_name="driveout",
-    #         skill_type="KiosDriveOut",
-    #         skill_parameters=payload,
-    #     )
-
+    @bb_deprecated(reason="not sure if this is ready")
     def generate_drive_out_mp(self, drivable, container) -> MiosSkill:
 
         if container is None:
@@ -915,49 +800,50 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
-    # def generate_drive_in_mp(
-    #     self,
-    #     drivable,
-    #     container,
-    #     clockwise: bool = True,
-    # ) -> MiosSkill:
+    @bb_deprecated(reason="not ready")
+    def generate_drive_in_mp(
+        self,
+        drivable,
+        container,
+        clockwise: bool = True,
+    ) -> MiosSkill:
 
-    #     if container is None:
-    #         raise Exception("container is not set!")
+        if container is None:
+            raise Exception("container is not set!")
 
-    #     # get the container from the scene
-    #     kios_object = self.task_scene.get_object(container)
-    #     if kios_object is not None:
-    #         payload = {
-    #             "skill": {
-    #                 "objects": {
-    #                     # "Container": container,
-    #                 },
-    #                 "time_max": 60,
-    #                 "p0": {
-    #                     "K_x": [1500, 1500, 1500, 600, 600, 600],
-    #                     "dq_max": 0.5,
-    #                     "ddq_max": 0.6,
-    #                     "clockwise": clockwise,
-    #                     "tighten_torque": 3,
-    #                 },
-    #             },
-    #             "control": {"control_mode": 1},
-    #             "user": {
-    #                 "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-    #                 "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-    #             },
-    #         }
+        # get the container from the scene
+        kios_object = self.task_scene.get_object(container)
+        if kios_object is not None:
+            payload = {
+                "skill": {
+                    "objects": {
+                        # "Container": container,
+                    },
+                    "time_max": 60,
+                    "p0": {
+                        "K_x": [1500, 1500, 1500, 600, 600, 600],
+                        "dq_max": 0.5,
+                        "ddq_max": 0.6,
+                        "clockwise": clockwise,
+                        "tighten_torque": 3,
+                    },
+                },
+                "control": {"control_mode": 1},
+                "user": {
+                    "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
+                    "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
+                },
+            }
 
-    #     return MiosSkill(
-    #         skill_name="drivein",
-    #         skill_type="KiosDriveIn",
-    #         skill_parameters=payload,
-    #     )
+        return MiosSkill(
+            skill_name="drivein",
+            skill_type="KiosDriveIn",
+            skill_parameters=payload,
+        )
 
     def generate_insert_skill(
-        self, parsed_action: Dict[str, Any]
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
         insertable = parsed_action["args"][2]
         container = parsed_action["args"][3]
         if container is None:
@@ -1019,63 +905,7 @@ class MiosTaskFactory:
                     "F_ext_contact": [10.0, 2.0],
                 },
             }
-        # else:
-        #     payload = {
-        #         "skill": {
-        #             "objects": {
-        #                 "Container": container,
-        #             },
-        #             "time_max": 20,
-        #             "p0": {  # ! approach should be move above in mios skill. mod it
-        #                 "dX_d": [0.1, 0.3],
-        #                 "ddX_d": [0.5, 4],
-        #                 "DeltaX": [0, 0, 0, 0, 0, 0],
-        #                 "K_x": [1500, 1500, 1500, 600, 600, 600],
-        #             },
-        #             "p1": {
-        #                 "dX_d": [0.03, 0.1],
-        #                 "ddX_d": [0.05, 0.01],
-        #                 "K_x": [500, 500, 500, 600, 600, 600],
-        #             },
-        #             "p2": {
-        #                 # "search_a": [10, 10, 0, 2, 2, 0],
-        #                 # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-        #                 "search_a": [5, 5, 0, 2, 2, 0],
-        #                 "search_f": [1, 1, 0, 1.2, 1.2, 0],
-        #                 "search_phi": [
-        #                     0,
-        #                     3.14159265358979323846 / 2,
-        #                     0,
-        #                     3.14159265358979323846 / 2,
-        #                     0,
-        #                     0,
-        #                 ],
-        #                 "K_x": [500, 500, 500, 800, 800, 800],
-        #                 "f_push": [0, 0, 3, 0, 0, 0],
-        #                 # "dX_d": [0.1, 0.5],
-        #                 # "ddX_d": [0.5, 1],
-        #                 "dX_d": [0.08, 0.5],
-        #                 "ddX_d": [0.3, 1],
-        #             },
-        #             "p3": {
-        #                 "dX_d": [0.1, 0.5],
-        #                 "ddX_d": [0.5, 1],
-        #                 "f_push": 7,
-        #                 "K_x": [500, 500, 0, 800, 800, 800],
-        #             },
-        #         },
-        #         "control": {"control_mode": 0},
-        #         "user": {
-        #             "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-        #             "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-        #             "F_ext_contact": [10.0, 2.0], # ! this doesn't work. change the param in the mongodb!
-        #         },
-        #     }
 
-        # !
-        from pprint import pprint
-
-        pprint(payload)
         insert = MiosSkill(
             skill_name="insert",
             skill_type="KiosInsertion",
@@ -1084,7 +914,7 @@ class MiosTaskFactory:
         update_object_in_mios = self.generate_teach_object_call(insertable)
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
 
-        release = self.generate_gripper_release_mp(width=0.042)
+        release = self.generate_gripper_release_mp(width=0.041)
 
         retreat = self.generate_move_above_mp(container)
 
@@ -1096,9 +926,10 @@ class MiosTaskFactory:
             retreat,
         ]
 
+    @bb_deprecated(reason="demo only")
     def generate_insert_skill_mod(
-        self, parsed_action: Dict[str, Any], param: Dict[str, Any] = None
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any], param: dict[str, Any] = None
+    ) -> list[MiosCall | MiosSkill]:
         insertable = parsed_action["args"][2]
         container = parsed_action["args"][3]
         if container is None:
@@ -1263,11 +1094,12 @@ class MiosTaskFactory:
             retreat,
         ]
 
+    @bb_deprecated(reason="demo only")
     def generate_insert_mp(
         self,
         insertable: str,
         container: str,
-        param: Dict[str, Any] = None,
+        param: dict[str, Any] = None,
     ) -> MiosSkill:
         if container is None:
             raise Exception("container is not set!")
@@ -1360,9 +1192,10 @@ class MiosTaskFactory:
             skill_parameters=payload,
         )
 
+    @bb_deprecated(reason="demo only")
     def generate_insert_skill_standalone_mod(
-        self, parsed_action: Dict[str, Any], param: Dict[str, Any] = None
-    ) -> List[MiosCall | MiosSkill]:
+        self, parsed_action: dict[str, Any], param: dict[str, Any] = None
+    ) -> list[MiosCall | MiosSkill]:
         insertable = parsed_action["args"][2]
         container = parsed_action["args"][3]
         if container is None:

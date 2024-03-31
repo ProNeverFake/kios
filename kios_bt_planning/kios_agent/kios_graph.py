@@ -5,6 +5,9 @@ import os
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 # os.environ["LANGCHAIN_PROJECT"] = "kios_human_in_the_loop"
 
+"""
+some chains that are used in kios graph
+"""
 
 from kios_agent.llm_supporter import KiosLLMSupporter
 from kios_agent.data_types import KiosPromptSkeleton

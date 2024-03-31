@@ -5,7 +5,6 @@ some functionaltiy is tailored for mios.
 
 from kios_utils.task import *
 import numpy as np
-from typing import Any, List, Dict
 
 from kios_bt.data_types import Action
 
@@ -57,7 +56,7 @@ class RobotInterface:
         return mios_response.has_finished
 
     # * BBCORE
-    def generate_robot_command(self, action: Action, shared_data: Any):
+    def generate_robot_command(self, action: Action, shared_data):
         """
         shard data is shared between the action node and the robot command thread.
         """
@@ -68,7 +67,7 @@ class RobotInterface:
             robot_port=self.robot_port,
             shared_data=shared_data,
             task_scene=self.task_scene,
-            robot_interface=self,  # ! LET'S HACK!
+            robot_interface=self,  # TODO someone comes to refactor this part plz!
         )
         """core method. 
         generate a robot command from an action. load the shared data into the command for possible use.

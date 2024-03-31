@@ -60,7 +60,13 @@ class Task:
         self.task_uuid = response["result"]["task_uuid"]
         return response
 
-    def wait(self):
+    def wait(self) -> dict:
+        """
+        a blocking function to start a observer in mios to monitor the execution of the task.
+
+        Returns:
+            mios response in json format
+        """
         print(f"\033[92mWait for skill {self.skill_names[0]} to finish\033[0m")
         result = wait_for_task(self.robot, self.task_uuid)
         print("Task execution took " + str(time.time() - self.t_0) + " s.")

@@ -1,10 +1,10 @@
-from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
+from typing import Any, List, Dict
 
 from dotenv import load_dotenv
 
 """
 supporter for generating the llm prompt.
-this is a historical file and should be removed later.
+! this is a historical file and should be removed later.
 """
 
 import openai

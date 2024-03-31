@@ -1,8 +1,8 @@
 from kios_utils.task import *
 import numpy as np
-from typing import Any, List, Dict
 from termcolor import colored
 from pprint import pprint
+from typing import Any
 
 from kios_robot.data_types import (
     MiosObject,
@@ -142,7 +142,7 @@ class RobotProprioceptor:
             print(mios_object)
             return mios_object
 
-    def align_object(self, object_name: str, **kwargs: Dict[str, Any]):
+    def align_object(self, object_name: str, **kwargs: dict[str, Any]):
         """
         cheat method for BB usecase
         """
@@ -154,7 +154,7 @@ class RobotProprioceptor:
             R=[1, 0, 0, 0, -1, 0, 0, 0, -1],
         )
 
-    def modify_object_position(self, object_name: str, **kwargs: Dict[str, Any]):
+    def modify_object_position(self, object_name: str, **kwargs: dict[str, Any]):
         this_object = self.get_object(object_name)
         O_T_EE = this_object.O_T_OB
         O_T_TCP = this_object.O_T_TCP

@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 import os
 import json
 
+"""
+semantic router factory.
+"""
+
 load_dotenv()
 
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())

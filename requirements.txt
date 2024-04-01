@@ -1,6 +1,8 @@
 # basics
 numpy
 websockets
+tabulate
+python-dotenv
 
 # behavior tree
 py_trees==2.2.3
@@ -20,9 +22,18 @@ openai # you may need to upgrade this after installing it
 tiktoken
 cohere
 langchain
+langchain-openai
+langgraph==0.0.24
+
+# semantic-router
+semantic-router
 
 # robotics 
 roboticstoolbox-python
+
+# vision
+opencv-python
+pyrealsense2
 
 # LLAMA
 torch

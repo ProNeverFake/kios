@@ -1,0 +1,25 @@
+{
+  "objects": [
+    {"name": "clampgripper", "properties": ["is_empty"]},
+    {"name": "outwardgripper", "properties": []},
+    {"name": "defaultgripper", "properties": ["is_empty"]},
+    ...
+    {"name": "gear1", "properties": []},
+    {"name": "shaft1", "properties": []},
+    ...
+    {"name": "left_hand", "properties": []}
+  ],
+  "constraints": [
+    {"source": "clampgripper", "name": "can_manipulate", "target": "shaft1"},
+    {"source": "parallelgripper", "name": "can_manipulate", "target": "gear1"},
+    ...
+    {"source": "shaft1", "name": "can_insert_to", "target": "gearbase_hole1"},
+    {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
+    ...
+  ],
+  "relations": [
+    {"source": "left_hand", "name": "hold", "target": "outwardgripper"},
+    {"source": "outwardgripper", "name": "hold", "target": "gear3"}
+  ]
+}
+

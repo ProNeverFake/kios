@@ -5,7 +5,6 @@ some functionaltiy is tailored for mios.
 
 from kios_utils.task import *
 import numpy as np
-from typing import Any, List, Dict
 
 from kios_bt.data_types import Action
 
@@ -14,21 +13,13 @@ from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.data_types import TaskScene, MiosInterfaceResponse
 
 
-# # * use localhost when running mios locally.
-# MIOS = "127.0.0.1"
-# # * use docker ip when running mios in docker.
-# MIOS_DOCKER = "10.157.175.17"
-
-
 class RobotInterface:
     robot_address: str = None
     robot_port: int = None
 
     proprioceptor: RobotProprioceptor = None
     mios_task_factory: MiosTaskFactory = None
-    # actuator: RobotActuator = None
 
-    # robot_status: RobotStatus = None
     task_scene: TaskScene = None
 
     def __init__(self, robot_address: str = None, robot_port: int = None):
@@ -53,12 +44,10 @@ class RobotInterface:
     def mios_setup(self):
         pass
         # dummy_object = self.proprioceptor.get_dummy_object()
-        # set the tool objects
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
         self.mios_task_factory.setup_scene(task_scene)
-        # teach the scene to mios
 
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")
@@ -67,7 +56,7 @@ class RobotInterface:
         return mios_response.has_finished
 
     # * BBCORE
-    def generate_robot_command(self, action: Action, shared_data: Any):
+    def generate_robot_command(self, action: Action, shared_data):
         """
         shard data is shared between the action node and the robot command thread.
         """
@@ -78,7 +67,7 @@ class RobotInterface:
             robot_port=self.robot_port,
             shared_data=shared_data,
             task_scene=self.task_scene,
-            robot_interface=self,  # ! LET'S HACK!
+            robot_interface=self,  # TODO someone comes to refactor this part plz!
         )
         """core method. 
         generate a robot command from an action. load the shared data into the command for possible use.
@@ -99,42 +88,3 @@ class RobotInterface:
             raise Exception("Action to robot command: None task is generated!")
 
         return robot_command
-
-    # # * robot command tests
-    # def load_tool(self, robot: str, tool_name: str) -> RobotCommand:
-    #     print("todo: check the tool in the scene.")
-    #     robot_command = RobotCommand(
-    #         robot_address=self.robot_address,
-    #         robot_port=self.robot_port,
-    #         robot_scene=self.task_scene,
-    #     )
-    #     robot_command.add_mios_task(
-    #         self.mios_task_factory.generate_load_tool(tool_name)
-    #     )
-    #     print("todo: add change robot TCP")
-    #     return robot_command
-
-    # def unload_tool(self, robot: str, tool_name: str):
-    #     print("todo: check the tool in the scene.")
-    #     robot_command = RobotCommand(
-    #         robot_address=self.robot_address,
-    #         robot_port=self.robot_port,
-    #         robot_scene=self.task_scene,
-    #     )
-    #     robot_command.add_mios_task(
-    #         self.mios_task_factory.generate_unload_tool(tool_name)
-    #     )
-    #     print("todo: change robot status TCP")
-    #     return robot_command
-
-    # def pick(self, object_name: str):
-    #     robot_command = RobotCommand(
-    #         robot_address=self.robot_address,
-    #         robot_port=self.robot_port,
-    #         robot_scene=self.task_scene,
-    #     )
-    #     robot_command.add_mios_task(self.mios_task_factory.generate_pick(object_name))
-    #     robot_command.add_mios_task(self.mios_task_factory.generate_move_to_object())
-    #     robot_command.add_mios_task(self.mios_task_factory.generate_gripper_grasp())
-    #     robot_command.add_mios_task(self.mios_task_factory.generate_())
-    #     return robot_command

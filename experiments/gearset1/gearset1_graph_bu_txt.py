@@ -3,7 +3,12 @@ import os
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
+os.environ["LANGCHAIN_PROJECT"] = "kios_instruction"
+
+
+"""
+...
+"""
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -14,18 +19,10 @@ from kios_world.world_interface import WorldInterface
 from kios_agent.llm_supporter import KiosLLMSupporter
 from kios_agent.data_types import KiosPromptSkeleton
 
-from kios_agent.kios_tools import (
-    BehaviorTreeExecutorTool,
-    BehaviorTreeSimulatorTool,
-    WorldStateQueryTool,
-)
-
 from typing import List, Tuple, Annotated, TypedDict
 import operator
 
 from dotenv import load_dotenv
-
-from langchain import hub
 
 from langchain_openai import ChatOpenAI
 
@@ -33,9 +30,7 @@ from langchain.chains.openai_functions import (
     create_structured_output_runnable,
     create_openai_fn_runnable,
 )
-from langchain_core.utils.function_calling import convert_to_openai_function
-from langchain_core.agents import AgentActionMessageLog, AgentFinish
-from langchain_core.messages import HumanMessage
+
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -98,13 +93,6 @@ behavior_tree_stewardship = BehaviorTreeStewardship(
 )
 
 ####################### * tools
-# bt_executor_tool = BehaviorTreeExecutorTool(behavior_tree_stewardship)
-
-bt_sim_tool = BehaviorTreeSimulatorTool(metadata={"bt_stw": behavior_tree_stewardship})
-
-# world_state_query_tool = WorldStateQueryTool(behavior_tree_stewardship)
-
-executor_tools = [bt_sim_tool]
 
 # * kios data prompt skeleton dir
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
@@ -144,76 +132,6 @@ skeleton_generator_chain = (
     | JsonOutputParser()
 )
 
-# ! DISCARDED behavior tree generator chain
-# bt_gen_chain = skeleton_generator_chain | re_sk_chain
-
-############################################### * behavior tree executor agent
-# ! NOW SUBSTITUTED BY THE FAKE EXECUTOR FUNCTION
-# bt_exe_ppt = hub.pull("hwchase17/openai-functions-agent")
-# bt_exe_ppt = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", "You are a helpful assistant"),
-#         ("user", "The behavior tree is: {behavior_tree}"),
-#         ("user", "The world state is: {world_state}"),
-#         MessagesPlaceholder(variable_name="agent_scratchpad"),
-#     ]
-# )
-
-# bt_exe_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-
-
-# def executor_agent_parse(output):
-#     # If no function was invoked, return to user
-#     if "function_call" not in output.additional_kwargs:
-#         return AgentFinish(return_values={"output": output.content}, log=output.content)
-
-#     # Parse out the function call
-#     function_call = output.additional_kwargs["function_call"]
-#     name = function_call["name"]
-#     inputs = json.loads(function_call["arguments"])
-
-#     # If the Response function was invoked, return to the user with the function inputs
-#     if name == "ExecutorResponse":
-#         return AgentFinish(return_values=inputs, log=str(function_call))
-#     # Otherwise, return an agent action
-#     else:
-#         return AgentActionMessageLog(
-#             tool=name, tool_input=inputs, log="", message_log=[output]
-#         )
-
-
-# class ExecutorResponse(BaseModel):
-#     """the result of the behavior tree execution"""
-
-#     hasSucceeded: bool = Field(description="If the behavior tree has succeeded or not")
-#     world_state: dict[str, list[dict[str, str]]] = Field(
-#         description="The final world state after the execution"
-#     )
-
-
-# bt_exe_llm_with_tools = bt_exe_llm.bind_functions(
-#     [convert_to_openai_function(t) for t in executor_tools]
-# )
-
-
-# ! BUG
-# bt_exe_agent = (
-#     {
-#         "input": lambda x: x["input"],
-#         # Format agent scratchpad from intermediate steps
-#         "agent_scratchpad": lambda x: format_to_openai_function_messages(
-#             x["intermediate_steps"]
-#         ),
-#     }
-#     | bt_exe_ppt
-#     | bt_exe_llm_with_tools
-#     | executor_agent_parse
-# )
-
-# bt_exe_agent_executor = AgentExecutor(
-#     tools=executor_tools, agent=bt_exe_agent, verbose=True
-# )
-
 
 # * the graph state
 class PlanExecuteState(TypedDict):
@@ -240,33 +158,6 @@ class Plan(BaseModel):
         description="a list of different steps to follow, should be in sorted order"
     )
 
-
-# ! now in data_dir
-# planner_prompt = ChatPromptTemplate.from_template(
-#     """
-#     The user input should be an instruction (or several instructions) of the robot assembly task. \
-#     For the given user input, summarize and come up with a bullet list task plan. \
-# This plan should involve individual assembly step(s) of robot assembly task.\
-# Do not add any superfluous steps. \
-# Make sure that each step has all the information needed - do not skip steps.\
-
-# You should only use assembly actions as the action in the steps.
-# The available assembly actions are:\
-# - insert something into something\
-# - place something onto something\
-# - screw something into something\
-
-# Example:\
-# user_input: "you should insert the red block into the blue hole"\
-# plan: "insert the red block into the blue hole"\
-
-# user_input: "intert the blub into the base, then put the cover onto it."\
-# plan: ["insert the blub into the base", "put the cover onto the blub"]\
-
-# world_state: {world_state}\
-# user_input: {user_input}\
-# """
-# )
 
 planner_prompt_file = os.path.join(prompt_dir, "planner/template.txt")
 
@@ -383,29 +274,16 @@ async def behavior_tree_execute_step(state: PlanExecuteState):
     behavior_tree = state["behavior_tree"]
     latest_world_state = state["world_state"][-1]
 
-    # exe_input = {
-    #     "behavior_tree": behavior_tree,
-    #     "world_state": latest_world_state,
-    # }
-
-    # agent_response = await bt_exe_agent_executor.ainvoke(
-    #     {
-    #         "input": exe_input,
-    #     }
-    # )
-
     response = behavior_tree_stewardship.fake_run(
         world_state=latest_world_state, bt_json=behavior_tree
     )
 
-    # hasSucceeded = response["hasSucceeded"]
-    # new_world_state = [response["world_state"]]
     hasSucceeded = response.result
     new_world_state = [response.world_state]
     the_step = state["plan"][0]
 
     return {
-        "past_steps": (the_step, hasSucceeded),  # ! why here not a list of tuple?
+        "past_steps": (the_step, hasSucceeded),
         "world_state": new_world_state,
     }
 

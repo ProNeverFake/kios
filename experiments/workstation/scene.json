@@ -1,0 +1,137 @@
+{
+    "reference_objects":
+    [
+        {
+            "object_name": "initialposition",
+            "source": "mios"
+        },
+        {
+            "object_name": "normalpickplace",
+            "source": "mios"
+        },
+        {
+            "object_name": "normalcontainer",
+            "source": "mios"
+        },
+        {
+            "object_name": "p1_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p1_sp2",
+            "source": "mios"
+        },
+        {
+            "object_name": "p2_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p2_sp1_above",
+            "source": "mios"
+        },
+        {
+            "object_name": "p3_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_sp1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_sp2",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition1",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition2",
+            "source":"mios"
+        },
+        {
+            "object_name": "initialposition3",
+            "source": "mios"
+        },
+        {
+            "object_name": "initialposition4",
+            "source": "mios"
+        },
+        {
+            "object_name": "p1_n1",
+            "source":"mios"
+        },
+        {
+            "object_name": "p2_n1",
+            "source":"mios"
+        },
+        {
+            "object_name": "p2_n2",
+            "source":"mios"
+        },
+        {
+            "object_name": "p3_n1",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_n1_above",
+            "source": "mios"
+        },
+        {
+            "object_name": "p4_n1",
+            "source": "mios"
+        },
+        {
+            "object_name": "shaft1",
+            "source": "mios"
+        },
+        {
+            "object_name": "gear2",
+            "source":"mios"
+        },
+        {
+            "object_name": "shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2_above",
+            "source":"mios"
+        },
+        {
+            "object_name": "gear1",
+            "source":"mios"
+        },
+        {
+            "object_name": "observe",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft2",
+            "source":"mios"
+        },
+        {
+            "object_name": "sp_shaft1",
+            "source":"mios"
+        }
+    ],
+    "tools": 
+    [
+        {
+            "tool_name": "defaultgripper",
+            "EE_T_TCP": [
+                [1, 0, 0, 0.0],
+                [0, 1, 0, 0.0],
+                [0, 0, 1, 0.03],
+                [0, 0, 0, 1]
+            ],
+            "EE_finger_width_max": 0.08,
+            "EE_finger_width_min": 0.01,
+            "load_width": 0.08,
+            "unload_width": 0.08
+        }
+    ]
+}

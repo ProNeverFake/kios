@@ -82,7 +82,6 @@ class SceneFactory:
             json_object = json.load(file)
 
         scene = self.create_scene_from_json(json_object)
-        # print(scene)
         return scene
 
 

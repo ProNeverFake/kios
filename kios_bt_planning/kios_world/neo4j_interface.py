@@ -17,7 +17,7 @@ class Neo4jInterface:
         self,
         uri: str = "neo4j://localhost:7687",
         user: str = "neo4j",
-        password: str = "14637982",
+        password: str = "12345678",
     ):
         self.uri = uri
         self.user = user
@@ -153,22 +153,3 @@ class Neo4jInterface:
                 print(
                     f"{record['from']['name']} - {record['r'].type} - {record['to']['name']}"
                 )
-
-
-def test_neo4j():
-    neo4j_interface = Neo4jInterface(
-        uri="neo4j://localhost:7687", user="neo4j", password="14637982"
-    )
-    neo4j_interface.clear_database()
-    neo4j_interface.create_objects(["a", "b", "c", "d", "e", "f"])
-    relations = {
-        "on": [("a", "b"), ("b", "c"), ("c", "d"), ("d", "e"), ("e", "f")],
-        "next_to": [("a", "c"), ("c", "e"), ("b", "d"), ("d", "f")],
-    }
-    neo4j_interface.create_relations(relations)
-    neo4j_interface.print_all()
-    neo4j_interface.close_driver()
-
-
-if __name__ == "__main__":
-    test_neo4j()

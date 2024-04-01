@@ -1,0 +1,19 @@
+{
+  "objects": [
+    {"name": "clampgripper", "properties": ["is_empty"]},
+    {"name": "whisk", "properties": []},
+    {"name": "spatula", "properties": []},
+    {"name": "pan", "properties": ["is_empty"]},
+    {"name": "pot", "properties": ["is_empty"]},
+    {"name": "bowl", "properties": ["is_empty"]},
+    {"name": "plate", "properties": ["is_empty"]},
+    {"name": "left_hand", "properties": []}
+  ],
+  "constraints": [
+    {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
+  ],
+  "relations": [
+    {"source": "left_hand", "name": "hold", "target": "outwardgripper"}
+  ]
+}
+

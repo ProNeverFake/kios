@@ -1,4 +1,4 @@
-from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
+from typing import Any, List, Dict
 import openai
 import tiktoken
 import json
@@ -14,7 +14,7 @@ from langsmith.wrappers import wrap_openai
 
 """
 the llm class for prompt testing.
-# ! now use chain.
+# ! deprecated
 """
 
 # langsmith tracing

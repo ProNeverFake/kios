@@ -1,8 +1,0 @@
-# dummy now
-string plan
-
----
-
-# the parameters should be stored in the json file.
-bool is_success
-string error_message

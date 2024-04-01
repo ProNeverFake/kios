@@ -1,7 +1,9 @@
 """
 selector without memory stolen from dynamic bt package
 """
-# ! not in use yet.
+
+# ! this feature is now a part of py_trees.
+# ! this file is preserved for overwriting the compound control nodes if needed.
 # import py_trees as pt
 # from typing import Any, List, Tuple
 

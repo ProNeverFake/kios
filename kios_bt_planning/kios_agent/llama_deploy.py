@@ -13,6 +13,7 @@ Traceback (most recent call last):
     family_usage = filtered_usage_info[family]
 KeyError: 'StandardNCADSA100v4Family'
 """
+
 # ! NOT IN USE NOW. THE LLAMA 70B MODEL IS DEPLOYED AS PAY-AS-YOU-GO SERVICE IN AZURE.
 from azure.ai.resources.client import AIClient
 from azure.ai.resources.entities.deployment import Deployment

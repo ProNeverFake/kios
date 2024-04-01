@@ -8,11 +8,15 @@ from pprint import pprint
 
 from kios_bt.data_types import ObjectProperty
 
+"""
+only skeleton node parser here
+"""
+
 
 load_dotenv()
 
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
-print(data_dir)
+# print(data_dir)
 world_definition_json = os.path.join(data_dir, "world_definition.json")
 
 with open(world_definition_json, "r") as f:
@@ -21,12 +25,26 @@ with open(world_definition_json, "r") as f:
 
 @dataclass
 class ParsedNode:
+    """
+    class to store the parsed node (condition or action)
+    """
+
     typename: str
     itemname: str
     params: list[str]
 
 
 def parse_node_name(name: str) -> ParsedNode:
+    """
+    parse a node name to extract the type, name and parameters
+    typename: selector, sequence, condition, precondition, target, action
+    itemname: the name of the condition/action
+    params: the parameters of the condition/action
+
+    Example:
+        a condition: hold(hand1, tool1)
+        an action: pick_up(hand1, tool1, target1)
+    """
     pattern = r"(\w+): (\w+)\((.*?)\)"
     match = re.match(pattern, name)
     if match:
@@ -48,7 +66,19 @@ def parse_node_type(name: str) -> str:
         return None
 
 
-def ground_action(action_name: str, params: list[str]):
+def ground_action(
+    action_name: str, params: list[str]
+) -> tuple[list[ObjectProperty], list[ObjectProperty]]:
+    """
+    furthre ground the parsed action node, extract its precondition and effect according to the definition.
+
+    The definitions are in the world_definition.json file in the "data" directory. See dotenv import sentence.
+
+    return:
+        - a list of precondition ObjectProperty
+        - a list of effect ObjectProperty
+
+    """
     if world_definition["actions"].get(action_name) is None:
         raise ValueError(f"Action {action_name} is not defined in the world definition")
     action_data = world_definition["actions"][action_name]
@@ -56,10 +86,10 @@ def ground_action(action_name: str, params: list[str]):
     precondition = action_data["precondition"]
     effect = action_data["effect"]
 
-    # Extract the placeholders from the template
+    # Extract the placeholders from the template (pattern: ?<name>)
     placeholders = re.findall(r"\?\w+", template)
 
-    # Replace the placeholders in the precondition and effect with the provided parameters
+    # Replace the placeholders one by one with the corresponding parameter value
     for i in range(len(placeholders)):
         escaped_placeholder = re.escape(placeholders[i])
         precondition = [

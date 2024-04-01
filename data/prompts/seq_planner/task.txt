@@ -1,5 +1,4 @@
 The input are:
-objects: a list of objects in the world.
 start_world_state: the world state when the behavior tree started.
 user_instruction: an instruction of a robotic assembly task. 
 

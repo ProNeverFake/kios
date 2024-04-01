@@ -1,8 +1,9 @@
 from kios_utils.task import *
 import numpy as np
-from typing import Any, List, Dict
+import logging
 from termcolor import colored
 from pprint import pprint
+from typing import Any
 
 from kios_robot.data_types import (
     MiosObject,
@@ -20,7 +21,6 @@ class RobotProprioceptor:
     robot_port: int = None
 
     mongodb_interface: MongoDBInterface = None
-    # robot_status: RobotStatus = None
 
     def __init__(self, robot_address: str, robot_port: int):
         if robot_address is not None:
@@ -38,8 +38,6 @@ class RobotProprioceptor:
     def initialize(self):
         pass
         self.mongodb_interface = MongoDBInterface()
-        # self.robot_status = RobotStatus()
-        # self.refresh_robot_status()
 
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")
@@ -62,10 +60,11 @@ class RobotProprioceptor:
             mios_object = self.mongodb_interface.query_mios_object(object_name)
 
             if scene.object_map.get(object_name) is None:
-                print(
-                    "\033[93m"
-                    + f"object {object_name} is not in the scene. Add it now."
-                )
+                logging.warn(f"object {object_name} is not in the scene. Add it now.")
+                # print(
+                #     "\033[93m"
+                #     + f"object {object_name} is not in the scene. Add it now."
+                # )
                 # scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
 
             scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
@@ -145,7 +144,7 @@ class RobotProprioceptor:
             print(mios_object)
             return mios_object
 
-    def align_object(self, object_name: str, **kwargs: Dict[str, Any]):
+    def align_object(self, object_name: str, **kwargs: dict[str, Any]):
         """
         cheat method for BB usecase
         """
@@ -157,7 +156,7 @@ class RobotProprioceptor:
             R=[1, 0, 0, 0, -1, 0, 0, 0, -1],
         )
 
-    def modify_object_position(self, object_name: str, **kwargs: Dict[str, Any]):
+    def modify_object_position(self, object_name: str, **kwargs: dict[str, Any]):
         this_object = self.get_object(object_name)
         O_T_EE = this_object.O_T_OB
         O_T_TCP = this_object.O_T_TCP

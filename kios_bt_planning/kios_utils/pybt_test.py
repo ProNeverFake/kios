@@ -4,6 +4,10 @@ import os
 import time
 import sched
 
+"""
+# ! should delete
+"""
+
 
 def post_tick_handler(
     snapshot_visitor: py_trees.visitors.SnapshotVisitor,
@@ -48,7 +52,7 @@ def generate_bt_stewardship(bt) -> py_trees.trees.BehaviourTree:
         functools.partial(post_tick_handler, snapshot_visitor)
     )
     behaviour_tree.visitors.append(snapshot_visitor)
-    behaviour_tree.setup(timeout=15)
+    behaviour_tree.setup()
 
     return behaviour_tree
 
@@ -56,7 +60,9 @@ def generate_bt_stewardship(bt) -> py_trees.trees.BehaviourTree:
 def render_dot_tree(bt: py_trees.trees.BehaviourTree):
     py_trees.display.render_dot_tree(
         bt.root,
+        # visibility_level=py_trees.common.VisibilityLevel.ALL,
         with_blackboard_variables=False,
+        # with_qualified_names=True,
         # target_directory=os.path(__file__),
     )
 

@@ -12,6 +12,10 @@ class MiosSkill:
     skill_name: str
     skill_type: str
     skill_parameters: Dict[str, Any]
+    retry: bool = field(default=False)
+    retry_count: int = field(default=0)
+    failure_pause: bool = field(default=False)
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.skill_name
@@ -21,6 +25,10 @@ class MiosSkill:
 class MiosCall:
     method_name: str
     method_payload: Dict[str, Any]
+    retry: bool = field(default=False)
+    retry_count: int = field(default=0)
+    failure_pause: bool = field(default=False)
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.method_name
@@ -30,7 +38,8 @@ class MiosCall:
 class KiosCall:
     method: object
     args: List[Any]
-    call_name: str = field(default="default name")  # ! alarm: test!
+    call_name: str = field(default="default name")
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.call_name
@@ -390,13 +399,17 @@ class TaskScene:
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     def get_object(self, object_name: str) -> Optional[KiosObject]:
-        return self.object_map.get(object_name)
+        return self.object_map.get(object_name, None)
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:
             return self.tool_map.get("no_tool")
         tool = self.tool_map.get(tool_name)
         if tool is None:
+            from pprint import pprint
+
+            pprint("current available tools are:")
+            pprint(self.tool_map.keys())
             raise Exception(f"Tool {tool_name} is not in the scene!")
         return tool
 
@@ -431,6 +444,7 @@ class RobotState:
             ["status", self.status],
             ["current_task", self.current_task],
             ["gripper_width", self.gripper_width],
+            # ? what is this?
             # ["q_d", self.q_d],
             # ["TF_T_EE_d", "\n".join(["\t".join(map(str, row)) for row in self.TF_T_EE_d.tolist()])],
         ]

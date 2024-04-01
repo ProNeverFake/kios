@@ -10,6 +10,9 @@ should provide:
 - test run
 """
 
+import logging
+import colorlog
+
 from typing import List, Set, Dict, Any, Tuple, Optional
 
 from kios_bt.behavior_nodes import (
@@ -17,6 +20,7 @@ from kios_bt.behavior_nodes import (
     ConditionNode,
     ActionNodeTest,
     ActionNodeSim,
+    ActionNodeOnlySuccess,
 )
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_world.world_interface import WorldInterface
@@ -28,6 +32,7 @@ from kios_utils.pddl_problem_parser import (
     parse_problem_init,
     parse_problem,
 )
+from kios_utils.bblab_utils import bb_deprecated
 
 import py_trees
 
@@ -35,6 +40,23 @@ import functools
 import copy
 import sched
 import time
+
+handler = colorlog.StreamHandler()
+handler.setFormatter(
+    colorlog.ColoredFormatter(
+        "%(log_color)s%(levelname)s:%(name)s:%(message)s",
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white",
+        },
+    )
+)
+
+logger = logging.getLogger()
+logger.addHandler(handler)
 
 
 class BehaviorTreeStewardship:
@@ -45,6 +67,9 @@ class BehaviorTreeStewardship:
     world_interface: WorldInterface = None  # for world states
     robot_interface: RobotInterface = None  # for robot actions
     roster: Dict[int, Any] = {}  # for tree mod
+    skeleton_dict = {}  # for tree to dict
+
+    tree_result: TreeResult = None  # to record the result of the tree run
 
     def __init__(
         self,
@@ -58,8 +83,6 @@ class BehaviorTreeStewardship:
             self.robot_interface = robot_interface
 
         if world_interface is None:
-            # self.world_interface = WorldInterface()
-            # self.world_interface.initialize()
             # ! now the world interface is a required parameter
             raise Exception("world_interface is not set")
         else:
@@ -94,12 +117,10 @@ class BehaviorTreeStewardship:
         )
 
     def generate_behavior_tree_from_skeleton(self, skeleton: dict) -> None:
-        self.roster, self.behavior_tree = (
+        self.bt_skeleton = skeleton
+        self.roster, self.behavior_tree, self.skeleton_dict = (
             self.behaviortree_factory.from_skeleton_to_behavior_tree(skeleton)
         )
-
-    def load_world_state(self, world_state: dict) -> None:
-        self.world_interface.load_world_from_json(world_state)
 
     def set_world_state(self, world_state: dict) -> None:
         """
@@ -152,7 +173,8 @@ class BehaviorTreeStewardship:
             functools.partial(self.post_tick_handler, snapshot_visitor)
         )
         behavior_tree.visitors.append(snapshot_visitor)
-        behavior_tree.setup(timeout=15)
+        # behavior_tree.setup(timeout=15) # ! signal bug
+        behavior_tree.setup()
 
     def render_dot_tree(self):
         py_trees.display.render_dot_tree(
@@ -169,6 +191,73 @@ class BehaviorTreeStewardship:
 
         print("\n")
 
+    def tick_tree(
+        self,
+        period_msec: int = 1,
+        timeout_sec: int = 200,
+    ):
+        """tick the tree at a specific frequency. the tree will be ticked until it returns success or failure, or timeout is triggered.
+
+        Args:
+            period_msec (int, optional): period for tree ticking. Defaults to 1 ms.
+            timeout_sec (int, optional): tree execution time limit. Defaults to 200 sec.
+
+        Raises:
+            Exception: this should never happen.
+        """
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
+        running_time = 0
+
+        def tick():
+            nonlocal running_time
+            # * timeout return
+            if running_time > timeout_sec:
+                logging.error("Tree tick returns timeout!")
+                tip_node = self.behavior_tree.root.tip()
+                self.tree_result = TreeResult(
+                    result="timeout",
+                    summary="Behavior tree tick returns timeout! The reason could be: an action node is being ticked repeatedly while the condition for the next step can not be satisfied; two actions are in one sequence and the tree got stuck here. the tree is not well-structured.",
+                    final_node=self.extract_node_metadata(tip_node).to_json(),
+                    world_state=self.world_interface.get_world_to_json(),
+                )
+
+            self.behavior_tree.tick()
+
+            if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
+                logging.info("Tree finished with success")
+                self.tree_result = TreeResult(
+                    result="success",
+                    summary="Behavior tree tick returns success",
+                    final_node=None,
+                    world_state=self.world_interface.get_world_to_json(),
+                )
+            elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
+                logging.error("Tree finished with failure")
+                tip_node = self.behavior_tree.root.tip()
+                if tip_node is None:
+                    self.tree_result = TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure with the defect node unknown",
+                        final_node=None,
+                        world_state=self.world_interface.get_world_to_json(),
+                    )
+                else:
+                    self.tree_result = TreeResult(
+                        result="failure",
+                        summary="Behavior tree tick returns failure",
+                        final_node=self.extract_node_metadata(tip_node).to_json(),
+                        world_state=self.world_interface.get_world_to_json(),
+                    )
+            elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
+                scheduler.enter(period_msec / 1000, 1, tick)
+                running_time += period_msec / 1000
+            else:
+                raise Exception("Unknown status!")
+
+        scheduler = sched.scheduler(time.time, time.sleep)
+        scheduler.enter(0, 1, tick)
+        scheduler.run()
+
     def tick_1000HZ_test(self):
         py_trees.logging.level = py_trees.logging.Level.DEBUG
 
@@ -179,9 +268,9 @@ class BehaviorTreeStewardship:
             self.behavior_tree.tick()
             tick_count += 1
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
-                print("\033[94mTree finished with success\033[0m")
+                logging.info("Tree finished with success")
             elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
-                print("\033[91mTree finished with failure\033[0m")
+                logging.warn("Tree finished with failure")
             elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
                 scheduler.enter(1 / 1000, 1, tick)
             else:
@@ -192,6 +281,9 @@ class BehaviorTreeStewardship:
         scheduler.run()
 
     def tick_frequency_test(self):
+        """
+        for testing the running frequency of the tree
+        """
         py_trees.logging.level = py_trees.logging.Level.DEBUG
 
         tick_count = 0
@@ -202,9 +294,9 @@ class BehaviorTreeStewardship:
             self.behavior_tree.tick()
             tick_count += 1
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
-                print("\033[94mTree finished with success\033[0m")
+                logging.info("Tree finished with success")
             elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
-                print("\033[91mTree finished with failure\033[0m")
+                logging.warn("Tree finished with failure")
             elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
                 scheduler.enter(1 / 1000, 1, tick)
             else:
@@ -222,6 +314,7 @@ class BehaviorTreeStewardship:
         print(f"Run time: {run_time} seconds")
         print(f"Running frequency: {frequency} Hz")
 
+    @bb_deprecated("TreeResult has been changed!")
     def tick_until_success(
         self,
         bt: py_trees.trees.BehaviourTree,
@@ -387,6 +480,10 @@ class BehaviorTreeStewardship:
         self.behavior_tree.prune_subtree(to_remove_node_id)
 
     ##########################################################
+
+    def setup_simulation(self):
+        self.replace_action_node_with_sim(self.behavior_tree, self.behavior_tree.root)
+
     # * the behavior tree simulator tool
     def simulate_behavior_tree(self) -> TreeResult:
         # ! maybe it is better to imp a new class for the simulation
@@ -425,6 +522,19 @@ class BehaviorTreeStewardship:
             # recursively replace the children
             self.replace_action_node_with_sim(stw, child)
 
+    def replace_action_node_with_only_success(self, stw, root):
+        for child in root.children:
+            # replace the action node with sim node
+            if isinstance(child, ActionNode):
+                sim_node = ActionNodeOnlySuccess.from_action_node(child)
+                stw.replace_subtree(child.id, sim_node)
+                # * update the skeleton dict, add the new replacement node
+                self.skeleton_dict[sim_node.id] = self.skeleton_dict[child.id]
+            # recursively replace the children
+            self.replace_action_node_with_only_success(stw, child)
+
+    ######################################################
+    # * the behavior tree simulator tools
     def fake_run(self, world_state: dict, bt_json: dict):
         """
         fake run for graph testing
@@ -467,13 +577,15 @@ class BehaviorTreeStewardship:
 
     def sk_sim_run(self, world_state: dict, skeleton_json: dict):
         """
-        fake run for graph testing
+        simulation run of behavior tree generated from skeleton json.
+        try the behavior tree to check if the tree works well.
+        restore the world state after the simulation.
         """
         self.set_world_state(world_state)
 
         self.world_interface.record_check_point()
 
-        _, sim_bt = self.behaviortree_factory.from_skeleton_to_behavior_tree(
+        _, sim_bt, _ = self.behaviortree_factory.from_skeleton_to_behavior_tree(
             skeleton_json
         )
         root = sim_bt.root
@@ -488,6 +600,111 @@ class BehaviorTreeStewardship:
         self.world_interface.restore_check_point()
 
         return tree_result, skeleton_json
+
+    def sk_baseline(
+        self, world_state: dict, skeleton_json: dict, ut_dict: dict
+    ) -> dict:
+        """baseline expanding, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
+
+        Args:
+            world_state (dict): ws to start with
+            skeleton_json (dict): the condition sk node to achieve. should be a condition node in sk form with summary and a legal name.
+
+        Raises:
+            Exception: see the code
+
+        Returns:
+            dict: the solution bt sk json.
+        """
+
+        from pprint import pprint
+
+        self.set_world_state(world_state)
+        self.world_interface.record_check_point("baseline_start")
+
+        _, sim_bt, self.skeleton_dict = (
+            self.behaviortree_factory.from_skeleton_to_behavior_tree(skeleton_json)
+        )
+        self.replace_action_node_with_only_success(sim_bt, sim_bt.root)
+        self.setup_behavior_tree(sim_bt)
+
+        from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+
+        while True:
+            sim_bt.tick()
+            if sim_bt.root.status == py_trees.common.Status.SUCCESS:
+                pprint("Behavior tree tick returns success!")
+                break
+            elif sim_bt.root.status == py_trees.common.Status.FAILURE:
+                tip_node = sim_bt.root.tip()
+                if tip_node is None:
+                    raise Exception(
+                        "Behavior tree tick returns failure with the defect node unknown"
+                    )
+                assert isinstance(tip_node, ConditionNode)
+                new_target = tip_node.condition.to_string()
+                new_ut = ut_dict.get(new_target, None)
+                if new_ut is None:
+                    pprint(f"cannot find a solution ut for the condtiion {new_target}!")
+                    pprint("the available targets are:")
+                    pprint(ut_dict.keys())
+                    raise Exception(
+                        f"cannot find a solution ut for the condtiion {new_target}!"
+                    )
+                    break
+                _, new_subtree, new_sk_dict = (
+                    self.behaviortree_factory.from_skeleton_to_behavior_tree(new_ut)
+                )
+                self.skeleton_dict.update(new_sk_dict)
+                self.replace_action_node_with_only_success(
+                    new_subtree, new_subtree.root
+                )
+                # render_dot_tree(new_subtree)
+                # pause = input("paused here! check the tree.")
+                if sim_bt.root.id == tip_node.id:
+                    sim_bt = new_subtree
+                else:
+                    sim_bt.replace_subtree(tip_node.id, new_subtree.root)
+                # render_dot_tree(sim_bt)
+                # pause = input("paused here! check the tree.")
+
+                sim_bt.setup(timeout=15)
+
+                self.world_interface.restore_check_point("baseline_start")
+            elif sim_bt.root.status == py_trees.common.Status.RUNNING:
+                print("Behavior tree is running")
+            else:
+                raise Exception("Unknown status!")
+
+        # * restore world check point
+        self.world_interface.restore_check_point("baseline_start")
+        render_dot_tree(sim_bt)
+        return self.from_tree_root_to_sk_json(sim_bt.root)
+
+    def from_tree_root_to_sk_json(
+        self, tree_root: py_trees.behaviour.Behaviour
+    ) -> dict:
+        """
+        convert the tree root to sk_json
+        """
+        if isinstance(tree_root, py_trees.composites.Selector):
+            compound_sk = self.skeleton_dict[tree_root.id]
+            compound_sk["children"] = [
+                self.from_tree_root_to_sk_json(child) for child in tree_root.children
+            ]
+            return compound_sk
+        elif isinstance(tree_root, py_trees.composites.Sequence):
+            compound_sk = self.skeleton_dict[tree_root.id]
+            compound_sk["children"] = [
+                self.from_tree_root_to_sk_json(child) for child in tree_root.children
+            ]
+            return compound_sk
+        elif isinstance(tree_root, ActionNode):
+            return self.skeleton_dict[tree_root.id]
+        elif isinstance(tree_root, ConditionNode):
+            return self.skeleton_dict[tree_root.id]
+        else:
+            raise Exception("Unknown node type!")
 
     ##########################################################
 

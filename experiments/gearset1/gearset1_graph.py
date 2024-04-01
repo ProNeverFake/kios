@@ -155,76 +155,6 @@ skeleton_generator_chain = (
     | JsonOutputParser()
 )
 
-# ! DISCARDED behavior tree generator chain
-# bt_gen_chain = skeleton_generator_chain | re_sk_chain
-
-############################################### * behavior tree executor agent
-# ! NOW SUBSTITUTED BY THE FAKE EXECUTOR FUNCTION
-# bt_exe_ppt = hub.pull("hwchase17/openai-functions-agent")
-# bt_exe_ppt = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", "You are a helpful assistant"),
-#         ("user", "The behavior tree is: {behavior_tree}"),
-#         ("user", "The world state is: {world_state}"),
-#         MessagesPlaceholder(variable_name="agent_scratchpad"),
-#     ]
-# )
-
-# bt_exe_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-
-
-# def executor_agent_parse(output):
-#     # If no function was invoked, return to user
-#     if "function_call" not in output.additional_kwargs:
-#         return AgentFinish(return_values={"output": output.content}, log=output.content)
-
-#     # Parse out the function call
-#     function_call = output.additional_kwargs["function_call"]
-#     name = function_call["name"]
-#     inputs = json.loads(function_call["arguments"])
-
-#     # If the Response function was invoked, return to the user with the function inputs
-#     if name == "ExecutorResponse":
-#         return AgentFinish(return_values=inputs, log=str(function_call))
-#     # Otherwise, return an agent action
-#     else:
-#         return AgentActionMessageLog(
-#             tool=name, tool_input=inputs, log="", message_log=[output]
-#         )
-
-
-# class ExecutorResponse(BaseModel):
-#     """the result of the behavior tree execution"""
-
-#     hasSucceeded: bool = Field(description="If the behavior tree has succeeded or not")
-#     world_state: dict[str, list[dict[str, str]]] = Field(
-#         description="The final world state after the execution"
-#     )
-
-
-# bt_exe_llm_with_tools = bt_exe_llm.bind_functions(
-#     [convert_to_openai_function(t) for t in executor_tools]
-# )
-
-
-# ! BUG
-# bt_exe_agent = (
-#     {
-#         "input": lambda x: x["input"],
-#         # Format agent scratchpad from intermediate steps
-#         "agent_scratchpad": lambda x: format_to_openai_function_messages(
-#             x["intermediate_steps"]
-#         ),
-#     }
-#     | bt_exe_ppt
-#     | bt_exe_llm_with_tools
-#     | executor_agent_parse
-# )
-
-# bt_exe_agent_executor = AgentExecutor(
-#     tools=executor_tools, agent=bt_exe_agent, verbose=True
-# )
-
 
 # * the graph state
 class PlanExecuteState(TypedDict):
@@ -290,9 +220,8 @@ planner = create_structured_output_runnable(
     Plan, ChatOpenAI(model="gpt-4-turbo-preview", temperature=0), planner_ppt_ppl
 )
 
+
 ##################################################### * plan_updaterner
-
-
 class UpdaterResponse(BaseModel):
     """used to response to the user for asking for more inputs."""
 
@@ -385,7 +314,7 @@ async def behavior_tree_generate_step(state: PlanExecuteState):
 
     pause = input("paused here")
 
-    # ! OBJECT CONCENTRATION
+    # TODO OBJECT CONCENTRATION
 
     response = await re_sk_chain.ainvoke(
         {

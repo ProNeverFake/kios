@@ -33,6 +33,26 @@
         "properties": []
       },
       {
+        "name": "chairseatbolt1",
+        "properties": []
+      },
+      {
+        "name": "chairseatbolt2",
+        "properties": []
+      },
+      {
+        "name": "chairseatconnector",
+        "properties": []
+      },
+      {
+        "name": "chairseatthread1",
+        "properties": []
+      },
+      {
+        "name": "chairseatthread2",
+        "properties": []
+      },
+      {
         "name": "chairback",
         "properties": []
       },
@@ -56,16 +76,14 @@
       {"source": "defaultgripper", "name": "can_manipulate", "target": "chairleg1"},
       {"source": "defaultgripper", "name": "can_manipulate", "target": "chairleg2"},
       {"source": "defaultgripper", "name": "can_manipulate", "target": "chairseat"},
-      {"source": "chairnut1", "name": "can_screw_to", "target": "chairseat"},
-      {"source": "chairnut2", "name": "can_screw_to", "target": "chairseat"},
-      {"source": "chairback", "name": "can_insert_to", "target": "chairseat"},
-      {"source": "chairleg1", "name": "can_insert_to", "target": "chairseat"},
-      {"source": "chairleg2", "name": "can_insert_to", "target": "chairseat"}
+      {"source": "chairnut1", "name": "can_screw_to", "target": "chairseatbolt1"},
+      {"source": "chairnut2", "name": "can_screw_to", "target": "chairseatbolt2"},
+      {"source": "chairback", "name": "can_insert_to", "target": "chairseatconnector"},
+      {"source": "chairleg1", "name": "can_screw_to", "target": "chairseatthread1"},
+      {"source": "chairleg2", "name": "can_screw_to", "target": "chairseatthread2"}
     ],
     "relations": [
-      {"source": "left_hand", "name": "hold", "target": "defaultgripper"},
-      {"source": "defaultgripper", "name": "hold", "target": "chairleg1"},
-      {"source": "chairback", "name": "is_inserted_to", "target": "chairseat"}
+      {"source": "left_hand", "name": "hold", "target": "defaultgripper"}
     ]
 }
 

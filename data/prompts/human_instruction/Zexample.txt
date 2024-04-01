@@ -1,0 +1,177 @@
+Following are some examples of the input and output.
+Example 1:
+"""
+- Input:
+runtime_world_state: 
+{
+    "objects": [
+        {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
+        {"name": "inward_claw", "properties": ["is_free", "is_equippable"]},
+        {"name": "outward_claw", "properties": ["is_free"]},
+        {"name": "gear1", "properties": []},
+        {"name": "shaft1", "properties": []},
+        {"name": "gearbase_hole1", "properties": []},
+        {"name": "left_hand", "properties": []}
+    ],
+    "constraints": [
+        {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+        {"source": "gear1", "name": "can_insert_to", "target": "shaft1"},
+    ],
+    "relations": [
+      {"source": "left_hand","name": "hold","target": "outward_claw"}
+    ]
+}
+last_behavior_tree:
+{
+    "summary": "selector to load parallel_box1",
+    "name": "selector: load_tool(left_hand, parallel_box1)",
+    "identifier": 0,
+    "children": [
+        {
+            "summary": "condition node to check if left_hand holds parallel_box1",
+            "name": "target: hold(left_hand, parallel_box1)"
+            "identifier": 1,
+        },
+        {
+            "summary": "sequence to load parallel_box1",
+            "name": "sequence: load_tool(left_hand, parallel_box1)",
+            "identifier": 2,
+            "children": [
+                {
+                    "summary": "condition node to check if parallel_box1 is equippable",
+                    "name": "precondition: is_equippable(parallel_box1)"
+                    "identifier": 3,
+                },
+                {
+                    "summary": "condition node to check if left_hand is free,
+                    "name": "target: is_free(left_hand)"
+                    "identifier": 4,   
+                },
+                {
+                    "summary": "action node to equip parallel_box1 to left hand",
+                    "name": "action: load_tool(left_hand, parallel_box1)",
+                    "identifier": 5,
+                },
+            ],
+        },
+    ],
+}
+user_instruction: "insert gear1 into shaft1"
+
+- Output:
+{
+    "summary": "selector to load parallel_box1",
+    "name": "selector: load_tool(left_hand, parallel_box1)",
+    "identifier": 0,
+    "children": [
+        {
+            "summary": "condition node to check if left_hand holds parallel_box1",
+            "name": "target: hold(left_hand, parallel_box1)"
+            "identifier": 1,
+        },
+        {
+            "summary": "sequence to load parallel_box1",
+            "name": "sequence: load_tool(left_hand, parallel_box1)",
+            "identifier": 2,
+            "children": [
+                {
+                    "summary": "condition node to check if parallel_box1 is equippable",
+                    "name": "precondition: is_equippable(parallel_box1)"
+                    "identifier": 3,
+                },
+                {
+                    "summary": "selector to make left_hand unload outward_claw",
+                    "name": "selector: unload_tool(left_hand, outward_claw)",
+                    "children": [
+                        {
+                            "summary": "condition node to check if left_hand is free,
+                            "name": "target: is_free(left_hand)"
+                        },
+                        {
+                            "summary": "sequence to make left_hand unload outward_claw",
+                            "name": "sequence: unload_tool(left_hand, outward_claw)",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if outward_claw is free",
+                                    "name": "precondition: is_free(outward_claw)"
+                                },
+                                {
+                                    "summary": "condition node to check if left hand holds outward_claw",
+                                    "name": "precondition: hold(left_hand, outward_claw)"
+                                },
+                                {
+                                    "summary": "action node to make left hand unload outward_claw",
+                                    "name": "action: unload_tool(left_hand, outward_claw)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "action node to equip parallel_box1 to left hand",
+                    "name": "action: load_tool(left_hand, parallel_box1)",
+                    "identifier": 5,
+                },
+            ],
+        },
+    ],
+}
+"""
+
+Example 2:
+"""
+- Input:
+objects:
+{
+    "tool": ["inward_claw"],
+    "part": ["nut1", "bolt1"]
+    "hand": ["left_hand"]
+} 
+runtime_world_state: 
+{
+    "objects": [
+        {"name": "inward_claw", "properties": ["is_free", "is_equippable"]},
+        {"name": "nut1", "properties": []},
+        {"name": "bolt1", "properties": []},
+        {"name": "left_hand", "properties": ["is_free"]}
+    ],
+    "constraints": [
+        {"source": "inward_claw", "name": "can_manipulate", "target": "nut1"},
+        {"source": "nut1", "name": "can_screw_to", "target": "bolt1"},
+    ],
+    "relations": []
+}
+last_behavior_tree: None
+last_failed_node: None
+instructions: "screw nut1 into bolt1"
+
+- Output:
+{
+    "summary": "selector to use left_hand with inward_claw to screw nut1 into bolt1",
+    "name": "selector: screw(left_hand, inward_claw, nut1, bolt1)",
+    "children": [
+        {
+            "summary": "condition node to check if nut1 is screwed into bolt1",
+            "name": "target: is_screwed_to(nut1, bolt1)"
+        },
+        {
+            "summary": "sequence to use left_hand with inward_claw to screw nut1 into bolt1",
+            "name": "sequence: screw(left_hand, inward_claw, nut1, bolt1)",
+            "children": [
+                {
+                    "summary": "condition node to check if inward_claw holds nut1",
+                    "name": "precondition: hold(inward_claw, nut1)"
+                },
+                {
+                    "summary": "condition node to check if nut1 can be screwed into bolt1",
+                    "name": "precondition: can_screw_to(nut1, bolt1)"
+                },                
+                {
+                    "summary": "action node to use left_hand with inward_claw to screw nut1 into bolt1",
+                    "name": "action: screw(left_hand, inward_claw, nut1, bolt1)"
+                },
+            ],
+        },
+    ],
+}
+"""

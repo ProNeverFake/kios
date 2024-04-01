@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from kios_scene.mongodb_interface import MongoDBInterface
 from kios_robot.data_types import MiosObject
 from bson import ObjectId
@@ -34,6 +35,7 @@ class LangTermMemoryManipulator:
         documents = self.mongodb_interface.fetch_all_mios_objects()
         backup_file_path = os.path.join(self.backup_dir, f"{backup_name}.json")
         if os.path.exists(backup_file_path):
+            logging.warning
             print(
                 "\033[91mThe backup file with name '{}' already exists. Type yes to overwrite. Type c to cancel the operation.".format(
                     backup_name
@@ -104,7 +106,7 @@ class LangTermMemoryManipulator:
 
     def restore_to_mios_environment(self, backup_name: str) -> None:
         """
-        erase all and inject the backup
+        erase all and inject the backup to mongodb
         """
         backup_file_path = os.path.join(self.backup_dir, f"{backup_name}.json")
         if not os.path.exists(backup_file_path):
@@ -127,9 +129,12 @@ class LangTermMemoryManipulator:
                         backup_file_path
                     )
                 )
+                print("\033[0m")  # Reset color
         elif user_input == "c":
             print("\033[92mOperation canceled.")
+            print("\033[0m")  # Reset color
             return
         else:
             print("\033[93mInvalid input. Operation canceled.")
+            print("\033[0m")  # Reset color
             return

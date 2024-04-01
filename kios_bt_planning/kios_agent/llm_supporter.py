@@ -1,6 +1,11 @@
-from typing import Any, List, Dict  # ! use embedded typing in python from 3.10.
+from typing import Any, List, Dict
 
 from dotenv import load_dotenv
+
+"""
+supporter for generating the llm prompt.
+! this is a historical file and should be removed later.
+"""
 
 import openai
 import tiktoken
@@ -29,11 +34,6 @@ from kios_agent.data_types import AgentResponse, KiosPromptSkeleton
 """
 the langchain version of the kios llm
 """
-
-# langsmith tracing
-# os.environ["LANGCHAIN_TRACING_V2"] = "true"
-# os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-# os.environ["LANGCHAIN_PROJECT"] = "kios_agent"
 
 load_dotenv()
 

@@ -2,6 +2,12 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List, Tuple, Annotated, TypedDict
 import operator
 
+"""
+this should be the implementation of one of the templates from the langgraph library
+check this:
+https://github.com/langchain-ai/langgraph/blob/main/examples/rewoo/rewoo.ipynb
+"""
+
 from langchain_openai import ChatOpenAI
 
 import os

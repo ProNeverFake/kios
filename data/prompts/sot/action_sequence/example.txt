@@ -1,0 +1,26 @@
+Following is an input/output example:
+INPUT:
+start_world_state: 
+{
+"objects": [
+    {"name": "outward_claw", "properties": ["is_empty"]},
+    {"name": "shaft1", "properties": []},
+    {"name": "left_hand", "properties": []},
+    {"name": "parallel_box1", "properties": [is_empty]}
+],
+"constraints": [
+    {"source": "outward_claw", "name": "can_manipulate", "target": "gear1"}
+],
+"relations": [
+    {"source": "left_hand", "name": "hold", "target": "parallel_box1"}
+]
+}
+target: "change the tool from the parallel_box1 to the outward_claw"
+
+OUTPUT:
+{   
+    "explanation": "The left_hand is holding the parallel_box1 now and the parallel_box1 is empty, so the change_tool action can be conducted to change the tool in the hand from the parallel_box1 to outward_claw.",
+    "task_plan": [
+        "change_tool(left_hand, parallel_box1, outward_claw)"
+    ]
+}

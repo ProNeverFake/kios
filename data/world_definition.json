@@ -34,7 +34,7 @@
                 "hold ?hand ?tool"
             ],
             "effect": [
-                "(not (hold ?hand ?part))",
+                "(not (hold ?tool ?part))",
                 "is_empty ?tool"
             ],
             "template": "put_down(?hand, ?tool, ?part)"

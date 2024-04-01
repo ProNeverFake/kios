@@ -1,6 +1,8 @@
 kios_agent
 kios_bt
 kios_domain
+kios_future
+kios_plan
 kios_robot
 kios_scene
 kios_utils

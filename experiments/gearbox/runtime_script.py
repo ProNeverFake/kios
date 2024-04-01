@@ -67,6 +67,11 @@ def align_object(object_name: str, **kwargs):
     ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
 
 
+def modify_object_position_rel(object_name: str, **kwargs):
+    ri.proprioceptor.modify_object_position(object_name, **kwargs)
+    ri.proprioceptor.update_scene_object_from_mios(scene=scene, object_name=object_name)
+
+
 def update_mios_memory_environment():
     robot_command = RobotCommand(
         robot_address="127.0.0.1",
@@ -487,6 +492,7 @@ def insert_cone():
         "F_ext_contact": [10.0, 2.0],
         "f_push": [0, 0, 5, 0, 0, 0],
         "K_x": [500, 500, 0, 500, 500, 800],
+        "env_X": [0.01, 0.01, 0.001, 0.05, 0.05, 0.05],
     }
 
     # ! warning: the location of part1 will be refreshed after the insertion!
@@ -674,7 +680,7 @@ def insert_ringgear():
     )
 
     robot_command.add_task(
-        ri.mios_task_factory.generate_gripper_release_mp(width=0.023),
+        ri.mios_task_factory.generate_gripper_release_mp(width=0.023, speed=0.01),
     )
 
     robot_command.add_task(
@@ -700,7 +706,7 @@ def insert_ringgear():
         "f_push": [0, 0, 3, 0, 0, 0],
         "K_x": [500, 500, 0, 300, 300, 500],
         "D_x": [0.7, 0.7, 0, 0.7, 0.7, 0.7],
-        "env_X": [0.01, 0.01, 0.001, 0.05, 0.05, 0.05],
+        "env_X": [0.01, 0.01, 0.000, 0.05, 0.05, 0.05],
     }
 
     # ! warning: the location of part1 will be refreshed after the insertion!
@@ -796,10 +802,10 @@ def insert_gearstage1():
 
     param = {
         "release_width": 0.03,
-        "search_a": [1, 1, 2, 1, 1, 40],
+        "search_a": [1, 1, 2, 2, 2, 40],
         "search_f": [1, 1, 1, 1, 1, 0.25],
         "F_ext_contact": [10.0, 2.0],
-        "f_push": [0, 0, 20, 0, 0, 0],
+        "f_push": [0, 0, 25, 0, 0, 0],
         "K_x": [500, 500, 0, 800, 800, 70],
         "D_x": [0.7, 0.7, 0, 0.7, 0.7, 1.2],
     }

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/kios_logo.png" alt="LOGO" width="30%">
+  <img src="/pic/kios_logo.png" alt="LOGO" width="30%">
 </div>
 
 # KIOS --- Knowledge-based Intelligent Operation System
@@ -13,17 +13,15 @@ This is a project for robot task planning and execution based on langchain agent
 > BB: To save your time, the tutorial part of the project is still unter construction. You may jump to the "something to try" part to see if there are any updates. BB will fill up the tutorial part as soon as possible.
 
 - About the old version: 
-The behavior tree executor is implemented based on project BehaviorTree.CPP. See `kios_cpp`.
-Some of the components are implemented in python. See `kios_py`.
-
-> BB: For the old version, please check `old_readme.md`. The old version will be archived and will not be updated anymore. 
+See the branch `kios_ros`.
+The project is refactored according to the KISS principle. The old version is now discarded.
 
 - About the new version:
 The no-ros version, which aims at simplizing the system structure, is now actively developed.
 For this part see `kios_bt_planning`.
 
 - About robot interface:
-For people who don't have access to mios, you may deploy your own methods to generate robot commands in "mios_task_factory.py" and your own methods to execute the commands in "robot_command.py".
+For people who don't have access to mios, you may deploy your own methods to generate `robot command` in `mios_task_factory.py` and your own methods to execute the commands in `robot_command.py`. You can also define your own command class, search for `MiosCall` and `KiosCall` in the project.
 
 ## Intro
 
@@ -54,17 +52,22 @@ The usecases are from the siemens robot assembly challenge and the furniture-ben
 
 ## What is KIOS?
 
+KIOS is a robot intelligent task planning system developed by BlackBird for his master thesis. Some of the key features are:
+
+- natural language understanding and interacting
+- assembly task planning based on state and knowledge
+- behavior tree generation, modification and execution
 
 ## Getting Started
 
 ### Requirements
 
-**For the client side:**
+**For the client (robot) side:**
 - Ubuntu 20.04 LTS
 - conan 1.59.0 (conan 2 is not compatible with the project mios)
 - linux Realtime kernal. This is the requirement of robot control interface (1000Hz control loop). For walkthrough please check [here](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel).
 
-**For the server side (if you want to try the local inference models):**
+**For the server side (for local LLMs, not deployed yet):**
 - Ubuntu 20.04 LTS
 - CUDA 12.1 or higher
 - RAM 32GB or higher
@@ -87,6 +90,8 @@ sudo apt-get install graphviz
 # install the package kios_bt_planning
 cd kios_bt_planning
 pip3 install -e .
+# this is for testing the project
+conda install ipython
 ```
 
 2. (Skip this if you do not need world state visualization) install neo4j.
@@ -98,7 +103,7 @@ After setting up the neo4j server, please change in the neo4j interface in `kios
 
 3. Set up the mios (branch = kios) and the franka robot.
 
-4. Install llama.cpp according to the [docs](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file#supported-backends). Please aware that you need to enable CUDA backend.
+4. (skip this now) Install llama.cpp according to the [docs](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file#supported-backends). Please aware that you need to enable CUDA backend.
 
 ```bash
 # in the virtual environment
@@ -107,10 +112,30 @@ CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
 
 > BB: Go to check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. The docker image's name is "mirmi/mios", but is not compatible with this project. The skills necessary for the robot manipulation in kios are still being actively developed. A new docker image will be released as soon as possible. 
 
+5. Set up your openai api-key.
+
+If you want to use the openai gpt models as your LLM, please set up your openai api-key globally according to this [link](https://platform.openai.com/docs/quickstart?context=python).
+
+Or you don't think it is annoying, then use `getpass` to input the api-key every time you run the project.
+
+> BB: Protect your api-key carefully and prevent any secret leakage.
+
+6. Set up langsmith.
+
+If you want to use langsmith to minitor the LLM queries, take a look at this [link](https://docs.smith.langchain.com/tracing) to set the api-key.
+
+You can also use something else like [langfuse](https://github.com/langfuse/langfuse) to monitor the LLM queries.
+
+7. Set up huggingface (skip this for now).
+
 ### Packages
 - experiments: the experiment files of different problems.
   - chair...
   - gearset...
+    - scene
+    - domain
+    - problem
+  - gearset1... (in use now)
     - scene
     - domain
     - problem
@@ -160,16 +185,49 @@ CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
 ### System Structure
 
 <div align="center">
-  <img src="/TRI.png" alt="The Concept" width="90%">
+  <img src="/pic/TRI.png" alt="The Concept" width="90%">
 </div>
 
 ### Something to try
 
-1. Set up your openai api-key.
+#### 1. Runtime script for robot commands
 
-2. Set up langsmith.
+The scripts `runtime_script.py` (just search them in the project) are live scripts for modifying mios memory, teaching mios objects (check mios documentation to understand what are the objects in mios), quick environment setup and robot command testing.
 
-3. Set up huggingface.
+Import it with ipython so you can call the function at runtime:
+
+```bash
+# in the virtual environment
+# change to its dir (gearset1 for example)
+cd experiments/gearset1
+
+# you need ipython installed in conda
+ipython -i runtime_script.py
+
+# run the commands...
+```
+
+Please check the script for more information about the functions.
+
+#### 2. Human-in-the-loop behavior tree generation
+
+The human-in-the-loop behavior tree generation is a process for generating behavior trees iteratively with the help of human feedback. User input is first passed to the assembly planner, which makes a high-level assembly plan including several product-concentrated assembly steps. Then the first step is passed to the sequential planner to generate an action sequence in natural language, which helps to generate the corresponding behavior tree in the behavior tree generator. The behavior tree is a mid-level plan about robot actions and condition checking. The user is asked to provide feedback to help improve or correct the beahvior tree in natural language. The feedback is then used to modify the behavior tree and generate a new plan(tree). The process is repeated until the user is satisfied with the behavior tree. Then the behavior tree is executed by the robot, which calls the robot interface to run low-level motion primitives or skills. The execution will stop when the tree gets a feedback and the user will be asked to provide feedback again. After successfully finishing the task, the plan updater will update the plan in the assembly planner and the process will be repeated for the next step until the whole assembly task is finished.
+
+Following is the workflow for human-in-the-loop behavior tree generation:
+
+<div align="center">
+  <img src="/pic/human_in_the_loop.png" alt="human-in-the-loop generation" width="90%">
+</div>
+
+User input: assembly instructions (natural language).
+
+User_feedback: suggestions for the behavior tree (natural language).
+
+```bash
+# in the virtual environment
+cd experiments/gearset1
+python human_in_the_loop_sync.py
+```
 
 ### Testing
 
@@ -183,7 +241,7 @@ conda install ipython
 
 ### Development Log
 
-For the old version see [old_dev_log.md](old_dev_log.md)
+...
 
 ## Contribute
 
@@ -195,6 +253,8 @@ MIT License
 
 ## Sources
 
+- [semantic-router](https://github.com/aurelio-labs/semantic-router)
+- [huggingface](https://huggingface.co/)
 - [langchain](https://python.langchain.com/docs/get_started/introduction)
 - [langsmith](https://docs.smith.langchain.com/tracing)
 - [llama_cpp_python](https://github.com/abetlen/llama-cpp-python)

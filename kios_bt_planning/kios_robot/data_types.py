@@ -13,6 +13,8 @@ class MiosSkill:
     skill_type: str
     skill_parameters: Dict[str, Any]
     retry: bool = field(default=False)
+    retry_count: int = field(default=0)
+    failure_pause: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.skill_name
@@ -23,6 +25,8 @@ class MiosCall:
     method_name: str
     method_payload: Dict[str, Any]
     retry: bool = field(default=False)
+    retry_count: int = field(default=0)
+    failure_pause: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.method_name

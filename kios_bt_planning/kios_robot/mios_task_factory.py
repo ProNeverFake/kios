@@ -156,10 +156,6 @@ class MiosTaskFactory:
         }
         return MiosCall(method_name="teach_object", method_payload=payload)
 
-    @bb_deprecated(
-        reason="this doesn't make sense if you use the object in the scene. turn to the scene method.",
-        can_run=False,
-    )
     def generate_update_mios_memory_environment_call(self) -> MiosCall:
         payload = {}
         return MiosCall(method_name="update_memory_environment", method_payload=payload)
@@ -514,7 +510,7 @@ class MiosTaskFactory:
         if tool_name is None:
             raise Exception("tool_name is not set!")
 
-        if tool_name is "defaultgripper":
+        if tool_name == "defaultgripper":
             return [self.generate_update_tool_call(tool_name)]
 
         payload = {
@@ -577,7 +573,7 @@ class MiosTaskFactory:
         if tool_name is None:
             raise Exception("tool_name is not set!")
 
-        if tool_name is "defaultgripper":
+        if tool_name == "defaultgripper":
             return []
 
         payload = {

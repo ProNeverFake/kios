@@ -2,6 +2,8 @@ from kios_utils.task import *
 from tabulate import tabulate
 from pprint import pprint
 
+import logging
+
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
@@ -101,9 +103,11 @@ class RobotCommand:
                 else:
                     raise Exception("Unknown task type: {}".format(task_item))
                 return True
-            except RetryException:
+            except RetryException as e:
+                logging.warning(f"Task {task_item} failed. Retrying...")
                 continue
             except FailureException:
+                logging.error(f"Task {task_item} failed. Stop and return failure...")
                 return False
 
     def try_starting_mios_task(self, mios_task: Task):
@@ -119,11 +123,20 @@ class RobotCommand:
 
     def check_response(self, response, task_item):
         if isinstance(response, MiosInterfaceResponse):
-            if not response.has_finished or not response.task_result.has_succeeded:
+            if not response.has_finished:
                 if task_item.retry:
                     raise RetryException
                 else:
                     raise FailureException
+            else:
+                if (
+                    response.task_result != None
+                    and not response.task_result.has_succeeded
+                ):
+                    if task_item.retry:
+                        raise RetryException
+                    else:
+                        raise FailureException
         else:
             if response is None:
                 if task_item.retry:

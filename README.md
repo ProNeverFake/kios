@@ -209,7 +209,7 @@ ipython -i runtime_script.py
 
 Please check the script for more information about the functions.
 
-2. Human-in-the-loop behavior tree generation
+#### 2. Human-in-the-loop behavior tree generation
 
 The human-in-the-loop behavior tree generation is a process for generating behavior trees iteratively with the help of human feedback. User input is first passed to the assembly planner, which makes a high-level assembly plan including several product-concentrated assembly steps. Then the first step is passed to the sequential planner to generate an action sequence in natural language, which helps to generate the corresponding behavior tree in the behavior tree generator. The behavior tree is a mid-level plan about robot actions and condition checking. The user is asked to provide feedback to help improve or correct the beahvior tree in natural language. The feedback is then used to modify the behavior tree and generate a new plan(tree). The process is repeated until the user is satisfied with the behavior tree. Then the behavior tree is executed by the robot, which calls the robot interface to run low-level motion primitives or skills. The execution will stop when the tree gets a feedback and the user will be asked to provide feedback again. After successfully finishing the task, the plan updater will update the plan in the assembly planner and the process will be repeated for the next step until the whole assembly task is finished.
 
@@ -220,6 +220,7 @@ Following is the workflow for human-in-the-loop behavior tree generation:
 </div>
 
 User input: assembly instructions (natural language).
+
 User_feedback: suggestions for the behavior tree (natural language).
 
 ```bash

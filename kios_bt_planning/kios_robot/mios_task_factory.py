@@ -157,8 +157,17 @@ class MiosTaskFactory:
         return MiosCall(method_name="teach_object", method_payload=payload)
 
     def generate_update_mios_memory_environment_call(self) -> MiosCall:
+        """call mios to update the memory "environment" from the mongodb.
+
+        Returns:
+            MiosCall: the call to update the mios memory environment
+        """
         payload = {}
-        return MiosCall(method_name="update_memory_environment", method_payload=payload)
+        return MiosCall(
+            method_name="update_memory_environment",
+            method_payload=payload,
+            isTrivial=True,
+        )
 
     def generate_move_above_mp(self, object_name: str) -> MiosSkill:
         """

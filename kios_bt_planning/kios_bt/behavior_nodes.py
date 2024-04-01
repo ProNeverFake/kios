@@ -302,18 +302,35 @@ class ActionNodeTest(ActionNode):
 
 
 class ActionNodeSim(ActionNode):
+    """Node for simulation. This node will succeed after a certain number of ticks.
+
+    Args:
+        ActionNode (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     success_flag: bool
 
     @staticmethod
-    def from_action_node(action_node: ActionNode) -> "ActionNodeSim":
-        return ActionNodeSim(action_node.action, action_node.world_interface)
+    def from_action_node(
+        action_node: ActionNode, willFail: bool = False
+    ) -> "ActionNodeSim":
+        return ActionNodeSim(
+            action_node.action,
+            action_node.world_interface,
+            willFail=willFail,
+        )
 
     def __init__(
         self,
         action: Action,
         world_interface: WorldInterface,
         robot_interface: RobotInterface = None,  #  not needed for simulation
+        willFail: bool = False,
     ):
+        self.willFail: bool = willFail
         self.success_flag = False
         self.tick_times = 0
         self.tick_times_target = 3
@@ -354,6 +371,8 @@ class ActionNodeSim(ActionNode):
 
         if self.tick_times >= self.tick_times_target:
             self.logger.info(f'Action "{self.behavior_name}" finished successfully')
+            if self.willFail:
+                return py_trees.common.Status.FAILURE
             # new_status = py_trees.common.Status.SUCCESS
             new_status = py_trees.common.Status.RUNNING
             # ! As I said, the action node should always return running.

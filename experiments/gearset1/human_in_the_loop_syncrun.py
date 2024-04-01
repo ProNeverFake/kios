@@ -6,7 +6,7 @@ import operator
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "trash"
+os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -209,7 +209,8 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     execute the first step of the plan, append the result to the past steps
     """
     print(f"-----behavior_tree_execute_step-----")
-
+    # * simulation shortcut. Uncomment the following line to use simulation instead of execution
+    return behavior_tree_simulation_step(state)
     this_step = state["plan"][0]
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]
@@ -248,43 +249,51 @@ def behavior_tree_execute_step(state: PlanExecuteState):
         }
 
 
-# @traceable(name="behavior_tree_execute_step")
-# def behavior_tree_simulation_step(state: PlanExecuteState):
-#     """
-#     execute the first step of the plan, append the result to the past steps
-#     """
-#     print(f"-----behavior_tree_simulation_step-----")
+@traceable(name="behavior_tree_simulation_step")
+def behavior_tree_simulation_step(state: PlanExecuteState):
+    """
+    execute the first step of the plan, append the result to the past steps
+    """
+    print(f"-----behavior_tree_simulation_step-----")
 
-#     this_step = state["plan"][0]
-#     behavior_tree_skeleton = state["last_behavior_tree"]
-#     latest_world_state = state["world_state"][-1]
+    this_step = state["plan"][0]
+    behavior_tree_skeleton = state["last_behavior_tree"]
+    latest_world_state = state["world_state"][-1]
 
-#     # * first sim run
-#     tree_result, skeleton_json = behavior_tree_stewardship.sk_sim_run(
-#         world_state=latest_world_state, skeleton_json=behavior_tree_skeleton
-#     )
+    behavior_tree_stewardship.set_world_state(latest_world_state)
 
-#     # pprint(tree_result.to_json())
-#     # pause = input("paused here")
+    behavior_tree_stewardship.generate_behavior_tree_from_skeleton(
+        behavior_tree_skeleton
+    )
 
-#     # * check result
-#     if tree_result.result == "success":
-#         return {
-#             "BTExecutionHasSucceeded": True,
-#             "past_steps": (
-#                 this_step,
-#                 tree_result.result,
-#             ),  # * only one because new plan will be generated and old steps are all removed
-#             "world_state": [tree_result.world_state],
-#             "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
-#         }
-#     else:
-#         return {
-#             "BTExecutionHasSucceeded": False,
-#             # ! do not change world state
-#             "world_state": [tree_result.world_state],
-#             "runtime_world_state": tree_result.world_state,
-#         }
+    behavior_tree_stewardship.setup_simulation()
+
+    behavior_tree_stewardship.setup_behavior_tree()
+
+    behavior_tree_stewardship.tick_tree()
+
+    tree_result = behavior_tree_stewardship.tree_result
+
+    pprint(tree_result.to_json())
+    pause = input("DEBUG: please check the tree result. Press enter to continue.")
+
+    # * check result
+    if tree_result.result == "success":
+        return {
+            "BTExecutionHasSucceeded": True,
+            "past_steps": (
+                this_step,
+                tree_result.result,
+            ),  # * only one because new plan will be generated and old steps are all removed
+            "world_state": [tree_result.world_state],
+            "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
+        }
+    else:
+        return {
+            "BTExecutionHasSucceeded": False,
+            "world_state": [tree_result.world_state],
+            "runtime_world_state": tree_result.world_state,
+        }
 
 
 @traceable(name="planner_step")
@@ -379,7 +388,7 @@ workflow.add_conditional_edges(
     user_feedback_should_end,
     {
         True: "behavior_tree_executor",
-        False: "behavior_tree_generator",
+        False: "sequence_generator",  # ! BUG 01042024
     },
 )
 
@@ -403,7 +412,7 @@ def executor_should_end(state: PlanExecuteState):
     if state["BTExecutionHasSucceeded"] == True:
         # ask for user confirmation and end, or go back to the behavior tree generator if the user wants to improve
         user_feedback = input(
-            "the behavior tree has succeeded.\n Is the target of this step satisfied now? Is there anything wrong?"
+            "the behavior tree has succeeded.\n Is the target of this step satisfied now? Is there anything wrong?\n"
         )
 
         if user_feedback == "" or not user_feedback:
@@ -414,7 +423,7 @@ def executor_should_end(state: PlanExecuteState):
             route = executor_router(user_feedback)
             if route.name == None:
                 user_feedback = input(
-                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?"
+                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?\n"
                 )
             else:
                 break
@@ -431,7 +440,7 @@ def executor_should_end(state: PlanExecuteState):
         # ask for user hint and go back to the behavior tree generator
         # * router is unnecessary here
         user_feedback = input(
-            "The behavior tree has failed in its execution.\nPlease give me a hint to improve it:"
+            "The behavior tree has failed in its execution.\nPlease give me a hint to improve it:\n"
         )
         return False
 
@@ -441,7 +450,7 @@ workflow.add_conditional_edges(
     executor_should_end,
     {
         True: "plan_updater",
-        False: "behavior_tree_generator",
+        False: "sequence_generator",
     },
 )
 
@@ -453,10 +462,10 @@ def plan_updater_should_end(state: PlanExecuteState):
     print(f"-----plan_updater_should_end-----")
 
     if state["plan"] == [] or len(state["plan"]) == 0:
-        print("The assembly plan has been finished.")
+        print("The assembly plan has been finished.\n")
         return True
     else:
-        print("The assembly plan has not been finished.")
+        print("The assembly plan has not been finished.\n")
         print(f'Unfinished steps: {state["plan"]}')
         return False
 
@@ -487,7 +496,7 @@ def user_input_should_end(state: PlanExecuteState):
     route = user_input_router(state["user_input"])
     if route.name == None:
         print(
-            "I don't understand your instruction. Can you provide me with a new instruction?"
+            "I don't understand your instruction. Can you provide me with a new instruction?\n"
         )
         return None
 

@@ -23,13 +23,17 @@ tiktoken
 cohere
 langchain
 langchain-openai
-langgraph
+langgraph==0.0.24
 
 # semantic-router
 semantic-router
 
 # robotics 
 roboticstoolbox-python
+
+# vision
+opencv-python
+pyrealsense2
 
 # LLAMA
 torch

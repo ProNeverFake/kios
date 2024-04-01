@@ -1,6 +1,7 @@
 import json
 import os
 
+# this should be set in the experiment file
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 # os.environ["LANGCHAIN_PROJECT"] = "kios_human_in_the_loop"

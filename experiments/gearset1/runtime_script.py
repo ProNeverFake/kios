@@ -1,21 +1,24 @@
 import numpy as np
 import os
 import json
-from spatialmath import *
-from spatialmath.base import trnorm
 from pprint import pprint
+import socket
+import threading
 
-from kios_robot.mios_task_factory import MiosTaskFactory
+from anran_tag.apriltag_rs import apriltag_rs
+
+# from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.robot_command import RobotCommand
 from kios_robot.robot_interface import RobotInterface
-from kios_robot.data_types import Toolbox
-from kios_scene.scene_factory import SceneFactory
 
+# from kios_robot.data_types import Toolbox
+from kios_scene.scene_factory import SceneFactory
 from kios_scene.mios_ltm_manipulator import LangTermMemoryManipulator
 from kios_utils.bblab_utils import execution_timer
-import socket
-from anran_tag.apriltag_rs import apriltag_rs
-import threading
+
+from spatialmath import *
+from spatialmath.base import trnorm
+
 
 ri = RobotInterface()
 sf = SceneFactory()

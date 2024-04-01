@@ -1,5 +1,6 @@
 from kios_utils.task import *
 import numpy as np
+import logging
 from termcolor import colored
 from pprint import pprint
 from typing import Any
@@ -59,10 +60,11 @@ class RobotProprioceptor:
             mios_object = self.mongodb_interface.query_mios_object(object_name)
 
             if scene.object_map.get(object_name) is None:
-                print(
-                    "\033[93m"
-                    + f"object {object_name} is not in the scene. Add it now."
-                )
+                logging.warn(f"object {object_name} is not in the scene. Add it now.")
+                # print(
+                #     "\033[93m"
+                #     + f"object {object_name} is not in the scene. Add it now."
+                # )
                 # scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
 
             scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)

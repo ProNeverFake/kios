@@ -10,6 +10,9 @@ should provide:
 - test run
 """
 
+import logging
+import colorlog
+
 from typing import List, Set, Dict, Any, Tuple, Optional
 
 from kios_bt.behavior_nodes import (
@@ -37,6 +40,23 @@ import functools
 import copy
 import sched
 import time
+
+handler = colorlog.StreamHandler()
+handler.setFormatter(
+    colorlog.ColoredFormatter(
+        "%(log_color)s%(levelname)s:%(name)s:%(message)s",
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white",
+        },
+    )
+)
+
+logger = logging.getLogger()
+logger.addHandler(handler)
 
 
 class BehaviorTreeStewardship:
@@ -176,6 +196,15 @@ class BehaviorTreeStewardship:
         period_msec: int = 1,
         timeout_sec: int = 200,
     ):
+        """tick the tree at a specific frequency. the tree will be ticked until it returns success or failure, or timeout is triggered.
+
+        Args:
+            period_msec (int, optional): period for tree ticking. Defaults to 1 ms.
+            timeout_sec (int, optional): tree execution time limit. Defaults to 200 sec.
+
+        Raises:
+            Exception: this should never happen.
+        """
         py_trees.logging.level = py_trees.logging.Level.DEBUG
         running_time = 0
 
@@ -183,7 +212,7 @@ class BehaviorTreeStewardship:
             nonlocal running_time
             # * timeout return
             if running_time > timeout_sec:
-                print("\033[91mTree finished with timeout\033[0m")
+                logging.error("Tree tick returns timeout!")
                 tip_node = self.behavior_tree.root.tip()
                 self.tree_result = TreeResult(
                     result="timeout",
@@ -195,7 +224,7 @@ class BehaviorTreeStewardship:
             self.behavior_tree.tick()
 
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
-                print("\033[94mTree finished with success\033[0m")
+                logging.info("Tree finished with success")
                 self.tree_result = TreeResult(
                     result="success",
                     summary="Behavior tree tick returns success",
@@ -203,7 +232,7 @@ class BehaviorTreeStewardship:
                     world_state=self.world_interface.get_world_to_json(),
                 )
             elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
-                print("\033[91mTree finished with failure\033[0m")
+                logging.error("Tree finished with failure")
                 tip_node = self.behavior_tree.root.tip()
                 if tip_node is None:
                     self.tree_result = TreeResult(
@@ -239,9 +268,9 @@ class BehaviorTreeStewardship:
             self.behavior_tree.tick()
             tick_count += 1
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
-                print("\033[94mTree finished with success\033[0m")
+                logging.info("Tree finished with success")
             elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
-                print("\033[91mTree finished with failure\033[0m")
+                logging.warn("Tree finished with failure")
             elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
                 scheduler.enter(1 / 1000, 1, tick)
             else:
@@ -265,9 +294,9 @@ class BehaviorTreeStewardship:
             self.behavior_tree.tick()
             tick_count += 1
             if self.behavior_tree.root.status == py_trees.common.Status.SUCCESS:
-                print("\033[94mTree finished with success\033[0m")
+                logging.info("Tree finished with success")
             elif self.behavior_tree.root.status == py_trees.common.Status.FAILURE:
-                print("\033[91mTree finished with failure\033[0m")
+                logging.warn("Tree finished with failure")
             elif self.behavior_tree.root.status == py_trees.common.Status.RUNNING:
                 scheduler.enter(1 / 1000, 1, tick)
             else:
@@ -451,6 +480,10 @@ class BehaviorTreeStewardship:
         self.behavior_tree.prune_subtree(to_remove_node_id)
 
     ##########################################################
+
+    def setup_simulation(self):
+        self.replace_action_node_with_sim(self.behavior_tree, self.behavior_tree.root)
+
     # * the behavior tree simulator tool
     def simulate_behavior_tree(self) -> TreeResult:
         # ! maybe it is better to imp a new class for the simulation
@@ -545,6 +578,7 @@ class BehaviorTreeStewardship:
     def sk_sim_run(self, world_state: dict, skeleton_json: dict):
         """
         simulation run of behavior tree generated from skeleton json.
+        try the behavior tree to check if the tree works well.
         restore the world state after the simulation.
         """
         self.set_world_state(world_state)

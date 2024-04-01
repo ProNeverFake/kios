@@ -15,6 +15,7 @@ class MiosSkill:
     retry: bool = field(default=False)
     retry_count: int = field(default=0)
     failure_pause: bool = field(default=False)
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.skill_name
@@ -27,6 +28,7 @@ class MiosCall:
     retry: bool = field(default=False)
     retry_count: int = field(default=0)
     failure_pause: bool = field(default=False)
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.method_name
@@ -37,6 +39,7 @@ class KiosCall:
     method: object
     args: List[Any]
     call_name: str = field(default="default name")
+    isTrivial: bool = field(default=False)
 
     def __str__(self) -> str:
         return self.call_name

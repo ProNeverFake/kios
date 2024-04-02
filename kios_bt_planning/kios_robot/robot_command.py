@@ -5,6 +5,7 @@ from pprint import pprint
 import logging
 import colorlog
 
+
 # ! I know this block for colorlog is duplicated. you can find the same thing in bt_stw.py.
 handler = colorlog.StreamHandler()
 handler.setFormatter(
@@ -20,8 +21,9 @@ handler.setFormatter(
     )
 )
 
-logger = logging.getLogger()
-logger.addHandler(handler)
+rc_logger = logging.getLogger(name="robot_command")
+rc_logger.addHandler(handler)
+rc_logger.setLevel(logging.DEBUG)
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
@@ -110,7 +112,7 @@ class RobotCommand:
             if not self.execute_task(task_item):
                 return False
 
-        logging.info("All tasks executed successfully.")
+        rc_logger.info("All tasks executed successfully.")
         return True
 
     def execute_task(self, task_item: MiosSkill | MiosCall | KiosCall) -> bool:
@@ -126,13 +128,13 @@ class RobotCommand:
                     raise Exception("Unknown task type: {}".format(task_item))
                 return True
             except TrivialException as e:
-                logging.warning(f"Task {task_item} is defined as trivial. Skip...")
+                rc_logger.warning(f"Task {task_item} is defined as trivial. Skip...")
                 return True
             except RetryException as e:
-                logging.warning(f"Task {task_item} failed. Retrying...")
+                rc_logger.warning(f"Task {task_item} failed. Retrying...")
                 continue
             except FailureException:
-                logging.error(f"Task {task_item} failed. Stop and return failure...")
+                rc_logger.error(f"Task {task_item} failed. Stop and return failure...")
                 return False
 
     def try_starting_mios_task(self, mios_task: Task):
@@ -142,12 +144,8 @@ class RobotCommand:
         return start_result
 
     def log_response(self, message, response):
-        print("this")
-        logging.info(message)
-        logging.info(response)
-        # print("\033[92m{}\033[0m".format(message))
-        # pprint(response)
-        # print("\033[0m")
+        rc_logger.info(message)
+        rc_logger.info(response)
 
     def raise_exception_for_task(self, task_item: MiosSkill | MiosCall | KiosCall):
         if task_item.isTrivial is not None and task_item.isTrivial:

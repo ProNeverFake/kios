@@ -190,8 +190,8 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     execute the first step of the plan, append the result to the past steps
     """
     print(f"-----behavior_tree_execute_step-----")
-    # * simulation shortcut. Uncomment the following line to use simulation instead of execution
-    return behavior_tree_simulation_step(state)
+    # # * simulation shortcut. Uncomment the following line to use simulation instead of execution
+    # return behavior_tree_simulation_step(state)
     this_step = state["plan"][0]
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]

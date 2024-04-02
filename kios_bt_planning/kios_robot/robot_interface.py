@@ -12,6 +12,8 @@ from kios_robot.robot_proprioceptor import RobotProprioceptor
 from kios_robot.mios_task_factory import MiosTaskFactory
 from kios_robot.data_types import TaskScene, MiosInterfaceResponse
 
+from kios_utils.bblab_utils import bb_deprecated
+
 
 class RobotInterface:
     robot_address: str = None
@@ -47,7 +49,12 @@ class RobotInterface:
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
+        print(f"rp scene id: {hex(id(self.task_scene))}")
         self.mios_task_factory.setup_scene(task_scene)
+
+    @bb_deprecated(reason="fix the bug!", can_run=True)
+    def refresh_scene_objects(self, task_scene: TaskScene):
+        self.task_scene.object_map = task_scene.object_map
 
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")
@@ -66,8 +73,8 @@ class RobotInterface:
             robot_address=self.robot_address,
             robot_port=self.robot_port,
             shared_data=shared_data,
-            task_scene=self.task_scene,
-            robot_interface=self,  # TODO someone comes to refactor this part plz!
+            # task_scene=self.task_scene,
+            # robot_interface=self,  # TODO someone comes to refactor this part plz!
         )
         """core method. 
         generate a robot command from an action. load the shared data into the command for possible use.

@@ -19,11 +19,11 @@
     {"name": "left_hand", "properties": []}
   ],
   "constraints": [
-    {"source": "clampgripper", "name": "can_manipulate", "target": "shaft1"},
-    {"source": "parallelgripper", "name": "can_manipulate", "target": "gear1"},
-    {"source": "outwardgripper", "name": "can_manipulate", "target": "gear2"},
-    {"source": "outwardgripper", "name": "can_manipulate", "target": "gear3"},
-    {"source": "defaultgripper", "name": "can_manipulate", "target": "shaft3"},
+    {"source": "parallelgripper", "name": "can_manipulate", "target": "shaft1"},
+    {"source": "defaultgripper", "name": "can_manipulate", "target": "gear1"},
+    {"source": "clampgripper", "name": "can_manipulate", "target": "gear2"},
+    {"source": "defaultgripper", "name": "can_manipulate", "target": "gear3"},
+    {"source": "inwardgripper", "name": "can_manipulate", "target": "shaft3"},
     {"source": "shaft1", "name": "can_insert_to", "target": "gearbase_hole1"},
     {"source": "shaft3", "name": "can_insert_to", "target": "gearbase_hole3"},
     {"source": "gear3", "name": "can_insert_to", "target": "shaft3"},
@@ -31,7 +31,7 @@
     {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}
   ],
   "relations": [
-    {"source": "left_hand", "name": "hold", "target": "outwardgripper"}
+    {"source": "left_hand", "name": "hold", "target": "parallelgripper"}
   ]
 }
 

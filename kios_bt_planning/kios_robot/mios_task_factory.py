@@ -254,6 +254,7 @@ class MiosTaskFactory:
             skill_name="cartesian_move",
             skill_type="KiosCartesianMove",
             skill_parameters=context,
+            # retry=True,
         )
 
     @bb_deprecated(reason="not for task space operation", can_run=True)
@@ -556,10 +557,6 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            # "user": {
-            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            # },
         }
 
         load_tool = MiosSkill(
@@ -619,10 +616,6 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            # "user": {
-            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            # },
         }
 
         unload_tool = MiosSkill(

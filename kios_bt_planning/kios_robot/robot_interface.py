@@ -78,7 +78,6 @@ class RobotInterface:
         Returns:
             RobotCommand: the robot command for the action node to execute.
         """
-        # ! hack
         tasks = self.mios_task_factory.generate_tasks(
             action=action, shared_data=shared_data
         )

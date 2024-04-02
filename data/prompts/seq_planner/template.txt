@@ -1,3 +1,4 @@
 Now make a plan with the following information:
 start_world_state: {start_world_state}
-user_instruction: {user_instruction}
+task_instruction: {task_instruction}
+user_feedback: {user_feedback}

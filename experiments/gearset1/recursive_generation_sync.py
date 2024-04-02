@@ -1,13 +1,20 @@
+"""
+node expanding method script. 
+run the algo to generate the tree for current goal, forecast the future world state, and find the new goal to expand.
+currently not a langgraph.
+"""
+
 import json
 import os
 from pprint import pprint
 from typing import List, Tuple, Annotated, TypedDict
 import operator
-from dotenv import load_dotenv
+import logging
+import re
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop"
+os.environ["LANGCHAIN_PROJECT"] = "recursive_generation"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -17,20 +24,42 @@ from kios_world.world_interface import WorldInterface
 
 from kios_agent.llm_supporter import KiosLLMSupporter
 from kios_agent.data_types import KiosPromptSkeleton
+
 from kios_agent.kios_graph import (
     plan_updater,
     planner,
     seq_planner_chain,
     human_instruction_chain,
+    ut_generation_chain,
+    state_predictor_chain,
 )
+
 from kios_agent.kios_routers import KiosRouterFactory
 
+from dotenv import load_dotenv
+
+from langchain_openai import ChatOpenAI
+
+from langchain.chains.openai_functions import (
+    create_structured_output_runnable,
+    create_openai_fn_runnable,
+)
+
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.pydantic_v1 import BaseModel, Field
+
+from langchain.prompts.pipeline import PipelinePromptTemplate
+from langchain.prompts.prompt import PromptTemplate
+
 from langgraph.graph import StateGraph, END
+
 from langsmith import traceable
 
 load_dotenv()
 
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+from kios_utils.pddl_problem_parser import parse_problem_init, parse_problem_objects
 
 
 def render_bt(bt_json: json):
@@ -45,9 +74,7 @@ def render_bt(bt_json: json):
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))
 scene_path = os.path.join(current_dir, "scene.json")
-# bt_json_file_path = os.path.join(current_dir, "behavior_tree.json")
 world_state_path = os.path.join(current_dir, "world_state.json")
-# domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
 
 ####################### scene
 with open(scene_path, "r") as file:
@@ -140,13 +167,11 @@ def sequence_generate_step(state: PlanExecuteState):
 
     plan_goal = state["plan"][0]
     start_world_state = state["world_state"][-1]
-    global user_feedback
 
     action_sequence = seq_planner_chain.invoke(
         {
             "start_world_state": start_world_state,
-            "task_instruction": plan_goal,  # TODO the naming method "user_instruction" is confusing. try to change it later.
-            "user_feedback": user_feedback,
+            "user_instruction": plan_goal,  # TODO the naming method "user_instruction" is confusing. try to change it later.
         }
     )
 
@@ -173,6 +198,9 @@ def behavior_tree_generate_step(state: PlanExecuteState):
     )
 
     render_bt(bt_skeleton)
+    # * here the reason not to use the btw is that the generated bt can be illegal while using btw assumes the bt to be legal and will do assertion.
+    # behavior_tree_stewardship.generate_behavior_tree_from_skeleton(bt_skeleton)
+    # behavior_tree_stewardship.render_dot_tree()
 
     user_feedback = input(
         "What should I do to improve the behavior tree?\nPlease give me your hint: "
@@ -518,5 +546,279 @@ def core_run():
                 print(v)
 
 
+################################################################ * from here
+
+# ! sequence planner estimation ppl
+system_file = os.path.join(prompt_dir, "seq_planner_est/system.txt")
+task_file = os.path.join(prompt_dir, "seq_planner_est/task.txt")
+domain_file = os.path.join(prompt_dir, "seq_planner_est/domain.txt")
+state_file = os.path.join(prompt_dir, "seq_planner_est/state.txt")
+output_format_file = os.path.join(prompt_dir, "seq_planner_est/output_format.txt")
+template_file = os.path.join(prompt_dir, "seq_planner_est/template.txt")
+example_file = os.path.join(prompt_dir, "seq_planner_est/example.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+with open(state_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    state_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+seq_planner_est_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("state", state_ppt),
+        ("output_format", output_format_ppt),
+        ("format_instructions", format_instructions),
+        ("example", example_ppt),
+    ],
+)
+
+seq_planner_est_chain = (
+    seq_planner_est_ppt_ppl
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | JsonOutputParser()
+)
+
+
+def seq_planner_est_test():
+    return seq_planner_est_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            # "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+def ut_gen_test():
+    ut = ut_generation_chain.invoke(
+        {
+            # "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
+            # "action": "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+            # "action": "change_tool(left_hand, parallel_box1, defaultgripper)",
+            "action": "insert(left_hand, clampgripper, gear2, shaft2)",
+        }
+    )
+
+    render_bt(ut)
+
+
+def seq_planner_est_test():
+    return seq_planner_est_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            # "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+def seq_action_plan_test():
+    return seq_ac_pl_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "target": "is_inserted_to(shaft1, gearbase_hole1)",
+            # "target": "hold(left_hand, outward_claw)",
+        }
+    )
+
+
+def state_est_test():
+    return state_predictor_chain.invoke(
+        {
+            "start_world_state": world_state_json,
+            "action_plan": [
+                "unload_tool(left_hand, outward_claw)",
+                "load_tool(left_hand, parallel_box1)",
+                "pick_up(left_hand, parallel_box1, shaft1)",
+                "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
+            ],
+        }
+    )
+
+
+##################################### * speed imp
+@traceable(name="make_plan")
+def make_plan(state: dict, goal: str) -> list[str]:
+    print(f"----------start to make plan for the goal {goal}")
+    response = seq_ac_pl_chain.invoke(
+        {
+            "start_world_state": state,
+            "target": goal,
+        }
+    )
+    print(f"finished making plan for the goal {goal}.")
+    pprint(f'LLM thought flow: {response["explanation"]}')
+    return response["task_plan"]
+
+
+@traceable(name="estimate_state")
+def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
+    print("----------start to estimate the state after the action plan:")
+    pprint(action_plan)
+    response = state_predictor_chain.invoke(
+        {
+            "start_world_state": start_world_state,
+            "action_plan": action_plan,
+        }
+    )
+    print(f"finished estimating the state after the action plan {action_plan}.")
+    return response["estimated_world_state"]
+
+
+@traceable(name="generate_unit_subtree")
+def generate_unit_subtree(action: str) -> dict:
+    print("----------start to generate the unit subtree for the action")
+    pprint(action)
+    response = ut_generation_chain.invoke(
+        {
+            "action": action,
+        }
+    )
+    print(f"finished generating the unit subtree for the action {action}.")
+    return response
+
+
+def get_node_list_from_tree(unit_subtree: dict) -> list[dict]:
+    children = unit_subtree["children"][1][
+        "children"
+    ]  # * the second child is a sequence
+    return children
+
+
+def extract_goal(node: dict) -> str:
+    name = node["name"]
+
+
+def match_type(node: dict) -> tuple[str, str]:
+    node_name = node["name"]
+    match = re.search(
+        r"(selector|sequence|action|precondition|condition|target):\s*(.+)", node_name
+    )
+    if match:
+        node_type = match.group(1)
+        node_body = match.group(2)
+        return node_type, node_body
+    else:
+        raise ValueError(f"the node name {node_name} does not match any type.")
+
+
+def expand_nodes(
+    node_list: list[dict],
+    start_state: dict,
+    overall_tree: list[dict] = None,
+) -> dict:
+    """
+    in order to monitor the tree generation, the overall tree and the node list should be the same variable when being passed in.
+    """
+    pprint("----------check the entire tree:")
+    if overall_tree is not None:
+        render_bt(overall_tree[0])
+    pprint("----------start to expand the node list:")
+    pprint(node_list)
+    pause = input("paused here! check the tree.")
+
+    assert len(node_list) > 0
+    state = start_state
+
+    for i in range(len(node_list)):
+        type_name, body = match_type(node_list[i])
+        # if match_type(node_list[i]) == "action":
+        if type_name == "action":
+            print(f"the node {node_list[i]['name']} is an action node. skip it.")
+            pause = input("paused here! check!")
+        # elif match_type(node_list[i]) == "precondition" or "target":
+        elif type_name in ["precondition", "target"]:
+            # goal = node_list[i]["name"]
+            goal = body
+            plan = make_plan(state, goal)
+            if len(plan) == 0:
+                logging.warning(f"No action should be performed for the goal {goal}.")
+                logging.warning(f'the node {node_list[i]["name"]} has been skipped.')
+                pause = input("paused here! check!")
+            else:
+                logging.info(f"Actions have been planed for the goal {goal}.")
+                pprint(f"the plan for the goal {goal} is {plan}")
+                pause = input("paused here! check!")
+                last_action = plan[-1]
+                unit_subtree = generate_unit_subtree(last_action)
+                # insert the subtree into the node_list
+                node_list[i] = unit_subtree
+                new_node_list = get_node_list_from_tree(unit_subtree)
+                expand_nodes(
+                    node_list=new_node_list,
+                    start_state=state,
+                    overall_tree=overall_tree,
+                )
+                state = estimate_state(state, plan)
+
+    return node_list[0]
+
+
+def test_expand_nodes():
+    start_state = world_state_json
+    node_list = [
+        {
+            "summary": "insert shaft1 into gearbase hole1",
+            "name": "target: insert shaft1 into gearbase hole1",
+        }
+    ]
+    # node_list = [
+    #     {
+    #         "summary": "insert gear2 into shaft2",
+    #         "name": "target: insert gear2 into shaft2",
+    #     }
+    # ]
+    # node_list = [
+    #     {
+    #         "summary": "pick up the shaft1",
+    #         "name": "target: pick up the shaft1",
+    #     },
+    # ]
+    expand_nodes(node_list, start_state, node_list)
+    pprint(node_list)
+
+
 if __name__ == "__main__":
-    core_run()
+
+    test_expand_nodes()

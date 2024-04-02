@@ -8,7 +8,7 @@ setup(
     name="kios_bt_planning",
     author="blackbird",
     description="Behavior Tree Planning for KIOS",
-    version="0.1.0",
+    version="0.1.1",
     packages=find_packages(),
     # include_package_data=True,
     # python_requires=">3.7,<3.9",

@@ -1,9 +1,17 @@
 {
+    "retry": [
+        "I think you should try again.",
+        "There is an error when you are executing the plan but that is not a big deal. You can try again.",
+        "Just try again. Something happened but that won't be a problem for your plan execution.",
+        "I just stopped you from executiing the plan. Now everything is fine and you can retry.",
+        "I paused the process because of some reason. Now you just run it again."
+    ],
     "rectify": [
         "I think this part is wrong. I think it should be like this: ",
         "The structure is not correct. ",
         "This part is A, and you do it like B. That is the reason that the system is not working. You should do C so that the system returns D.",
-        "I think you should change this part. "
+        "I think you should change this part. ",
+        "I stopped you because there is something wrong in your plan that you need to fix. "
     ],
     "approve": [
         "I think it works. ",
@@ -17,7 +25,8 @@
     "disapprove": [
         "No I don't think this is correct. ",
         "The plan does not perform correctly. ",
-        "I guess you need to do it again."
+        "Something in your plan is wrong. ",
+        "No. I don't think this is the right way. "
     ],
     "finish": [
         "Nothing else to do. bye. ",

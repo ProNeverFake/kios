@@ -2,6 +2,10 @@
 from .ws_client import *
 import time
 
+import logging
+
+mios_task_logger = logging.getLogger("mios_task_interface")
+
 
 class Skill:
     def __init__(self, skill_name=None, skill_type=None, skill_context=None):
@@ -49,15 +53,27 @@ class Task:
             },
             "skills": self.skill_context,
         }
-        # ceased. 13022024
-        # print(self.skill_context)
-        print(f"\033[92mStart the skill: {self.skill_names[0]}\033[0m")
+
+        mios_task_logger.info(f"Starting task with skills: {self.skill_names}")
         response = start_task(self.robot, "GenericTask", parameters)
         self.task_start_response = response
 
-        # ! bbtodo YOU SHOULD CHECK THE RESPONSE HERE
-
-        self.task_uuid = response["result"]["task_uuid"]
+        # TODO YOU SHOULD CHECK THE RESPONSE HERE
+        if response is not None:
+            if response["result"]["result"] is False:
+                mios_task_logger.error(
+                    f"Failed to start the skill at mios: {self.skill_names[0]}"
+                )
+                return None
+            else:
+                if response["result"]["task_uuid"] is not None:
+                    mios_task_logger.info("Task started successfully")
+                    self.task_uuid = response["result"]["task_uuid"]
+                else:
+                    mios_task_logger.error(
+                        f"Response includes no UUID for the task {self.skill_names[0]}"
+                    )
+                    return None
         return response
 
     def wait(self) -> dict:

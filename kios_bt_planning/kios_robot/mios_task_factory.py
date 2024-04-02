@@ -2,6 +2,7 @@ from typing import Any
 import re
 import numpy as np
 from pprint import pprint
+import logging
 
 from kios_scene.mongodb_interface import MongoDBInterface
 from kios_utils.bblab_utils import bb_deprecated
@@ -24,6 +25,9 @@ which takes formatted node data as input.
 Anyway, the current implementation is straightforward and easy to understand.
 """
 
+mti_logger = logging.getLogger("mios_task_interface")
+mti_logger.setLevel(logging.DEBUG)
+
 
 class MiosTaskFactory:
     task_scene: TaskScene
@@ -42,6 +46,7 @@ class MiosTaskFactory:
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
+        print(f"mtf scene id: {hex(id(self.task_scene))}")
 
     def parse_action(self, action: Action) -> dict[str, Any]:
         """parse the action string to get the action name and arguments.
@@ -137,6 +142,7 @@ class MiosTaskFactory:
         Returns:
             KiosCall: _description_
         """
+        print(f"scene id before update: {hex(id(self.task_scene))}")
         return KiosCall(
             method=self.robot_interface.proprioceptor.update_scene_object_from_mios,
             args=[self.task_scene, object_name],
@@ -146,9 +152,9 @@ class MiosTaskFactory:
     # * methods to generate one mios task
     def generate_teach_O_T_TCP_call(self, object_name: str) -> MiosCall:
         payload = {
-            "object_name": object_name,
+            "object": object_name,
         }
-        return MiosCall(method_name="teach_O_T_TCP", method_payload=payload)
+        return MiosCall(method_name="teach_object_TCP", method_payload=payload)
 
     def generate_teach_object_call(self, object_name: str) -> MiosCall:
         payload = {
@@ -175,6 +181,10 @@ class MiosTaskFactory:
         """
         # default: 15cm above the object
         # get the object from the scene
+        print(f" move above scece id: {hex(id(self.task_scene))}")
+        # mti_logger.warn(
+        #     f"scene content {object_name} x: {self.task_scene.object_map[object_name].O_T_TCP[2][0]}"
+        # )
         kios_object = self.task_scene.get_object(object_name)
         if kios_object is None:
             raise Exception(f'object "{object_name}" is not found in the scene!')
@@ -254,6 +264,7 @@ class MiosTaskFactory:
             skill_name="cartesian_move",
             skill_type="KiosCartesianMove",
             skill_parameters=context,
+            # retry=True,
         )
 
     @bb_deprecated(reason="not for task space operation", can_run=True)
@@ -294,7 +305,7 @@ class MiosTaskFactory:
         }
         return MiosCall(method_name="grasp", method_payload=payload)
 
-    @bb_deprecated(reason="meaningless")
+    @bb_deprecated(reason="meaningless", can_run=True)
     def generate_gripper_release_mp(self, width=0.08, speed=0.2) -> MiosCall:
         return self.generate_gripper_move_mp(width=width, speed=speed)
 
@@ -497,6 +508,23 @@ class MiosTaskFactory:
     ###################################################################
     # * methods to generate a sequence of mios tasks
 
+    @bb_deprecated(reason="not tested", can_run=True)
+    def memory_scene_object_synchronize(
+        self, object_name: str
+    ) -> list[MiosCall | KiosCall]:
+        """synchronize the indicated object in both sides.
+
+        Args:
+            object_name (str): the name of the object to be synchronized.
+
+        Returns:
+            list[MiosCall | KiosCall]: _description_
+        """
+        return [
+            self.generate_update_mios_memory_environment_call(),
+            self.generate_update_object_from_mios_call(object_name=object_name),
+        ]
+
     def generate_change_tool_skill(
         self, parsed_action: dict[str, Any]
     ) -> list[MiosCall | MiosSkill]:
@@ -556,10 +584,6 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            # "user": {
-            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            # },
         }
 
         load_tool = MiosSkill(
@@ -619,10 +643,6 @@ class MiosTaskFactory:
                 },
             },
             "control": {"control_mode": 0},
-            # "user": {
-            #     "env_X": [0.01, 0.01, 0.002, 0.05, 0.05, 0.05],
-            #     "env_dX": [0.001, 0.001, 0.001, 0.005, 0.005, 0.005],
-            # },
         }
 
         unload_tool = MiosSkill(
@@ -654,8 +674,6 @@ class MiosTaskFactory:
         move_above = self.generate_move_above_mp(object_name)
         task_list.append(move_above)
         # move in
-        # ! BUG
-        # reach = self.generate_cartesian_move_mp(object_name=object_name)
         reach = self.generate_reach_mp(object_name)
         task_list.append(reach)
         # grasp
@@ -702,6 +720,7 @@ class MiosTaskFactory:
     #     kios_object = self.task_scene.get_object(container)
     #     if kios_object is None:
     #         raise Exception(f'object "{container}" is not found in the scene!')
+    @bb_deprecated(reason="not used")
     def generate_loose_gripper_call(self) -> MiosCall:
         payload = {}
         return MiosCall(method_name="loose_gripper", method_payload=payload)
@@ -855,6 +874,7 @@ class MiosTaskFactory:
             raise Exception("container is not set!")
 
         # get the container from the scene
+        print(f"insertion scene id: {hex(id(self.task_scene))}")
         kios_object = self.task_scene.get_object(container)
         if kios_object is not None:
             O_T_TCP = kios_object.O_T_TCP
@@ -866,21 +886,21 @@ class MiosTaskFactory:
                     "time_max": 25,
                     "p0": {
                         "O_T_TCP": O_T_TCP.T.flatten().tolist(),
-                        "dX_d": [0.05, 0.3],
+                        "dX_d": [0.2, 0.3],
                         "ddX_d": [0.5, 1],
                         "DeltaX": [0, 0, 0, 0, 0, 0],
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
                     },
                     "p1": {
-                        "dX_d": [0.05, 0.1],
+                        "dX_d": [0.08, 0.1],
                         "ddX_d": [0.1, 0.05],
                         "K_x": [1500, 1500, 500, 800, 800, 800],
                     },
                     "p2": {
                         # "search_a": [10, 10, 0, 2, 2, 0],
                         # "search_f": [1, 1, 0, 1.2, 1.2, 0],
-                        "search_a": [4, 4, 0, 1, 1, 0],
-                        "search_f": [1, 1, 0, 1.5, 1.5, 0],
+                        "search_a": [10, 10, 0, 1.5, 1.5, 0],
+                        "search_f": [1, 1, 0, 1.2, 1.2, 0],
                         "search_phi": [
                             0,
                             3.14159265358979323846 / 2,
@@ -891,8 +911,6 @@ class MiosTaskFactory:
                         ],
                         "K_x": [300, 300, 500, 500, 500, 800],
                         "f_push": [0, 0, 5, 0, 0, 0],
-                        # "dX_d": [0.1, 0.5],
-                        # "ddX_d": [0.5, 1],
                         "dX_d": [0.03, 0.3],
                         "ddX_d": [0.3, 1],
                     },
@@ -916,7 +934,9 @@ class MiosTaskFactory:
             skill_type="KiosInsertion",
             skill_parameters=payload,
         )
-        update_object_in_mios = self.generate_teach_object_call(insertable)
+        teach_object_in_mios = self.generate_teach_O_T_TCP_call(insertable)
+
+        # update_object_in_mios = self.generate_update_mios_memory_environment_call()
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
 
         release = self.generate_gripper_release_mp(width=0.041)
@@ -925,7 +945,8 @@ class MiosTaskFactory:
 
         return [
             insert,
-            update_object_in_mios,
+            teach_object_in_mios,
+            # update_object_in_mios,
             update_object_in_kios,
             release,
             retreat,
@@ -1293,7 +1314,7 @@ class MiosTaskFactory:
             skill_type="KiosInsertion",
             skill_parameters=payload,
         )
-        update_object_in_mios = self.generate_teach_object_call(insertable)
+        update_object_in_mios = self.generate_teach_O_T_TCP_call(insertable)
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
 
         return [

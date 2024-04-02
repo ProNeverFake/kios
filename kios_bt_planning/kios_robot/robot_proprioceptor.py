@@ -15,6 +15,9 @@ from kios_robot.data_types import (
 
 from kios_scene.mongodb_interface import MongoDBInterface
 
+rp_logger = logging.getLogger("robot_proprioceptor")
+rp_logger.setLevel(logging.DEBUG)
+
 
 class RobotProprioceptor:
     robot_address: str = None
@@ -55,19 +58,29 @@ class RobotProprioceptor:
         else:
             raise Exception("Robot state is not ready yet.")
 
-    def update_scene_object_from_mios(self, scene: TaskScene, object_name: str) -> bool:
+    def update_scene_object_from_mios(
+        self, scene: TaskScene, object_name: str | list[str]
+    ) -> bool:
+        logging.warning(f"update scene id: {hex(id(scene))}")
+        if isinstance(object_name, str):
+            object_names = [object_name]
         try:
-            mios_object = self.mongodb_interface.query_mios_object(object_name)
+            for object_name in object_names:
+                rp_logger.debug(
+                    f"scene content {object_name}.x before: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                )
+                mios_object = self.mongodb_interface.query_mios_object(object_name)
 
-            if scene.object_map.get(object_name) is None:
-                logging.warn(f"object {object_name} is not in the scene. Add it now.")
-                # print(
-                #     "\033[93m"
-                #     + f"object {object_name} is not in the scene. Add it now."
-                # )
-                # scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
+                if scene.object_map.get(object_name) is None:
+                    rp_logger.warn(
+                        f"object {object_name} is not in the scene. Add it now."
+                    )
 
-            scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
+                scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
+                rp_logger.debug(
+                    f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                )
+
         except Exception as e:
             print(e)
             raise e

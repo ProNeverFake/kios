@@ -106,6 +106,7 @@ class ActionNode(BehaviorNode):
 
         self.multiprocessing_manager = Manager()
         self.shared_data = self.multiprocessing_manager.dict()
+        # ! BBBUG: use shared_data for robot command later!
         self.robot_command = self.robot_interface.generate_robot_command(
             action, self.shared_data
         )
@@ -172,7 +173,7 @@ class ActionNode(BehaviorNode):
             self.result = self.parent_connection.recv().pop()  # ! here only bool
             if self.result == True:
                 self.logger.info(f'Action "{self.behavior_name}" finished successfully')
-                new_status = py_trees.common.Status.SUCCESS
+                # new_status = py_trees.common.Status.SUCCESS
                 # * exert the effects
                 self.take_effect()
                 # ! I think here the action node should not return a success. it should always return running.

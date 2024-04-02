@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop"
+os.environ["LANGCHAIN_PROJECT"] = "bt_exe_test"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -54,6 +54,7 @@ with open(scene_path, "r") as file:
     scene_json_object = json.load(file)
 
 scene = SceneFactory().create_scene_from_json(scene_json_object)
+print(f"global scene id: {hex(id(scene))}")
 
 ####################### world
 world_interface = WorldInterface()
@@ -69,14 +70,14 @@ robot_interface = RobotInterface(
 robot_interface.setup_scene(scene)
 
 ####################### bt_factory
-# bt_factory = BehaviorTreeFactory(
-#     world_interface=world_interface,
-#     robot_interface=robot_interface,
-# )
+bt_factory = BehaviorTreeFactory(
+    world_interface=world_interface,
+    robot_interface=robot_interface,
+)
 
 ####################### behavior_tree_stewardship
 behavior_tree_stewardship = BehaviorTreeStewardship(
-    # behaviortree_factory=bt_factory,
+    behaviortree_factory=bt_factory,
     world_interface=world_interface,
     robot_interface=robot_interface,
 )
@@ -192,11 +193,11 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     print(f"-----behavior_tree_execute_step-----")
     # # * simulation shortcut. Uncomment the following line to use simulation instead of execution
     # return behavior_tree_simulation_step(state)
-    this_step = state["plan"][0]
+    global behavior_tree_stewardship
+
+    this_step = "execute the first step of the plan"
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]
-
-    global behavior_tree_stewardship
 
     behavior_tree_stewardship.set_world_state(latest_world_state)
 
@@ -206,11 +207,24 @@ def behavior_tree_execute_step(state: PlanExecuteState):
 
     behavior_tree_stewardship.setup_behavior_tree()
 
+    scene = behavior_tree_stewardship.robot_interface.task_scene
+
+    print(f"btexe scene id: {hex(id(scene))}")
+
+    print(f"btexe scene.objectmap id: {hex(id(scene.object_map))}")
+
+    print(f'scene.shaft1.x before: {scene.get_object("shaft1").O_T_TCP[0, 3]}')
+
     behavior_tree_stewardship.tick_tree()
+
+    print(f"btexe scene id: {hex(id(scene))}")
+
+    print(f"btexe scene.objectmap id: {hex(id(scene.object_map))}")
+
+    print(f'scene.shaft1.x after: {scene.get_object("shaft1").O_T_TCP[0, 3]}')
 
     tree_result = behavior_tree_stewardship.tree_result
 
-    # ! BB DIRTY FIX
     behavior_tree_stewardship.refresh_scene_objects(scene_json_object)
 
     pprint(tree_result.to_json())
@@ -226,6 +240,7 @@ def behavior_tree_execute_step(state: PlanExecuteState):
             ),  # * only one because new plan will be generated and old steps are all removed
             "world_state": [tree_result.world_state],
             "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
+            "last_behavior_tree": bt2,
         }
     else:
         return {
@@ -242,11 +257,9 @@ def behavior_tree_simulation_step(state: PlanExecuteState):
     """
     print(f"-----behavior_tree_simulation_step-----")
 
-    this_step = state["plan"][0]
+    this_step = "execute the first step of the plan"
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]
-
-    global behavior_tree_stewardship
 
     behavior_tree_stewardship.set_world_state(latest_world_state)
 
@@ -332,15 +345,15 @@ workflow.add_node("behavior_tree_generator", behavior_tree_generate_step)
 workflow.add_node("behavior_tree_executor", behavior_tree_execute_step)
 workflow.add_node("plan_updater", plan_updater_step)
 workflow.add_node("user_input_node", user_input_step)
-workflow.set_entry_point("user_input_node")
+workflow.set_entry_point("behavior_tree_executor")
 workflow.add_edge("planner", "sequence_generator")
 workflow.add_edge("sequence_generator", "behavior_tree_generator")
 
 router_factory = KiosRouterFactory()
 
-user_feedback_router = router_factory.create_router_layer(
-    route_names=["rectify", "approve"]
-)
+# user_feedback_router = router_factory.create_router_layer(
+#     route_names=["rectify", "approve"]
+# )
 
 
 def user_feedback_should_end(state: PlanExecuteState):
@@ -380,22 +393,22 @@ workflow.add_conditional_edges(
     },
 )
 
-executor_success_router = router_factory.create_router_layer(
-    route_names=[
-        "finish",
-        "rectify",
-        "approve",
-        "disapprove",
-    ]
-)
+# executor_success_router = router_factory.create_router_layer(
+#     route_names=[
+#         "finish",
+#         "rectify",
+#         "approve",
+#         "disapprove",
+#     ]
+# )
 
-executor_failure_router = router_factory.create_router_layer(
-    route_names=[
-        "retry",
-        "rectify",
-        "approve",
-    ]
-)
+# executor_failure_router = router_factory.create_router_layer(
+#     route_names=[
+#         "retry",
+#         "rectify",
+#         "approve",
+#     ]
+# )
 
 
 def executor_should_end(state: PlanExecuteState):
@@ -404,6 +417,8 @@ def executor_should_end(state: PlanExecuteState):
     """
     print(f"-----executor_should_end-----")
     global user_feedback
+
+    return None
 
     if state["BTExecutionHasSucceeded"] == True:
         # ask for user confirmation and end, or go back to the behavior tree generator if the user wants to improve
@@ -499,9 +514,9 @@ workflow.add_conditional_edges(
     },
 )
 
-user_input_router = router_factory.create_router_layer(
-    route_names=["finish", "instruction"]
-)
+# user_input_router = router_factory.create_router_layer(
+#     route_names=["finish", "instruction"]
+# )
 
 
 def user_input_should_end(state: PlanExecuteState):
@@ -542,8 +557,138 @@ app = workflow.compile()
 
 config = {"recursion_limit": 500}
 
+bt1 = {
+    "summary": "Selector to complete the task of inserting shaft1 into gearbase_hole1",
+    "name": "selector: complete_insertion_task",
+    "children": [
+        {
+            "summary": "The target is that shaft1 is inserted into gearbase_hole1",
+            "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
+            "type_name": "target",
+        },
+        {
+            "summary": "Sequence to change tool, pick up shaft1, and insert it into gearbase_hole1",
+            "name": "sequence: task_sequence",
+            "children": [
+                {
+                    "summary": "Selector to change the tool in the left hand from outwardgripper to parallelgripper",
+                    "name": "selector: change_tool(left_hand, outwardgripper, parallelgripper)",
+                    "children": [
+                        {
+                            "summary": "The target is that the left hand is holding the parallelgripper",
+                            "name": "target: hold(left_hand, parallelgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "Sequence to change the tool in the left hand from outwardgripper to parallelgripper",
+                            "name": "sequence: change_tool(left_hand, outwardgripper, parallelgripper)",
+                            "children": [
+                                {
+                                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "A precondition is that the outwardgripper is empty",
+                                    "name": "precondition: is_empty(outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "The action to change the tool in the left hand from outwardgripper to parallelgripper",
+                                    "name": "action: change_tool(left_hand, outwardgripper, parallelgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "Selector to pick up shaft1 using the parallelgripper",
+                    "name": "selector: pick_up(left_hand, parallelgripper, shaft1)",
+                    "children": [
+                        {
+                            "summary": "The target is that the parallelgripper is holding shaft1",
+                            "name": "target: hold(parallelgripper, shaft1)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "Sequence to pick up shaft1 using the parallelgripper",
+                            "name": "sequence: pick_up(left_hand, parallelgripper, shaft1)",
+                            "children": [
+                                {
+                                    "summary": "A precondition is that the left hand is holding the parallelgripper",
+                                    "name": "precondition: hold(left_hand, parallelgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "A precondition is that the parallelgripper is empty",
+                                    "name": "precondition: is_empty(parallelgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "The action to pick up shaft1 using the parallelgripper",
+                                    "name": "action: pick_up(left_hand, parallelgripper, shaft1)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "Selector to insert shaft1 into gearbase_hole1",
+                    "name": "selector: insert(left_hand, parallelgripper, shaft1, gearbase_hole1)",
+                    "children": [
+                        {
+                            "summary": "The target is that shaft1 is inserted into gearbase_hole1",
+                            "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "Sequence to insert shaft1 into gearbase_hole1",
+                            "name": "sequence: insert(left_hand, parallelgripper, shaft1, gearbase_hole1)",
+                            "children": [
+                                {
+                                    "summary": "A precondition is that the left hand is holding the parallelgripper",
+                                    "name": "precondition: hold(left_hand, parallelgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "A precondition is that the parallelgripper is holding shaft1",
+                                    "name": "precondition: hold(parallelgripper, shaft1)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "The action to insert shaft1 into gearbase_hole1",
+                                    "name": "action: insert(left_hand, parallelgripper, shaft1, gearbase_hole1)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+            ],
+            "type_name": "sequence",
+        },
+    ],
+    "type_name": "selector",
+}
+
+bt2 = {
+    "summary": "The action to pick up shaft1 using the parallelgripper",
+    "name": "action: pick_up(left_hand, parallelgripper, shaft1)",
+    "type_name": "action",
+}
+
+
 inputs = {
     "world_state": [world_state_json],
+    "last_behavior_tree": bt1,
 }
 
 
@@ -554,7 +699,8 @@ def core_run():
     ):
         for k, v in event.items():
             if k != "__end__":
-                pprint(v)
+                # print(v)
+                pass
 
 
 if __name__ == "__main__":

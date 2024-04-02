@@ -3,6 +3,7 @@ import functools
 import os
 import time
 import sched
+from PIL import Image
 
 """
 # ! should delete
@@ -57,14 +58,17 @@ def generate_bt_stewardship(bt) -> py_trees.trees.BehaviourTree:
     return behaviour_tree
 
 
-def render_dot_tree(bt: py_trees.trees.BehaviourTree):
+def render_dot_tree(bt: py_trees.trees.BehaviourTree, name="visualisation"):
+
     py_trees.display.render_dot_tree(
         bt.root,
         # visibility_level=py_trees.common.VisibilityLevel.ALL,
         with_blackboard_variables=False,
+        name=name,
         # with_qualified_names=True,
-        # target_directory=os.path(__file__),
+        target_directory=os.path.dirname(__file__),
     )
+    Image.open(os.path.join(os.path.dirname(__file__), name + ".png")).show()
 
 
 def tick_loop_test(bt: py_trees.trees.BehaviourTree):

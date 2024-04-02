@@ -1,6 +1,26 @@
 import time
 import functools
 import warnings
+import logging
+import colorlog
+
+handler = colorlog.StreamHandler()
+handler.setFormatter(
+    colorlog.ColoredFormatter(
+        "%(log_color)s[%(name)s]:(%(levelname)s):%(message)s",
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "green",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white",
+        },
+    )
+)
+
+bblogger = logging.getLogger(name="blackbird_logger")
+bblogger.addHandler(handler)
+bblogger.setLevel(logging.DEBUG)
 
 
 def bb_result_test(func):
@@ -8,7 +28,8 @@ def bb_result_test(func):
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if result == False:
-            pause = input("Failed. Press enter to continue")
+            bblogger.error(f"Test failed: {func.__name__}")
+            pause = input("Press Enter to continue...")
 
         return result
 
@@ -19,10 +40,7 @@ def bb_deprecated(reason: str, can_run: bool = False):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            warnings.warn(
-                f"Function {func.__name__} is deprecated.\n{reason}",
-                DeprecationWarning,
-            )
+            bblogger.warning(f"Function {func.__name__} is deprecated: {reason}")
             return func(*args, **kwargs) if can_run else None
 
         return wrapper
@@ -39,7 +57,7 @@ def execution_timer(func):
         start = time.perf_counter()
         func(*args, **kwargs)
         end = time.perf_counter()
-        print(f"Execution time: {end - start} seconds")
+        bblogger.info(f"Execution time: {end - start} seconds")
         execution_duration = end - start
         return execution_duration
 

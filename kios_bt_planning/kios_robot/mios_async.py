@@ -98,6 +98,19 @@ def robot_command_monitor(
     Args:
         pipe_connection: connection to the mios_monitor process
     """
+    # ! BBBUG 02042024 multiprocessing virtual memory.
+    """
+    The inconsistency of the scene data between the robot_command and the btw is due to the feature of the multiprocessing module.
+
+    It starts a new process and the data is copied to the new process in a new allocated memory. The data is not naturely shared between the processes.
+
+    The data is shared between the processes by using the multiprocessing module's shared memory feature.
+
+    By printing the address using hex id, the virtual memory address of the scene object is printed. However, the addresses are the same address in the main process and the new process. This is because id() returns the virtual memory address of the object, while the physical memory address is hidden and managed by python. 
+    
+    The virtual memory address is the same in the main process and the new process, but the physical memory address is different.
+
+    """
     try:
         robot_command.interrupt()
         response = robot_command.execute_task_list_sync()

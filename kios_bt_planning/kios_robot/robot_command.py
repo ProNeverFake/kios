@@ -5,6 +5,7 @@ from pprint import pprint
 import logging
 import colorlog
 
+
 # ! I know this block for colorlog is duplicated. you can find the same thing in bt_stw.py.
 handler = colorlog.StreamHandler()
 handler.setFormatter(
@@ -20,8 +21,9 @@ handler.setFormatter(
     )
 )
 
-logger = logging.getLogger()
-logger.addHandler(handler)
+rc_logger = logging.getLogger(name="robot_command")
+rc_logger.addHandler(handler)
+rc_logger.setLevel(logging.DEBUG)
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
@@ -59,8 +61,8 @@ class RobotCommand:
         robot_address: str,
         robot_port: int,
         shared_data,
-        task_scene: TaskScene,
-        robot_interface: RobotInterface,  # ! not used yet
+        task_scene: TaskScene = None,
+        robot_interface: RobotInterface = None,
     ):
         if robot_address is not None:
             self.robot_address = robot_address
@@ -75,18 +77,18 @@ class RobotCommand:
         if shared_data is not None:
             self.shared_data = shared_data
         else:
-            print("warning: robot command shared_data is not set.")
+            rc_logger.warning("robot command shared_data is not set!")
 
-        if task_scene is not None:
-            self.task_scene = task_scene
-        else:
-            # raise Exception("robot_scene is not set")
-            print("warning: robot command task_scene is not set.")
+        # if task_scene is not None:
+        #     self.task_scene = task_scene
+        # else:
+        #     # raise Exception("robot_scene is not set")
+        #     rc_logger.critical("robot_scene is not set!")
 
-        if robot_interface is not None:
-            self.robot_interface = robot_interface
-        else:
-            raise Exception("robot_interface is not set")
+        # if robot_interface is not None:
+        #     self.robot_interface = robot_interface
+        # else:
+        #     raise Exception("robot_interface is not set")
         self.task_list = []
 
     def initialize(self):
@@ -110,7 +112,7 @@ class RobotCommand:
             if not self.execute_task(task_item):
                 return False
 
-        logging.info("All tasks executed successfully.")
+        rc_logger.info("All tasks executed successfully.")
         return True
 
     def execute_task(self, task_item: MiosSkill | MiosCall | KiosCall) -> bool:
@@ -126,13 +128,14 @@ class RobotCommand:
                     raise Exception("Unknown task type: {}".format(task_item))
                 return True
             except TrivialException as e:
-                logging.warning(f"Task {task_item} is defined as trivial. Skip...")
+                rc_logger.warning(f"Task {task_item} is defined as trivial. Skip...")
                 return True
             except RetryException as e:
-                logging.warning(f"Task {task_item} failed. Retrying...")
+                rc_logger.warning(f"Task {task_item} failed. Retry after 5 seconds...")
+                time.sleep(5)
                 continue
             except FailureException:
-                logging.error(f"Task {task_item} failed. Stop and return failure...")
+                rc_logger.error(f"Task {task_item} failed. Stop and return failure...")
                 return False
 
     def try_starting_mios_task(self, mios_task: Task):
@@ -142,12 +145,8 @@ class RobotCommand:
         return start_result
 
     def log_response(self, message, response):
-        print("this")
-        logging.info(message)
-        logging.info(response)
-        # print("\033[92m{}\033[0m".format(message))
-        # pprint(response)
-        # print("\033[0m")
+        rc_logger.info(message)
+        rc_logger.info(response)
 
     def raise_exception_for_task(self, task_item: MiosSkill | MiosCall | KiosCall):
         if task_item.isTrivial is not None and task_item.isTrivial:
@@ -188,17 +187,21 @@ class RobotCommand:
             task_item.skill_parameters,
         )
         start_result = self.try_starting_mios_task(mios_task)
-
+        rc_logger.info(
+            f"MiosSkill {task_item.skill_name} started. Waiting for response..."
+        )
         mios_start_response = MiosInterfaceResponse.from_json(start_result["result"])
         self.log_response("MiosSkill started: ", mios_start_response)
 
         result = mios_task.wait()
         self.check_response(result, task_item)
         final_response = MiosInterfaceResponse.from_json(result["result"])
+        rc_logger.info(f"MiosSkill {task_item.skill_name} finished.")
         self.log_response("Mios replied: ", final_response)
         self.check_response(final_response, task_item)
 
     def execute_mios_call(self, task_item: MiosCall):
+        rc_logger.info(f"MiosCall {task_item.method_name} started.")
         result = call_method(
             self.robot_address,
             self.robot_port,
@@ -208,12 +211,17 @@ class RobotCommand:
         # block call, must have a response
         self.check_response(result, task_item)
         mios_response = MiosInterfaceResponse.from_json(result["result"])
+        rc_logger.info(f"MiosCall {task_item.method_name} finished.")
         self.log_response("Mios replied: ", mios_response)
         self.check_response(mios_response, task_item)
 
     def execute_kios_call(self, task_item: KiosCall):
+        # pprint(task_item)
         result_bool = task_item.method(*task_item.args)
-        if not result_bool:
+        if result_bool is None:
+            rc_logger.error("KiosCall failed. retrying...")
+            raise RetryException
+        elif result_bool == False:
             self.raise_exception_for_task(task_item)
 
     def add_task(self, task: MiosSkill | MiosCall | KiosCall):

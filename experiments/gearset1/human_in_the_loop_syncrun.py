@@ -373,12 +373,20 @@ workflow.add_conditional_edges(
     },
 )
 
-executor_router = router_factory.create_router_layer(
+executor_success_router = router_factory.create_router_layer(
     route_names=[
         "finish",
         "rectify",
         "approve",
         "disapprove",
+    ]
+)
+
+executor_failure_router = router_factory.create_router_layer(
+    route_names=[
+        "retry",
+        "rectify",
+        "approve",
     ]
 )
 
@@ -401,7 +409,7 @@ def executor_should_end(state: PlanExecuteState):
             return True
 
         while True:
-            route = executor_router(user_feedback)
+            route = executor_success_router(user_feedback)
             if route.name == None:
                 user_feedback = input(
                     "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?\n"
@@ -423,7 +431,30 @@ def executor_should_end(state: PlanExecuteState):
         user_feedback = input(
             "The behavior tree has failed in its execution.\nPlease give me a hint to improve it:\n"
         )
-        return False
+        if user_feedback == "" or not user_feedback:
+            user_feedback = input(
+                "I don't understand your instruction if you leave the input empty.\nAt least you shoud tell me what should I do next.\n"
+            )
+
+        while True:
+            route = executor_failure_router(user_feedback)
+            if route.name == None:
+                user_feedback = input(
+                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?\n"
+                )
+            else:
+                break
+
+        if route.name in ["approve"]:
+            # * clear the states for this step
+            user_feedback = None
+            return True
+        elif route.name in ["rectify"]:
+            return False
+        elif route.name in ["retry"]:
+            return None
+        else:
+            raise ValueError(f"Route {route.name} not supported!")
 
 
 workflow.add_conditional_edges(
@@ -432,6 +463,7 @@ workflow.add_conditional_edges(
     {
         True: "plan_updater",
         False: "sequence_generator",
+        None: "behavior_tree_executor",
     },
 )
 

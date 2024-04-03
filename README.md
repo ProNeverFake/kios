@@ -98,7 +98,7 @@ conda install ipython
 
 The application can be downloaded from [here](https://github.com/neo4j/neo4j-python-driver).
 
-After setting up the neo4j server, please change in the neo4j interface in `kios_bt_planning/kios_world` to your pw.
+After setting up the neo4j server, please change the autherization information in `kios_bt_planning/kios_world/neo4j_interface.py`.
 
 
 3. Set up the mios (branch = kios) and the franka robot.
@@ -128,7 +128,16 @@ You can also use something else like [langfuse](https://github.com/langfuse/lang
 
 7. Set up huggingface (skip this for now).
 
+8. Set up the mongoDB.
+
+Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/) to install the mongoDB. You should also start the mongoDB service after the installation!
+
 ### Packages
+- data:
+  - prompt: the prompt engineering files for the LLMs.
+  - world_definition: the definitions of the actions in pddl style.
+  - router_utterances: the utterances for the semantic router.
+  - 
 - experiments: the experiment files of different problems.
   - chair...
   - gearset...

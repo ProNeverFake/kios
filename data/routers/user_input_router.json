@@ -1,0 +1,32 @@
+{
+    "encoder_type": "openai",
+    "encoder_name": "text-embedding-ada-002",
+    "routes": [
+        {
+            "name": "finish",
+            "utterances": [
+                "Nothing else to do. bye. ",
+                "That's all. You did a good job. ",
+                "Thank you for your help."
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.5
+        },
+        {
+            "name": "instruction",
+            "utterances": [
+                "I need you to write a program that does the following",
+                "You should add pepper to the soup",
+                "Now please write a program that deletes the last element of the list",
+                "You do this, then you do that, finally you should finish with this",
+                "can you try to pick up the apple for me?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.5
+        }
+    ]
+}

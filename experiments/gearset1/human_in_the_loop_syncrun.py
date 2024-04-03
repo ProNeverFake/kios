@@ -23,7 +23,7 @@ from kios_agent.kios_graph import (
     seq_planner_chain,
     human_instruction_chain,
 )
-from kios_agent.kios_routers import KiosRouterFactory
+from kios_agent.kios_routers import KiosRouterFactory, load_router_from_json
 
 from langgraph.graph import StateGraph, END
 from langsmith import traceable
@@ -338,9 +338,13 @@ workflow.add_edge("sequence_generator", "behavior_tree_generator")
 
 router_factory = KiosRouterFactory()
 
-user_feedback_router = router_factory.create_router_layer(
-    route_names=["rectify", "approve"]
-)
+# * factory generate
+# user_feedback_router = router_factory.create_router_layer(
+#     route_names=["rectify", "approve"]
+# )
+
+# * load from json (offline)
+user_feedback_router = load_router_from_json("user_feedback_router")
 
 
 def user_feedback_should_end(state: PlanExecuteState):
@@ -380,22 +384,30 @@ workflow.add_conditional_edges(
     },
 )
 
-executor_success_router = router_factory.create_router_layer(
-    route_names=[
-        "finish",
-        "rectify",
-        "approve",
-        "disapprove",
-    ]
-)
 
-executor_failure_router = router_factory.create_router_layer(
-    route_names=[
-        "retry",
-        "rectify",
-        "approve",
-    ]
-)
+# * factory generate
+# executor_success_router = router_factory.create_router_layer(
+#     route_names=[
+#         "finish",
+#         "rectify",
+#         "approve",
+#         "disapprove",
+#     ]
+# )
+# * load from json (offline)
+executor_success_router = load_router_from_json("executor_success_router")
+
+# * factory generate
+# executor_failure_router = router_factory.create_router_layer(
+#     route_names=[
+#         "retry",
+#         "rectify",
+#         "approve",
+#     ]
+# )
+
+# * load from json (offline)
+executor_failure_router = load_router_from_json("executor_failure_router")
 
 
 def executor_should_end(state: PlanExecuteState):
@@ -499,9 +511,13 @@ workflow.add_conditional_edges(
     },
 )
 
-user_input_router = router_factory.create_router_layer(
-    route_names=["finish", "instruction"]
-)
+# * factory generate
+# user_input_router = router_factory.create_router_layer(
+#     route_names=["finish", "instruction"]
+# )
+
+# * load from json (offline)
+user_input_router = load_router_from_json("user_input_router")
 
 
 def user_input_should_end(state: PlanExecuteState):

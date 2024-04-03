@@ -105,6 +105,9 @@ class ActionNode(BehaviorNode):
         # * setup the task
 
         self.multiprocessing_manager = Manager()
+
+        # ! as a hint, multi-threading is better than multi-processing if you need to share memory.
+
         self.shared_data = self.multiprocessing_manager.dict()
         # ! BBBUG: use shared_data for robot command later!
         self.robot_command = self.robot_interface.generate_robot_command(
@@ -138,6 +141,7 @@ class ActionNode(BehaviorNode):
                 self.child_connection,
             ),
         )
+
         atexit.register(self.monitor.terminate)
         self.monitor.start()
         self.logger.info(f"Action node {self.behavior_name} started.")

@@ -5,6 +5,12 @@ from typing import List, Tuple, Annotated, TypedDict
 import operator
 from dotenv import load_dotenv
 
+"""
+only for testing purpose.
+# ! BBBUG: The multiprocessing shared data and isolated memory.
+# ! check mios_async.py for fixing.
+"""
+
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 os.environ["LANGCHAIN_PROJECT"] = "bt_exe_test"

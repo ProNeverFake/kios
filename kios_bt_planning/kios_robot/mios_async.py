@@ -154,3 +154,28 @@ def fake_robot_command_monitor(
 
     except KeyboardInterrupt:
         pass
+
+
+def robot_command_monitor_fix_try(
+    robot_command: RobotCommand, pipe_connection: multiprocessing.connection.Connection
+) -> None:
+    """Emulate a (potentially) long running external process.
+
+    Args:
+        pipe_connection: connection to the mios_monitor process
+    """
+
+    try:
+        robot_command.interrupt()
+        response = robot_command.execute_task_list_sync()
+
+        if response == False:
+            pipe_connection.send([False])
+            return
+
+        if response == True:
+            pipe_connection.send([True])
+            return
+
+    except KeyboardInterrupt:
+        pass

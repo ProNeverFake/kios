@@ -87,6 +87,7 @@ def generate_router_json_config():
 
 def load_router_from_json(router_name: str) -> RouteLayer:
     rl = RouteLayer.from_json(os.path.join(router_dir, router_name + ".json"))
+    return rl
 
 
 if __name__ == "__main__":

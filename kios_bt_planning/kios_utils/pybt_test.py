@@ -4,10 +4,22 @@ import os
 import time
 import sched
 from PIL import Image
+import re
 
 """
 # ! should delete
 """
+
+
+def fix_node_name(name: str) -> str:
+    """a function to fix the node name for the dot graph.
+    # ! BBBUG: the name of the node should not includes colon":".
+    # ! this will cause error in rendering the node because
+    # ! the colon has special meaning in the dot language.
+    """
+    if ":" in name:
+        name = re.sub(r":", r":\n", name)
+    return '"{}"'.format(name)
 
 
 def post_tick_handler(

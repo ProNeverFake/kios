@@ -22,6 +22,7 @@ from kios_utils.skeleton_parser import (
     ground_action,
     parse_node_type,
 )
+from kios_utils.pybt_test import fix_node_name
 
 
 """
@@ -107,7 +108,7 @@ class BehaviorTreeFactory:
 
         if json_data["type_name"] == "selector":
             control_flow_node = py_trees.composites.Selector(
-                name=json_data["name"], memory=False
+                name=fix_node_name(json_data["name"]), memory=False
             )
             for child in json_data["children"]:
                 child_node = self.from_json_to_simple_bt(child)
@@ -117,7 +118,7 @@ class BehaviorTreeFactory:
 
         elif json_data["type_name"] == "sequence":
             control_flow_node = py_trees.composites.Sequence(
-                name=json_data["name"], memory=False
+                name=fix_node_name(json_data["name"]), memory=False
             )
             for child in json_data["children"]:
                 child_node = self.from_json_to_simple_bt(child)
@@ -303,7 +304,7 @@ class BehaviorTreeFactory:
         parsed_type = parse_node_type(skeleton["name"])
         if parsed_type == "selector":
             control_flow_node = py_trees.composites.Selector(
-                name=skeleton["name"], memory=False
+                name=fix_node_name(skeleton["name"]), memory=False
             )
 
             # * skip identifier since it is not a must for a skeleton
@@ -323,7 +324,7 @@ class BehaviorTreeFactory:
             return control_flow_node
         elif parsed_type == "sequence":
             control_flow_node = py_trees.composites.Sequence(
-                name=skeleton["name"], memory=False
+                name=fix_node_name(skeleton["name"]), memory=False
             )
             if "identifier" not in skeleton.keys():
                 skeleton["identifier"] = next(self.id_generator)

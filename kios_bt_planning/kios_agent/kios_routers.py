@@ -15,6 +15,7 @@ semantic router factory.
 load_dotenv()
 
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
+router_dir = os.path.join(data_dir, "routers")
 
 
 class KiosRouterFactory:
@@ -69,14 +70,25 @@ class KiosRouterFactory:
         ]
 
 
-def test():
-    factory = KiosRouterFactory()
-    router = factory.create_router_layer(["finish", "instruction"])
+def generate_router_json_config():
+    krf = KiosRouterFactory()
+    # * create a router layer
+    rl = krf.create_router_layer(
+        [
+            "route_1",  # change this to the route names you want to include
+            "route_2",
+            "route_3",
+        ]
+    )
+    # * save the router layer to a json file
+    router_name = "your_router_name"  # change this to the name of the router
+    rl.to_json(os.path.join(router_dir, router_name + ".json"))
 
-    from pprint import pprint
 
-    pprint(router("can you insert the shaft1 into hole 1?"))
+def load_router_from_json(router_name: str) -> RouteLayer:
+    rl = RouteLayer.from_json(os.path.join(router_dir, router_name + ".json"))
 
 
 if __name__ == "__main__":
-    test()
+    # load_router_from_json("user_input_router")
+    pass

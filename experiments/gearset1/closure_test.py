@@ -68,6 +68,10 @@ with open(world_state_path, "r") as file:
     world_state_json = json.load(file)
     world_interface.load_world_from_json(world_state_json)
 
+world_interface.graph_interface.refresh_neo4j()
+
+pause = input("DEBUG: please check the world state. Press enter to continue.")
+
 ####################### robot
 robot_interface = RobotInterface(
     robot_address="127.0.0.1",

@@ -1,0 +1,36 @@
+{
+    "encoder_type": "openai",
+    "encoder_name": "text-embedding-ada-002",
+    "routes": [
+        {
+            "name": "rectify",
+            "utterances": [
+                "I think this part is wrong. I think it should be like this: ",
+                "The structure is not correct. ",
+                "This part is A, and you do it like B. That is the reason that the system is not working. You should do C so that the system returns D.",
+                "I think you should change this part. ",
+                "I stopped you because there is something wrong in your plan that you need to fix. "
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.5
+        },
+        {
+            "name": "approve",
+            "utterances": [
+                "I think it works. ",
+                "go ahead. ",
+                "Yes, I think this is correct. ",
+                "So far so good. ",
+                "Looks good. Let's try this out.",
+                "I think your plan is good. ",
+                "I don't find any mistake in your response. Let's run it."
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.5
+        }
+    ]
+}

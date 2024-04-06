@@ -25,6 +25,7 @@ import py_trees.console as console
 
 # kios
 from kios_utils.task import *
+from kios_utils.pybt_test import fix_node_name
 from kios_bt.data_types import (
     Action,
     Condition,
@@ -52,7 +53,8 @@ class BehaviorNode(
         robot_interface: RobotInterface,
     ):
         """Configure the name of the behaviour."""
-        self.behavior_name = behavior_name
+        # ! BBFIX 05042024
+        self.behavior_name = fix_node_name(behavior_name)
         super(BehaviorNode, self).__init__(self.behavior_name)
         self.monitor = None
         self.world_interface = world_interface

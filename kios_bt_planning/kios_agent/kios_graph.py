@@ -13,6 +13,7 @@ some chains that are used in kios graph
 from kios_agent.llm_supporter import KiosLLMSupporter
 from kios_agent.data_types import KiosPromptSkeleton
 
+from kios_utils.bblab_utils import bb_deprecated
 
 from dotenv import load_dotenv
 
@@ -87,6 +88,13 @@ seq_planner_ppt_ppl = PipelinePromptTemplate(
 seq_planner_chain = (
     seq_planner_ppt_ppl
     | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+    | StrOutputParser()
+)
+
+seq_planner_chain_gpt3 = (
+    seq_planner_ppt_ppl
+    # | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     | StrOutputParser()
 )
 
@@ -312,6 +320,12 @@ human_instruction_chain = (
     | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
     | JsonOutputParser()
 )
+human_instruction_chain_gpt3 = (
+    human_instruction_ppt_ppl
+    # | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | JsonOutputParser()
+)
 
 #########################################################################################
 # * unit tree generation
@@ -365,15 +379,27 @@ ut_gen_ppt_ppl = PipelinePromptTemplate(
     ],
 )
 
-ut_generation_chain = (
+rec_ut_generator_chain = (
     ut_gen_ppt_ppl
     # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
-    | ChatOpenAI(
-        model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
-        temperature=0,
-    )
-    # | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+rec_ut_generator_chain_gpt3 = (
+    ut_gen_ppt_ppl
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     | JsonOutputParser()
 )
 
@@ -443,10 +469,17 @@ state_est_ppt_ppl = PipelinePromptTemplate(
 )
 
 
-state_predictor_chain = (
+rec_state_predictor_chain = (
     state_est_ppt_ppl
     # | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
     | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+rec_state_predictor_chain_gpt3 = (
+    state_est_ppt_ppl
+    | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )
 
@@ -520,9 +553,278 @@ seq_ac_pl_ppt_ppl = PipelinePromptTemplate(
     ],
 )
 
-seq_ac_pl_chain = (
+# seq_ac_pl_chain
+rec_sequential_action_planner_chain = (
     seq_ac_pl_ppt_ppl
     | ChatOpenAI(model="gpt-4", temperature=0)
     # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | JsonOutputParser()
+)
+rec_sequential_action_planner_chain_gpt3 = (
+    seq_ac_pl_ppt_ppl
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    | JsonOutputParser()
+)
+
+#########################################################################################
+# * one_step generation
+system_file = os.path.join(prompt_dir, "end_to_end_v3/system.txt")
+task_file = os.path.join(prompt_dir, "end_to_end_v3/task.txt")
+domain_file = os.path.join(prompt_dir, "end_to_end_v3/domain.txt")
+behaviortree_file = os.path.join(prompt_dir, "end_to_end_v3/behaviortree.txt")
+example_file = os.path.join(prompt_dir, "end_to_end_v3/example.txt")
+output_format_file = os.path.join(prompt_dir, "end_to_end_v3/output_format.txt")
+state_file = os.path.join(prompt_dir, "end_to_end_v3/state.txt")
+template_file = os.path.join(prompt_dir, "end_to_end_v3/template.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(state_file, "r") as f:
+    state_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(behaviortree_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    behaviortree_ppt = ppt_tmp.partial(input=f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {behaviortree}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+e2e_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("behaviortree", behaviortree_ppt),
+        ("output_format", output_format_ppt),
+        ("example", example_ppt),
+        ("state", state_ppt),
+        ("format_instructions", format_instructions),
+    ],
+)
+
+one_step_chain = (
+    e2e_ppt_ppl
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+one_step_chain_gpt3 = (
+    e2e_ppt_ppl
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+
+#########################################################################################
+# * iterative generation chain
+
+# behaviortree_file = os.path.join(prompt_dir, "rec_sk_gen/behaviortree.txt")
+# template_file = os.path.join(prompt_dir, "rec_sk_gen/template.txt")
+# task_file = os.path.join(prompt_dir, "rec_sk_gen/task.txt")
+# system_file = os.path.join(prompt_dir, "rec_sk_gen/system.txt")
+# object_file = os.path.join(prompt_dir, "rec_sk_gen/object.txt")
+# domain_file = os.path.join(prompt_dir, "rec_sk_gen/domain.txt")
+# example_file = os.path.join(prompt_dir, "rec_sk_gen/example.txt")
+# state_file = os.path.join(prompt_dir, "rec_sk_gen/state.txt")
+# with open(template_file, "r") as f:
+#     template_ppt = PromptTemplate.from_template(f.read())
+# with open(task_file, "r") as f:
+#     task_ppt = PromptTemplate.from_template(f.read())
+# with open(system_file, "r") as f:
+#     system_ppt = PromptTemplate.from_template(f.read())
+# with open(domain_file, "r") as f:
+#     domain_ppt = PromptTemplate.from_template(f.read())
+# with open(object_file, "r") as f:
+#     object_ppt = PromptTemplate.from_template(f.read())
+# with open(behaviortree_file, "r") as f:
+#     ppt_tmp = PromptTemplate.from_template("{input}")
+#     behaviortree_ppt = ppt_tmp.partial(input=f.read())
+
+# with open(state_file, "r") as f:
+#     ppt_tmp = PromptTemplate.from_template("{input}")
+#     state_ppt = ppt_tmp.partial(input=f.read())
+
+# with open(example_file, "r") as f:
+#     ppt_tmp = PromptTemplate.from_template("{input}")
+#     example_ppt = ppt_tmp.partial(input=f.read())
+# full_template_ppt = ChatPromptTemplate.from_template(
+#     """{system}
+
+#     {task}
+
+#     {domain}
+
+#     {state}
+
+#     {object}
+
+#     {behaviortree}
+
+#     {example}
+
+#     {template}
+#     """
+# )
+
+# re_sk_gen_ppt_ppl = PipelinePromptTemplate(
+#     final_prompt=full_template_ppt,
+#     pipeline_prompts=[
+#         ("template", template_ppt),
+#         ("task", task_ppt),
+#         ("system", system_ppt),
+#         ("domain", domain_ppt),
+#         ("object", object_ppt),
+#         ("behaviortree", behaviortree_ppt),
+#         ("example", example_ppt),
+#         ("state", state_ppt),
+#     ],
+# )
+
+
+# re_sk_gen_chain = (
+#     re_sk_gen_ppt_ppl
+#     | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+#     | JsonOutputParser()
+# )
+
+# * iterative generation
+system_file = os.path.join(prompt_dir, "iterative_standalone/system.txt")
+task_file = os.path.join(prompt_dir, "iterative_standalone/task.txt")
+domain_file = os.path.join(prompt_dir, "iterative_standalone/domain.txt")
+behaviortree_file = os.path.join(prompt_dir, "iterative_standalone/behaviortree.txt")
+example_file = os.path.join(prompt_dir, "iterative_standalone/example.txt")
+output_format_file = os.path.join(prompt_dir, "iterative_standalone/output_format.txt")
+state_file = os.path.join(prompt_dir, "iterative_standalone/state.txt")
+template_file = os.path.join(prompt_dir, "iterative_standalone/template.txt")
+with open(template_file, "r") as f:
+    template_ppt = PromptTemplate.from_template(f.read())
+with open(task_file, "r") as f:
+    task_ppt = PromptTemplate.from_template(f.read())
+with open(system_file, "r") as f:
+    system_ppt = PromptTemplate.from_template(f.read())
+with open(domain_file, "r") as f:
+    domain_ppt = PromptTemplate.from_template(f.read())
+with open(state_file, "r") as f:
+    state_ppt = PromptTemplate.from_template(f.read())
+with open(output_format_file, "r") as f:
+    output_format_ppt = PromptTemplate.from_template(f.read())
+with open(behaviortree_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    behaviortree_ppt = ppt_tmp.partial(input=f.read())
+with open(example_file, "r") as f:
+    ppt_tmp = PromptTemplate.from_template("{input}")
+    example_ppt = ppt_tmp.partial(input=f.read())
+
+full_template_ppt = ChatPromptTemplate.from_template(
+    """{system}
+
+    {task}
+
+    {domain}
+
+    {state}
+
+    {behaviortree}
+
+    {output_format}
+
+    {example}
+
+    {template}
+
+    {format_instructions}
+    """
+)
+
+parser = JsonOutputParser()
+
+format_instructions = PromptTemplate.from_template("""{input}""").partial(
+    input=parser.get_format_instructions()
+)
+
+iterative_generation_ppt_ppl = PipelinePromptTemplate(
+    final_prompt=full_template_ppt,
+    pipeline_prompts=[
+        ("template", template_ppt),
+        ("task", task_ppt),
+        ("system", system_ppt),
+        ("domain", domain_ppt),
+        ("behaviortree", behaviortree_ppt),
+        ("output_format", output_format_ppt),
+        ("example", example_ppt),
+        ("state", state_ppt),
+        ("format_instructions", format_instructions),
+    ],
+)
+
+iterative_generation_chain = (
+    iterative_generation_ppt_ppl
+    # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    | ChatOpenAI(model="gpt-4", temperature=0)
+    | JsonOutputParser()
+)
+
+iterative_generation_chain_gpt3 = (
+    iterative_generation_ppt_ppl
+    | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+    # | ChatOpenAI(model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi::8y1cXwVw", temperature=0)
+    # | ChatOpenAI(
+    #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
+    #     temperature=0,
+    # )
+    # | ChatOpenAI(model="gpt-4", temperature=0)
     | JsonOutputParser()
 )

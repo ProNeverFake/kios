@@ -14,6 +14,7 @@ When building a unit subtree, follow these rules:
     - A number of precondition nodes as the first child nodes of the sequence node to check the action's preconditions.
     - One action node as the last child of the sequence node, whose preconditions are checked in the child condition nodes before.
     - The action should have effects that can fulfill the target condition node in the selector.
+7. The constraints of the action in the domain knowledge should not be made as precondition nodes in the behavior tree of the action.
 Following is an example:
 action: change_tool(left_hand, outwardgripper, defaultgripper)
 unit subtree:

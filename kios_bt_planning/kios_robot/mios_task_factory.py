@@ -46,7 +46,6 @@ class MiosTaskFactory:
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
-        print(f"mtf scene id: {hex(id(self.task_scene))}")
 
     def parse_action(self, action: Action) -> dict[str, Any]:
         """parse the action string to get the action name and arguments.

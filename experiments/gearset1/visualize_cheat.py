@@ -1000,4 +1000,4 @@ def render_bt_fix_try(bt_json: json):
 
 
 # render_bt(result)
-render_bt_fix_try(ut)
+render_bt_fix_try(result)

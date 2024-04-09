@@ -1,0 +1,96 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=octagon, style=filled];
+"target:
+ is_inserted_to(gear3, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(gear3, shaft3)", shape=ellipse, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "target:
+ is_inserted_to(gear3, shaft3)";
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=box, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)";
+"selector:
+ change_tool(left_hand, clampgripper, defaultgripper)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ change_tool(left_hand, clampgripper, defaultgripper)", shape=octagon, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "selector:
+ change_tool(left_hand, clampgripper, defaultgripper)";
+"target:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"selector:
+ change_tool(left_hand, clampgripper, defaultgripper)" -> "target:
+ hold(left_hand, defaultgripper)";
+"sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)", shape=box, style=filled];
+"selector:
+ change_tool(left_hand, clampgripper, defaultgripper)" -> "sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)";
+"precondition:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)" -> "precondition:
+ hold(left_hand, clampgripper)";
+"selector:
+ put_down(left_hand, clampgripper, shaft1)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ put_down(left_hand, clampgripper, shaft1)", shape=octagon, style=filled];
+"sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)" -> "selector:
+ put_down(left_hand, clampgripper, shaft1)";
+"target:
+ is_empty(clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_empty(clampgripper)", shape=ellipse, style=filled];
+"selector:
+ put_down(left_hand, clampgripper, shaft1)" -> "target:
+ is_empty(clampgripper)";
+"sequence:
+ put_down(left_hand, clampgripper, shaft1)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ put_down(left_hand, clampgripper, shaft1)", shape=box, style=filled];
+"selector:
+ put_down(left_hand, clampgripper, shaft1)" -> "sequence:
+ put_down(left_hand, clampgripper, shaft1)";
+"\"precondition:\n hold(left_hand, clampgripper)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="\"precondition:\n hold(left_hand, clampgripper)\"*", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, clampgripper, shaft1)" -> "\"precondition:\n hold(left_hand, clampgripper)\"*";
+"precondition:
+ hold(clampgripper, shaft1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(clampgripper, shaft1)", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, clampgripper, shaft1)" -> "precondition:
+ hold(clampgripper, shaft1)";
+"action:
+ put_down(left_hand, clampgripper, shaft1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ put_down(left_hand, clampgripper, shaft1)", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, clampgripper, shaft1)" -> "action:
+ put_down(left_hand, clampgripper, shaft1)";
+"action:
+ change_tool(left_hand, clampgripper, defaultgripper)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ change_tool(left_hand, clampgripper, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, clampgripper, defaultgripper)" -> "action:
+ change_tool(left_hand, clampgripper, defaultgripper)";
+"precondition:
+ hold(defaultgripper, gear3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(defaultgripper, gear3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "precondition:
+ hold(defaultgripper, gear3)";
+"action:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "action:
+ insert(left_hand, defaultgripper, gear3, shaft3)";
+}

@@ -1,0 +1,39 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=octagon, style=filled];
+"target:
+ is_inserted_to(gear3, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(gear3, shaft3)", shape=ellipse, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "target:
+ is_inserted_to(gear3, shaft3)";
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=box, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)";
+"precondition:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "precondition:
+ hold(left_hand, defaultgripper)";
+"precondition:
+ hold(defaultgripper, gear3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(defaultgripper, gear3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "precondition:
+ hold(defaultgripper, gear3)";
+"action:
+ insert(left_hand, defaultgripper, gear3, shaft3)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ insert(left_hand, defaultgripper, gear3, shaft3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, gear3, shaft3)" -> "action:
+ insert(left_hand, defaultgripper, gear3, shaft3)";
+}

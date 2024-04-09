@@ -1,0 +1,11 @@
+The input are:
+target: The target that you make the sequential plan and construct the behavior tree to achieve.
+initial_state: The initial state that you start from.
+runtime_world_state: the world state when the last behaior tree stopped.
+last_behavior_tree: the last executed behavior tree.
+last_failed_node: the last node that failed in the last behavior tree.
+
+You analyze the failure reason based on the information of the failed node and the runtime world state when the behavior tree failed, then fix the behavior tree.
+If no last_behavior_tree is given, you analyze the target, refer to the domain knowledge to understand it, make an action sequence and construct a behavior tree based on it.
+Learn from the examples to understand the regulated format of the behavior tree.
+Your output should be a json object which follows the regulated format.

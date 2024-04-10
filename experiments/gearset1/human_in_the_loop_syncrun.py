@@ -4,10 +4,11 @@ from pprint import pprint
 from typing import List, Tuple, Annotated, TypedDict
 import operator
 from dotenv import load_dotenv
+import datetime
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop"
+os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation_gpt3.5"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -31,6 +32,8 @@ from langsmith import traceable
 load_dotenv()
 
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+
+time_stamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
 def render_bt(bt_json: json):
@@ -190,8 +193,8 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     execute the first step of the plan, append the result to the past steps
     """
     print(f"-----behavior_tree_execute_step-----")
-    # # * simulation shortcut. Uncomment the following line to use simulation instead of execution
-    # return behavior_tree_simulation_step(state)
+    # * simulation shortcut. Uncomment the following line to use simulation instead of execution
+    return behavior_tree_simulation_step(state)
     this_step = state["plan"][0]
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]

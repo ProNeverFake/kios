@@ -1,0 +1,39 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ place(left_hand, outwardgripper, lampshade, lampbulb)", shape=octagon, style=filled];
+"target:
+ is_placed_to(lampshade, lampbulb)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_placed_to(lampshade, lampbulb)", shape=ellipse, style=filled];
+"selector:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" -> "target:
+ is_placed_to(lampshade, lampbulb)";
+"sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)", shape=box, style=filled];
+"selector:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" -> "sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)";
+"precondition:
+ hold(left_hand, outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, outwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" -> "precondition:
+ hold(left_hand, outwardgripper)";
+"precondition:
+ hold(outwardgripper, lampshade)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(outwardgripper, lampshade)", shape=ellipse, style=filled];
+"sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" -> "precondition:
+ hold(outwardgripper, lampshade)";
+"action:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ place(left_hand, outwardgripper, lampshade, lampbulb)", shape=ellipse, style=filled];
+"sequence:
+ place(left_hand, outwardgripper, lampshade, lampbulb)" -> "action:
+ place(left_hand, outwardgripper, lampshade, lampbulb)";
+}

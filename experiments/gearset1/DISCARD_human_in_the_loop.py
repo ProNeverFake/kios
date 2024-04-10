@@ -4,6 +4,12 @@ from pprint import pprint
 from typing import List, Tuple, Annotated, TypedDict
 import operator
 
+"""
+this one is a asynchronous version of the human in the loop generation method.
+However the concurrency doesn't allow two async functions to run at the same time.
+mios py interface uses asyncio.run() to run the async function, while here the graph also uses asyncio.run() to run the async function. that's a problem.
+BB uses sync run in the graph instead in human_in_the_loop_syncrun.py now.
+"""
 
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -132,6 +138,7 @@ class PlanExecuteState(TypedDict):
     )
 
     BTExecutionHasSucceeded: bool  # this indicates if the last execution has succeeded
+
 
 ##################################################### * graph node functions
 @traceable(name="user_input_node_step")

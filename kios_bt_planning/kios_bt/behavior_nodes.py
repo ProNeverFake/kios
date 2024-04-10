@@ -442,6 +442,36 @@ class ActionNodeOnlySuccess(ActionNode):
         return new_status
 
 
+#################################################################################
+# * for visualization only
+class ActionNodeViz(BehaviorNode):
+    def __init__(self, name: str):
+        super().__init__(name, None, None)
+
+    def setup(self, **kwargs: int) -> None:
+        pass
+
+    def initialise(self) -> None:
+        pass
+
+    def update(self) -> py_trees.common.Status:
+        pass
+
+
+class ConditionNodeViz(BehaviorNode):
+    def __init__(self, name: str):
+        super().__init__(name, None, None)
+
+    def setup(self, **kwargs: int) -> None:
+        pass
+
+    def initialise(self) -> None:
+        pass
+
+    def update(self) -> py_trees.common.Status:
+        pass
+
+
 ##############################################################################
 # Main
 ##############################################################################

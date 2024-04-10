@@ -1,0 +1,6 @@
+ {
+    "result": "error",
+    "summary": "endless loop",
+    "world_state": null,
+    "final_node": null
+}

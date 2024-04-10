@@ -1,0 +1,39 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ screw(left_hand, clampgripper, lampbulb, lampbase)", shape=octagon, style=filled];
+"target:
+ is_screwed_to(lampbulb, lampbase)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_screwed_to(lampbulb, lampbase)", shape=ellipse, style=filled];
+"selector:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" -> "target:
+ is_screwed_to(lampbulb, lampbase)";
+"sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)", shape=box, style=filled];
+"selector:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" -> "sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)";
+"precondition:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" -> "precondition:
+ hold(left_hand, clampgripper)";
+"precondition:
+ hold(clampgripper, lampbulb)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(clampgripper, lampbulb)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" -> "precondition:
+ hold(clampgripper, lampbulb)";
+"action:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ screw(left_hand, clampgripper, lampbulb, lampbase)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, lampbulb, lampbase)" -> "action:
+ screw(left_hand, clampgripper, lampbulb, lampbase)";
+}

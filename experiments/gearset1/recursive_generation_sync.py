@@ -14,7 +14,7 @@ import re
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "recursive_generation"
+os.environ["LANGCHAIN_PROJECT"] = "recursive_generation_gpt3.5"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -30,8 +30,9 @@ from kios_agent.kios_graph import (
     planner,
     seq_planner_chain,
     human_instruction_chain,
-    ut_generation_chain,
-    state_predictor_chain,
+    rec_ut_generator_chain_gpt3,
+    rec_state_predictor_chain_gpt3,
+    rec_sequential_action_planner_chain_gpt3,
 )
 
 from kios_agent.kios_routers import KiosRouterFactory
@@ -60,15 +61,54 @@ load_dotenv()
 
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
 from kios_utils.pddl_problem_parser import parse_problem_init, parse_problem_objects
+import datetime
+
+timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+problem_set = os.path.join(current_dir, "baseline_result.jsonl")
+
+with open(problem_set, "r") as f:
+    problem_set = f.readlines()
+# NEW SHOULD BE 8
+problem_number = 7
+
+result_dir = os.path.join(
+    current_dir, "recursive_generation_record_gpt3.5", str(problem_number)
+)
+
+if not os.path.exists(result_dir):
+    os.makedirs(result_dir)
+
+the_problem = json.loads(problem_set[problem_number])
+
+metadata = {
+    "method_name": "recursive_generation",
+    "try_count": problem_number,
+    "timestamp": timestamp,
+    "llm": "gpt-3.5-turbo-0125",
+}
 
 
-def render_bt(bt_json: json):
+def render_bt(bt_json: json, dir=None):
     test_class = BehaviorTreeFactory()
     bt = test_class.from_json_to_simple_bt(bt_json)
     # bt = test_class.from_json_to_tree_root(bt_json)
     bt_stewardship = generate_bt_stewardship(bt)
     # bt_stewardship.setup(timeout=15)
-    render_dot_tree(bt_stewardship)
+    time_stamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    render_dot_tree(bt_stewardship, name=time_stamp, dir=dir)
+
+
+def write_result(bt_json: json, dir: str, tree_result: dict):
+    result = {
+        "problem": the_problem,
+        "behavior_tree": bt_json,
+        "tree_result": tree_result,
+    }
+    with open(os.path.join(dir, "result.json"), "w") as f:
+        json.dump(result, f)
 
 
 ####################### dirs
@@ -631,7 +671,7 @@ def seq_planner_est_test():
 
 
 def ut_gen_test():
-    ut = ut_generation_chain.invoke(
+    ut = rec_ut_generator_chain_gpt3.invoke(
         {
             # "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
             # "action": "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
@@ -654,7 +694,7 @@ def seq_planner_est_test():
 
 
 def seq_action_plan_test():
-    return seq_ac_pl_chain.invoke(
+    return rec_sequential_action_planner_chain_gpt3.invoke(
         {
             "start_world_state": world_state_json,
             "target": "is_inserted_to(shaft1, gearbase_hole1)",
@@ -664,7 +704,7 @@ def seq_action_plan_test():
 
 
 def state_est_test():
-    return state_predictor_chain.invoke(
+    return rec_state_predictor_chain_gpt3.invoke(
         {
             "start_world_state": world_state_json,
             "action_plan": [
@@ -678,10 +718,10 @@ def state_est_test():
 
 
 ##################################### * speed imp
-@traceable(name="make_plan")
+@traceable(name="rec_seq_plan", metadata=metadata)
 def make_plan(state: dict, goal: str) -> list[str]:
     print(f"----------start to make plan for the goal {goal}")
-    response = seq_ac_pl_chain.invoke(
+    response = rec_sequential_action_planner_chain_gpt3.invoke(
         {
             "start_world_state": state,
             "target": goal,
@@ -692,11 +732,11 @@ def make_plan(state: dict, goal: str) -> list[str]:
     return response["task_plan"]
 
 
-@traceable(name="estimate_state")
+@traceable(name="rec_state_prediction", metadata=metadata)
 def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
     print("----------start to estimate the state after the action plan:")
     pprint(action_plan)
-    response = state_predictor_chain.invoke(
+    response = rec_state_predictor_chain_gpt3.invoke(
         {
             "start_world_state": start_world_state,
             "action_plan": action_plan,
@@ -706,11 +746,11 @@ def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
     return response["estimated_world_state"]
 
 
-@traceable(name="generate_unit_subtree")
+@traceable(name="rec_unit_subtree", metadata=metadata)
 def generate_unit_subtree(action: str) -> dict:
     print("----------start to generate the unit subtree for the action")
     pprint(action)
-    response = ut_generation_chain.invoke(
+    response = rec_ut_generator_chain_gpt3.invoke(
         {
             "action": action,
         }
@@ -719,6 +759,49 @@ def generate_unit_subtree(action: str) -> dict:
     return response
 
 
+@traceable(name="final_simulation", metadata=metadata)
+def behavior_tree_simulation(bt_skeleton: dict, world_state: dict) -> dict:
+    """
+    execute the first step of the plan, append the result to the past steps
+    """
+    print(f"-----behavior_tree_simulation_step-----")
+
+    try:
+        behavior_tree_stewardship.set_world_state(world_state)
+
+        behavior_tree_stewardship.generate_behavior_tree_from_skeleton(bt_skeleton)
+
+        behavior_tree_stewardship.setup_simulation()
+
+        behavior_tree_stewardship.setup_behavior_tree()
+
+        behavior_tree_stewardship.tick_tree(period_msec=500)
+
+        tree_result = behavior_tree_stewardship.tree_result
+
+        pprint(tree_result.to_json())
+        pause = input("DEBUG: please check the tree result. Press enter to continue.")
+
+        return tree_result.to_json()
+    except Exception as e:
+        logging.error(f"Error occurred in the simulation: {e}")
+        return {
+            "result": "error",
+            "summary": str(e),
+            "world_state": world_state,
+            "final_node": None,
+        }
+    except KeyboardInterrupt:
+        logging.error(f"Execution has been interrupted.")
+        return {
+            "result": "error",
+            "summary": "endless loop in execution",
+            "world_state": world_state,
+            "final_node": None,
+        }
+
+
+##################################### * speed imp
 def get_node_list_from_tree(unit_subtree: dict) -> list[dict]:
     children = unit_subtree["children"][1][
         "children"
@@ -753,10 +836,10 @@ def expand_nodes(
     """
     pprint("----------check the entire tree:")
     if overall_tree is not None:
-        render_bt(overall_tree[0])
+        render_bt(overall_tree[0], dir=result_dir)
     pprint("----------start to expand the node list:")
     pprint(node_list)
-    pause = input("paused here! check the tree.")
+    # pause = input("paused here! check the tree.")
 
     assert len(node_list) > 0
     state = start_state
@@ -766,8 +849,7 @@ def expand_nodes(
         # if match_type(node_list[i]) == "action":
         if type_name == "action":
             print(f"the node {node_list[i]['name']} is an action node. skip it.")
-            pause = input("paused here! check!")
-        # elif match_type(node_list[i]) == "precondition" or "target":
+            # pause = input("paused here! check!")
         elif type_name in ["precondition", "target"]:
             # goal = node_list[i]["name"]
             goal = body
@@ -775,11 +857,11 @@ def expand_nodes(
             if len(plan) == 0:
                 logging.warning(f"No action should be performed for the goal {goal}.")
                 logging.warning(f'the node {node_list[i]["name"]} has been skipped.')
-                pause = input("paused here! check!")
+                # pause = input("paused here! check!")
             else:
                 logging.info(f"Actions have been planed for the goal {goal}.")
                 pprint(f"the plan for the goal {goal} is {plan}")
-                pause = input("paused here! check!")
+                # pause = input("paused here! check!")
                 last_action = plan[-1]
                 unit_subtree = generate_unit_subtree(last_action)
                 # insert the subtree into the node_list
@@ -796,13 +878,21 @@ def expand_nodes(
 
 
 def test_expand_nodes():
-    start_state = world_state_json
+    start_state = the_problem["initial_world_state"]
     node_list = [
         {
-            "summary": "insert shaft1 into gearbase hole1",
-            "name": "target: insert shaft1 into gearbase hole1",
+            "summary": the_problem["target"],
+            "name": the_problem["target"],
         }
     ]
+
+    # start_state = world_state_json
+    # node_list = [
+    #     {
+    #         "summary": "insert shaft1 into gearbase hole1",
+    #         "name": "target: insert shaft1 into gearbase hole1",
+    #     }
+    # ]
     # node_list = [
     #     {
     #         "summary": "insert gear2 into shaft2",
@@ -815,10 +905,30 @@ def test_expand_nodes():
     #         "name": "target: pick up the shaft1",
     #     },
     # ]
-    expand_nodes(node_list, start_state, node_list)
-    pprint(node_list)
+    try:
+        expand_nodes(node_list, start_state, node_list)
+    except KeyboardInterrupt:
+        print("The execution has been interrupted.")
+        tree_result = {
+            "result": "error",
+            "summary": "endless loop in generation",
+            "world_state": start_state,
+            "final_node": None,
+        }
+        write_result(bt_json=node_list[0], dir=result_dir, tree_result=tree_result)
+        exit(0)
+
+    # pprint("----------check the entire tree:")
+    render_bt(node_list[0], dir=result_dir)
+
+    tree_result = behavior_tree_simulation(node_list[0], start_state)
+
+    write_result(bt_json=node_list[0], dir=result_dir, tree_result=tree_result)
+    # pprint(node_list)
 
 
 if __name__ == "__main__":
 
     test_expand_nodes()
+    # print(the_problem["target"])
+    # print(the_problem["initial_world_state"])

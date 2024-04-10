@@ -49,7 +49,6 @@ class RobotInterface:
 
     def setup_scene(self, task_scene: TaskScene):
         self.task_scene = task_scene
-        print(f"rp scene id: {hex(id(self.task_scene))}")
         self.mios_task_factory.setup_scene(task_scene)
 
     @bb_deprecated(reason="fix the bug!", can_run=True)

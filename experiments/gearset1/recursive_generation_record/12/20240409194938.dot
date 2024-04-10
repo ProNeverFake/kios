@@ -1,0 +1,69 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)", shape=octagon, style=filled];
+"target:
+ is_inserted_to(shaft3, gearbase_hole3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(shaft3, gearbase_hole3)", shape=ellipse, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" -> "target:
+ is_inserted_to(shaft3, gearbase_hole3)";
+"sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)", shape=box, style=filled];
+"selector:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" -> "sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)";
+"selector:
+ change_tool(left_hand, inwardgripper, defaultgripper)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ change_tool(left_hand, inwardgripper, defaultgripper)", shape=octagon, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" -> "selector:
+ change_tool(left_hand, inwardgripper, defaultgripper)";
+"target:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"selector:
+ change_tool(left_hand, inwardgripper, defaultgripper)" -> "target:
+ hold(left_hand, defaultgripper)";
+"sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)", shape=box, style=filled];
+"selector:
+ change_tool(left_hand, inwardgripper, defaultgripper)" -> "sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)";
+"precondition:
+ hold(left_hand, inwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, inwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)" -> "precondition:
+ hold(left_hand, inwardgripper)";
+"precondition:
+ is_empty(inwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ is_empty(inwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)" -> "precondition:
+ is_empty(inwardgripper)";
+"action:
+ change_tool(left_hand, inwardgripper, defaultgripper)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ change_tool(left_hand, inwardgripper, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, inwardgripper, defaultgripper)" -> "action:
+ change_tool(left_hand, inwardgripper, defaultgripper)";
+"precondition:
+ hold(defaultgripper, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(defaultgripper, shaft3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" -> "precondition:
+ hold(defaultgripper, shaft3)";
+"action:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)", shape=ellipse, style=filled];
+"sequence:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)" -> "action:
+ insert(left_hand, defaultgripper, shaft3, gearbase_hole3)";
+}

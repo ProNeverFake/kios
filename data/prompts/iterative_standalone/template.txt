@@ -1,0 +1,8 @@
+Resume from the input below.
+"""
+target: {target}
+initial_world_state: {initial_world_state}
+runtime_world_state: {runtime_world_state}
+last_behavior_tree: {last_behavior_tree}
+last_failed_node: {last_failed_node}
+""" 

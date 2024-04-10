@@ -5,6 +5,7 @@ from pprint import pprint
 """
 test skeleton behavior tree generation.
 the btw data structure should be updated.
+don't use this
 """
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"

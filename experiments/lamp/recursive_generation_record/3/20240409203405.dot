@@ -1,0 +1,9 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"target:
+ is_placed_to(lampshade, lampbulb)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_placed_to(lampshade, lampbulb)", shape=ellipse, style=filled];
+}

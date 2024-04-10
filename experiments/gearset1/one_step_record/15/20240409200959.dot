@@ -1,0 +1,15 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ is_inserted_to(gear3, shaft3)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ is_inserted_to(gear3, shaft3)", shape=octagon, style=filled];
+"target:
+ is_inserted_to(gear3, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(gear3, shaft3)", shape=ellipse, style=filled];
+"selector:
+ is_inserted_to(gear3, shaft3)" -> "target:
+ is_inserted_to(gear3, shaft3)";
+}

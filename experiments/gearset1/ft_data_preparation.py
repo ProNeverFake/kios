@@ -130,6 +130,5 @@ for i in range(len(baseline_results)):
         }
     )
 
-with open(os.path.join(current_dir, "ft_data_one_step.jsonl"), "w") as f:
-    for entry in final_data:
-        f.write(json.dumps(entry) + "\n")
+with open(os.path.join(current_dir, "ft_data_one_step.json"), "w") as f:
+    json.dump(final_data, f)

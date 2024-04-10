@@ -44,10 +44,8 @@ domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
 
 # * kios data prompt skeleton dir
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
-print(data_dir)
 prompt_sk_dir = os.path.join(data_dir, "prompt_skeletons")
 prompt_dir = os.path.join(data_dir, "prompts")
-
 
 ########## *sequential planner for BT
 

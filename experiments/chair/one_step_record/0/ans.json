@@ -1,0 +1,48 @@
+{
+          "summary": "selector to screw the chairnut1 to the chairseatbolt1 with the left_hand holding the defaultgripper",
+          "name": "selector: screw(chairnut1, chairseatbolt1, left_hand, defaultgripper)",
+          "children": [
+                    {
+                              "summary": "check the target that the chairnut1 is screwed to the chairseatbolt1",
+                              "name": "target: is_screwed_to(chairnut1, chairseatbolt1)"
+                    },
+                    {
+                              "summary": "sequence to screw the chairnut1 to the chairseatbolt1 with the left_hand holding the defaultgripper",
+                              "name": "sequence: screw(chairnut1, chairseatbolt1, left_hand, defaultgripper)",
+                              "children": [
+                                        {
+                                                  "summary": "check the precondition that the left_hand is holding the defaultgripper",
+                                                  "name": "precondition: hold(left_hand, defaultgripper)"
+                                        },
+                                        {
+                                                  "summary": "selector to pick_up the defaultgripper with the left_hand",
+                                                  "name": "selector: pick_up(left_hand, defaultgripper)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "check the target that the defaultgripper is picked up by the left_hand",
+                                                                      "name": "target: hold(defaultgripper, left_hand)"
+                                                            },
+                                                            {
+                                                                      "summary": "sequence to pick_up the defaultgripper with the left_hand",
+                                                                      "name": "sequence: pick_up(left_hand, defaultgripper)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "check the precondition that the defaultgripper is empty",
+                                                                                          "name": "precondition: is_empty(defaultgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "the action to pick_up the defaultgripper with the left_hand",
+                                                                                          "name": "action: pick_up(left_hand, defaultgripper)"
+                                                                                }
+                                                                      ]
+                                                            }
+                                                  ]
+                                        },
+                                        {
+                                                  "summary": "the action to screw the chairnut1 to the chairseatbolt1 with the left_hand holding the defaultgripper",
+                                                  "name": "action: screw(chairnut1, chairseatbolt1, left_hand, defaultgripper)"
+                                        }
+                              ]
+                    }
+          ]
+}

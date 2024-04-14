@@ -1,0 +1,4 @@
+{
+          "summary": "the target is to place the lampshade to the lampbulb",
+          "name": "target: is_placed_to(lampshade, lampbulb)"
+}

@@ -1,0 +1,32 @@
+Sure, I'd be happy to help! Based on the input you provided, here is the unit subtree for the action "screw(left_hand, clampgripper, lampbulb, lampbase)" in JSON format:
+
+{
+"summary": "Selector to screw the lampbulb into the lampbase using the left hand and clampgripper",
+"name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)",
+"children": [
+{
+"summary": "The target is to make the left hand hold the clampgripper and the lampbulb",
+"name": "target: hold(left_hand, clampgripper, lampbulb)"
+},
+{
+"summary": "Sequence to screw the lampbulb into the lampbase using the left hand and clampgripper",
+"name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)",
+"children": [
+{
+"summary": "A precondition is that the left hand is holding the clampgripper",
+"name": "precondition: hold(left_hand, clampgripper)"
+},
+{
+"summary": "A precondition is that the clampgripper is empty",
+"name": "precondition: is_empty(clampgripper)"
+},
+{
+"summary": "Take the action to screw the lampbulb into the lampbase using the left hand and clampgripper",
+"name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"
+}
+]
+}
+]
+}
+
+I hope this helps! Let me know if you have any questions or need further assistance.

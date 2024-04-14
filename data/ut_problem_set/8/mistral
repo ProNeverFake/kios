@@ -1,0 +1,28 @@
+{
+"summary": "Selector to change the tool in the left hand from defaultgripper to clampgripper",
+"name": "selector: change_tool(left_hand, defaultgripper, clampgripper)",
+"children": [
+{
+"summary": "The target is to make the left hand hold the clampgripper",
+"name": "target: hold(left_hand, clampgripper)",
+},
+{
+"summary": "Sequence to change the tool in the left hand from defaultgripper to clampgripper",
+"name": "sequence: change_tool(left_hand, defaultgripper, clampgripper)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding the defaultgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, defaultgripper)",
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the defaultgripper is empty",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_empty(defaultgripper)",
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Take the action to change the tool in the left hand from defaultgripper to clampgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: change_tool(left_hand, defaultgripper, clampgripper)",
+}
+]
+}
+]
+}

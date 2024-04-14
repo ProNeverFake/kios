@@ -1,0 +1,28 @@
+{
+"summary": "Selector to pick up lampshade with outwardgripper using left hand",
+"name": "selector: pick_up(left_hand, outwardgripper, lampshade)",
+"children": [
+{
+"summary": "The target is to make the outwardgripper hold the lampshade",
+"name": "target: hold(outwardgripper, lampshade)"
+},
+{
+"summary": "Sequence to pick up lampshade with outwardgripper using left hand",
+"name": "sequence: pick_up(left_hand, outwardgripper, lampshade)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding the outwardgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, outwardgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the outwardgripper is empty",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_empty(outwardgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Take the action to pick up lampshade with outwardgripper using left hand",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: pick_up(left_hand, outwardgripper, lampshade)"
+}
+]
+}
+]
+}

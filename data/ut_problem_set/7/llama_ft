@@ -1,0 +1,28 @@
+{
+          "summary": "Selector to pick up the lampbulb using the clampgripper with the left hand",
+          "name": "selector: pick_up(left_hand, clampgripper, lampbulb)",
+          "children": [
+                    {
+                              "summary": "The target is to make the clampgripper hold the lampbulb",
+                              "name": "target: hold(clampgripper, lampbulb)"
+                    },
+                    {
+                              "summary": "Sequence to pick up the lampbulb using the clampgripper with the left hand",
+                              "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)",
+                              "children": [
+                                        {
+                                                  "summary": "A precondition is that the left hand is holding the clampgripper",
+                                                  "name": "precondition: hold(left_hand, clampgripper)"
+                                        },
+                                        {
+                                                  "summary": "A precondition is that the clampgripper is empty",
+                                                  "name": "precondition: is_empty(clampgripper)"
+                                        },
+                                        {
+                                                  "summary": "Take the action to pick up the lampbulb using the clampgripper with the left hand",
+                                                  "name": "action: pick_up(left_hand, clampgripper, lampbulb)"
+                                        }
+                              ]
+                    }
+          ]
+}

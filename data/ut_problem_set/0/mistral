@@ -1,0 +1,44 @@
+{
+"summary": "Selector to pick up chairleg1 using the defaultgripper in the left hand",
+"name": "selector: pick_up(left_hand, defaultgripper, chairleg1)",
+"children": [
+{
+"summary": "The target is to make the left hand hold chairleg1",
+"name": "target: is_placed_to(chairleg1, left_hand)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding the defaultgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, defaultgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the defaultgripper is empty",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_empty(defaultgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that chairleg1 is placed into the world",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_placed_to(chairleg1, world)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the defaultgripper can manipulate chairleg1",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: can_manipulate(defaultgripper, chairleg1)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that chairleg1 can be picked up by the defaultgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: can_pick_up(chairleg1, defaultgripper)"
+}
+]
+},
+{
+"summary": "Sequence to pick up chairleg1 using the defaultgripper in the left hand",
+"name": "sequence: pick_up(left_hand, defaultgripper, chairleg1)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Action to pick up chairleg1 using the defaultgripper in the left hand",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: pick_up(left_hand, defaultgripper, chairleg1)"
+}
+]
+}
+]
+}
+
+Note: I assumed that there is a predicate "can_pick_up(<part>, <tool>" in the domain knowledge, which checks if the given part can be picked up by the given tool.

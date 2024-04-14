@@ -1,0 +1,28 @@
+{
+          "summary": "Selector to put down the default gripper in the left hand on chairleg1",
+          "name": "selector: put_down(left_hand, defaultgripper, chairleg1)",
+          "children": [
+                    {
+                              "summary": "The target is to put down the default gripper in the left hand on chairleg1",
+                              "name": "target: is_inserted_to(defaultgripper, chairleg1)"
+                    },
+                    {
+                              "summary": "Sequence to put down the default gripper in the left hand on chairleg1",
+                              "name": "sequence: put_down(left_hand, defaultgripper, chairleg1)",
+                              "children": [
+                                        {
+                                                  "summary": "A precondition is that the left hand is holding the default gripper",
+                                                  "name": "precondition: hold(left_hand, defaultgripper)"
+                                        },
+                                        {
+                                                  "summary": "A precondition is that the default gripper is holding chairleg1",
+                                                  "name": "precondition: hold(defaultgripper, chairleg1)"
+                                        },
+                                        {
+                                                  "summary": "Take the action to put down the default gripper in the left hand on chairleg1",
+                                                  "name": "action: put_down(left_hand, defaultgripper, chairleg1)"
+                                        }
+                              ]
+                    }
+          ]
+}

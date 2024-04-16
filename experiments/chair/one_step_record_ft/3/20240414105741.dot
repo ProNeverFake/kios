@@ -1,0 +1,66 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)", shape=octagon, style=filled];
+"target:
+ is_screwed_to(chairleg2, chairseatthread2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ is_screwed_to(chairleg2, chairseatthread2)", shape=ellipse, style=filled];
+"selector:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" -> "target:
+ is_screwed_to(chairleg2, chairseatthread2)";
+"sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)", shape=box, style=filled];
+"selector:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" -> "sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)";
+"precondition:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" -> "precondition:
+ hold(left_hand, clampgripper)";
+"selector:
+ pick_up(left_hand, clampgripper, chairleg2)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
+ pick_up(left_hand, clampgripper, chairleg2)", shape=octagon, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" -> "selector:
+ pick_up(left_hand, clampgripper, chairleg2)";
+"target:
+ hold(clampgripper, chairleg2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ hold(clampgripper, chairleg2)", shape=ellipse, style=filled];
+"selector:
+ pick_up(left_hand, clampgripper, chairleg2)" -> "target:
+ hold(clampgripper, chairleg2)";
+"sequence:
+ pick_up(left_hand, clampgripper, chairleg2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ pick_up(left_hand, clampgripper, chairleg2)", shape=box, style=filled];
+"selector:
+ pick_up(left_hand, clampgripper, chairleg2)" -> "sequence:
+ pick_up(left_hand, clampgripper, chairleg2)";
+"precondition:
+ is_empty(clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ is_empty(clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, clampgripper, chairleg2)" -> "precondition:
+ is_empty(clampgripper)";
+"\"precondition:\n hold(left_hand, clampgripper)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="\"precondition:\n hold(left_hand, clampgripper)\"*", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, clampgripper, chairleg2)" -> "\"precondition:\n hold(left_hand, clampgripper)\"*";
+"action:
+ pick_up(left_hand, clampgripper, chairleg2)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ pick_up(left_hand, clampgripper, chairleg2)", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, clampgripper, chairleg2)" -> "action:
+ pick_up(left_hand, clampgripper, chairleg2)";
+"action:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)" -> "action:
+ screw(left_hand, clampgripper, chairleg2, chairseatthread2)";
+}

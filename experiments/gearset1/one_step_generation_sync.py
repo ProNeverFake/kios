@@ -55,9 +55,9 @@ problem_set = os.path.join(current_dir, "baseline_result.jsonl")
 with open(problem_set, "r") as f:
     problem_set = f.readlines()
 
-problem_number = 7
+problem_number = 17
 
-result_dir = os.path.join(current_dir, "one_step_record_gpt3.5", str(problem_number))
+result_dir = os.path.join(current_dir, "one_step_record", str(problem_number))
 
 if not os.path.exists(result_dir):
     os.makedirs(result_dir)
@@ -69,7 +69,7 @@ metadata = {
     "try_count": problem_number,
     "timestamp": timestamp,
     "usecase": "gearset",
-    "llm": "gpt-3.5-turbo-0125",
+    "llm": "gpt-4",
 }
 
 
@@ -186,7 +186,7 @@ def one_step() -> dict:
     start_state = the_problem["initial_world_state"]
     target = the_problem["target"]
 
-    response = one_step_chain_gpt3.invoke(
+    response = one_step_chain.invoke(
         {
             "target": target,
             "initial_state": start_state,

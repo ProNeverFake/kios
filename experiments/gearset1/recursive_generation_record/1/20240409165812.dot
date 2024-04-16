@@ -1,9 +1,0 @@
-digraph pastafarianism {
-ordering=out;
-graph [fontname="times-roman"];
-node [fontname="times-roman"];
-edge [fontname="times-roman"];
-"target:
- is_inserted_to(shaft1, gearbase_hole1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
- is_inserted_to(shaft1, gearbase_hole1)", shape=ellipse, style=filled];
-}

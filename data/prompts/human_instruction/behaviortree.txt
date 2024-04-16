@@ -1,4 +1,3 @@
-[user]
 The behavior tree should be in json dictionary format.
 Following is a simple example:
 """
@@ -43,9 +42,10 @@ Following is a simple example:
     - One target condition node as the first child of the selector to check if the target of this subtree has been satisfied.
     - A sequence node as the last child of the selector node to achieve the target condition node.
     - A number of precondition nodes as the first child nodes of the sequence node to check the action's preconditions.
-    - One action node as the last child of the sequence node, whose preconditions are checked in the child condition nodes before.
+    - One action node as the last child of the sequence node, whose preconditions are checked in the child condition nodes before. 
+    - A subtree is only for one action, so only one action node should be in one unit subtree. If you want to put two action nodes into one subtree, you know you are doing something wrong.
     - The action should have effects that can fulfill the target condition node in the selector.
 
 7. If any precondition node will be unsatisfied when it is ticked, a unit subtree should be constructed to replace it, which take that precondition node as its target node and aims to achieve it. You should estimate the world state when the precondition is ticked (checked) according to the initial state and the effects of the actions executed before, then do this replacement repeatedly until all the preconditions are satisfied at the time they are ticked.  
 8. The behavior tree should be constructed based on the action sequence you planned and the action definitions in ROBOT_ACTION_LIST.
-9. Control flow nodes (sequence nodes and selector nodes) don't have memory. Each tick starts from the root and traverses all nodes, regardless of their previous state.
+9. Action nodes and Control flow nodes (sequence nodes and selector nodes) don't have memory. Each tick starts from the root and traverses all nodes, regardless of their previous state. An action node should always be able to satisfy some condition on its upper level, which will help avoid ticking the same action node repeatedly with the help of the mechanism of selector nodes.

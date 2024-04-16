@@ -12,7 +12,7 @@ for data collecting
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation_gpt3.5"
+os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -25,9 +25,13 @@ from kios_agent.data_types import KiosPromptSkeleton
 from kios_agent.kios_graph import (
     plan_updater,
     planner,
-    seq_planner_chain_gpt3,
-    human_instruction_chain_gpt3,
+    # seq_planner_chain_gpt3,
+    seq_planner_chain,
+    # human_instruction_chain_gpt3,
+    human_instruction_chain,
+    human_instruction_chain_v2,
 )
+
 from kios_agent.kios_routers import KiosRouterFactory, load_router_from_json
 
 from langgraph.graph import StateGraph, END
@@ -46,11 +50,13 @@ problem_set = os.path.join(current_dir, "baseline_result.jsonl")
 with open(problem_set, "r") as f:
     problem_set = f.readlines()
 
-problem_number = 0
+problem_number = 17
 
 result_dir = os.path.join(
-    current_dir, "human_in_the_loop_generation_gpt3.5", str(problem_number)
+    current_dir, "human_in_the_loop_generation", str(problem_number)
 )
+
+run_result = None
 
 if not os.path.exists(result_dir):
     os.makedirs(result_dir)
@@ -62,7 +68,7 @@ metadata = {
     "try_count": problem_number,
     "timestamp": timestamp,
     "usecase": "gearset",
-    "llm": "gpt-3.5-turbo-0125",
+    "llm": "gpt-4",
 }
 
 
@@ -103,7 +109,9 @@ scene = SceneFactory().create_scene_from_json(scene_json_object)
 world_interface = WorldInterface()
 with open(world_state_path, "r") as file:
     world_state_json = json.load(file)
-    world_interface.load_world_from_json(world_state_json)
+
+world_state_json = the_problem["initial_world_state"]
+world_interface.load_world_from_json(world_state_json)
 
 ####################### robot
 robot_interface = RobotInterface(
@@ -175,7 +183,7 @@ def user_input_step(state: PlanExecuteState):
     }
 
 
-@traceable(name="sequence_generate_step", metadata=metadata)
+@traceable(run_type="chain", name="sequence_generate_step", metadata=metadata)
 def sequence_generate_step(state: PlanExecuteState):
     """
     generate the sequence based on the instruction
@@ -186,7 +194,7 @@ def sequence_generate_step(state: PlanExecuteState):
     start_world_state = state["world_state"][-1]
     global user_feedback
 
-    action_sequence = seq_planner_chain_gpt3.invoke(
+    action_sequence = seq_planner_chain.invoke(
         {
             "start_world_state": start_world_state,
             "task_instruction": plan_goal,  # TODO the naming method "user_instruction" is confusing. try to change it later.
@@ -208,11 +216,12 @@ def behavior_tree_generate_step(state: PlanExecuteState):
 
     global user_feedback
 
-    bt_skeleton = human_instruction_chain_gpt3.invoke(
+    bt_skeleton = human_instruction_chain_v2.invoke(
         {
-            "user_instruction": user_feedback,
+            "user_feedback": user_feedback,
             "last_behavior_tree": state["last_behavior_tree"],
             "action_sequence": state["action_sequence"],
+            # "world_state": state["world_state"][-1],
         }
     )
 
@@ -302,12 +311,13 @@ def behavior_tree_simulation_step(state: PlanExecuteState):
 
     behavior_tree_stewardship.setup_behavior_tree()
 
-    behavior_tree_stewardship.tick_tree()
+    behavior_tree_stewardship.tick_tree(period_msec=10)
 
     tree_result = behavior_tree_stewardship.tree_result
 
     pprint(tree_result.to_json())
     pause = input("DEBUG: please check the tree result. Press enter to continue.")
+    render_bt(behavior_tree_skeleton, dir=result_dir)
     write_result(behavior_tree_skeleton, result_dir, tree_result.to_json())
 
     # * check result
@@ -369,6 +379,24 @@ def plan_updater_step(state: PlanExecuteState):
     }
 
 
+@traceable(name="record_step")
+def record_step(state: PlanExecuteState):
+    """
+    record the result of the last execution
+    """
+    print(f"-----record_step-----")
+
+    # write_result(
+    #     state["last_behavior_tree"],
+    #     result_dir,
+    # )
+    exit(0)
+
+    return {
+        "last_failed_node": state["last_failed_node"],
+    }
+
+
 ##################################################### * construct the graph
 
 workflow = StateGraph(PlanExecuteState)
@@ -382,6 +410,9 @@ workflow.add_node("user_input_node", user_input_step)
 workflow.set_entry_point("sequence_generator")
 workflow.add_edge("planner", "sequence_generator")
 workflow.add_edge("sequence_generator", "behavior_tree_generator")
+workflow.add_node("recorder", record_step)
+workflow.add_edge("recorder", "plan_updater")
+
 
 router_factory = KiosRouterFactory()
 
@@ -431,27 +462,8 @@ workflow.add_conditional_edges(
     },
 )
 
-
-# * factory generate
-# executor_success_router = router_factory.create_router_layer(
-#     route_names=[
-#         "finish",
-#         "rectify",
-#         "approve",
-#         "disapprove",
-#     ]
-# )
 # * load from json (offline)
 executor_success_router = load_router_from_json("executor_success_router")
-
-# * factory generate
-# executor_failure_router = router_factory.create_router_layer(
-#     route_names=[
-#         "retry",
-#         "rectify",
-#         "approve",
-#     ]
-# )
 
 # * load from json (offline)
 executor_failure_router = load_router_from_json("executor_failure_router")
@@ -527,7 +539,7 @@ workflow.add_conditional_edges(
     "behavior_tree_executor",
     executor_should_end,
     {
-        True: "plan_updater",
+        True: "recorder",  # "plan_updater
         False: "sequence_generator",
         None: "behavior_tree_executor",
     },
@@ -605,8 +617,12 @@ app = workflow.compile()
 
 config = {"recursion_limit": 500}
 
+plan = input(f'{the_problem["target"]}\n')
+
+pprint(the_problem["initial_world_state"])
+
 inputs = {
-    "plan": [the_problem["target"]],
+    "plan": [plan],
     "world_state": [the_problem["initial_world_state"]],
 }
 

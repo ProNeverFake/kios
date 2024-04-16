@@ -1,0 +1,8 @@
+The input are:
+last_behavior_tree: the last executed behavior tree.
+user_feedback: the feedback from the user to help you improve the bahavior tree.
+action_sequence: the action_sequence to assist you in behavior tree generation.
+
+You analyze the failure reason of the last_behavior_tree with the help of user_feedback, then fix the behavior tree.
+If no last_behavior_tree is given, you generate a behavior tree according to the action sequence. The behavior tree should follow the regulated format.
+You only return the behavior tree as a json object that is ready to be parsed.

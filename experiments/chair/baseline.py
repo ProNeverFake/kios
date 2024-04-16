@@ -120,84 +120,14 @@ def match_type(node: dict) -> tuple[str, str]:
         raise ValueError(f"the node name {node_name} does not match any type.")
 
 
-def expand_nodes(
-    node_list: list[dict],
-    start_state: dict,
-    overall_tree: list[dict] = None,
-) -> dict:
-    """
-    in order to monitor the tree generation, the overall tree and the node list should be the same variable when being passed in.
-    """
-    pprint("----------check the entire tree:")
-    if overall_tree is not None:
-        render_bt(overall_tree[0])
-    pprint("----------start to expand the node list:")
-    pprint(node_list)
-    pause = input("paused here! check the tree.")
-
-    assert len(node_list) > 0
-    state = start_state
-
-    for i in range(len(node_list)):
-        type_name, body = match_type(node_list[i])
-        # if match_type(node_list[i]) == "action":
-        if type_name == "action":
-            print(f"the node {node_list[i]['name']} is an action node. skip it.")
-            pause = input("paused here! check!")
-        # elif match_type(node_list[i]) == "precondition" or "target":
-        elif type_name in ["precondition", "target"]:
-            # goal = node_list[i]["name"]
-            goal = body
-            plan = make_plan(state, goal)
-            if len(plan) == 0:
-                logging.warning(f"No action should be performed for the goal {goal}.")
-                logging.warning(f'the node {node_list[i]["name"]} has been skipped.')
-                pause = input("paused here! check!")
-            else:
-                logging.info(f"Actions have been planed for the goal {goal}.")
-                pprint(f"the plan for the goal {goal} is {plan}")
-                pause = input("paused here! check!")
-                last_action = plan[-1]
-                unit_subtree = generate_unit_subtree(last_action)
-                # insert the subtree into the node_list
-                node_list[i] = unit_subtree
-                new_node_list = get_node_list_from_tree(unit_subtree)
-                expand_nodes(
-                    node_list=new_node_list,
-                    start_state=state,
-                    overall_tree=overall_tree,
-                )
-                state = estimate_state(state, plan)
-
-    return node_list[0]
-
-
-def test_expand_nodes():
-    start_state = world_state_json
-    node_list = [
-        {
-            "summary": "screw the lampbulb into the lampbase",
-            "name": "target: screw the lampbulb into the lampbase",
-        }
-    ]
-    # node_list = [
-    #     {
-    #         "summary": "place the lampbulb onto the lampbulb",
-    #         "name": "target: place the lampshade onto the lampbulb",
-    #     }
-    # ]
-    expand_nodes(node_list, start_state, node_list)
-    pprint(node_list)
-
-
 def test_baseline():
     sk = {
         # "summary": "the target is to screw the chairnut1 into the chairseatbolt1",
         # "name": "target: is_screwed_to(chairnut1, chairseatbolt1)",
-        # "summary": "the target is to screw the chairnut2 into the chairseatbolt2",
-        # "name": "target: is_screwed_to(chairnut2, chairseatbolt2)",
-        "summary": "the target is to screw the chairleg1 into the chairseatthread1",
-        "name": "target: is_screwed_to(chairleg1, chairseatthread1)",
+        "summary": "the target is to screw the chairnut2 into the chairseatbolt2",
+        "name": "target: is_screwed_to(chairnut2, chairseatbolt2)",
+        # "summary": "the target is to screw the chairleg1 into the chairseatthread1",
+        # "name": "target: is_screwed_to(chairleg1, chairseatthread1)",
         # "summary": "the target is to screw the chairleg2 into the chairseatthread2",
         # "name": "target: is_screwed_to(chairleg2, chairseatthread2)",
         # "summary": "the target is to insert the chairback into the chairseatconnector",

@@ -1,0 +1,39 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ change_tool(left_hand, defaultgripper, clampgripper)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ change_tool(left_hand, defaultgripper, clampgripper)", shape=octagon, style=filled];
+"target:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"selector:
+ change_tool(left_hand, defaultgripper, clampgripper)" -> "target:
+ hold(left_hand, clampgripper)";
+"sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)", shape=box, style=filled];
+"selector:
+ change_tool(left_hand, defaultgripper, clampgripper)" -> "sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)";
+"precondition:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)" -> "precondition:
+ hold(left_hand, defaultgripper)";
+"precondition:
+ is_empty(defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ is_empty(defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)" -> "precondition:
+ is_empty(defaultgripper)";
+"action:
+ change_tool(left_hand, defaultgripper, clampgripper)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ change_tool(left_hand, defaultgripper, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, defaultgripper, clampgripper)" -> "action:
+ change_tool(left_hand, defaultgripper, clampgripper)";
+}

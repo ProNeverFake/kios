@@ -22,7 +22,7 @@ new_plan: ["put the cover onto the blub"]
 Example:
 user_input: "can you help me to put the ball on the table?"
 in world_state: on(ball, table)
-new_plan: []
+plan: []
 
 Example:
 user_input: "can you pick up the key?"

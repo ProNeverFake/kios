@@ -171,6 +171,23 @@ def test_screw_in(object_name: str):
     robot_command.execute_task_list_sync()
 
 
+def test_drive_in():
+    # need object "test"
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    parsed_action = {"args": ["left_hand", "tool", "shaft2", "gearbase_hole2"]}
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_screw_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+
 def load_tool_test(tool_name: str):
     parsed_action = {
         "action_name": "load_tool",

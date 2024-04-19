@@ -306,6 +306,9 @@ class MiosTaskFactory:
 
     @bb_deprecated(reason="meaningless", can_run=True)
     def generate_gripper_release_mp(self, width=0.08, speed=0.2) -> MiosCall:
+        """
+        the gripper limit is set in mios. when a gripper is equipped, it should be 0.4
+        """
         return self.generate_gripper_move_mp(width=width, speed=speed)
 
     def generate_gripper_move_mp(
@@ -370,7 +373,7 @@ class MiosTaskFactory:
     #         skill_parameters=payload,
     #     )
 
-    @bb_deprecated(reason="rapid implimentation", can_run=True)
+    @bb_deprecated(reason="rapid implimentation, DONT USE THIS", can_run=False)
     def generate_screw_in_mp(self, object_name: str = None, O_T_OB=None) -> MiosSkill:
         if object_name is None and O_T_OB is None:
             raise Exception("Object target is not set!")
@@ -754,7 +757,7 @@ class MiosTaskFactory:
         if container is None:
             raise Exception("container is not set!")
 
-        kios_object = self.task_scene.get_object(container)
+        # kios_object = self.task_scene.get_object(container)
 
         move_above = self.generate_move_above_mp(container)
 
@@ -769,7 +772,7 @@ class MiosTaskFactory:
         update_object_in_mios = self.generate_update_mios_memory_environment_call()
         update_object_in_kios = self.generate_update_object_from_mios_call(screwable)
 
-        release = self.generate_gripper_release_mp(width=0.041)
+        release = self.generate_gripper_release_mp(width=0.08)
 
         retreat = self.generate_move_above_mp(container)
 
@@ -834,8 +837,8 @@ class MiosTaskFactory:
                         "ddq_max": 1.0,
                     },
                     "p3": {
-                        "grasp_force": 30,
-                        "K_x": [500, 500, 500, 800, 800, 800],
+                        "grasp_force": 50,
+                        "K_x": [1500, 1500, 1500, 800, 800, 800],
                     },
                 },
                 "control": {"control_mode": 1},
@@ -1012,7 +1015,7 @@ class MiosTaskFactory:
         update_object_in_mios = self.generate_update_mios_memory_environment_call()
         update_object_in_kios = self.generate_update_object_from_mios_call(insertable)
 
-        release = self.generate_gripper_release_mp(width=0.041)
+        release = self.generate_gripper_release_mp(width=0.08)
 
         retreat = self.generate_move_above_mp(container)
 

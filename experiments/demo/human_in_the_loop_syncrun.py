@@ -167,7 +167,8 @@ def behavior_tree_generate_step(state: PlanExecuteState):
 
     bt_skeleton = human_instruction_chain.invoke(
         {
-            "user_instruction": user_feedback,
+            "world_state": state["world_state"][-1],
+            "user_feedback": user_feedback,
             "last_behavior_tree": state["last_behavior_tree"],
             "action_sequence": state["action_sequence"],
         }

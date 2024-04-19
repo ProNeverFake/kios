@@ -150,16 +150,52 @@ class MiosTaskFactory:
     ###################################################################
     # * methods to generate one mios task
     def generate_teach_O_T_TCP_call(self, object_name: str) -> MiosCall:
+        """teach the O_T_TCP to mios (well, O_T_EE and q as well).
+        This is different from the teach_object_call because the O_T_TCP can change when the robot is using a toolcube.
+
+        Args:
+            object_name (str): _description_
+
+        Returns:
+            MiosCall: _description_
+        """
         payload = {
             "object": object_name,
         }
         return MiosCall(method_name="teach_object_TCP", method_payload=payload)
 
     def generate_teach_object_call(self, object_name: str) -> MiosCall:
+        """teach the current cartesian and joint pose to mios.
+        this includes q and O_T_EE.
+
+        Args:
+            object_name (str): _description_
+
+        Returns:
+            MiosCall: _description_
+        """
         payload = {
             "object": object_name,
         }
         return MiosCall(method_name="teach_object", method_payload=payload)
+
+    @bb_deprecated(reason="only for test. mios should take over this", can_run=True)
+    def generate_set_load_call(self, load_mass: float) -> MiosCall:
+        """MIOS_CALL
+        change the load of the object the robot is holding.
+        using the libfranka API.
+        used here for changing toolcube mass.
+
+        Args:
+            load_mass: the mass of the object in kg.
+
+        Returns:
+            _type_: _description_
+        """
+        payload = {
+            "load_mass": load_mass,
+        }
+        return MiosCall(method_name="set_load", method_payload=payload)
 
     def generate_update_mios_memory_environment_call(self) -> MiosCall:
         """call mios to update the memory "environment" from the mongodb.
@@ -538,18 +574,21 @@ class MiosTaskFactory:
         """
         # get the tool from the scene
         if tool_name is None:
-            tool = self.task_scene.get_tool("no_tool")  # ! BBCHANGE
+            raise Exception("tool_name is not set!")
+            # tool = self.task_scene.get_tool("no_tool")
         else:
             tool = self.task_scene.get_tool(tool_name)
         # get the EE_T_TCP
         EE_T_TCP = tool.EE_T_TCP
         EE_finger_width_max = tool.EE_finger_width_max
         EE_finger_width_min = tool.EE_finger_width_min
+        tool_mass = tool.tool_mass
 
         payload = {
             "EE_T_TCP": EE_T_TCP.T.flatten().tolist(),
             "EE_finger_width_max": EE_finger_width_max,
             "EE_finger_width_min": EE_finger_width_min,
+            "tool_mass": tool_mass,
         }
         return MiosCall(method_name="change_tool", method_payload=payload)
 
@@ -583,9 +622,14 @@ class MiosTaskFactory:
 
         action1 = {"args": ["xxxx", tool1]}
         unload_skill = self.generate_unload_tool_skill(action1)
+
         action2 = {"args": ["xxxx", tool2]}
         load_skill = self.generate_load_tool_skill(action2)
-        return unload_skill + load_skill
+
+        return [
+            unload_skill,
+            load_skill,
+        ]
 
     def generate_load_tool_skill(
         self, parsed_action: dict[str, Any]

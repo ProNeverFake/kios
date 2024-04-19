@@ -15,6 +15,8 @@ from kios_robot.data_types import (
 
 from kios_scene.mongodb_interface import MongoDBInterface
 
+from kios_utils.bblab_utils import bb_deprecated
+
 rp_logger = logging.getLogger("robot_proprioceptor")
 rp_logger.setLevel(logging.DEBUG)
 
@@ -61,7 +63,6 @@ class RobotProprioceptor:
     def update_scene_object_from_mios(
         self, scene: TaskScene, object_name: str | list[str]
     ) -> bool:
-        logging.warning(f"update scene id: {hex(id(scene))}")
         if isinstance(object_name, str):
             object_names = [object_name]
         try:
@@ -131,7 +132,7 @@ class RobotProprioceptor:
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         print(mios_response)
 
-    # ! this will lead to a jerk in the robot. dont use it.
+    @bb_deprecated(reason="this will lead to a jerk in the robot. dont use it.")
     def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
         payload = {
             "EE_T_TCP": new_EE_T_TCP.T.flatten().tolist(),

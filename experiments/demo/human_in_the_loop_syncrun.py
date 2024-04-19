@@ -99,7 +99,7 @@ class PlanExecuteState(TypedDict):
     ]  # this is the action sequence for only ONE step from the assembly plan
     world_state: Annotated[
         List[dict], operator.add
-    ]  # ! to add, you need to make world_state a list of dict
+    ]  # * to add, you need to make world_state a list of dict
     past_steps: Annotated[
         List[Tuple], operator.add
     ]  # this is for update the assembly plan

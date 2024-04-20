@@ -17,6 +17,7 @@ from kios_robot.data_types import (
 )
 
 from kios_bt.data_types import Action
+from kios_utils.bblab_utils import setup_logger
 
 """
 BB knows this is not a good design to create generate method for each task/call. 
@@ -25,8 +26,7 @@ which takes formatted node data as input.
 Anyway, the current implementation is straightforward and easy to understand.
 """
 
-mti_logger = logging.getLogger("mios_task_interface")
-mti_logger.setLevel(logging.DEBUG)
+mti_logger = setup_logger(__name__, logging.DEBUG)
 
 
 class MiosTaskFactory:
@@ -852,7 +852,7 @@ class MiosTaskFactory:
 
     @bb_deprecated(reason="TESTING", can_run=True)
     def generate_drive_in_mp(self, drivable, container) -> MiosSkill:
-
+        # ! BUG: the torque end condition doesn't work well. A connection error will be raised at the websocket side.
         if container is None:
             raise Exception("container is not set!")
 

@@ -23,6 +23,13 @@ bblogger.addHandler(handler)
 bblogger.setLevel(logging.DEBUG)
 
 
+def setup_logger(name: str, level=logging.INFO):
+    logger = logging.getLogger(name)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    return logger
+
+
 def bb_result_test(func):
 
     def wrapper(*args, **kwargs):

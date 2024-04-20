@@ -11,7 +11,6 @@ should provide:
 """
 
 import logging
-import colorlog
 
 from typing import List, Set, Dict, Any, Tuple, Optional
 
@@ -32,34 +31,18 @@ from kios_utils.pddl_problem_parser import (
     parse_problem_init,
     parse_problem,
 )
-from kios_utils.bblab_utils import bb_deprecated
+from kios_utils.bblab_utils import bb_deprecated, setup_logger
 
 import py_trees
 
 import functools
-import copy
 import sched
 import time
 
 from kios_scene.scene_factory import SceneFactory
 
-handler = colorlog.StreamHandler()
-handler.setFormatter(
-    colorlog.ColoredFormatter(
-        "%(log_color)s%(levelname)s:%(name)s:%(message)s",
-        log_colors={
-            "DEBUG": "cyan",
-            "INFO": "green",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "red,bg_white",
-        },
-    )
-)
 
-stw_logger = logging.getLogger("behavior_tree_stewardship")
-stw_logger.addHandler(handler)
-stw_logger.setLevel(logging.INFO)
+stw_logger = setup_logger(__name__, level=logging.INFO)
 
 
 class BehaviorTreeStewardship:

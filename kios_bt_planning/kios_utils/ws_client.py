@@ -11,7 +11,6 @@ import os
 mios_communication_root = os.path.dirname(__file__)
 if mios_communication_root not in sys.path:
     sys.path.insert(0, os.path.abspath(mios_communication_root))
-    # print("add path mios_communication_root in the file", __file__)
 
 
 async def send(

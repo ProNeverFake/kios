@@ -5,6 +5,7 @@ import time
 import logging
 
 mios_task_logger = logging.getLogger("mios_task_interface")
+mios_task_logger.setLevel(logging.INFO)
 
 
 class Skill:
@@ -83,23 +84,28 @@ class Task:
         Returns:
             mios response in json format
         """
-        print(f"\033[92mWait for skill {self.skill_names[0]} to finish\033[0m")
+        mios_task_logger.info(f"Wait for skill {self.skill_names[0]} to finish")
         result = wait_for_task(self.robot, self.task_uuid)
-        print("Task execution took " + str(time.time() - self.t_0) + " s.")
+        mios_task_logger.info(
+            "Task execution took " + str(time.time() - self.t_0) + " s."
+        )
         self.task_wait_response = result
         return result
 
     def stop(self):
         result = stop_task(self.robot)
-        print("Task execution took " + str(time.time() - self.t_0) + " s.")
+        mios_task_logger.info("Task stopped!")
+        mios_task_logger.info(
+            "Task execution took " + str(time.time() - self.t_0) + " s."
+        )
         return result
 
     def interrupt(self):
         result = stop_task(
             self.robot, raise_exception=False, recover=False, empty_queue=False
         )
-        print("Current task is interrupted.")
-        print(str(result))
+        mios_task_logger.info("Task interrupted!")
+        mios_task_logger.info(str(result))
         return result
 
     def initialize(self):

@@ -15,7 +15,12 @@ if mios_communication_root not in sys.path:
 
 
 async def send(
-    hostname, port=12000, endpoint="mios/core", request=None, timeout=100, silent=False
+    hostname,
+    port=12000,
+    endpoint="mios/core",
+    request=None,
+    timeout=1000,
+    silent=False,
 ):
     """sending msg to the wbesoecket server
 

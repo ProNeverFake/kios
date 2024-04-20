@@ -106,7 +106,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.45,
+                              "tool_mass": 0.8,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -120,7 +120,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.45,
+                              "tool_mass": 0.8,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -134,7 +134,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.45,
+                              "tool_mass": 0.8,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -148,7 +148,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.45,
+                              "tool_mass": 0.8,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },

@@ -46,7 +46,7 @@ class RobotProprioceptor:
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         return mios_response.has_finished
 
     def get_robot_state(self) -> RobotState:
@@ -54,7 +54,7 @@ class RobotProprioceptor:
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         if mios_response.has_finished:
             robot_state = RobotState.from_json(response["result"])
-            print(robot_state)
+            pprint(robot_state)
             return robot_state
         else:
             raise Exception("Robot state is not ready yet.")
@@ -82,7 +82,7 @@ class RobotProprioceptor:
                 )
 
         except Exception as e:
-            print(e)
+            rp_logger.error(f"Error occurred in the update_scene_object_from_mios: {e}")
             raise e
 
         return True
@@ -151,10 +151,10 @@ class RobotProprioceptor:
             {"object_name": object},
         )
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         if mios_response.has_finished:
             mios_object = MiosObject.from_json(response["result"])
-            print(mios_object)
+            pprint(mios_object)
             return mios_object
 
     def align_object(self, object_name: str, **kwargs: dict[str, Any]):
@@ -198,7 +198,7 @@ class RobotProprioceptor:
         )
 
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(colored(f"mios replied:\n {mios_response}", "green"))
+        pprint(colored(f"mios replied:\n {mios_response}", "green"))
 
     def get_object_O_T_OB(self, object_name: str):
         """
@@ -222,10 +222,10 @@ class RobotProprioceptor:
         )
 
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         if mios_response.has_finished:
             dummy_object = MiosObject.from_json(response["result"])
-            print(dummy_object)
+            pprint(dummy_object)
             return dummy_object
         else:
             return None

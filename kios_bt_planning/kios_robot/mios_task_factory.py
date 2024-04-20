@@ -141,7 +141,6 @@ class MiosTaskFactory:
         Returns:
             KiosCall: _description_
         """
-        print(f"scene id before update: {hex(id(self.task_scene))}")
         return KiosCall(
             method=self.robot_interface.proprioceptor.update_scene_object_from_mios,
             args=[self.task_scene, object_name],
@@ -216,7 +215,6 @@ class MiosTaskFactory:
         """
         # default: 15cm above the object
         # get the object from the scene
-        print(f" move above scece id: {hex(id(self.task_scene))}")
         # mti_logger.warn(
         #     f"scene content {object_name} x: {self.task_scene.object_map[object_name].O_T_TCP[2][0]}"
         # )
@@ -356,7 +354,6 @@ class MiosTaskFactory:
             "width": width,
             "speed": speed,
         }
-        pprint(payload)
         return MiosCall(method_name="move_gripper", method_payload=payload)
 
     def generate_gripper_home_mp(self) -> MiosCall:

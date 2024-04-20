@@ -5,11 +5,8 @@ from kios_bt.data_types import (
     Condition,
     ObjectProperty,
 )
-import copy
 import py_trees
-import json
 import re
-from pprint import pprint
 from typing import List, Dict, Any, Tuple, Optional
 from kios_bt.behavior_nodes import ActionNode, ConditionNode, ActionNodeTest
 
@@ -353,7 +350,6 @@ class BehaviorTreeFactory:
         """
         from skeleton to condition node
         """
-        pprint(skeleton)
         # TODO remove the limitation that the preconditions and targets are only true conditions and negative conditions (predicates with "not") only exist in the effects of actions
         op = ObjectProperty(
             object_name=parsed_node.params[0],

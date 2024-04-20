@@ -603,8 +603,6 @@ class BehaviorTreeStewardship:
             dict: the solution bt sk json.
         """
 
-        from pprint import pprint
-
         self.set_world_state(world_state)
         self.world_interface.record_check_point("baseline_start")
 
@@ -619,7 +617,7 @@ class BehaviorTreeStewardship:
         while True:
             sim_bt.tick()
             if sim_bt.root.status == py_trees.common.Status.SUCCESS:
-                pprint("Behavior tree tick returns success!")
+                stw_logger.info("Behavior tree tick returns success!")
                 break
             elif sim_bt.root.status == py_trees.common.Status.FAILURE:
                 tip_node = sim_bt.root.tip()
@@ -631,9 +629,11 @@ class BehaviorTreeStewardship:
                 new_target = tip_node.condition.to_string()
                 new_ut = ut_dict.get(new_target, None)
                 if new_ut is None:
-                    pprint(f"cannot find a solution ut for the condtiion {new_target}!")
-                    pprint("the available targets are:")
-                    pprint(ut_dict.keys())
+                    stw_logger.error(
+                        f"cannot find a solution ut for the condtiion {new_target}!"
+                    )
+                    stw_logger.error("the available targets are:")
+                    stw_logger.error(ut_dict.keys())
                     raise Exception(
                         f"cannot find a solution ut for the condtiion {new_target}!"
                     )
@@ -658,7 +658,7 @@ class BehaviorTreeStewardship:
 
                 self.world_interface.restore_check_point("baseline_start")
             elif sim_bt.root.status == py_trees.common.Status.RUNNING:
-                print("Behavior tree is running")
+                stw_logger.info("Behavior tree is running")
             else:
                 raise Exception("Unknown status!")
 

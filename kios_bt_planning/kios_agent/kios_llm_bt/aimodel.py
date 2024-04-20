@@ -7,7 +7,9 @@ import argparse
 import sys
 import textwrap
 
-# ! code is still dirty. need to be cleaned up and wrapped into a class KiosAgent
+"""
+! deprecated
+"""
 
 enc = tiktoken.get_encoding("cl100k_base")
 

@@ -7,7 +7,7 @@ import colorlog
 handler = colorlog.StreamHandler()
 handler.setFormatter(
     colorlog.ColoredFormatter(
-        "%(log_color)s[%(name)s]:(%(levelname)s):%(message)s",
+        "%(log_color)s(%(levelname)s):[%(name)s]:%(message)s",
         log_colors={
             "DEBUG": "cyan",
             "INFO": "green",
@@ -27,6 +27,7 @@ def setup_logger(name: str, level=logging.INFO):
     logger = logging.getLogger(name)
     logger.addHandler(handler)
     logger.setLevel(level)
+    logger.propagate = False
     return logger
 
 

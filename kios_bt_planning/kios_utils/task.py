@@ -3,9 +3,9 @@ from .ws_client import *
 import time
 
 import logging
+from kios_utils.bblab_utils import setup_logger
 
-mios_task_logger = logging.getLogger("mios_task_interface")
-mios_task_logger.setLevel(logging.INFO)
+mios_task_logger = setup_logger(__name__, logging.INFO)
 
 
 class Skill:
@@ -55,7 +55,7 @@ class Task:
             "skills": self.skill_context,
         }
 
-        mios_task_logger.info(f"Starting task with skills: {self.skill_names}")
+        # mios_task_logger.info(f"Starting task with skills: {self.skill_names}")
         response = start_task(self.robot, "GenericTask", parameters)
         self.task_start_response = response
 

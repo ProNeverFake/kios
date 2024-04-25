@@ -614,6 +614,7 @@ class MiosTaskFactory:
     ) -> list[MiosCall | MiosSkill]:
         tool1 = parsed_action["args"][1]
         tool2 = parsed_action["args"][2]
+
         if tool1 is None or tool2 is None:
             raise Exception("tool_name is not set!")
 
@@ -623,10 +624,11 @@ class MiosTaskFactory:
         action2 = {"args": ["xxxx", tool2]}
         load_skill = self.generate_load_tool_skill(action2)
 
-        return [
-            unload_skill,
-            load_skill,
-        ]
+        # return [
+        #     unload_skill,
+        #     load_skill,
+        # ]
+        return unload_skill + load_skill
 
     def generate_load_tool_skill(
         self, parsed_action: dict[str, Any]
@@ -695,9 +697,6 @@ class MiosTaskFactory:
         if tool_name is None:
             raise Exception("tool_name is not set!")
 
-        if tool_name == "defaultgripper":
-            return []
-
         payload = {
             "skill": {
                 "objects": {
@@ -742,10 +741,14 @@ class MiosTaskFactory:
 
         update_tool = self.generate_update_tool_call(tool_name="defaultgripper")
 
-        return [
-            unload_tool,
-            update_tool,
-        ]
+        task = []
+
+        if tool_name != "defaultgripper":
+            task.append(unload_tool)
+
+        task.append(update_tool)
+
+        return task
 
     # ! BUG
     def generate_pick_up_skill(
@@ -864,8 +867,8 @@ class MiosTaskFactory:
                     # "time_max": 60,
                     "p0": {
                         "K_x": [1500, 1500, 1500, 600, 600, 600],
-                        "dq_max": 1,
-                        "ddq_max": 0.8,
+                        "dq_max": 1.5,
+                        "ddq_max": 1.5,
                         "tighten_torque": 1.5,
                         "f_push": [
                             0,
@@ -882,8 +885,8 @@ class MiosTaskFactory:
                     },
                     "p2": {
                         "K_x": [3000, 3000, 3000, 1200, 1200, 1200],
-                        "dq_max": 1,
-                        "ddq_max": 1.0,
+                        "dq_max": 1.5,
+                        "ddq_max": 1.5,
                     },
                     "p3": {
                         "grasp_force": 50,

@@ -4,61 +4,13 @@ graph [fontname="times-roman"];
 node [fontname="times-roman"];
 edge [fontname="times-roman"];
 "selector:
- screw_shaft2_into_gearbase_hole2" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
- screw_shaft2_into_gearbase_hole2", shape=octagon, style=filled];
-"target:
- is_screwed_to(shaft2, gearbase_hole2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
- is_screwed_to(shaft2, gearbase_hole2)", shape=ellipse, style=filled];
-"selector:
- screw_shaft2_into_gearbase_hole2" -> "target:
- is_screwed_to(shaft2, gearbase_hole2)";
-"sequence:
- screw_shaft2_into_gearbase_hole2" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- screw_shaft2_into_gearbase_hole2", shape=box, style=filled];
-"selector:
- screw_shaft2_into_gearbase_hole2" -> "sequence:
- screw_shaft2_into_gearbase_hole2";
-"selector:
- change_tool(left_hand, defaultgripper, inwardgripper)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
- change_tool(left_hand, defaultgripper, inwardgripper)", shape=octagon, style=filled];
-"sequence:
- screw_shaft2_into_gearbase_hole2" -> "selector:
- change_tool(left_hand, defaultgripper, inwardgripper)";
-"target:
- hold(left_hand, inwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
- hold(left_hand, inwardgripper)", shape=ellipse, style=filled];
-"selector:
- change_tool(left_hand, defaultgripper, inwardgripper)" -> "target:
- hold(left_hand, inwardgripper)";
-"sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)", shape=box, style=filled];
-"selector:
- change_tool(left_hand, defaultgripper, inwardgripper)" -> "sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)";
-"precondition:
- hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
- hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
-"sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)" -> "precondition:
- hold(left_hand, defaultgripper)";
-"precondition:
- is_empty(defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
- is_empty(defaultgripper)", shape=ellipse, style=filled];
-"sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)" -> "precondition:
- is_empty(defaultgripper)";
-"action:
- change_tool(left_hand, defaultgripper, inwardgripper)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- change_tool(left_hand, defaultgripper, inwardgripper)", shape=ellipse, style=filled];
-"sequence:
- change_tool(left_hand, defaultgripper, inwardgripper)" -> "action:
- change_tool(left_hand, defaultgripper, inwardgripper)";
+ root" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ root", shape=octagon, style=filled];
 "selector:
  pick_up(left_hand, inwardgripper, shaft2)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
  pick_up(left_hand, inwardgripper, shaft2)", shape=octagon, style=filled];
-"sequence:
- screw_shaft2_into_gearbase_hole2" -> "selector:
+"selector:
+ root" -> "selector:
  pick_up(left_hand, inwardgripper, shaft2)";
 "target:
  hold(inwardgripper, shaft2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
@@ -93,12 +45,15 @@ edge [fontname="times-roman"];
 "selector:
  screw(left_hand, inwardgripper, shaft2, gearbase_hole2)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
  screw(left_hand, inwardgripper, shaft2, gearbase_hole2)", shape=octagon, style=filled];
-"sequence:
- screw_shaft2_into_gearbase_hole2" -> "selector:
- screw(left_hand, inwardgripper, shaft2, gearbase_hole2)";
-"\"target:\n is_screwed_to(shaft2, gearbase_hole2)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="\"target:\n is_screwed_to(shaft2, gearbase_hole2)\"*", shape=ellipse, style=filled];
 "selector:
- screw(left_hand, inwardgripper, shaft2, gearbase_hole2)" -> "\"target:\n is_screwed_to(shaft2, gearbase_hole2)\"*";
+ root" -> "selector:
+ screw(left_hand, inwardgripper, shaft2, gearbase_hole2)";
+"target:
+ is_screwed_to(shaft2, gearbase_hole2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ is_screwed_to(shaft2, gearbase_hole2)", shape=ellipse, style=filled];
+"selector:
+ screw(left_hand, inwardgripper, shaft2, gearbase_hole2)" -> "target:
+ is_screwed_to(shaft2, gearbase_hole2)";
 "sequence:
  screw(left_hand, inwardgripper, shaft2, gearbase_hole2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
  screw(left_hand, inwardgripper, shaft2, gearbase_hole2)", shape=box, style=filled];

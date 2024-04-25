@@ -66,9 +66,9 @@ class RobotProprioceptor:
             object_names = [object_name]
         try:
             for object_name in object_names:
-                rp_logger.debug(
-                    f"scene content {object_name}.x before: {scene.object_map[object_name].O_T_TCP[0][3]}"
-                )
+                # rp_logger.debug(
+                #     f"scene content {object_name}.x before: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                # )
                 mios_object = self.mongodb_interface.query_mios_object(object_name)
 
                 if scene.object_map.get(object_name) is None:
@@ -77,9 +77,9 @@ class RobotProprioceptor:
                     )
 
                 scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
-                rp_logger.debug(
-                    f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
-                )
+                # rp_logger.debug(
+                #     f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                # )
 
         except Exception as e:
             rp_logger.error(f"Error occurred in the update_scene_object_from_mios: {e}")

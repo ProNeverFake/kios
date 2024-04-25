@@ -209,20 +209,27 @@ def behavior_tree_execute_step(state: PlanExecuteState):
 
     global behavior_tree_stewardship
 
-    behavior_tree_stewardship.set_world_state(latest_world_state)
-
-    behavior_tree_stewardship.generate_behavior_tree_from_skeleton(
-        behavior_tree_skeleton
+    tree_result = behavior_tree_stewardship.execute_behavior_tree_skeleton(
+        world_state=latest_world_state,
+        bt_skeleton=behavior_tree_skeleton,
+        scene_json_object=scene_json_object,
+        is_simulation=False,
     )
 
-    behavior_tree_stewardship.setup_behavior_tree()
+    # behavior_tree_stewardship.set_world_state(latest_world_state)
 
-    behavior_tree_stewardship.tick_tree()
+    # behavior_tree_stewardship.generate_behavior_tree_from_skeleton(
+    #     behavior_tree_skeleton
+    # )
 
-    tree_result = behavior_tree_stewardship.tree_result
+    # behavior_tree_stewardship.setup_behavior_tree()
 
-    # ! BB DIRTY FIX
-    behavior_tree_stewardship.refresh_scene_objects(scene_json_object)
+    # behavior_tree_stewardship.tick_tree()
+
+    # tree_result = behavior_tree_stewardship.tree_result
+
+    # # ! BB DIRTY FIX
+    # behavior_tree_stewardship.refresh_scene_objects(scene_json_object)
 
     pprint(tree_result.to_json())
     pause = input("DEBUG: please check the tree result. Press enter to continue.")

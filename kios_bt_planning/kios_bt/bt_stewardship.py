@@ -181,7 +181,9 @@ class BehaviorTreeStewardship:
         period_msec: int = 2000,
         timeout_sec: int = 200,
     ):
-        """tick the tree at a specific frequency. the tree will be ticked until it returns success or failure, or timeout is triggered.
+        """tick the tree at a specific frequency.
+        The tree will be ticked until it returns success or failure, or timeout is triggered.
+        ### * The result will be stored in self.tree_result.
 
         Args:
             period_msec (int, optional): period for tree ticking. Defaults to 1 ms.
@@ -475,7 +477,6 @@ class BehaviorTreeStewardship:
         # ! maybe it is better to imp a new class for the simulation
         """
         simulate the tree run with action nodes returning only success.
-
         this should be the following step of the full tree generation.
         """
         # * record world check point
@@ -493,13 +494,15 @@ class BehaviorTreeStewardship:
         tree_result = self.tick_loop_until_success(sim_bt, loop_max=20)
 
         # * restore world check point
-        # ! dirty but works well.
         self.world_interface.restore_check_point()
 
         return tree_result
 
-    # ! please generate two trees instead.
     def replace_action_node_with_sim(self, stw, root):
+        """
+        just its name, replace the action node with sim node.
+        a better idea might be generating a new tree with sim nodes.
+        """
         for child in root.children:
             # replace the action node with sim node
             if isinstance(child, ActionNode):
@@ -541,6 +544,7 @@ class BehaviorTreeStewardship:
 
         return tree_result
 
+    @bb_deprecated("fake_run, not sure its usage")
     def sk_fake_run(self, world_state: dict, skeleton_json: dict):
         """
         fake run for testing
@@ -590,8 +594,8 @@ class BehaviorTreeStewardship:
     def sk_baseline(
         self, world_state: dict, skeleton_json: dict, ut_dict: dict
     ) -> dict:
-        """baseline expanding, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
-
+        """baseline expanding algo, return a solution bt skeleton to start from this world state to achieve the skeleton json condition node.
+        # * a rush implementation with the desired action nominated.
         Args:
             world_state (dict): ws to start with
             skeleton_json (dict): the condition sk node to achieve. should be a condition node in sk form with summary and a legal name.
@@ -699,7 +703,7 @@ class BehaviorTreeStewardship:
 
     def update_world_state_with_pddl_problem(self, pddl_problem: str):
         """
-        bb problem parser
+        call the pddl problem parser to read some world state from the pddl problem.
         """
 
         world_state = parse_problem(pddl_problem)
@@ -710,9 +714,49 @@ class BehaviorTreeStewardship:
 
     def refresh_scene_objects(self, task_scene: dict):
         """
-        update the scene objects in the world interface
-        # ! this is the dirty fix of the multiprocessing misuse.
+        ## ! this is the dirty fix of the multiprocessing misuse.
+        update the scene objects in the world interface.
         first read the positions from mios when creating the scene again, then update the scene objects in the robot interface.
         """
         new_scene = SceneFactory().create_scene_from_json(task_scene)
         self.robot_interface.refresh_scene_objects(new_scene)
+
+    ##########################################################
+    # * langgraph execution methods. all in one.
+    def execute_behavior_tree_skeleton(
+        self,
+        world_state: dict,
+        bt_skeleton: dict,
+        scene_json_object: dict,
+        is_simulation: bool = False,
+    ) -> TreeResult:
+        """execute the behavior tree skeleton from a given world state
+
+        Args:
+            world_state (dict): the ws to start with
+            skeleton_json (dict): the sk to execute
+            scene_json_object (dict): the scene to update
+        Returns:
+            TreeResult: a synthesized result of tree execution. Will cover all the possible results/exceptions
+            in the entire process.
+        """
+
+        try:
+            self.set_world_state(world_state)
+            self.generate_behavior_tree_from_skeleton(bt_skeleton)
+            if is_simulation:
+                self.setup_simulation()
+            self.setup_behavior_tree()
+            self.tick_tree()
+            self.refresh_scene_objects(scene_json_object)
+            return self.tree_result
+
+        except Exception as e:
+            result = TreeResult(
+                result="error",
+                summary=f"Error: {str(e)}",
+                final_node=None,
+                world_state=self.world_interface.get_world_to_json(),
+            )
+            # construct the error tree result
+            return result

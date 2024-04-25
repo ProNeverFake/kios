@@ -18,6 +18,7 @@ from kios_robot.data_types import (
 
 from kios_bt.data_types import Action
 from kios_utils.bblab_utils import setup_logger
+from kios_utils.exceptions import FormatException, ParsingException
 
 """
 BB knows this is not a good design to create generate method for each task/call. 
@@ -1004,7 +1005,10 @@ class MiosTaskFactory:
 
         # get the container from the scene
         kios_object = self.task_scene.get_object(container)
-        if kios_object is not None:
+
+        if kios_object is None:
+            raise ParsingException(f'object "{container}" is not found in the scene!')
+        else:
             O_T_TCP = kios_object.O_T_TCP
             payload = {
                 "skill": {

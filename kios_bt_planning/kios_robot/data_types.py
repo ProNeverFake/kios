@@ -402,7 +402,10 @@ class TaskScene:
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
-    def get_object(self, object_name: str) -> Optional[KiosObject]:
+    def get_object(self, object_name: str) -> Optional[KiosObject] | None:
+        """
+        get object from the scene dictionary, return None if not found
+        """
         return self.object_map.get(object_name, None)
 
     def get_tool(self, tool_name: str = None) -> Toolbox:

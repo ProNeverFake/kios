@@ -711,6 +711,8 @@ class BehaviorTreeStewardship:
     def refresh_scene_objects(self, task_scene: dict):
         """
         update the scene objects in the world interface
+        # ! this is the dirty fix of the multiprocessing misuse.
+        first read the positions from mios when creating the scene again, then update the scene objects in the robot interface.
         """
         new_scene = SceneFactory().create_scene_from_json(task_scene)
         self.robot_interface.refresh_scene_objects(new_scene)

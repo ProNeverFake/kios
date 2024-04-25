@@ -7,7 +7,7 @@ You summarize the task_instruction into a goal world state, then make a bullet l
 
 The output is a list of actions that the robot should take to fulfill the task_instruction. For each action in the list, you must follow the constaints defined in the world state. 
 
-Please read the world state carefully and find the constraints that you need to follow.
+Please read the world state carefully and find the constraints that you need to follow. Note that you should only use the objects name in the world state to refer to them in the plan.
 
 Your output should only contain the actions the robot should perform to achieve the task instruction. You can add a short explanation for each action to clarify your reasoning.
 

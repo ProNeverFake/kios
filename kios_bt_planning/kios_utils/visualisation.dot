@@ -25,12 +25,6 @@ edge [fontname="times-roman"];
  pick_up(left_hand, inwardgripper, shaft2)" -> "sequence:
  pick_up(left_hand, inwardgripper, shaft2)";
 "precondition:
- hold(left_hand, inwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
- hold(left_hand, inwardgripper)", shape=ellipse, style=filled];
-"sequence:
- pick_up(left_hand, inwardgripper, shaft2)" -> "precondition:
- hold(left_hand, inwardgripper)";
-"precondition:
  is_empty(inwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
  is_empty(inwardgripper)", shape=ellipse, style=filled];
 "sequence:

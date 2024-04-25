@@ -21,6 +21,7 @@ from kios_agent.kios_graph import (
     planner,
     seq_planner_chain,
     human_instruction_chain,
+    human_instruction_chain_v2,
 )
 from kios_agent.kios_routers import KiosRouterFactory, load_router_from_json
 
@@ -165,9 +166,17 @@ def behavior_tree_generate_step(state: PlanExecuteState):
 
     global user_feedback
 
-    bt_skeleton = human_instruction_chain.invoke(
+    # bt_skeleton = human_instruction_chain.invoke(
+    #     {
+    #         "world_state": state["world_state"][-1],
+    #         "user_feedback": user_feedback,
+    #         "last_behavior_tree": state["last_behavior_tree"],
+    #         "action_sequence": state["action_sequence"],
+    #     }
+    # )
+    bt_skeleton = human_instruction_chain_v2.invoke(
         {
-            "world_state": state["world_state"][-1],
+            # "world_state": state["world_state"][-1],
             "user_feedback": user_feedback,
             "last_behavior_tree": state["last_behavior_tree"],
             "action_sequence": state["action_sequence"],
@@ -193,7 +202,7 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     """
     print(f"-----behavior_tree_execute_step-----")
     # * simulation shortcut. Uncomment the following line to use simulation instead of execution
-    # return behavior_tree_simulation_step(state)
+    return behavior_tree_simulation_step(state)
     this_step = state["plan"][0]
     behavior_tree_skeleton = state["last_behavior_tree"]
     latest_world_state = state["world_state"][-1]

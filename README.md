@@ -21,7 +21,7 @@ The no-ros version, which aims at simplizing the system structure, is now active
 For this part see `kios_bt_planning`.
 
 - About robot interface:
-For people who don't have access to mios, you may deploy your own methods to generate `robot command` in `mios_task_factory.py` and your own methods to execute the commands in `robot_command.py`. You can also define your own command class, search for `MiosCall` and `KiosCall` in the project.
+For people who don't have access to mios or want to use their own robot interface, you may deploy your own methods to generate `robot command` in `mios_task_factory.py` and your own methods to execute the commands in `robot_command.py`. You can also define your own command class, search for `MiosCall` and `KiosCall` in the project.
 
 ## Intro
 

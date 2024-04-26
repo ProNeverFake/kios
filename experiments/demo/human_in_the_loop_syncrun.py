@@ -213,7 +213,7 @@ def behavior_tree_execute_step(state: PlanExecuteState):
         world_state=latest_world_state,
         bt_skeleton=behavior_tree_skeleton,
         scene_json_object=scene_json_object,
-        is_simulation=True,
+        is_simulation=False,
     )
 
     # behavior_tree_stewardship.set_world_state(latest_world_state)

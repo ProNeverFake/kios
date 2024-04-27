@@ -75,6 +75,18 @@
                               "source": "mios"
                     },
                     {
+                              "object_name": "gearbase_shaft1",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "gearbase_shaft2",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "gearbase_shaft3",
+                              "source": "mios"
+                    },
+                    {
                               "object_name": "lampbulb",
                               "source": "mios"
                     },
@@ -106,7 +118,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.8,
+                              "tool_mass": 0.5,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -120,7 +132,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.8,
+                              "tool_mass": 0.5,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -134,7 +146,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.8,
+                              "tool_mass": 0.6,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },
@@ -148,7 +160,7 @@
                               ],
                               "EE_finger_width_max": 0.04,
                               "EE_finger_width_min": 0.01,
-                              "tool_mass": 0.8,
+                              "tool_mass": 0.6,
                               "load_width": 0.04,
                               "unload_width": 0.08
                     },

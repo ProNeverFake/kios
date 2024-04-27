@@ -559,6 +559,269 @@ def test_drive_out_mp(container: str = "normalcontainer"):
     robot_command.execute_task_list_sync()
 
 
+def shaft1():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    #########################################
+    parsed_action = {
+        "action_name": "pick",
+        "args": [None, "defaultgripper", "parallelgripper"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_change_tool_skill(parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "parallelgripper", "shaft1"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "insert",
+        "args": [None, "parallelgripper", "shaft1", "gearbase_hole1"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def shaft2():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    #########################################
+    parsed_action = {
+        "action_name": "change_tool",
+        "args": [None, "defaultgripper", "inwardgripper"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_change_tool_skill(parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "inwardgripper", "shaft2"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "screw",
+        "args": [None, "inwardgripper", "shaft2", "gearbase_hole2"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_screw_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def shaft3():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    #########################################
+    parsed_action = {
+        "action_name": "pick",
+        "args": [None, "defaultgripper", "parallelgripper"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_change_tool_skill(parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "parallelgripper", "shaft3"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "insert",
+        "args": [None, "parallelgripper", "shaft3", "gearbase_hole3"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def gear1():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "defaultgripper", "gear1"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "insert",
+        "args": [None, "parallelgripper", "gear1", "gearbase_shaft1"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def gear2():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+
+    parsed_action = {
+        "action_name": "pick",
+        "args": [None, "defaultgripper", "clampgripper"],
+    }
+
+    robot_command.add_tasks(
+        ri.mios_task_factory.generate_change_tool_skill(parsed_action)
+    )
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "clampgripper", "gear2"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "insert",
+        "args": [None, "clampgripper", "gear2", "gearbase_shaft2"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def gear3():
+    robot_command = RobotCommand(
+        robot_address="127.0.0.1",
+        robot_port=12000,
+        shared_data=None,
+        task_scene=scene,
+        robot_interface=ri,
+    )
+    #########################################
+    parsed_action = {
+        "action_name": "pick_up",
+        "args": [None, "defaultgripper", "gear3"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+    #########################################
+    parsed_action = {
+        "action_name": "insert",
+        "args": [None, "defaultgripper", "gear3", "gearbase_shaft3"],
+    }
+
+    robot_command.add_tasks(ri.mios_task_factory.generate_insert_skill(parsed_action))
+
+    robot_command.execute_task_list_sync()
+
+    robot_command.clear_tasks()
+
+
+def demo():
+    shaft1()
+    change_gripper("parallelgripper", "defaultgripper")
+    shaft2()
+    change_gripper("inwardgripper", "defaultgripper")
+    shaft3()
+    change_gripper("parallelgripper", "defaultgripper")
+    gear2()
+    change_gripper("clampgripper", "defaultgripper")
+    gear1()
+    gear3()
+
+
 if __name__ == "__main__":
     pass
     # apriltag_rs()

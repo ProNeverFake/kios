@@ -4,6 +4,7 @@ import numpy as np
 import json
 
 from kios_utils.math_utils import *
+from kios_utils.exceptions import SceneException
 from tabulate import tabulate
 
 
@@ -402,11 +403,14 @@ class TaskScene:
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
-    def get_object(self, object_name: str) -> Optional[KiosObject] | None:
+    def get_object(self, object_name: str) -> Optional[KiosObject]:
         """
         get object from the scene dictionary, return None if not found
         """
-        return self.object_map.get(object_name, None)
+        obj = self.object_map.get(object_name, None)
+        if obj is None:
+            raise SceneException(f"Object {object_name} is not in the scene!")
+        return obj
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:

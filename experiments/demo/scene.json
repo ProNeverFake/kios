@@ -15,6 +15,10 @@
                               "source": "mios"
                     },
                     {
+                              "object_name": "free_space",
+                              "source": "mios"
+                    },
+                    {
                               "object_name": "inwardgripper",
                               "source": "mios"
                     },

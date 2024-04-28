@@ -18,6 +18,16 @@ class RuntimeException(Exception):
         super().__init__(message)
 
 
+class SceneException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class CallException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class CommunicationException(Exception):
     def __init__(self, message):
         super().__init__(message)

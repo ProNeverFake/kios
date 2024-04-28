@@ -1,0 +1,28 @@
+{
+"summary": "Selector to screw lampbulb into lampbase using clampgripper in the left hand",
+"name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)",
+"children": [
+{
+"summary": "The target is to make the lampbulb screwed into lampbase",
+"name": "target: is_screwed_to(lampbulb, lampbase)"
+},
+{
+"summary": "Sequence to screw lampbulb into lampbase using clampgripper in the left hand",
+"name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding clampgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, clampgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that clampgripper is holding lampbulb",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(clampgripper, lampbulb)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Take the action to screw lampbulb into lampbase using clampgripper in the left hand",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"
+}
+]
+}
+]
+}

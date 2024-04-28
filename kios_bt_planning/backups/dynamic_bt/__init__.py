@@ -1,1 +1,0 @@
-print("\033[91mThis package is from the dynamic behavior tree project. It uses the old py_trees package and lacks some implementation in behavior tree expanding algorithm. It is not in use now.\033[0m")

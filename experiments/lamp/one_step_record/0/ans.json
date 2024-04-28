@@ -1,0 +1,48 @@
+{
+          "summary": "selector to screw the lampbulb into the lampbase with the left hand",
+          "name": "selector: screw(left_hand, defaultgripper, lampbulb, lampbase)",
+          "children": [
+                    {
+                              "summary": "the target is to screw the lampbulb into the lampbase",
+                              "name": "target: is_screwed_to(lampbulb, lampbase)"
+                    },
+                    {
+                              "summary": "sequence to screw the lampbulb into the lampbase with the left hand",
+                              "name": "sequence: screw(left_hand, defaultgripper, lampbulb, lampbase)",
+                              "children": [
+                                        {
+                                                  "summary": "selector to pick up the lampbulb with the left hand",
+                                                  "name": "selector: pick_up(left_hand, defaultgripper, lampbulb)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "the target is to pick up the lampbulb",
+                                                                      "name": "target: hold(left_hand, defaultgripper, lampbulb)"
+                                                            },
+                                                            {
+                                                                      "summary": "sequence to pick up the lampbulb with the left hand",
+                                                                      "name": "sequence: pick_up(left_hand, defaultgripper, lampbulb)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "a precondition is the left hand is holding the defaultgripper",
+                                                                                          "name": "precondition: hold(left_hand, defaultgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "a precondition is the defaultgripper is empty",
+                                                                                          "name": "precondition: is_empty(defaultgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "the action to pick up the lampbulb with the left hand",
+                                                                                          "name": "action: pick_up(left_hand, defaultgripper, lampbulb)"
+                                                                                }
+                                                                      ]
+                                                            }
+                                                  ]
+                                        },
+                                        {
+                                                  "summary": "the action to screw the lampbulb into the lampbase with the left hand",
+                                                  "name": "action: screw(left_hand, defaultgripper, lampbulb, lampbase)"
+                                        }
+                              ]
+                    }
+          ]
+}

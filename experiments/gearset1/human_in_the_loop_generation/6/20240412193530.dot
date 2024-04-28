@@ -1,0 +1,63 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ insert_gear3_into_shaft3" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert_gear3_into_shaft3", shape=octagon, style=filled];
+"target:
+ is_inserted_to(gear3, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(gear3, shaft3)", shape=ellipse, style=filled];
+"selector:
+ insert_gear3_into_shaft3" -> "target:
+ is_inserted_to(gear3, shaft3)";
+"sequence:
+ pick_up_gear3" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ pick_up_gear3", shape=box, style=filled];
+"selector:
+ insert_gear3_into_shaft3" -> "sequence:
+ pick_up_gear3";
+"precondition:
+ hold(left_hand, outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, outwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_gear3" -> "precondition:
+ hold(left_hand, outwardgripper)";
+"precondition:
+ is_empty(outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ is_empty(outwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_gear3" -> "precondition:
+ is_empty(outwardgripper)";
+"action:
+ pick_up(left_hand, outwardgripper, gear3)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ pick_up(left_hand, outwardgripper, gear3)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_gear3" -> "action:
+ pick_up(left_hand, outwardgripper, gear3)";
+"sequence:
+ insert_gear3" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert_gear3", shape=box, style=filled];
+"selector:
+ insert_gear3_into_shaft3" -> "sequence:
+ insert_gear3";
+"precondition:
+ hold(outwardgripper, gear3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(outwardgripper, gear3)", shape=ellipse, style=filled];
+"sequence:
+ insert_gear3" -> "precondition:
+ hold(outwardgripper, gear3)";
+"precondition:
+ can_insert_to(gear3, shaft3)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ can_insert_to(gear3, shaft3)", shape=ellipse, style=filled];
+"sequence:
+ insert_gear3" -> "precondition:
+ can_insert_to(gear3, shaft3)";
+"action:
+ insert(left_hand, outwardgripper, gear3, shaft3)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ insert(left_hand, outwardgripper, gear3, shaft3)", shape=ellipse, style=filled];
+"sequence:
+ insert_gear3" -> "action:
+ insert(left_hand, outwardgripper, gear3, shaft3)";
+}

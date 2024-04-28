@@ -2,7 +2,9 @@ Start working. Resume from the input below.
 ---------------
 last_behavior_tree: {last_behavior_tree}
 
-user_instruction: {user_instruction}
+user_feedback: {user_feedback}
+
+world_state: {world_state}
 
 action_sequence: {action_sequence}
 ---------------

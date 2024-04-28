@@ -1,0 +1,28 @@
+{
+"summary": "Selector to pick up chairnut1 using the inwardgripper on the left hand",
+"name": "selector: pick_up(left_hand, inwardgripper, chairnut1)",
+"children": [
+{
+"summary": "The target is to make the left hand hold chairnut1",
+"name": "target: is_placed_to(chairnut1, left_hand)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding the inwardgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, inwardgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the inwardgripper is empty",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_empty(inwardgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that chairnut1 is placed into the location where the left hand can reach",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_placed_to(chairnut1, reachable_location)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Action to pick up chairnut1 using the inwardgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: pick_up(left_hand, inwardgripper, chairnut1)"
+}
+]
+}
+]
+}

@@ -1,7 +1,0 @@
---extra-index-url https://agx-access:UymNbuiLHJ13CKGnmsoD@git.algoryx.se/api/v4/projects/270/packages/pypi/simple
---extra-index-url https://click-access:F2q7LauW_d-HJ7bH37sV@git.algoryx.se/api/v4/projects/262/packages/pypi/simple
-
-
-agxBrick==0.5.15
-agxClick==0.1.32
-numpy

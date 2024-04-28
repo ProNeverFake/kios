@@ -1,3 +1,0 @@
-from colorama import Fore
-
-print(Fore.RED + "THIS MODULE IS CURRENTLY DISCARDED! SEE KIOS_DOMAIN INSTEAD!")

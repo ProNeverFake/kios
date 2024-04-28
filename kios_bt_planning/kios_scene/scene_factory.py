@@ -1,6 +1,8 @@
 from typing import Dict, List, Any
 import json
 import numpy as np
+import os
+
 
 from kios_robot.data_types import (
     MiosObject,
@@ -10,8 +12,7 @@ from kios_robot.data_types import (
     KiosObject,
 )
 from kios_scene.mongodb_interface import MongoDBInterface
-import json
-import os
+from kios_utils.bblab_utils import bb_deprecated
 
 
 class SceneFactory:
@@ -41,7 +42,7 @@ class SceneFactory:
             elif reference_object_json["source"] == "segmentation":
                 raise NotImplementedError
             else:
-                raise Exception("Undefined source!")
+                raise Exception(f'Unknown source: {reference_object_json["source"]}')
 
         # # create the relative objects
         # for object_name, reference_relation in scene_json["relative_objects"].items():
@@ -64,13 +65,16 @@ class SceneFactory:
                     if "EE_finger_width_min" in tool_json.keys()
                     else 0.01
                 ),
-                # ! BBCHANGE
+                tool_mass=tool_json[
+                    "tool_mass"
+                ],  # ! for changing the gravity compensation
             )
             # print(tool)
             self.task_scene.tool_map[tool.name] = tool
 
         return self.task_scene
 
+    @bb_deprecated(reason="just a test function.")
     def create_test_scene(self) -> TaskScene:
         file_dir = os.path.dirname(os.path.abspath(__file__))
 

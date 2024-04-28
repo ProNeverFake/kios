@@ -1,0 +1,28 @@
+Sure, I'd be happy to help! Based on the input you provided, here is the unit subtree for the action "pick_up(left_hand, outwardgripper, lampshade)" using the domain knowledge you provided:
+
+{
+"summary": "Selector to pick up the lampshade with the left hand using the outwardgripper",
+"name": "selector: pick_up(left_hand, outwardgripper, lampshade)",
+"children": [
+{
+"summary": "The target is to hold the lampshade with the left hand using the outwardgripper",
+"name": "target: hold(left_hand, lampshade, outwardgripper)"},
+{
+"summary": "Sequence to pick up the lampshade with the left hand using the outwardgripper",
+"name": "sequence: pick_up(left_hand, outwardgripper, lampshade)",
+"children": [
+{
+"summary": "A precondition is that the left hand is holding the outwardgripper",
+"name": "precondition: hold(left_hand, outwardgripper)"},
+{
+"summary": "A precondition is that the outwardgripper is empty",
+"name": "precondition: is_empty(outwardgripper)"},
+{
+"summary": "Take the action to pick up the lampshade with the left hand using the outwardgripper",
+"name": "action: pick_up(left_hand, outwardgripper, lampshade)"}
+]
+}
+]
+}
+
+I hope this helps! Let me know if you have any questions or need further assistance.

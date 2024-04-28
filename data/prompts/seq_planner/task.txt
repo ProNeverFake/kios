@@ -1,12 +1,16 @@
 The input are:
-start_world_state: the world state when the behavior tree started.
-task_instruction: an instruction of a robotic assembly task. 
+start_world_state: the world state to start with.
+task_instruction: an instruction of a robotic assembly task, representing some target state that the plan should end with. 
 user_feedback: feedback messages from the user.
 
 You summarize the task_instruction into a goal world state, then make a bullet list task plan to fulfill the task_instruction with the help of the user_feedback.
 
-The output is a list of actions that the robot should take to fulfill the task_instruction.
+The output is a list of actions that the robot should take to fulfill the task_instruction. For each action in the list, you must follow the constaints defined in the world state. 
 
-Use the definitions in the domain knowledge to construct actions. If user_feedback is provided, you should use it to adjust the plan. When there is any conflict between your knowledge and user_feedback, the user_feedback should be prioritized.
+Please read the world state carefully and find the constraints that you need to follow. Note that you should only use the objects name in the world state to refer to them in the plan.
+
+Your output should only contain the actions the robot should perform to achieve the task instruction. You can add a short explanation for each action to clarify your reasoning.
+
+If user_feedback is provided, you should use it to adjust the plan. When there is any conflict between your knowledge and user_feedback, the user_feedback should be prioritized.
 
 Do not add any superfluous steps. Make sure that each step has all the information needed. Do not skip steps.

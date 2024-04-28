@@ -1,0 +1,84 @@
+Following are some examples of behavior trees that follows the regulated format.
+example 1. 
+{
+    "summary": "selector to load parallel_box1",
+    "name": "selector: load_tool(left_hand, parallel_box1)",
+    "children": [
+        {
+            "summary": "condition node to check if left_hand holds parallel_box1",
+            "name": "target: hold(left_hand, parallel_box1)"
+        },
+        {
+            "summary": "sequence to load parallel_box1",
+            "name": "sequence: load_tool(left_hand, parallel_box1)",
+            "children": [
+                {
+                    "summary": "condition node to check if parallel_box1 is equippable",
+                    "name": "precondition: is_equippable(parallel_box1)"
+                },
+                {
+                    "summary": "selector to make left_hand unload outward_claw",
+                    "name": "selector: unload_tool(left_hand, outward_claw)",
+                    "children": [
+                        {
+                            "summary": "condition node to check if left_hand is free,
+                            "name": "target: is_free(left_hand)"
+                        },
+                        {
+                            "summary": "sequence to make left_hand unload outward_claw",
+                            "name": "sequence: unload_tool(left_hand, outward_claw)",
+                            "children": [
+                                {
+                                    "summary": "condition node to check if outward_claw is free",
+                                    "name": "precondition: is_free(outward_claw)"
+                                },
+                                {
+                                    "summary": "condition node to check if left hand holds outward_claw",
+                                    "name": "precondition: hold(left_hand, outward_claw)"
+                                },
+                                {
+                                    "summary": "action node to make left hand unload outward_claw",
+                                    "name": "action: unload_tool(left_hand, outward_claw)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "action node to equip parallel_box1 to left hand",
+                    "name": "action: load_tool(left_hand, parallel_box1)",
+                },
+            ],
+        },
+    ],
+}
+
+example 2:
+{
+    "summary": "selector to use left_hand with inward_claw to screw nut1 into bolt1",
+    "name": "selector: screw(left_hand, inward_claw, nut1, bolt1)",
+    "children": [
+        {
+            "summary": "condition node to check if nut1 is screwed into bolt1",
+            "name": "target: is_screwed_to(nut1, bolt1)"
+        },
+        {
+            "summary": "sequence to use left_hand with inward_claw to screw nut1 into bolt1",
+            "name": "sequence: screw(left_hand, inward_claw, nut1, bolt1)",
+            "children": [
+                {
+                    "summary": "condition node to check if inward_claw holds nut1",
+                    "name": "precondition: hold(inward_claw, nut1)"
+                },
+                {
+                    "summary": "condition node to check if nut1 can be screwed into bolt1",
+                    "name": "precondition: can_screw_to(nut1, bolt1)"
+                },                
+                {
+                    "summary": "action node to use left_hand with inward_claw to screw nut1 into bolt1",
+                    "name": "action: screw(left_hand, inward_claw, nut1, bolt1)"
+                },
+            ],
+        },
+    ],
+}

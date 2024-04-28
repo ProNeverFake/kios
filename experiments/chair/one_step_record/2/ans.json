@@ -1,0 +1,52 @@
+{
+          "summary": "selector to screw the chairleg1 into the chairseatthread1 with the left_hand holding the defaultgripper",
+          "name": "selector: screw(left_hand, defaultgripper, chairleg1, chairseatthread1)",
+          "children": [
+                    {
+                              "summary": "check the target that the chairleg1 is screwed into the chairseatthread1",
+                              "name": "target: is_screwed_to(chairleg1, chairseatthread1)"
+                    },
+                    {
+                              "summary": "sequence to screw the chairleg1 into the chairseatthread1 with the left_hand holding the defaultgripper",
+                              "name": "sequence: screw(left_hand, defaultgripper, chairleg1, chairseatthread1)",
+                              "children": [
+                                        {
+                                                  "summary": "check the precondition that the left_hand is holding the defaultgripper",
+                                                  "name": "precondition: hold(left_hand, defaultgripper)"
+                                        },
+                                        {
+                                                  "summary": "selector to pick_up the defaultgripper with the left_hand",
+                                                  "name": "selector: pick_up(left_hand, defaultgripper)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "check the target that the defaultgripper is empty",
+                                                                      "name": "target: is_empty(defaultgripper)"
+                                                            },
+                                                            {
+                                                                      "summary": "sequence to pick_up the defaultgripper with the left_hand",
+                                                                      "name": "sequence: pick_up(left_hand, defaultgripper)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "check the precondition that the left_hand is empty",
+                                                                                          "name": "precondition: is_empty(left_hand)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "the action to pick_up the defaultgripper with the left_hand",
+                                                                                          "name": "action: pick_up(left_hand, defaultgripper)"
+                                                                                }
+                                                                      ]
+                                                            }
+                                                  ]
+                                        },
+                                        {
+                                                  "summary": "the action to hold the defaultgripper with the left_hand",
+                                                  "name": "action: hold(left_hand, defaultgripper)"
+                                        }
+                              ]
+                    },
+                    {
+                              "summary": "the action to screw the chairleg1 into the chairseatthread1 with the left_hand holding the defaultgripper",
+                              "name": "action: screw(left_hand, defaultgripper, chairleg1, chairseatthread1)"
+                    }
+          ]
+}

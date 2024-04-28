@@ -1,0 +1,32 @@
+Sure, I'd be happy to help! Based on the input you provided, here is the unit subtree for the action "pick_up(left_hand, inwardgripper, chairnut1)" in JSON format:
+
+{
+"summary": "Selector to pick up chairnut1 with the left hand using inwardgripper",
+"name": "selector: pick_up(left_hand, inwardgripper, chairnut1)",
+"children": [
+{
+"summary": "The target is to hold chairnut1 with the left hand using inwardgripper",
+"name": "target: hold(left_hand, inwardgripper, chairnut1)"
+},
+{
+"summary": "Sequence to pick up chairnut1 with the left hand using inwardgripper",
+"name": "sequence: pick_up(left_hand, inwardgripper, chairnut1)",
+"children": [
+{
+"summary": "A precondition is that the left hand is empty",
+"name": "precondition: is_empty(left_hand)"
+},
+{
+"summary": "A precondition is that the inwardgripper is holding chairnut1",
+"name": "precondition: hold(inwardgripper, chairnut1)"
+},
+{
+"summary": "Take the action to pick up chairnut1 with the left hand using inwardgripper",
+"name": "action: pick_up(left_hand, inwardgripper, chairnut1)"
+}
+]
+}
+]
+}
+
+I hope this helps! Let me know if you have any questions or need further assistance.

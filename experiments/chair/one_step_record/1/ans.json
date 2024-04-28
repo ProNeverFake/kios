@@ -1,0 +1,52 @@
+{
+          "summary": "selector to screw the chairnut1 into the chairseatbolt1 with the left_hand holding the clampgripper",
+          "name": "selector: screw(left_hand, clampgripper, chairnut1, chairseatbolt1)",
+          "children": [
+                    {
+                              "summary": "check the target that the chairnut1 is screwed into the chairseatbolt1",
+                              "name": "target: is_screwed_to(chairnut1, chairseatbolt1)"
+                    },
+                    {
+                              "summary": "sequence to screw the chairnut1 into the chairseatbolt1 with the left_hand holding the clampgripper",
+                              "name": "sequence: screw(left_hand, clampgripper, chairnut1, chairseatbolt1)",
+                              "children": [
+                                        {
+                                                  "summary": "check the precondition that the left_hand is holding the clampgripper",
+                                                  "name": "precondition: hold(left_hand, clampgripper)"
+                                        },
+                                        {
+                                                  "summary": "selector to pick_up the clampgripper with the left_hand",
+                                                  "name": "selector: pick_up(left_hand, clampgripper)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "check the target that the clampgripper is held by the left_hand",
+                                                                      "name": "target: hold(left_hand, clampgripper)"
+                                                            },
+                                                            {
+                                                                      "summary": "sequence to pick_up the clampgripper with the left_hand",
+                                                                      "name": "sequence: pick_up(left_hand, clampgripper)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "check the precondition that the clampgripper is empty",
+                                                                                          "name": "precondition: is_empty(clampgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "the action to pick_up the clampgripper with the left_hand",
+                                                                                          "name": "action: pick_up(left_hand, clampgripper)"
+                                                                                }
+                                                                      ]
+                                                            }
+                                                  ]
+                                        },
+                                        {
+                                                  "summary": "the action to pick_up the clampgripper with the left_hand",
+                                                  "name": "action: pick_up(left_hand, clampgripper)"
+                                        }
+                              ]
+                    },
+                    {
+                              "summary": "the action to screw the chairnut1 into the chairseatbolt1 with the left_hand holding the clampgripper",
+                              "name": "action: screw(left_hand, clampgripper, chairnut1, chairseatbolt1)"
+                    }
+          ]
+}

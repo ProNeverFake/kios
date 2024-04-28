@@ -1,0 +1,156 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ insert_shaft1_into_gearbase_hole1" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert_shaft1_into_gearbase_hole1", shape=octagon, style=filled];
+"target:
+ is_inserted_to(shaft1, gearbase_hole1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_inserted_to(shaft1, gearbase_hole1)", shape=ellipse, style=filled];
+"selector:
+ insert_shaft1_into_gearbase_hole1" -> "target:
+ is_inserted_to(shaft1, gearbase_hole1)";
+"sequence:
+ insert_shaft1_into_gearbase_hole1" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert_shaft1_into_gearbase_hole1", shape=box, style=filled];
+"selector:
+ insert_shaft1_into_gearbase_hole1" -> "sequence:
+ insert_shaft1_into_gearbase_hole1";
+"selector:
+ put_down_gear2_with_outwardgripper" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ put_down_gear2_with_outwardgripper", shape=octagon, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1" -> "selector:
+ put_down_gear2_with_outwardgripper";
+"target:
+ is_empty(outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ is_empty(outwardgripper)", shape=ellipse, style=filled];
+"selector:
+ put_down_gear2_with_outwardgripper" -> "target:
+ is_empty(outwardgripper)";
+"sequence:
+ put_down_gear2_with_outwardgripper" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ put_down_gear2_with_outwardgripper", shape=box, style=filled];
+"selector:
+ put_down_gear2_with_outwardgripper" -> "sequence:
+ put_down_gear2_with_outwardgripper";
+"precondition:
+ hold(left_hand, outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, outwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ put_down_gear2_with_outwardgripper" -> "precondition:
+ hold(left_hand, outwardgripper)";
+"precondition:
+ hold(outwardgripper, gear2)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(outwardgripper, gear2)", shape=ellipse, style=filled];
+"sequence:
+ put_down_gear2_with_outwardgripper" -> "precondition:
+ hold(outwardgripper, gear2)";
+"action:
+ put_down(left_hand, outwardgripper, gear2)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ put_down(left_hand, outwardgripper, gear2)", shape=ellipse, style=filled];
+"sequence:
+ put_down_gear2_with_outwardgripper" -> "action:
+ put_down(left_hand, outwardgripper, gear2)";
+"selector:
+ change_tool(left_hand, outwardgripper, clampgripper)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ change_tool(left_hand, outwardgripper, clampgripper)", shape=octagon, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1" -> "selector:
+ change_tool(left_hand, outwardgripper, clampgripper)";
+"target:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"selector:
+ change_tool(left_hand, outwardgripper, clampgripper)" -> "target:
+ hold(left_hand, clampgripper)";
+"sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)", shape=box, style=filled];
+"selector:
+ change_tool(left_hand, outwardgripper, clampgripper)" -> "sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)";
+"\"precondition:\n hold(left_hand, outwardgripper)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="\"precondition:\n hold(left_hand, outwardgripper)\"*", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)" -> "\"precondition:\n hold(left_hand, outwardgripper)\"*";
+"precondition:
+ is_empty(outwardgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ is_empty(outwardgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)" -> "precondition:
+ is_empty(outwardgripper)";
+"action:
+ change_tool(left_hand, outwardgripper, clampgripper)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ change_tool(left_hand, outwardgripper, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ change_tool(left_hand, outwardgripper, clampgripper)" -> "action:
+ change_tool(left_hand, outwardgripper, clampgripper)";
+"selector:
+ pick_up_shaft1_with_clampgripper" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ pick_up_shaft1_with_clampgripper", shape=octagon, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1" -> "selector:
+ pick_up_shaft1_with_clampgripper";
+"target:
+ hold(clampgripper, shaft1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="target:
+ hold(clampgripper, shaft1)", shape=ellipse, style=filled];
+"selector:
+ pick_up_shaft1_with_clampgripper" -> "target:
+ hold(clampgripper, shaft1)";
+"sequence:
+ pick_up_shaft1_with_clampgripper" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ pick_up_shaft1_with_clampgripper", shape=box, style=filled];
+"selector:
+ pick_up_shaft1_with_clampgripper" -> "sequence:
+ pick_up_shaft1_with_clampgripper";
+"precondition:
+ hold(left_hand, clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(left_hand, clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_shaft1_with_clampgripper" -> "precondition:
+ hold(left_hand, clampgripper)";
+"precondition:
+ is_empty(clampgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ is_empty(clampgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_shaft1_with_clampgripper" -> "precondition:
+ is_empty(clampgripper)";
+"action:
+ pick_up(left_hand, clampgripper, shaft1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ pick_up(left_hand, clampgripper, shaft1)", shape=ellipse, style=filled];
+"sequence:
+ pick_up_shaft1_with_clampgripper" -> "action:
+ pick_up(left_hand, clampgripper, shaft1)";
+"selector:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper", shape=octagon, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1" -> "selector:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper";
+"\"target:\n is_inserted_to(shaft1, gearbase_hole1)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="\"target:\n is_inserted_to(shaft1, gearbase_hole1)\"*", shape=ellipse, style=filled];
+"selector:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" -> "\"target:\n is_inserted_to(shaft1, gearbase_hole1)\"*";
+"sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper", shape=box, style=filled];
+"selector:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" -> "sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper";
+"\"precondition:\n hold(left_hand, clampgripper)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="\"precondition:\n hold(left_hand, clampgripper)\"*", shape=ellipse, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" -> "\"precondition:\n hold(left_hand, clampgripper)\"*";
+"precondition:
+ hold(clampgripper, shaft1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="precondition:
+ hold(clampgripper, shaft1)", shape=ellipse, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" -> "precondition:
+ hold(clampgripper, shaft1)";
+"action:
+ insert(left_hand, clampgripper, shaft1, gearbase_hole1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="action:
+ insert(left_hand, clampgripper, shaft1, gearbase_hole1)", shape=ellipse, style=filled];
+"sequence:
+ insert_shaft1_into_gearbase_hole1_with_clampgripper" -> "action:
+ insert(left_hand, clampgripper, shaft1, gearbase_hole1)";
+}

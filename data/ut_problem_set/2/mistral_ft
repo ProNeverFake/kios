@@ -1,0 +1,28 @@
+{
+"summary": "Selector to change the tool in the left hand from clampgripper to inwardgripper",
+"name": "selector: change_tool(left_hand, clampgripper, inwardgripper)",
+"children": [
+{
+"summary": "The target is to make the left hand hold the inwardgripper",
+"name": "target: hold(left_hand, inwardgripper)"
+},
+{
+"summary": "Sequence to change the tool in the left hand from clampgripper to inwardgripper",
+"name": "sequence: change_tool(left_hand, clampgripper, inwardgripper)",
+"children": [
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the left hand is holding the clampgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: hold(left_hand, clampgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "A precondition is that the clampgripper is empty",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "precondition: is_empty(clampgripper)"
+},
+{
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "summary": "Take the action to change the tool in the left hand from clampgripper to inwardgripper",
+▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ "name": "action: change_tool(left_hand, clampgripper, inwardgripper)"
+}
+]
+}
+]
+}

@@ -1,0 +1,160 @@
+{
+          "problem": {
+                    "target": "target: is_placed_to(lampshade, lampbulb)",
+                    "initial_world_state": {
+                              "objects": [
+                                        {
+                                                  "name": "clampgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "parallelgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "inwardgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "outwardgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "defaultgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "lampbase",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "lampshade",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "lampbulb",
+                                                  "properties": []
+                                        },
+                                        { "name": "cube", "properties": [] },
+                                        {
+                                                  "name": "designring",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "left_hand",
+                                                  "properties": []
+                                        }
+                              ],
+                              "constraints": [
+                                        {
+                                                  "source": "clampgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "lampbulb"
+                                        },
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "lampshade"
+                                        },
+                                        {
+                                                  "source": "lampbulb",
+                                                  "name": "can_screw_to",
+                                                  "target": "lampbase"
+                                        },
+                                        {
+                                                  "source": "lampshade",
+                                                  "name": "can_place_to",
+                                                  "target": "lampbulb"
+                                        }
+                              ],
+                              "relations": [
+                                        {
+                                                  "source": "left_hand",
+                                                  "name": "hold",
+                                                  "target": "inwardgripper"
+                                        },
+                                        {
+                                                  "source": "lampbulb",
+                                                  "name": "is_screwed_to",
+                                                  "target": "lampbase"
+                                        }
+                              ]
+                    },
+                    "result": {
+                              "summary": "selector to place the lampshade into the lampbulb with the outwardgripper in the left_hand",
+                              "name": "selector: place(left_hand, outwardgripper, lampshade, lampbulb)",
+                              "children": [
+                                        {
+                                                  "summary": "the target is to make the lampshade be placed into the lampbulb",
+                                                  "name": "target: is_placed_to(lampshade, lampbulb)"
+                                        },
+                                        {
+                                                  "summary": "sequence to place the lampshade into the lampbulb with the outwardgripper in the left_hand",
+                                                  "name": "sequence: place(left_hand, outwardgripper, lampshade, lampbulb)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "selector to change tool in left_hand from inwardgripper to outwardgripper",
+                                                                      "name": "selector: change_tool(left_hand, inwardgripper, outwardgripper)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "the target is to make left_hand hold outwardgripper",
+                                                                                          "name": "target: hold(left_hand, outwardgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "sequence to change tool in left_hand from inwardgripper to outwardgripper",
+                                                                                          "name": "sequence: change_tool(left_hand, inwardgripper, outwardgripper)",
+                                                                                          "children": [
+                                                                                                    {
+                                                                                                              "summary": "a precondition is left_hand is holding inwardgripper",
+                                                                                                              "name": "precondition: hold(left_hand, inwardgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "a precondition is inwardgripper is empty",
+                                                                                                              "name": "precondition: is_empty(inwardgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "the action to change tool in left_hand from inwardgripper to outwardgripper",
+                                                                                                              "name": "action: change_tool(left_hand, inwardgripper, outwardgripper)"
+                                                                                                    }
+                                                                                          ]
+                                                                                }
+                                                                      ]
+                                                            },
+                                                            {
+                                                                      "summary": "selector to pick up the lampshade with the outwardgripper in the left_hand",
+                                                                      "name": "selector: pick_up(left_hand, outwardgripper, lampshade)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "the target is to make the outwardgripper hold the lampshade",
+                                                                                          "name": "target: hold(outwardgripper, lampshade)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "sequence to pick up the lampshade with the outwardgripper in the left_hand",
+                                                                                          "name": "sequence: pick_up(left_hand, outwardgripper, lampshade)",
+                                                                                          "children": [
+                                                                                                    {
+                                                                                                              "summary": "a precondition is the outwardgripper is empty",
+                                                                                                              "name": "precondition: is_empty(outwardgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "a precondition is the left_hand is holding outwardgripper",
+                                                                                                              "name": "precondition: hold(left_hand, outwardgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "the action to pick up the lampshade with the outwardgripper in the left_hand",
+                                                                                                              "name": "action: pick_up(left_hand, outwardgripper, lampshade)"
+                                                                                                    }
+                                                                                          ]
+                                                                                }
+                                                                      ]
+                                                            },
+                                                            {
+                                                                      "summary": "the action to place the lampshade into the lampbulb with the outwardgripper in the left_hand",
+                                                                      "name": "action: place(left_hand, outwardgripper, lampshade, lampbulb)"
+                                                            }
+                                                  ]
+                                        }
+                              ]
+                    }
+          }
+}

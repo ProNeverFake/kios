@@ -1,0 +1,6 @@
+Information about world states is in json dictionary format. Example:
+It contains three lists: 
+    - "objects": the objects in the world and their properties. The properties can be changed by robot actions.
+    - "constraints": the constraint relations that are enforced and should not be changed. You should make sure that the constraints are not violated by the robot actions. 
+    - "relations": the relations in the world. They can be changed by robot actions.
+The properties, constraints and relations should always align with the [PREDICATE_LIST] in domain knowledge.

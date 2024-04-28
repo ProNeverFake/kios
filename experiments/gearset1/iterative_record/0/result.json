@@ -1,1 +1,478 @@
-{"problem": {"target": "target: is_inserted_to(shaft1, gearbase_hole1)", "initial_world_state": {"objects": [{"name": "clampgripper", "properties": ["is_empty"]}, {"name": "parallelgripper", "properties": ["is_empty"]}, {"name": "inwardgripper", "properties": ["is_empty"]}, {"name": "outwardgripper", "properties": []}, {"name": "defaultgripper", "properties": ["is_empty"]}, {"name": "gear1", "properties": []}, {"name": "gear2", "properties": []}, {"name": "gear3", "properties": []}, {"name": "shaft1", "properties": []}, {"name": "shaft2", "properties": []}, {"name": "shaft3", "properties": []}, {"name": "gearbase", "properties": []}, {"name": "gearbase_hole1", "properties": []}, {"name": "gearbase_hole3", "properties": []}, {"name": "left_hand", "properties": []}], "constraints": [{"source": "gear3", "name": "can_insert_to", "target": "shaft3"}, {"source": "shaft1", "name": "can_insert_to", "target": "gearbase_hole1"}, {"source": "parallelgripper", "name": "can_manipulate", "target": "gear1"}, {"source": "gear2", "name": "can_insert_to", "target": "shaft2"}, {"source": "outwardgripper", "name": "can_manipulate", "target": "gear3"}, {"source": "gear1", "name": "can_insert_to", "target": "shaft1"}, {"source": "defaultgripper", "name": "can_manipulate", "target": "shaft3"}, {"source": "outwardgripper", "name": "can_manipulate", "target": "gear2"}, {"source": "shaft3", "name": "can_insert_to", "target": "gearbase_hole3"}, {"source": "clampgripper", "name": "can_manipulate", "target": "shaft1"}], "relations": [{"source": "outwardgripper", "name": "hold", "target": "gear2"}, {"source": "left_hand", "name": "hold", "target": "outwardgripper"}]}, "result": {"summary": "selector to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand", "name": "selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", "children": [{"summary": "the target is to make the shaft1 be inserted into the gearbase_hole1", "name": "target: is_inserted_to(shaft1, gearbase_hole1)"}, {"summary": "sequence to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand", "name": "sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", "children": [{"summary": "selector to change tool in left_hand from outwardgripper to clampgripper", "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)", "children": [{"summary": "the target is to make left_hand hold clampgripper", "name": "target: hold(left_hand, clampgripper)"}, {"summary": "sequence to change tool in left_hand from outwardgripper to clampgripper", "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)", "children": [{"summary": "a precondition is left_hand is holding outwardgripper", "name": "precondition: hold(left_hand, outwardgripper)"}, {"summary": "selector to put down the gear2 held by the outwardgripper in the left_hand", "name": "selector: put_down(left_hand, outwardgripper, gear2)", "children": [{"summary": "the target is to make the outwardgripper empty", "name": "target: is_empty(outwardgripper)"}, {"summary": "sequence to put down the gear2 held by the outwardgripper in the left_hand", "name": "sequence: put_down(left_hand, outwardgripper, gear2)", "children": [{"summary": "a precondition is the left_hand is holding outwardgripper", "name": "precondition: hold(left_hand, outwardgripper)"}, {"summary": "a precondition is the outwardgripper is holding gear2", "name": "precondition: hold(outwardgripper, gear2)"}, {"summary": "the action to put down the gear2 held by the outwardgripper in the left_hand", "name": "action: put_down(left_hand, outwardgripper, gear2)"}]}]}, {"summary": "the action to change tool in left_hand from outwardgripper to clampgripper", "name": "action: change_tool(left_hand, outwardgripper, clampgripper)"}]}]}, {"summary": "selector to pick up the shaft1 with the clampgripper in the left_hand", "name": "selector: pick_up(left_hand, clampgripper, shaft1)", "children": [{"summary": "the target is to make the clampgripper hold the shaft1", "name": "target: hold(clampgripper, shaft1)"}, {"summary": "sequence to pick up the shaft1 with the clampgripper in the left_hand", "name": "sequence: pick_up(left_hand, clampgripper, shaft1)", "children": [{"summary": "a precondition is the clampgripper is empty", "name": "precondition: is_empty(clampgripper)"}, {"summary": "a precondition is the left_hand is holding clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "the action to pick up the shaft1 with the clampgripper in the left_hand", "name": "action: pick_up(left_hand, clampgripper, shaft1)"}]}]}, {"summary": "the action to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand", "name": "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)"}]}]}}, "behavior_tree": {"summary": "selector to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand", "name": "selector: insert(shaft1, gearbase_hole1, clampgripper, left_hand)", "children": [{"summary": "check the target that shaft1 is inserted to gearbase_hole1", "name": "target: is_inserted_to(shaft1, gearbase_hole1)", "type_name": "target", "identifier": 17}, {"summary": "sequence to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand", "name": "sequence: insert(shaft1, gearbase_hole1, clampgripper, left_hand)", "children": [{"summary": "selector to put down the gear2 with the outwardgripper in the left hand", "name": "selector: put_down(left_hand, outwardgripper, gear2)", "children": [{"summary": "check the target that the outwardgripper is empty", "name": "target: is_empty(outwardgripper)", "type_name": "target", "identifier": 20}, {"summary": "sequence to put down the gear2 with the outwardgripper in the left hand", "name": "sequence: put_down(left_hand, outwardgripper, gear2)", "children": [{"summary": "check the precondition that the left hand is holding the outwardgripper", "name": "precondition: hold(left_hand, outwardgripper)", "type_name": "precondition", "identifier": 22}, {"summary": "check the precondition that the outwardgripper is holding the gear2", "name": "precondition: hold(outwardgripper, gear2)", "type_name": "precondition", "identifier": 23}, {"summary": "the action to put down the gear2 with the outwardgripper in the left hand", "name": "action: put_down(left_hand, outwardgripper, gear2)", "type_name": "action", "identifier": 24}], "type_name": "sequence", "identifier": 21}], "type_name": "selector", "identifier": 19}, {"summary": "selector to change the tool in the left hand from outwardgripper to clampgripper", "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)", "children": [{"summary": "check the target that the left hand is holding the clampgripper", "name": "target: hold(left_hand, clampgripper)", "type_name": "target", "identifier": 26}, {"summary": "sequence to change the tool in the left hand from outwardgripper to clampgripper", "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)", "children": [{"summary": "check the precondition that the left hand is holding the outwardgripper", "name": "precondition: hold(left_hand, outwardgripper)", "type_name": "precondition", "identifier": 28}, {"summary": "check the precondition that the outwardgripper is empty", "name": "precondition: is_empty(outwardgripper)", "type_name": "precondition", "identifier": 29}, {"summary": "the action to change the tool in the left hand from outwardgripper to clampgripper", "name": "action: change_tool(left_hand, outwardgripper, clampgripper)", "type_name": "action", "identifier": 30}], "type_name": "sequence", "identifier": 27}], "type_name": "selector", "identifier": 25}, {"summary": "selector to pick_up the shaft1 with the clampgripper in the left hand", "name": "selector: pick_up(left_hand, clampgripper, shaft1)", "children": [{"summary": "check the target that the clampgripper is holding the shaft1", "name": "target: hold(clampgripper, shaft1)", "type_name": "target", "identifier": 32}, {"summary": "sequence to pick_up the shaft1 with the clampgripper in the left hand", "name": "sequence: pick_up(left_hand, clampgripper, shaft1)", "children": [{"summary": "check the precondition that the clampgripper is empty", "name": "precondition: is_empty(clampgripper)", "type_name": "precondition", "identifier": 34}, {"summary": "check the precondition that the left hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)", "type_name": "precondition", "identifier": 35}, {"summary": "the action to pick_up the shaft1 with the clampgripper in the left hand", "name": "action: pick_up(left_hand, clampgripper, shaft1)", "type_name": "action", "identifier": 36}], "type_name": "sequence", "identifier": 33}], "type_name": "selector", "identifier": 31}, {"summary": "the action to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand", "name": "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)", "type_name": "action", "identifier": 37}], "type_name": "sequence", "identifier": 18}], "type_name": "selector", "identifier": 16}, "tree_result": {"result": "success", "summary": "Behavior tree tick returns success", "final_node": null, "world_state": {"objects": [{"name": "clampgripper", "properties": ["is_empty"]}, {"name": "parallelgripper", "properties": ["is_empty"]}, {"name": "inwardgripper", "properties": ["is_empty"]}, {"name": "outwardgripper", "properties": ["is_empty"]}, {"name": "defaultgripper", "properties": ["is_empty"]}, {"name": "gear1", "properties": []}, {"name": "gear2", "properties": []}, {"name": "gear3", "properties": []}, {"name": "shaft1", "properties": []}, {"name": "shaft2", "properties": []}, {"name": "shaft3", "properties": []}, {"name": "gearbase", "properties": []}, {"name": "gearbase_hole1", "properties": []}, {"name": "gearbase_hole3", "properties": []}, {"name": "left_hand", "properties": []}], "constraints": [{"source": "gear1", "name": "can_insert_to", "target": "shaft1"}, {"source": "parallelgripper", "name": "can_manipulate", "target": "gear1"}, {"source": "gear2", "name": "can_insert_to", "target": "shaft2"}, {"source": "shaft1", "name": "can_insert_to", "target": "gearbase_hole1"}, {"source": "clampgripper", "name": "can_manipulate", "target": "shaft1"}, {"source": "outwardgripper", "name": "can_manipulate", "target": "gear3"}, {"source": "outwardgripper", "name": "can_manipulate", "target": "gear2"}, {"source": "defaultgripper", "name": "can_manipulate", "target": "shaft3"}, {"source": "gear3", "name": "can_insert_to", "target": "shaft3"}, {"source": "shaft3", "name": "can_insert_to", "target": "gearbase_hole3"}], "relations": [{"source": "left_hand", "name": "hold", "target": "clampgripper"}, {"source": "shaft1", "name": "is_inserted_to", "target": "gearbase_hole1"}]}}}
+{
+          "problem": {
+                    "target": "target: is_inserted_to(shaft1, gearbase_hole1)",
+                    "initial_world_state": {
+                              "objects": [
+                                        {
+                                                  "name": "clampgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "parallelgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "inwardgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "outwardgripper",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "defaultgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        { "name": "gear1", "properties": [] },
+                                        { "name": "gear2", "properties": [] },
+                                        { "name": "gear3", "properties": [] },
+                                        { "name": "shaft1", "properties": [] },
+                                        { "name": "shaft2", "properties": [] },
+                                        { "name": "shaft3", "properties": [] },
+                                        {
+                                                  "name": "gearbase",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "gearbase_hole1",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "gearbase_hole3",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "left_hand",
+                                                  "properties": []
+                                        }
+                              ],
+                              "constraints": [
+                                        {
+                                                  "source": "gear3",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft3"
+                                        },
+                                        {
+                                                  "source": "shaft1",
+                                                  "name": "can_insert_to",
+                                                  "target": "gearbase_hole1"
+                                        },
+                                        {
+                                                  "source": "parallelgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear1"
+                                        },
+                                        {
+                                                  "source": "gear2",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft2"
+                                        },
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear3"
+                                        },
+                                        {
+                                                  "source": "gear1",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft1"
+                                        },
+                                        {
+                                                  "source": "defaultgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "shaft3"
+                                        },
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear2"
+                                        },
+                                        {
+                                                  "source": "shaft3",
+                                                  "name": "can_insert_to",
+                                                  "target": "gearbase_hole3"
+                                        },
+                                        {
+                                                  "source": "clampgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "shaft1"
+                                        }
+                              ],
+                              "relations": [
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "hold",
+                                                  "target": "gear2"
+                                        },
+                                        {
+                                                  "source": "left_hand",
+                                                  "name": "hold",
+                                                  "target": "outwardgripper"
+                                        }
+                              ]
+                    },
+                    "result": {
+                              "summary": "selector to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand",
+                              "name": "selector: insert(left_hand, clampgripper, shaft1, gearbase_hole1)",
+                              "children": [
+                                        {
+                                                  "summary": "the target is to make the shaft1 be inserted into the gearbase_hole1",
+                                                  "name": "target: is_inserted_to(shaft1, gearbase_hole1)"
+                                        },
+                                        {
+                                                  "summary": "sequence to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand",
+                                                  "name": "sequence: insert(left_hand, clampgripper, shaft1, gearbase_hole1)",
+                                                  "children": [
+                                                            {
+                                                                      "summary": "selector to change tool in left_hand from outwardgripper to clampgripper",
+                                                                      "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "the target is to make left_hand hold clampgripper",
+                                                                                          "name": "target: hold(left_hand, clampgripper)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "sequence to change tool in left_hand from outwardgripper to clampgripper",
+                                                                                          "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)",
+                                                                                          "children": [
+                                                                                                    {
+                                                                                                              "summary": "a precondition is left_hand is holding outwardgripper",
+                                                                                                              "name": "precondition: hold(left_hand, outwardgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "selector to put down the gear2 held by the outwardgripper in the left_hand",
+                                                                                                              "name": "selector: put_down(left_hand, outwardgripper, gear2)",
+                                                                                                              "children": [
+                                                                                                                        {
+                                                                                                                                  "summary": "the target is to make the outwardgripper empty",
+                                                                                                                                  "name": "target: is_empty(outwardgripper)"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                                  "summary": "sequence to put down the gear2 held by the outwardgripper in the left_hand",
+                                                                                                                                  "name": "sequence: put_down(left_hand, outwardgripper, gear2)",
+                                                                                                                                  "children": [
+                                                                                                                                            {
+                                                                                                                                                      "summary": "a precondition is the left_hand is holding outwardgripper",
+                                                                                                                                                      "name": "precondition: hold(left_hand, outwardgripper)"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                      "summary": "a precondition is the outwardgripper is holding gear2",
+                                                                                                                                                      "name": "precondition: hold(outwardgripper, gear2)"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                      "summary": "the action to put down the gear2 held by the outwardgripper in the left_hand",
+                                                                                                                                                      "name": "action: put_down(left_hand, outwardgripper, gear2)"
+                                                                                                                                            }
+                                                                                                                                  ]
+                                                                                                                        }
+                                                                                                              ]
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "the action to change tool in left_hand from outwardgripper to clampgripper",
+                                                                                                              "name": "action: change_tool(left_hand, outwardgripper, clampgripper)"
+                                                                                                    }
+                                                                                          ]
+                                                                                }
+                                                                      ]
+                                                            },
+                                                            {
+                                                                      "summary": "selector to pick up the shaft1 with the clampgripper in the left_hand",
+                                                                      "name": "selector: pick_up(left_hand, clampgripper, shaft1)",
+                                                                      "children": [
+                                                                                {
+                                                                                          "summary": "the target is to make the clampgripper hold the shaft1",
+                                                                                          "name": "target: hold(clampgripper, shaft1)"
+                                                                                },
+                                                                                {
+                                                                                          "summary": "sequence to pick up the shaft1 with the clampgripper in the left_hand",
+                                                                                          "name": "sequence: pick_up(left_hand, clampgripper, shaft1)",
+                                                                                          "children": [
+                                                                                                    {
+                                                                                                              "summary": "a precondition is the clampgripper is empty",
+                                                                                                              "name": "precondition: is_empty(clampgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "a precondition is the left_hand is holding clampgripper",
+                                                                                                              "name": "precondition: hold(left_hand, clampgripper)"
+                                                                                                    },
+                                                                                                    {
+                                                                                                              "summary": "the action to pick up the shaft1 with the clampgripper in the left_hand",
+                                                                                                              "name": "action: pick_up(left_hand, clampgripper, shaft1)"
+                                                                                                    }
+                                                                                          ]
+                                                                                }
+                                                                      ]
+                                                            },
+                                                            {
+                                                                      "summary": "the action to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left_hand",
+                                                                      "name": "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)"
+                                                            }
+                                                  ]
+                                        }
+                              ]
+                    }
+          },
+          "behavior_tree": {
+                    "summary": "selector to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand",
+                    "name": "selector: insert(shaft1, gearbase_hole1, clampgripper, left_hand)",
+                    "children": [
+                              {
+                                        "summary": "check the target that shaft1 is inserted to gearbase_hole1",
+                                        "name": "target: is_inserted_to(shaft1, gearbase_hole1)",
+                                        "type_name": "target",
+                                        "identifier": 17
+                              },
+                              {
+                                        "summary": "sequence to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand",
+                                        "name": "sequence: insert(shaft1, gearbase_hole1, clampgripper, left_hand)",
+                                        "children": [
+                                                  {
+                                                            "summary": "selector to put down the gear2 with the outwardgripper in the left hand",
+                                                            "name": "selector: put_down(left_hand, outwardgripper, gear2)",
+                                                            "children": [
+                                                                      {
+                                                                                "summary": "check the target that the outwardgripper is empty",
+                                                                                "name": "target: is_empty(outwardgripper)",
+                                                                                "type_name": "target",
+                                                                                "identifier": 20
+                                                                      },
+                                                                      {
+                                                                                "summary": "sequence to put down the gear2 with the outwardgripper in the left hand",
+                                                                                "name": "sequence: put_down(left_hand, outwardgripper, gear2)",
+                                                                                "children": [
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the left hand is holding the outwardgripper",
+                                                                                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 22
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the outwardgripper is holding the gear2",
+                                                                                                    "name": "precondition: hold(outwardgripper, gear2)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 23
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "the action to put down the gear2 with the outwardgripper in the left hand",
+                                                                                                    "name": "action: put_down(left_hand, outwardgripper, gear2)",
+                                                                                                    "type_name": "action",
+                                                                                                    "identifier": 24
+                                                                                          }
+                                                                                ],
+                                                                                "type_name": "sequence",
+                                                                                "identifier": 21
+                                                                      }
+                                                            ],
+                                                            "type_name": "selector",
+                                                            "identifier": 19
+                                                  },
+                                                  {
+                                                            "summary": "selector to change the tool in the left hand from outwardgripper to clampgripper",
+                                                            "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)",
+                                                            "children": [
+                                                                      {
+                                                                                "summary": "check the target that the left hand is holding the clampgripper",
+                                                                                "name": "target: hold(left_hand, clampgripper)",
+                                                                                "type_name": "target",
+                                                                                "identifier": 26
+                                                                      },
+                                                                      {
+                                                                                "summary": "sequence to change the tool in the left hand from outwardgripper to clampgripper",
+                                                                                "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)",
+                                                                                "children": [
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the left hand is holding the outwardgripper",
+                                                                                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 28
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the outwardgripper is empty",
+                                                                                                    "name": "precondition: is_empty(outwardgripper)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 29
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "the action to change the tool in the left hand from outwardgripper to clampgripper",
+                                                                                                    "name": "action: change_tool(left_hand, outwardgripper, clampgripper)",
+                                                                                                    "type_name": "action",
+                                                                                                    "identifier": 30
+                                                                                          }
+                                                                                ],
+                                                                                "type_name": "sequence",
+                                                                                "identifier": 27
+                                                                      }
+                                                            ],
+                                                            "type_name": "selector",
+                                                            "identifier": 25
+                                                  },
+                                                  {
+                                                            "summary": "selector to pick_up the shaft1 with the clampgripper in the left hand",
+                                                            "name": "selector: pick_up(left_hand, clampgripper, shaft1)",
+                                                            "children": [
+                                                                      {
+                                                                                "summary": "check the target that the clampgripper is holding the shaft1",
+                                                                                "name": "target: hold(clampgripper, shaft1)",
+                                                                                "type_name": "target",
+                                                                                "identifier": 32
+                                                                      },
+                                                                      {
+                                                                                "summary": "sequence to pick_up the shaft1 with the clampgripper in the left hand",
+                                                                                "name": "sequence: pick_up(left_hand, clampgripper, shaft1)",
+                                                                                "children": [
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the clampgripper is empty",
+                                                                                                    "name": "precondition: is_empty(clampgripper)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 34
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "check the precondition that the left hand is holding the clampgripper",
+                                                                                                    "name": "precondition: hold(left_hand, clampgripper)",
+                                                                                                    "type_name": "precondition",
+                                                                                                    "identifier": 35
+                                                                                          },
+                                                                                          {
+                                                                                                    "summary": "the action to pick_up the shaft1 with the clampgripper in the left hand",
+                                                                                                    "name": "action: pick_up(left_hand, clampgripper, shaft1)",
+                                                                                                    "type_name": "action",
+                                                                                                    "identifier": 36
+                                                                                          }
+                                                                                ],
+                                                                                "type_name": "sequence",
+                                                                                "identifier": 33
+                                                                      }
+                                                            ],
+                                                            "type_name": "selector",
+                                                            "identifier": 31
+                                                  },
+                                                  {
+                                                            "summary": "the action to insert the shaft1 into the gearbase_hole1 with the clampgripper in the left hand",
+                                                            "name": "action: insert(left_hand, clampgripper, shaft1, gearbase_hole1)",
+                                                            "type_name": "action",
+                                                            "identifier": 37
+                                                  }
+                                        ],
+                                        "type_name": "sequence",
+                                        "identifier": 18
+                              }
+                    ],
+                    "type_name": "selector",
+                    "identifier": 16
+          },
+          "tree_result": {
+                    "result": "success",
+                    "summary": "Behavior tree tick returns success",
+                    "final_node": null,
+                    "world_state": {
+                              "objects": [
+                                        {
+                                                  "name": "clampgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "parallelgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "inwardgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "outwardgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        {
+                                                  "name": "defaultgripper",
+                                                  "properties": ["is_empty"]
+                                        },
+                                        { "name": "gear1", "properties": [] },
+                                        { "name": "gear2", "properties": [] },
+                                        { "name": "gear3", "properties": [] },
+                                        { "name": "shaft1", "properties": [] },
+                                        { "name": "shaft2", "properties": [] },
+                                        { "name": "shaft3", "properties": [] },
+                                        {
+                                                  "name": "gearbase",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "gearbase_hole1",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "gearbase_hole3",
+                                                  "properties": []
+                                        },
+                                        {
+                                                  "name": "left_hand",
+                                                  "properties": []
+                                        }
+                              ],
+                              "constraints": [
+                                        {
+                                                  "source": "gear1",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft1"
+                                        },
+                                        {
+                                                  "source": "parallelgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear1"
+                                        },
+                                        {
+                                                  "source": "gear2",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft2"
+                                        },
+                                        {
+                                                  "source": "shaft1",
+                                                  "name": "can_insert_to",
+                                                  "target": "gearbase_hole1"
+                                        },
+                                        {
+                                                  "source": "clampgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "shaft1"
+                                        },
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear3"
+                                        },
+                                        {
+                                                  "source": "outwardgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "gear2"
+                                        },
+                                        {
+                                                  "source": "defaultgripper",
+                                                  "name": "can_manipulate",
+                                                  "target": "shaft3"
+                                        },
+                                        {
+                                                  "source": "gear3",
+                                                  "name": "can_insert_to",
+                                                  "target": "shaft3"
+                                        },
+                                        {
+                                                  "source": "shaft3",
+                                                  "name": "can_insert_to",
+                                                  "target": "gearbase_hole3"
+                                        }
+                              ],
+                              "relations": [
+                                        {
+                                                  "source": "left_hand",
+                                                  "name": "hold",
+                                                  "target": "clampgripper"
+                                        },
+                                        {
+                                                  "source": "shaft1",
+                                                  "name": "is_inserted_to",
+                                                  "target": "gearbase_hole1"
+                                        }
+                              ]
+                    }
+          }
+}

@@ -1,0 +1,149 @@
+Following is an input/output example.
+Example 1:
+"""
+INPUT:
+action_sequence: 
+- change tool from tool1 to tool2
+- pick up the box1 with tool2 in the robot_hand
+last_behavior_tree: null
+user_feedback: null
+OUTPUT:
+{
+    "summary": "selector to pick up the box1 with tool2 in the robot_hand",
+    "name": "selector: pick_up(left_hand, tool2, box1)",
+    "children": [
+        {
+            "summary": "check the target that the tool2 is holding the box1",
+            "name": "target: hold(tool2, box1)"
+        },
+        {
+            "summary": "sequence to pick up the box1 with tool2 in the robot_hand",
+            "name": "sequence: pick_up(left_hand, tool2, box1)",
+            "children": [  
+                {
+                    "summary": "selector to change the tool in robot_hand from tool1 to tool2",
+                    "name": "selector: change_tool(left_hand, tool1, tool2)",
+                    "children": [
+                        {
+                            "summary": "check the target that the robot_hand is holding the tool2",
+                            "name": "target: hold(robot_hand, tool2)"
+                        },
+                        {
+                            "summary": "sequence to change the tool in robot_hand from tool1 to tool2",
+                            "name": "sequence: change_tool(left_hand, tool1, tool2)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the robot_hand is holding the tool1",
+                                    "name": "precondition: hold(robot_hand, tool1)"
+                                },
+                                {
+                                    "summary": "check the precondition that the tool1 is empty",
+                                    "name": "precondition: is_empty(tool1)"
+                                },
+                                {
+                                    "summary": "the action to change the tool in robot_hand from tool1 to tool2",
+                                    "name": "action: change_tool(left_hand, tool1, tool2)"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "summary": "check the precondition that the tool2 is empty",
+                    "name": "precondition: is_empty(tool2)"
+                }
+                {
+                    "summary": "the action to pick up the box1 with tool2 in the robot_hand",
+                    "name": "action: pick_up(left_hand, tool2, box1)"
+                }
+            ]
+        }
+    ]
+}
+"""
+
+Example 2:
+"""
+action_sequence: 
+- put down the box2 in tool1
+- change tool from tool1 to tool2
+last_behavior_tree:
+{
+    "summary": "selector to change the tool in robot_hand from tool1 to tool2",
+    "name": "selector: change_tool(left_hand, tool1, tool2)",
+    "children": [
+        {
+            "summary": "check the target that the robot_hand is holding the tool2",
+            "name": "target: hold(robot_hand, tool2)"
+        },
+        {
+            "summary": "sequence to change the tool in robot_hand from tool1 to tool2",
+            "name": "sequence: change_tool(left_hand, tool1, tool2)",
+            "children": [
+                {
+                    "summary": "check the precondition that the robot_hand is holding the tool1",
+                    "name": "precondition: hold(robot_hand, tool1)"
+                },
+                {
+                    "summary": "check the precondition that the tool1 is empty",
+                    "name": "precondition: is_empty(tool1)"
+                },
+                {
+                    "summary": "the action to change the tool in robot_hand from tool1 to tool2",
+                    "name": "action: change_tool(left_hand, tool1, tool2)"
+                }
+            ]
+        }
+    ]
+}
+user_feedback: the tool1 is holding something so it cannot be changed. You need to handle this case first.
+OUTPUT:
+{
+    "summary": "selector to change the tool in robot_hand from tool1 to tool2",
+    "name": "selector: change_tool(left_hand, tool1, tool2)",
+    "children": [
+        {
+            "summary": "check the target that the robot_hand is holding the tool2",
+            "name": "target: hold(robot_hand, tool2)"
+        },
+        {
+            "summary": "sequence to change the tool in robot_hand from tool1 to tool2",
+            "name": "sequence: change_tool(left_hand, tool1, tool2)",
+            "children": [
+                {
+                    "summary": "check the precondition that the robot_hand is holding the tool1",
+                    "name": "precondition: hold(robot_hand, tool1)"
+                },
+                {
+                    "summary": "selector to put down the box2 in tool1",
+                    "name": "selector: put_down(left_hand, tool1, box2)",
+                    "children": [
+                        {
+                            "summary": "check the target that the tool1 is empty",
+                            "name": "target: is_empty(tool1)"
+                        },
+                        {
+                            "summary": "sequence to put down the box2 in tool1",
+                            "name": "sequence: put_down(left_hand, tool1, box2)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the tool1 is holding the box2",
+                                    "name": "precondition: hold(tool1, box2)"
+                                },
+                                {
+                                    "summary": "the action to put down the box2 in tool1",
+                                    "name": "action: put_down(left_hand, tool1, box2)"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "summary": "the action to change the tool in robot_hand from tool1 to tool2",
+                    "name": "action: change_tool(left_hand, tool1, tool2)"
+                }
+            ]
+        }
+    ]
+}
+"""

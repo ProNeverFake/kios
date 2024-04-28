@@ -1,0 +1,17 @@
+You should only use formal assembly actions as the action in the steps.
+The available assembly actions are used to achieve the assembly constraints between two parts.
+The assembly actions are:
+- insert <part1> into <part2>
+- place <part1> onto <part2>
+- screw <part1> into <part2>
+
+You should also refer to the constraints in the world state, which provides the assembly constraints between the parts.
+
+Example:
+user_input: "you should assembly the red block with the blue hole."
+in world state's constraint: can_insert_into(red_block, blue_hole)
+plan: "insert the red block into the blue hole"
+
+Example:
+user_input: "intert the blub into the base, then put the cover onto it."
+plan: ["insert the blub into the base", "put the cover onto the blub"]

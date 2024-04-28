@@ -14,7 +14,7 @@ import re
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "recursive_generation_gpt3.5"
+os.environ["LANGCHAIN_PROJECT"] = "recursive_generation"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -31,8 +31,11 @@ from kios_agent.kios_graph import (
     seq_planner_chain,
     human_instruction_chain,
     rec_ut_generator_chain_gpt3,
+    rec_ut_generator_chain,
     rec_state_predictor_chain_gpt3,
+    rec_state_predictor_chain,
     rec_sequential_action_planner_chain_gpt3,
+    rec_sequential_action_planner_chain,
 )
 
 from kios_agent.kios_routers import KiosRouterFactory
@@ -72,10 +75,10 @@ problem_set = os.path.join(current_dir, "baseline_result.jsonl")
 with open(problem_set, "r") as f:
     problem_set = f.readlines()
 # NEW SHOULD BE 8
-problem_number = 7
+problem_number = 6
 
 result_dir = os.path.join(
-    current_dir, "recursive_generation_record_gpt3.5", str(problem_number)
+    current_dir, "recursive_generation_record", str(problem_number)
 )
 
 if not os.path.exists(result_dir):
@@ -87,7 +90,7 @@ metadata = {
     "method_name": "recursive_generation",
     "try_count": problem_number,
     "timestamp": timestamp,
-    "llm": "gpt-3.5-turbo-0125",
+    "llm": "gpt-4",
 }
 
 
@@ -671,7 +674,7 @@ def seq_planner_est_test():
 
 
 def ut_gen_test():
-    ut = rec_ut_generator_chain_gpt3.invoke(
+    ut = rec_ut_generator_chain.invoke(
         {
             # "action": "insert(left_hand, defaultgripper, gear1, shaft1)",
             # "action": "insert(left_hand, parallel_box1, shaft1, gearbase_hole1)",
@@ -694,7 +697,7 @@ def seq_planner_est_test():
 
 
 def seq_action_plan_test():
-    return rec_sequential_action_planner_chain_gpt3.invoke(
+    return rec_sequential_action_planner_chain.invoke(
         {
             "start_world_state": world_state_json,
             "target": "is_inserted_to(shaft1, gearbase_hole1)",
@@ -704,7 +707,7 @@ def seq_action_plan_test():
 
 
 def state_est_test():
-    return rec_state_predictor_chain_gpt3.invoke(
+    return rec_state_predictor_chain.invoke(
         {
             "start_world_state": world_state_json,
             "action_plan": [
@@ -721,7 +724,7 @@ def state_est_test():
 @traceable(name="rec_seq_plan", metadata=metadata)
 def make_plan(state: dict, goal: str) -> list[str]:
     print(f"----------start to make plan for the goal {goal}")
-    response = rec_sequential_action_planner_chain_gpt3.invoke(
+    response = rec_sequential_action_planner_chain.invoke(
         {
             "start_world_state": state,
             "target": goal,
@@ -736,7 +739,7 @@ def make_plan(state: dict, goal: str) -> list[str]:
 def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
     print("----------start to estimate the state after the action plan:")
     pprint(action_plan)
-    response = rec_state_predictor_chain_gpt3.invoke(
+    response = rec_state_predictor_chain.invoke(
         {
             "start_world_state": start_world_state,
             "action_plan": action_plan,
@@ -750,7 +753,7 @@ def estimate_state(start_world_state: dict, action_plan: list[str]) -> dict:
 def generate_unit_subtree(action: str) -> dict:
     print("----------start to generate the unit subtree for the action")
     pprint(action)
-    response = rec_ut_generator_chain_gpt3.invoke(
+    response = rec_ut_generator_chain.invoke(
         {
             "action": action,
         }

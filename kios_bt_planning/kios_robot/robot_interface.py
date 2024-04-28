@@ -51,7 +51,7 @@ class RobotInterface:
         self.task_scene = task_scene
         self.mios_task_factory.setup_scene(task_scene)
 
-    @bb_deprecated(reason="fix the bug!", can_run=True)
+    @bb_deprecated(reason="DIRTY FIX OF THE MULTIPROCESS MISUSE", can_run=True)
     def refresh_scene_objects(self, task_scene: TaskScene):
         self.task_scene.object_map = task_scene.object_map
 

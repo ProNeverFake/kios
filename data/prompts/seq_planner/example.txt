@@ -1,0 +1,33 @@
+Following is an input/output example.
+Example 1:
+"""
+INPUT:
+start_world_state: 
+{
+    "objects": {
+        {"name": "ball1", "properties": {}},
+        {"name": "ball2", "properties": {}},
+        {"name": "box1", "properties": {}},
+        {"name": "tool1", "properties": {"is_empty"}},
+        {"name": "tool2", "properties": {"is_empty}},
+        {"name": "tool3", "properties": {"is_empty}},
+        {"name": "robot_hand", "properties": {}}
+    },
+    "constraints": {
+        {"source": "tool2", "name": "can_manipulate", "target": "ball1"},
+        {"source": "tool3", "name": "can_manipulate", "target": "ball2"},
+        {"source": "tool1", "name": "can_manipulate", "target": "box1"}
+    },
+    "relations": {
+        {"source": "robot_hand", "name": "hold", "target": "tool1"},
+    }
+}
+task_instruction: put the ball1 into the box1
+user_feedback: null
+OUTPUT:
+"
+the action sequence is:
+- "change the tool from tool1 to tool2". According to the constraints, tool2 can manipulate ball1, and tool1 is also empty, which allows the tool changing.
+- "pick up the ball1 with tool2". Now with tool2 in robot_hand, the ball1 can be picked up.
+- "place the ball into box1".
+"

@@ -83,7 +83,9 @@
       {"source": "chairleg2", "name": "can_screw_to", "target": "chairseatthread2"}
     ],
     "relations": [
-      {"source": "left_hand", "name": "hold", "target": "defaultgripper"}
+      {"source": "left_hand", "name": "hold", "target": "outwardgripper"},
+      {"source": "chairback", "name": "is_inserted_to", "target": "chairseatconnector"},
+      {"source": "chairnut1", "name": "is_screwed_to", "target": "chairseatbolt1"}
     ]
 }
 

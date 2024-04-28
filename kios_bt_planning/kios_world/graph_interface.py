@@ -10,9 +10,13 @@ from typing import Set, Dict, List, Any
 from kios_world.neo4j_interface import Neo4jInterface
 from kios_world.data_types import WorldNode, Relationship
 
+from kios_utils.bblab_utils import setup_logger
+
 """
 this is the current state holder of the world
 """
+
+gi_logger = setup_logger(__name__, logging.DEBUG)
 
 
 class GraphInterface:
@@ -131,7 +135,7 @@ class GraphInterface:
             self.add_properties(node["name"], node["properties"])
 
         if json_data.get("constraints") is None:
-            print("\033[93mWarning: No constraint found in the JSON data.\033[0m")
+            gi_logger.warning("No constraint found in the JSON data.")
         else:
             # * add constraints (unchangeable relations)
             for constraint in json_data["constraints"]:
@@ -144,7 +148,7 @@ class GraphInterface:
 
         # * add relations
         if json_data.get("relations") is None:
-            print("\033[93mWarning: No relations found in the JSON data.\033[0m")
+            gi_logger.warning("No relation found in the JSON data.")
         else:
             for relation in json_data["relations"]:
                 self.add_relation(

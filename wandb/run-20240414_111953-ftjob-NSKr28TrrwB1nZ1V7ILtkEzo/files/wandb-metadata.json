@@ -1,0 +1,80 @@
+{
+    "os": "Linux-6.7.11-x64v3-xanmod1-x86_64-with-glibc2.31",
+    "python": "3.10.0",
+    "heartbeatAt": "2024-04-14T09:19:53.888797",
+    "startedAt": "2024-04-14T09:19:53.381639",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/blackbird/kios/data/finetuning/visualize.py",
+    "codePathLocal": "data/finetuning/visualize.py",
+    "codePath": "data/finetuning/visualize.py",
+    "git": {
+        "remote": "git@gitlab.lrz.de:bblab/ma/kios.git",
+        "commit": "9164b14464117cfc6f83979c6b9f6a65c914e830"
+    },
+    "email": "jicong.ao@tum.de",
+    "root": "/home/blackbird/kios",
+    "host": "bblab-laptop",
+    "username": "blackbird",
+    "executable": "/home/blackbird/miniconda3/envs/kios/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 1167.95725,
+        "min": 400.0,
+        "max": 4200.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1192.195,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2998.416,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1376.719,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1201.702,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1482.187,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1564.106,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 2738.657,
+            "min": 400.0,
+            "max": 4200.0
+        },
+        {
+            "current": 1839.298,
+            "min": 400.0,
+            "max": 4200.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 467.8895797729492,
+            "used": 187.73107147216797
+        }
+    },
+    "memory": {
+        "total": 15.429557800292969
+    }
+}

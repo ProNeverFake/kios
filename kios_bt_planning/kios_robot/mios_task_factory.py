@@ -16,7 +16,7 @@ from kios_robot.data_types import (
 )
 
 # * only for demo
-from kios_robot.demo_solution import assembly_dictionary
+from kios_robot.demo_solution import assembly_dictionary, putdown_dictionary
 
 from kios_bt.data_types import Action
 from kios_utils.bblab_utils import setup_logger
@@ -765,46 +765,14 @@ class MiosTaskFactory:
                 f'object name is not set in {parsed_action["name"]}!'
             )
 
-        task_list = []
         # move above
         move_above = self.generate_move_above_mp(object_name)
-        task_list.append(move_above)
         # move in
         reach = self.generate_reach_mp(object_name)
-        task_list.append(reach)
         # grasp
         grasp = self.generate_gripper_grasp_mp()
-        task_list.append(grasp)
         # retreat
         retreat = self.generate_move_above_mp(object_name)
-        task_list.append(retreat)
-        # update object in mios
-        update_object_in_mios = self.generate_teach_object_call(object_name)
-        task_list.append(update_object_in_mios)
-        # update object in kios
-        update_object_in_kios = self.generate_update_object_from_mios_call(object_name)
-        task_list.append(update_object_in_kios)
-
-        return task_list
-
-    def generate_put_down_skill(
-        self, parsed_action: dict[str, Any]
-    ) -> list[MiosCall | MiosSkill]:
-        object_name = parsed_action["args"][2]
-        place = "free_space"
-        if object_name is None:
-            raise ParsingException(
-                f'object name is not set in {parsed_action["name"]}!'
-            )
-
-        # move above
-        move_above = self.generate_move_above_mp(place)
-        # move in
-        reach = self.generate_reach_mp(place)
-        # release
-        release = self.generate_gripper_release_mp()
-        # retreat
-        retreat = self.generate_move_above_mp(place)
         # update object in mios
         update_object_in_mios = self.generate_teach_object_call(object_name)
         # update object in kios
@@ -813,10 +781,43 @@ class MiosTaskFactory:
         return [
             move_above,
             reach,
-            release,
+            grasp,
             retreat,
             update_object_in_mios,
             update_object_in_kios,
+        ]
+
+    def generate_put_down_skill(
+        self, parsed_action: dict[str, Any]
+    ) -> list[MiosCall | MiosSkill]:
+        object_name = parsed_action["args"][2]
+        if object_name is None:
+            raise ParsingException(
+                f'object name is not set in {parsed_action["name"]}!'
+            )
+
+        putdown_place = putdown_dictionary[object_name]
+
+        # move above
+        move_above = self.generate_move_above_mp(putdown_place)
+        # move in
+        reach = self.generate_reach_mp(putdown_place)
+        # release
+        release = self.generate_gripper_release_mp()
+        # update object in mios
+        update_object_in_mios = self.generate_teach_object_call(object_name)
+        # update object in kios
+        update_object_in_kios = self.generate_update_object_from_mios_call(object_name)
+        # retreat
+        retreat = self.generate_move_above_mp(putdown_place)
+
+        return [
+            move_above,
+            reach,
+            release,
+            update_object_in_mios,
+            update_object_in_kios,
+            retreat,
         ]
 
     def generate_place_skill(

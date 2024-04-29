@@ -5,7 +5,10 @@ import time
 import logging
 from kios_utils.bblab_utils import setup_logger
 
-mios_task_logger = setup_logger(__name__, logging.INFO)
+mios_task_logger = setup_logger(
+    __name__,
+    # logging.INFO,
+)
 
 
 class Skill:

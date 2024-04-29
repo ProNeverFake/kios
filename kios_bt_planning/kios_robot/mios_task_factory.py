@@ -29,7 +29,10 @@ which takes formatted node data as input.
 Anyway, the current implementation is straightforward and easy to understand.
 """
 
-mti_logger = setup_logger(__name__, logging.DEBUG)
+mti_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 class MiosTaskFactory:
@@ -1034,7 +1037,7 @@ class MiosTaskFactory:
         container = parsed_action["args"][3]
         if container is None:
             raise ParsingException(f'container is not set in {parsed_action["name"]}!')
-
+        test_container = self.task_scene.get_object(container)  # check its validity
         # * this only for demo video. cease this to make the action align with the true action context.
         container = assembly_dictionary.get(insertable, None)
         if container is None:

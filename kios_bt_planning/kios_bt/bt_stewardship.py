@@ -747,7 +747,7 @@ class BehaviorTreeStewardship:
             if is_simulation:
                 self.setup_simulation()
             self.setup_behavior_tree()
-            self.tick_tree()
+            self.tick_tree(period_msec=100)
             self.refresh_scene_objects(scene_json_object)
             return self.tree_result
 

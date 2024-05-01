@@ -974,6 +974,87 @@ ut = {
     ],
 }
 
+try_this = {
+    "summary": "selector to screw the chairleg1 to the chairseatthread1 with the defaultgripper in the left hand",
+    "name": "selector: screw(chairleg1, chairseatthread1, defaultgripper, left_hand)",
+    "children": [
+        {
+            "summary": "check the target that chairleg1 is screwed to chairseatthread1",
+            "name": "target: is_screwed_to(chairleg1, chairseatthread1)",
+        },
+        {
+            "summary": "sequence to screw the chairleg1 to the chairseatthread1 with the defaultgripper in the left hand",
+            "name": "sequence: screw(chairleg1, chairseatthread1, defaultgripper, left_hand)",
+            "children": [
+                {
+                    "summary": "check the precondition that the left hand is holding the defaultgripper",
+                    "name": "precondition: hold(left_hand, defaultgripper)",
+                },
+                {
+                    "summary": "selector to change the tool in the left hand from defaultgripper to clampgripper",
+                    "name": "selector: change_tool(left_hand, defaultgripper, clampgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left hand is holding the clampgripper",
+                            "name": "target: hold(left_hand, clampgripper)",
+                        },
+                        {
+                            "summary": "sequence to change the tool in the left hand from defaultgripper to clampgripper",
+                            "name": "sequence: change_tool(left_hand, defaultgripper, clampgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left hand is holding the defaultgripper",
+                                    "name": "precondition: hold(left_hand, defaultgripper)",
+                                },
+                                {
+                                    "summary": "check the precondition that the defaultgripper is empty",
+                                    "name": "precondition: is_empty(defaultgripper)",
+                                },
+                                {
+                                    "summary": "the action to change the tool in the left hand from defaultgripper to clampgripper",
+                                    "name": "action: change_tool(left_hand, defaultgripper, clampgripper)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "selector to pick_up the chairleg1 with the clampgripper in the left hand",
+                    "name": "selector: pick_up(left_hand, clampgripper, chairleg1)",
+                    "children": [
+                        {
+                            "summary": "check the target that the clampgripper is holding the chairleg1",
+                            "name": "target: hold(clampgripper, chairleg1)",
+                        },
+                        {
+                            "summary": "sequence to pick_up the chairleg1 with the clampgripper in the left hand",
+                            "name": "sequence: pick_up(left_hand, clampgripper, chairleg1)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the clampgripper is empty",
+                                    "name": "precondition: is_empty(clampgripper)",
+                                },
+                                {
+                                    "summary": "check the precondition that the left hand is holding the clampgripper",
+                                    "name": "precondition: hold(left_hand, clampgripper)",
+                                },
+                                {
+                                    "summary": "the action to pick_up the chairleg1 with the clampgripper in the left hand",
+                                    "name": "action: pick_up(left_hand, clampgripper, chairleg1)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "the action to screw the chairleg1 to the chairseatthread1 with the clampgripper in the left hand",
+                    "name": "action: screw(left_hand, clampgripper, chairleg1, chairseatthread1)",
+                },
+            ],
+        },
+    ],
+}
+
 
 def render_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
@@ -999,5 +1080,7 @@ def render_bt_fix_try(bt_json: json):
     )
 
 
+bt = {"summary": "selector to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the target that the lampbulb is screwed into the lampbase", "name": "target: is_screwed_to(lampbulb, lampbase)"}, {"summary": "sequence to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "selector to pick_up the lampbulb with the clampgripper in the left_hand", "name": "selector: pick_up(left_hand, clampgripper, lampbulb)"}, {"summary": "check the target that the clampgripper is holding the lampbulb", "name": "target: hold(clampgripper, lampbulb)"}, {"summary": "sequence to pick_up the lampbulb with the clampgripper in the left_hand", "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)", "children": [ {"summary": "check the precondition that the clampgripper is empty", "name": "precondition: is_empty(clampgripper)"}, {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "the action to pick_up the lampbulb with the clampgripper in the left_hand", "name": "action: pick_up(left_hand, clampgripper, lampbulb)"} ] } ]}, {"summary": "the action to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"} ] }
+
 # render_bt(result)
-render_bt_fix_try(result)
+render_bt_fix_try(bt)

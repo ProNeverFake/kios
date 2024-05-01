@@ -13,7 +13,6 @@ from langsmith import traceable
 from langsmith.wrappers import wrap_openai
 
 """
-the llm class for prompt testing.
 # ! deprecated
 """
 

@@ -4,6 +4,7 @@ import numpy as np
 import json
 
 from kios_utils.math_utils import *
+from kios_utils.exceptions import SceneException
 from tabulate import tabulate
 
 
@@ -325,6 +326,7 @@ class Toolbox:
     # * for future you should consider using these parameters to invoke the gripper-related skills
     EE_finger_width_max: float = field(default=0.08)
     EE_finger_width_min: float = field(default=0.0)
+    tool_mass: float = field(default=0.0)  # * for set load.
     load_width: float = field(
         default=0.042
     )  # the width the hand to reach in order to load this tool
@@ -343,6 +345,7 @@ class Toolbox:
             ["name", self.name],
             ["EE_finger_width_max", self.EE_finger_width_max],
             ["EE_finger_width_min", self.EE_finger_width_min],
+            ["tool_mass", self.tool_mass],
             ["load_width", self.load_width],
             ["unload_width", self.unload_width],
             ["grasp_force", self.grasp_force],
@@ -359,6 +362,7 @@ class Toolbox:
             name=json["name"],
             EE_finger_width_max=json["EE_finger_width_max"],
             EE_finger_width_min=json["EE_finger_width_min"],
+            tool_mass=json["tool_mass"],
             load_width=json["load_width"],
             unload_width=json["unload_width"],
             grasp_force=json["grasp_force"],
@@ -374,6 +378,7 @@ class Toolbox:
             "name": toolbox.name,
             "EE_finger_width_max": toolbox.EE_finger_width_max,
             "EE_finger_width_min": toolbox.EE_finger_width_min,
+            "tool_mass": toolbox.tool_mass,
             "load_width": toolbox.load_width,
             "unload_width": toolbox.unload_width,
             "grasp_force": toolbox.grasp_force,
@@ -399,7 +404,13 @@ class TaskScene:
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     def get_object(self, object_name: str) -> Optional[KiosObject]:
-        return self.object_map.get(object_name, None)
+        """
+        get object from the scene dictionary, return None if not found
+        """
+        obj = self.object_map.get(object_name, None)
+        if obj is None:
+            raise SceneException(f"Object {object_name} is not in the scene!")
+        return obj
 
     def get_tool(self, tool_name: str = None) -> Toolbox:
         if tool_name is None:

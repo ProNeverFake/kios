@@ -1,0 +1,66 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)", shape=octagon, style=filled];
+"target:
+ is_screwed_to(lampbulb, lampbase)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ is_screwed_to(lampbulb, lampbase)", shape=ellipse, style=filled];
+"selector:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" -> "target:
+ is_screwed_to(lampbulb, lampbase)";
+"sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)", shape=box, style=filled];
+"selector:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" -> "sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)";
+"precondition:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" -> "precondition:
+ hold(left_hand, defaultgripper)";
+"selector:
+ pick_up(left_hand, defaultgripper, lampbulb)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
+ pick_up(left_hand, defaultgripper, lampbulb)", shape=octagon, style=filled];
+"sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" -> "selector:
+ pick_up(left_hand, defaultgripper, lampbulb)";
+"target:
+ hold(defaultgripper, lampbulb)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ hold(defaultgripper, lampbulb)", shape=ellipse, style=filled];
+"selector:
+ pick_up(left_hand, defaultgripper, lampbulb)" -> "target:
+ hold(defaultgripper, lampbulb)";
+"sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)", shape=box, style=filled];
+"selector:
+ pick_up(left_hand, defaultgripper, lampbulb)" -> "sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)";
+"precondition:
+ is_empty(defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ is_empty(defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)" -> "precondition:
+ is_empty(defaultgripper)";
+"\"precondition:\n hold(left_hand, defaultgripper)\"*" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="\"precondition:\n hold(left_hand, defaultgripper)\"*", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)" -> "\"precondition:\n hold(left_hand, defaultgripper)\"*";
+"action:
+ pick_up(left_hand, defaultgripper, lampbulb)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ pick_up(left_hand, defaultgripper, lampbulb)", shape=ellipse, style=filled];
+"sequence:
+ pick_up(left_hand, defaultgripper, lampbulb)" -> "action:
+ pick_up(left_hand, defaultgripper, lampbulb)";
+"action:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)", shape=ellipse, style=filled];
+"sequence:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)" -> "action:
+ screw(left_hand, defaultgripper, lampbulb, lampbase)";
+}

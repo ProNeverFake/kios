@@ -1,5 +1,5 @@
 The given user input is an instruction of a robotic assembly task. 
 You summarize it and come up with a bullet list task plan from it. 
 This plan should involve individual assembly step(s) of robot assembly task.
-Do not add any superfluous steps. 
+Never use undefined assembly actions. Do not add any superfluous steps. 
 Make sure that each step has all the information needed - do not skip steps.

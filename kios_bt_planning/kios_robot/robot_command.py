@@ -1,29 +1,14 @@
 from kios_utils.task import *
+from kios_utils.bblab_utils import setup_logger
 from tabulate import tabulate
 from pprint import pprint
 
 import logging
-import colorlog
 
-
-# ! I know this block for colorlog is duplicated. you can find the same thing in bt_stw.py.
-handler = colorlog.StreamHandler()
-handler.setFormatter(
-    colorlog.ColoredFormatter(
-        "%(log_color)s%(levelname)s:%(name)s:%(message)s",
-        log_colors={
-            "DEBUG": "cyan",
-            "INFO": "green",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "red,bg_white",
-        },
-    )
+rc_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
 )
-
-rc_logger = logging.getLogger(name="robot_command")
-rc_logger.addHandler(handler)
-rc_logger.setLevel(logging.DEBUG)
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult
@@ -216,7 +201,6 @@ class RobotCommand:
         self.check_response(mios_response, task_item)
 
     def execute_kios_call(self, task_item: KiosCall):
-        # pprint(task_item)
         result_bool = task_item.method(*task_item.args)
         if result_bool is None:
             rc_logger.error("KiosCall failed. retrying...")

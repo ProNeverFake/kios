@@ -15,8 +15,12 @@ from kios_robot.data_types import (
 
 from kios_scene.mongodb_interface import MongoDBInterface
 
-rp_logger = logging.getLogger("robot_proprioceptor")
-rp_logger.setLevel(logging.DEBUG)
+from kios_utils.bblab_utils import bb_deprecated, setup_logger
+
+rp_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 class RobotProprioceptor:
@@ -45,7 +49,7 @@ class RobotProprioceptor:
     def test_connection(self) -> bool:
         response = call_method(self.robot_address, self.robot_port, "test_connection")
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         return mios_response.has_finished
 
     def get_robot_state(self) -> RobotState:
@@ -53,7 +57,7 @@ class RobotProprioceptor:
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         if mios_response.has_finished:
             robot_state = RobotState.from_json(response["result"])
-            print(robot_state)
+            pprint(robot_state)
             return robot_state
         else:
             raise Exception("Robot state is not ready yet.")
@@ -61,14 +65,13 @@ class RobotProprioceptor:
     def update_scene_object_from_mios(
         self, scene: TaskScene, object_name: str | list[str]
     ) -> bool:
-        logging.warning(f"update scene id: {hex(id(scene))}")
         if isinstance(object_name, str):
             object_names = [object_name]
         try:
             for object_name in object_names:
-                rp_logger.debug(
-                    f"scene content {object_name}.x before: {scene.object_map[object_name].O_T_TCP[0][3]}"
-                )
+                # rp_logger.debug(
+                #     f"scene content {object_name}.x before: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                # )
                 mios_object = self.mongodb_interface.query_mios_object(object_name)
 
                 if scene.object_map.get(object_name) is None:
@@ -77,12 +80,12 @@ class RobotProprioceptor:
                     )
 
                 scene.object_map[object_name] = KiosObject.from_mios_object(mios_object)
-                rp_logger.debug(
-                    f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
-                )
+                # rp_logger.debug(
+                #     f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
+                # )
 
         except Exception as e:
-            print(e)
+            rp_logger.error(f"Error occurred in the update_scene_object_from_mios: {e}")
             raise e
 
         return True
@@ -131,7 +134,7 @@ class RobotProprioceptor:
         mios_response = MiosInterfaceResponse.from_json(response["result"])
         print(mios_response)
 
-    # ! this will lead to a jerk in the robot. dont use it.
+    @bb_deprecated(reason="this will lead to a jerk in the robot. dont use it.")
     def change_EE_T_TCP(self, new_EE_T_TCP: np.ndarray):
         payload = {
             "EE_T_TCP": new_EE_T_TCP.T.flatten().tolist(),
@@ -151,10 +154,10 @@ class RobotProprioceptor:
             {"object_name": object},
         )
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         if mios_response.has_finished:
             mios_object = MiosObject.from_json(response["result"])
-            print(mios_object)
+            pprint(mios_object)
             return mios_object
 
     def align_object(self, object_name: str, **kwargs: dict[str, Any]):
@@ -198,7 +201,7 @@ class RobotProprioceptor:
         )
 
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(colored(f"mios replied:\n {mios_response}", "green"))
+        pprint(colored(f"mios replied:\n {mios_response}", "green"))
 
     def get_object_O_T_OB(self, object_name: str):
         """
@@ -222,10 +225,10 @@ class RobotProprioceptor:
         )
 
         mios_response = MiosInterfaceResponse.from_json(response["result"])
-        print(mios_response)
+        pprint(mios_response)
         if mios_response.has_finished:
             dummy_object = MiosObject.from_json(response["result"])
-            print(dummy_object)
+            pprint(dummy_object)
             return dummy_object
         else:
             return None

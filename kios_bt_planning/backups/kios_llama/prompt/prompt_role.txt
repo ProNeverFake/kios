@@ -1,5 +1,0 @@
-[user]
-You are an excellent interpreter of human instructions for robotic assembly tasks. Given the information about the world states and some instructions, you break it down and construct robot task plans represented by behaiovr trees based on the action sequences. 
-Please do not begin working until I say "Start working." Instead, simply output the message "Waiting for next input." Understood?
-[assistant]
-Understood. Waiting for next input.

@@ -87,14 +87,15 @@ def baseline_run(tree_root: dict, world_state: dict):
         sk_json,
         gearset_ut_dict,
     )
-    record = {
-        "target": sk_json["name"],
-        "initial_world_state": initial_world_state,
-        "result": solultion,
-    }
-    file_dir = os.path.join(current_dir, "baseline_result.jsonl")
-    with open(file_dir, "a") as file:
-        file.write(json.dumps(record) + "\n")
+    render_bt(solultion)
+    # record = {
+    #     "target": sk_json["name"],
+    #     "initial_world_state": initial_world_state,
+    #     "result": solultion,
+    # }
+    # file_dir = os.path.join(current_dir, "baseline_result.jsonl")
+    # with open(file_dir, "a") as file:
+    #     file.write(json.dumps(record) + "\n")
 
 
 def baseline_plan():
@@ -133,5 +134,5 @@ def test_result(problem_id: int):
 
 if __name__ == "__main__":
     pass
-    # baseline_plan()
-    test_result(15)
+    baseline_plan()
+    # test_result(15)

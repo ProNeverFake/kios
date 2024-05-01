@@ -945,29 +945,54 @@ result = {
     ],
 }
 
-ut = {
-    "summary": "Selector to change the tool in the left hand from outwardgripper to defaultgripper",
-    "name": "selector: change_tool(left_hand, outwardgripper, defaultgripper)",
+
+bt = {
+    "summary": "selector to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+    "name": "selector: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
     "children": [
         {
-            "summary": "the target is that the left hand is holding the default gripper",
-            "name": "target: hold(left_hand, defaultgripper)",
+            "summary": "check the target that chairnut1 is screwed to chairseatbolt1",
+            "name": "target: is_screwed_to(chairnut1, chairseatbolt1)",
         },
         {
-            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
-            "name": "sequence: change_tool(left_hand, outwardgripper, defaultgripper)",
+            "summary": "sequence to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+            "name": "sequence: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
             "children": [
                 {
-                    "summary": "A precondition is that the left hand is holding the outwardgripper",
-                    "name": "precondition: hold(left_hand, outwardgripper)",
+                    "summary": "check the precondition that the left hand is holding the inwardgripper",
+                    "name": "precondition: hold(left_hand, inwardgripper)",
                 },
                 {
-                    "summary": "A precondition is that the outwardgripper is empty",
-                    "name": "precondition: is_empty(outwardgripper)",
+                    "summary": "selector to pick_up the chairnut1 with the inwardgripper in the left hand",
+                    "name": "selector: pick_up(left_hand, inwardgripper, chairnut1)",
+                    "children": [
+                        {
+                            "summary": "check the target that the inwardgripper is holding the chairnut1",
+                            "name": "target: hold(inwardgripper, chairnut1)",
+                        },
+                        {
+                            "summary": "sequence to pick_up the chairnut1 with the inwardgripper in the left hand",
+                            "name": "sequence: pick_up(left_hand, inwardgripper, chairnut1)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the inwardgripper is empty",
+                                    "name": "precondition: is_empty(inwardgripper)",
+                                },
+                                {
+                                    "summary": "check the precondition that the left hand is holding the inwardgripper",
+                                    "name": "precondition: hold(left_hand, inwardgripper)",
+                                },
+                                {
+                                    "summary": "the action to pick_up the chairnut1 with the inwardgripper in the left hand",
+                                    "name": "action: pick_up(left_hand, inwardgripper, chairnut1)",
+                                },
+                            ],
+                        },
+                    ],
                 },
                 {
-                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
-                    "name": "action: change_tool(left_hand, outwardgripper, defaultgripper)",
+                    "summary": "the action to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+                    "name": "action: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
                 },
             ],
         },

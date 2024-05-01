@@ -1,0 +1,86 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.0
+    cli_version: 0.16.3
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1713085215.271518
+    t:
+      1:
+      - 55
+      - 95
+      - 105
+      2:
+      - 55
+      - 95
+      - 105
+      3:
+      - 13
+      - 14
+      - 23
+      - 58
+      4: 3.10.0
+      5: 0.16.3
+      8:
+      - 5
+      13: linux-x86_64
+id:
+  desc: null
+  value: ftjob-etyUipVMelsJSEtpe3nKcXH3
+created_at:
+  desc: null
+  value: '2024-04-14 10:47:12'
+error:
+  desc: null
+  value: Error(code=None, message=None, param=None, error=None)
+fine_tuned_model:
+  desc: null
+  value: ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-onestep-v1:9DprEvbP
+finished_at:
+  desc: null
+  value: '2024-04-14 10:50:31'
+model:
+  desc: null
+  value: gpt-3.5-turbo-0125
+object:
+  desc: null
+  value: fine_tuning.job
+organization_id:
+  desc: null
+  value: org-ygWwisor3PBcF2dPNRDTzzgd
+result_files:
+  desc: null
+  value: file-WNCOIUkvB8wNhMqJTYa9lSuE
+status:
+  desc: null
+  value: succeeded
+trained_tokens:
+  desc: null
+  value: 60206
+training_file:
+  desc: null
+  value: file-ZduAH3vCfTfZD6fYA8VeHOuI
+validation_file:
+  desc: null
+  value: null
+user_provided_suffix:
+  desc: null
+  value: kios_onestep_v1
+seed:
+  desc: null
+  value: 630413819
+integrations:
+  desc: null
+  value: []
+hyperparameters:
+  desc: null
+  value:
+    n_epochs: 1
+    batch_size: 1
+    learning_rate_multiplier: 0.05
+n_train:
+  desc: null
+  value: 18

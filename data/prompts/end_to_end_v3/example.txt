@@ -26,7 +26,7 @@ OUTPUT:
     ],
     "behavior_tree": {
         "summary": "selector to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
-        "name": "selector: insert(gear1, shaft1, parallel_box1, left_hand)",
+        "name": "selector: insert(left_hand, parallel_box1, gear1, shaft1)",
         "children": [
             {
                 "summary": "check the target that gear1 is inserted to shaft1",
@@ -34,7 +34,7 @@ OUTPUT:
             },
             {
                 "summary": "sequence to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
-                "name": "sequence: insert(gear1, shaft1, parallel_box1, left_hand)",
+                "name": "sequence: insert(left_hand, parallel_box1, gear1, shaft1)",
                 "children": [
                     {
                         "summary": "check the precondition that the left hand is holding the parallel_box1",

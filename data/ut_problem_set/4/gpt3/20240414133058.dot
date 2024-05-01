@@ -1,0 +1,39 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+"selector:
+ put_down(left_hand, defaultgripper, chairleg1)" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label="selector:
+ put_down(left_hand, defaultgripper, chairleg1)", shape=octagon, style=filled];
+"target:
+ hold(left_hand, chairleg1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="target:
+ hold(left_hand, chairleg1)", shape=ellipse, style=filled];
+"selector:
+ put_down(left_hand, defaultgripper, chairleg1)" -> "target:
+ hold(left_hand, chairleg1)";
+"sequence:
+ put_down(left_hand, defaultgripper, chairleg1)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ put_down(left_hand, defaultgripper, chairleg1)", shape=box, style=filled];
+"selector:
+ put_down(left_hand, defaultgripper, chairleg1)" -> "sequence:
+ put_down(left_hand, defaultgripper, chairleg1)";
+"precondition:
+ hold(left_hand, defaultgripper)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ hold(left_hand, defaultgripper)", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, defaultgripper, chairleg1)" -> "precondition:
+ hold(left_hand, defaultgripper)";
+"precondition:
+ hold(defaultgripper, chairleg1)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="precondition:
+ hold(defaultgripper, chairleg1)", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, defaultgripper, chairleg1)" -> "precondition:
+ hold(defaultgripper, chairleg1)";
+"action:
+ put_down(left_hand, defaultgripper, chairleg1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ put_down(left_hand, defaultgripper, chairleg1)", shape=ellipse, style=filled];
+"sequence:
+ put_down(left_hand, defaultgripper, chairleg1)" -> "action:
+ put_down(left_hand, defaultgripper, chairleg1)";
+}

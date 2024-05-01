@@ -26,7 +26,7 @@ OUTPUT:
     ],
     "behavior_tree": {
         "summary": "selector to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
-        "name": "selector: insert(gear1, shaft1, parallel_box1, left_hand)",
+        "name": "selector: insert(left_hand, parallel_box1, gear1, shaft1)",
         "children": [
             {
                 "summary": "check the target that gear1 is inserted to shaft1",
@@ -34,7 +34,7 @@ OUTPUT:
             },
             {
                 "summary": "sequence to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
-                "name": "sequence: insert(gear1, shaft1, parallel_box1, left_hand)",
+                "name": "sequence: insert(left_hand, parallel_box1, gear1, shaft1)",
                 "children": [
                     {
                         "summary": "check the precondition that the left hand is holding the parallel_box1",
@@ -90,9 +90,9 @@ objects:
 runtime_world_state: 
 {
     "objects": [
-        {"name": "parallel_box1", "properties": ["is_free", "is_equippable"]},
-        {"name": "inward_claw", "properties": ["is_free", "is_equippable"]},
-        {"name": "outward_claw", "properties": ["is_free"]},
+        {"name": "parallel_box1", "properties": ["is_empty"]},
+        {"name": "inward_claw", "properties": ["is_empty"]},
+        {"name": "outward_claw", "properties": ["is_empty"]},
         {"name": "gear1", "properties": []},
         {"name": "shaft1", "properties": []},
         {"name": "gearbase_hole1", "properties": []},
@@ -129,7 +129,7 @@ last_behavior_tree:
                 },
                 {
                     "summary": "condition node to check if left_hand is free,
-                    "name": "target: is_free(left_hand)"
+                    "name": "target: is_empty(left_hand)"
                     "identifier": 4,   
                 },
                 {
@@ -144,10 +144,10 @@ last_behavior_tree:
 last_failed_node: 
 {
     "summary": "condition node to check if left_hand is free,
-    "name": "target: is_free(left_hand)"
+    "name": "target: is_empty(left_hand)"
     "identifier": 4,   
 }
-instructions: "insert gear1 into shaft1"
+instructions: "load the parallel_box1 to the left hand."
 
 - Output:
 {
@@ -176,7 +176,7 @@ instructions: "insert gear1 into shaft1"
                     "children": [
                         {
                             "summary": "condition node to check if left_hand is free,
-                            "name": "target: is_free(left_hand)"
+                            "name": "target: is_empty(left_hand)"
                         },
                         {
                             "summary": "sequence to make left_hand unload outward_claw",
@@ -184,7 +184,7 @@ instructions: "insert gear1 into shaft1"
                             "children": [
                                 {
                                     "summary": "condition node to check if outward_claw is free",
-                                    "name": "precondition: is_free(outward_claw)"
+                                    "name": "precondition: is_empty(outward_claw)"
                                 },
                                 {
                                     "summary": "condition node to check if left hand holds outward_claw",

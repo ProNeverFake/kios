@@ -8,7 +8,7 @@ import datetime
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation_gpt3.5"
+os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -388,26 +388,8 @@ workflow.add_conditional_edges(
 )
 
 
-# * factory generate
-# executor_success_router = router_factory.create_router_layer(
-#     route_names=[
-#         "finish",
-#         "rectify",
-#         "approve",
-#         "disapprove",
-#     ]
-# )
 # * load from json (offline)
 executor_success_router = load_router_from_json("executor_success_router")
-
-# * factory generate
-# executor_failure_router = router_factory.create_router_layer(
-#     route_names=[
-#         "retry",
-#         "rectify",
-#         "approve",
-#     ]
-# )
 
 # * load from json (offline)
 executor_failure_router = load_router_from_json("executor_failure_router")
@@ -513,11 +495,6 @@ workflow.add_conditional_edges(
         False: "sequence_generator",
     },
 )
-
-# * factory generate
-# user_input_router = router_factory.create_router_layer(
-#     route_names=["finish", "instruction"]
-# )
 
 # * load from json (offline)
 user_input_router = load_router_from_json("user_input_router")

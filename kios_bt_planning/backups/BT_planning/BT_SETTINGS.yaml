@@ -1,9 +1,0 @@
-fallback_nodes:
-    - 'f('
-sequence_nodes:
-    - 's('              
-action_nodes:
-    - 'mv2'        
-    - 'mv3'
-up_node:
-    - ')'

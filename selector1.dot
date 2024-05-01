@@ -1,0 +1,25 @@
+digraph pastafarianism {
+ordering=out;
+graph [fontname="times-roman"];
+node [fontname="times-roman"];
+edge [fontname="times-roman"];
+Selector1 [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label=Selector1, shape=octagon, style=filled];
+"Target Condition 1" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="Target Condition 1", shape=ellipse, style=filled];
+Selector1 -> "Target Condition 1";
+"Sequence 1" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="Sequence 1", shape=box, style=filled];
+Selector1 -> "Sequence 1";
+"Precondition 1" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="Precondition 1", shape=ellipse, style=filled];
+"Sequence 1" -> "Precondition 1";
+Selector2 [fillcolor=darkslategray2, fontcolor=black, fontsize=18, label=Selector2, shape=octagon, style=filled];
+"Sequence 1" -> Selector2;
+"Target Condition 2" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="Target Condition 2", shape=ellipse, style=filled];
+Selector2 -> "Target Condition 2";
+"Sequence 2" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="Sequence 2", shape=box, style=filled];
+Selector2 -> "Sequence 2";
+"Precondition 2" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, label="Precondition 2", shape=ellipse, style=filled];
+"Sequence 2" -> "Precondition 2";
+"Action 2" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="Action 2", shape=ellipse, style=filled];
+"Sequence 2" -> "Action 2";
+"Action 1" [fillcolor=lightgreen, fontcolor=black, fontsize=18, label="Action 1", shape=ellipse, style=filled];
+"Sequence 1" -> "Action 1";
+}

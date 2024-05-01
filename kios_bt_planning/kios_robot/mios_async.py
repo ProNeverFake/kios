@@ -12,6 +12,12 @@ import multiprocessing.connection
 import time
 
 from kios_robot.robot_command import RobotCommand
+from kios_utils.bblab_utils import setup_logger
+
+logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 def mios_monitor(
@@ -27,7 +33,7 @@ def mios_monitor(
         task.start()
         # hanlde startup failure
         # ! check the response here
-        print(str(task.task_start_response))
+        logger.info(str(task.task_start_response))
 
         task.shared_data["task_start_response"] = task.task_start_response
 
@@ -59,11 +65,9 @@ def fake_monitor(
         # task.start()
         # hanlde startup failure
         # ! check the response here
-        # print(str(task.task_start_response))
 
         time.sleep(2)
         # * fake a start response
-        # print("start fake monitor")
         task.shared_data["task_start_response"] = {"result": {"result": True}}
 
         # * skip the start
@@ -83,7 +87,7 @@ def fake_monitor(
         #     pipe_connection.send([False])
 
         # * send fake response
-        print("send fake response")
+        logger.info("send fake response...")
         pipe_connection.send([True])
 
     except KeyboardInterrupt:
@@ -149,7 +153,7 @@ def fake_robot_command_monitor(
         # * skip the wait response
 
         # * send fake response
-        print("send fake response")
+        logger.info("send fake response...")
         pipe_connection.send([True])
 
     except KeyboardInterrupt:

@@ -2,13 +2,15 @@
   <img src="/LOGO.jpg" alt="LOGO" width="30%">
 </div>
 
-# KIOS --- Knowledge-based Intelligent Operation System
+# KIOS_ROS --- Knowledge-based Intelligent Operation System
 
-This is the package for robot skill learning and selecting based on ROS2 (based on distro Humble in principle).
+This is the package for skill-based robot behavior tree execution based on ROS2 (based on distro Foxy).
 
 ## Intro
 
-KIOS is developed as a full-level robot planning and learning framework based on ROS2. It integrates the high-level planning, which is realized by applying behavior tree mechanism, and the low-level action fine-tuning, which can be achieved by making use of the existing learning algorithms. The functionality of the system is highly decoupled and isolated in the corresponding ROS2 nodes, which composite a cycle like control loop that following the sensing-actuating mode.
+KIOS is developed as a skill-based robot behavior tree execution framework based on ROS2. It integrates behavior tree mechanism with robot skills, aiming at enabling behavior tree-based task planning based on the designed robot skills. 
+
+The functionality of the system is highly decoupled and isolated in the corresponding ROS2 nodes, which composite a cycle like control loop that following the sensing-actuating mode.
 
 ## NEWS
 
@@ -33,7 +35,7 @@ SEE [DEVELOPMENT LOG](#development-log)
 
 ## What is KIOS?
 
-KIOS, short for "Knowledge-based Intelligent Operation System", is a robot skill learing and selecting system developed by BlackBird for his master thesis. The system is built based on ROS2 and should be used along with the mios developed by @Lars.
+KIOS, short for "Knowledge-based Intelligent Operation System", is a a skill-based robot behavior tree execution framework developed by BlackBird, aiming at providing an execution interface for behavior tree represented plans while making use of the designed and fine-tuned skills in the skill base of the collective learning group of MIRMI. The system is built based on ROS2 and should be used along with the mios developed by @Lars.
 
 ## Getting Started
 
@@ -47,13 +49,18 @@ KIOS, short for "Knowledge-based Intelligent Operation System", is a robot skill
 
 - linux Realtime kernal. This is the requirement mios (or more precisely the requirement of robot control frequency).
 
-> BB: This part is still under construction.
+
+- ROS2 Foxy
+- mios (branch: kios)
+- BehaviorTree.CPP 4.x (has been integrated as a sub-module)
+- conan 1.59.0 (important due to the compatibility of mios)
 
 ### Install
 
 1. Install ROS2 foxy.
 
-Currently the system is only verified on Ubuntu 20.04 LTS with Ros2 Foxy. In Ubuntu 22.04 environment the mongocxx (installed by conanfile.txt and is a common dependency for mios and kios) may have problem finding the system dependencies. 
+Currently the system is only verified on Ubuntu 20.04 LTS with Ros2 Foxy. 
+In Ubuntu 22.04 environment the mongocxx (installed by conanfile.txt and is a common dependency for mios and kios) may have problem finding the system dependencies. 
 
 2. ~~Install BehaviorTree.CPP.~~
 
@@ -67,7 +74,7 @@ sudo apt-get install libwebsocketpp-dev
 
 4. Install nlohmann.
 
-5. clone the project and build.
+5. clone the project and build using colcon.
 
 6. enable global auto-fill (Skip this if you do not use CLI of kios)
 
@@ -88,13 +95,11 @@ pip3 install conan==1.59.0
 
 9. install spdlog.
 
-10. install fmt
+10. install fmt.
 
 ```bash
 sudo apt install libfmt-dev
 ```
-
-> BB: There must be something I have forgotten. Feel free to start an issue if you get any error with the project (though I don't think I will check the issues so frequently).
 
 ### Usage
 
@@ -279,16 +284,6 @@ The basic idea is to make the decision making part in kios and the skill executi
 
 ### Testing
 
-The code are currently in debug mode. The test is conducted in the following environment:
-
-- Ubuntu 20.04 LTS
-- ROS2 Foxy
-- mios (branch: kios)
-- BehaviorTree.CPP 4.x
-- conan 1.59.0 (important)
-
-
-
 ### Development Log
 
 For the old version see [old_dev_log.md](old_dev_log.md)
@@ -308,10 +303,7 @@ MIT License
 [websocketpp](https://github.com/zaphoyd/websocketpp)
 [ros2](https://docs.ros.org/en/foxy/index.html)
 
-...
 
 ## More
 
 The project is still under development. Please feel free to start an issue if you have any question or suggestion.
-
-The tutorial for the new version is still under construction. It will be released as soon as possible (maybe sometime around 15.04.2024, which is the deadline of my master thesis).

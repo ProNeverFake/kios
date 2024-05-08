@@ -3,6 +3,9 @@ from typing import Dict, List
 import logging
 
 from kios_robot.data_types import MiosObject
+from kios_utils.bblab_utils import setup_logger
+
+mongodb_logger = setup_logger("MongoDB_interface")
 
 
 class MongoDBInterface:
@@ -23,55 +26,55 @@ class MongoDBInterface:
         # ! BBTEST
         # self.setup_defaults()
 
-    # ! DISCARDED
-    def setup_defaults(self):
-        # if tools collection does not exist, create it. add the default tools.
-        if "tools" not in self.kios_database.list_collection_names():
-            self.kios_database.create_collection("tools")
-            self.kios_database["tools"].insert_one(
-                {
-                    "name": "parallel_box1",
-                    "EE_T_TCP": [
-                        [1, 0, 0, 0.0],
-                        [0, 1, 0, 0.0],
-                        [0, 0, 1, 0.1],
-                        [0, 0, 0, 1],
-                    ],
-                }
-            )
-            self.kios_database["tools"].insert_one(
-                {
-                    "name": "parallel_box2",
-                    "EE_T_TCP": [
-                        [1, 0, 0, 0.0],
-                        [0, 1, 0, 0.0],
-                        [0, 0, 1, 0.1],
-                        [0, 0, 0, 1],
-                    ],
-                }
-            )
-            self.kios_database["tools"].insert_one(
-                {
-                    "name": "inward_claw",
-                    "EE_T_TCP": [
-                        [1, 0, 0, 0.0],
-                        [0, 1, 0, 0.0],
-                        [0, 0, 1, 0.1],
-                        [0, 0, 0, 1],
-                    ],
-                }
-            )
-            self.kios_database["tools"].insert_one(
-                {
-                    "name": "outward_claw",
-                    "EE_T_TCP": [
-                        [1, 0, 0, 0.0],
-                        [0, 1, 0, 0.0],
-                        [0, 0, 1, 0.1],
-                        [0, 0, 0, 1],
-                    ],
-                }
-            )
+    # # ! DISCARDED
+    # def setup_defaults(self):
+    #     # if tools collection does not exist, create it. add the default tools.
+    #     if "tools" not in self.kios_database.list_collection_names():
+    #         self.kios_database.create_collection("tools")
+    #         self.kios_database["tools"].insert_one(
+    #             {
+    #                 "name": "parallel_box1",
+    #                 "EE_T_TCP": [
+    #                     [1, 0, 0, 0.0],
+    #                     [0, 1, 0, 0.0],
+    #                     [0, 0, 1, 0.1],
+    #                     [0, 0, 0, 1],
+    #                 ],
+    #             }
+    #         )
+    #         self.kios_database["tools"].insert_one(
+    #             {
+    #                 "name": "parallel_box2",
+    #                 "EE_T_TCP": [
+    #                     [1, 0, 0, 0.0],
+    #                     [0, 1, 0, 0.0],
+    #                     [0, 0, 1, 0.1],
+    #                     [0, 0, 0, 1],
+    #                 ],
+    #             }
+    #         )
+    #         self.kios_database["tools"].insert_one(
+    #             {
+    #                 "name": "inward_claw",
+    #                 "EE_T_TCP": [
+    #                     [1, 0, 0, 0.0],
+    #                     [0, 1, 0, 0.0],
+    #                     [0, 0, 1, 0.1],
+    #                     [0, 0, 0, 1],
+    #                 ],
+    #             }
+    #         )
+    #         self.kios_database["tools"].insert_one(
+    #             {
+    #                 "name": "outward_claw",
+    #                 "EE_T_TCP": [
+    #                     [1, 0, 0, 0.0],
+    #                     [0, 1, 0, 0.0],
+    #                     [0, 0, 1, 0.1],
+    #                     [0, 0, 0, 1],
+    #                 ],
+    #             }
+    #         )
 
     def query_mios_object(self, object_name: str) -> MiosObject:
         """
@@ -83,10 +86,9 @@ class MongoDBInterface:
         if count > 1:
             raise Exception("Duplicated object name!")
         elif count == 0:
-            # raise Exception(f'object "{object_name}" not found in the database')
-            logging.warning(f'object "{object_name}" not found in the database')
+            mongodb_logger.warn(f'object "{object_name}" not found in the database')
             # ! HACK
-            return MiosObject.generate_dummy(object_name=object_name) 
+            return MiosObject.generate_dummy(object_name=object_name)
         for document in result:
             return MiosObject.from_json(document)
 

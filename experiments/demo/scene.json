@@ -103,11 +103,47 @@
                               "source": "mios"
                     },
                     {
+                              "object_name": "lampbulb_top",
+                              "source": "mios"
+                    },
+                    {
                               "object_name": "Ferris_the_crab",
                               "source": "mios"
                     },
                     {
                               "object_name": "mini_laptop",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "gear1_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "gear2_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "gear3_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "shaft1_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "shaft2_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "shaft3_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "lampshade_place",
+                              "source": "mios"
+                    },
+                    {
+                              "object_name": "lampbulb_place",
                               "source": "mios"
                     }
           ],

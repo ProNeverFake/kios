@@ -999,6 +999,176 @@ bt = {
     ],
 }
 
+ut = {
+    "summary": "selector to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+    "name": "selector: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
+    "children": [
+        {
+            "summary": "check the target that chairnut1 is screwed to chairseatbolt1",
+            "name": "target: is_screwed_to(chairnut1, chairseatbolt1)",
+        },
+        {
+            "summary": "sequence to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+            "name": "sequence: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
+            "children": [
+                {
+                    "summary": "check the precondition that the left hand is holding the inwardgripper",
+                    "name": "precondition: hold(left_hand, inwardgripper)",
+                },
+                {
+                    "summary": "check the precondition that the inwardgripper is holding the chairnut1",
+                    "name": "precondition: hold(inwardgripper, chairnut1)",
+                },
+                {
+                    "summary": "the action to screw the chairnut1 into the chairseatbolt1 with the inwardgripper in the left hand",
+                    "name": "action: screw(left_hand, inwardgripper, chairnut1, chairseatbolt1)",
+                },
+            ],
+        },
+    ],
+}
+
+json_format_bt = {
+    "summary": "Selector to change the tool in the left hand from outwardgripper to defaultgripper",
+    "name": "selector: change_tool(left_hand, outwardgripper, defaultgripper)",
+    "children": [
+        {
+            "summary": "the target is that the left hand is holding the default gripper",
+            "name": "target: hold(left_hand, defaultgripper)",
+        },
+        {
+            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
+            "name": "sequence: change_tool(left_hand, outwardgripper, defaultgripper)",
+            "children": [
+                {
+                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                    "name": "precondition: hold(left_hand, outwardgripper)",
+                },
+                {
+                    "summary": "A precondition is that the outwardgripper is empty",
+                    "name": "precondition: is_empty(outwardgripper)",
+                },
+                {
+                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
+                    "name": "action: change_tool(left_hand, outwardgripper, defaultgripper)",
+                },
+            ],
+        },
+    ],
+}
+
+rec_exp_1 = {
+    "summary": "Selector to change the tool in the left hand from outwardgripper to defaultgripper",
+    "name": "selector: change_tool(left_hand, outwardgripper, defaultgripper)",
+    "children": [
+        {
+            "summary": "the target is that the left hand is holding the default gripper",
+            "name": "target: hold(left_hand, defaultgripper)",
+        },
+        {
+            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
+            "name": "sequence: change_tool(left_hand, outwardgripper, defaultgripper)",
+            "children": [
+                {
+                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                    "name": "precondition: hold(left_hand, outwardgripper)",
+                },
+                {
+                    "summary": "A precondition is that the outwardgripper is empty",
+                    "name": "precondition: is_empty(outwardgripper)",
+                },
+                {
+                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
+                    "name": "action: change_tool(left_hand, outwardgripper, defaultgripper)",
+                },
+            ],
+        },
+    ],
+}
+
+
+rec_exp_replace = {
+    "summary": "Selector to put_down the tool in the left hand from outwardgripper to defaultgripper",
+    "name": "selector: put_down(left_hand, outwardgripper, ring)",
+    "children": [
+        {
+            "summary": "the target is that the left hand is holding the default gripper",
+            "name": "target: is_empty(outwardgripper)",
+        },
+        {
+            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
+            "name": "sequence: put_down(left_hand, outwardgripper, ring)",
+            "children": [
+                {
+                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                    "name": "precondition: hold(left_hand, outwardgripper)",
+                },
+                {
+                    "summary": "A precondition is that the outwardgripper is empty",
+                    "name": "precondition: hold(left_hand, outwardgripper, ring)",
+                },
+                {
+                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
+                    "name": "action: put_down(left_hand, outwardgripper, ring)",
+                },
+            ],
+        },
+    ],
+}
+
+rec_exp_2 = {
+    "summary": "Selector to change the tool in the left hand from outwardgripper to defaultgripper",
+    "name": "selector: change_tool(left_hand, outwardgripper, defaultgripper)",
+    "children": [
+        {
+            "summary": "the target is that the left hand is holding the default gripper",
+            "name": "target: hold(left_hand, defaultgripper)",
+        },
+        {
+            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
+            "name": "sequence: change_tool(left_hand, outwardgripper, defaultgripper)",
+            "children": [
+                {
+                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                    "name": "precondition: hold(left_hand, outwardgripper)",
+                },
+                {
+                    "summary": "Selector to put_down the tool in the left hand from outwardgripper to defaultgripper",
+                    "name": "selector: put_down(left_hand, outwardgripper, ring)",
+                    "children": [
+                        {
+                            "summary": "the target is that the left hand is holding the default gripper",
+                            "name": "target: is_empty(outwardgripper)",
+                        },
+                        {
+                            "summary": "Sequence to change the tool in the left hand from outwardgripper to defaultgripper",
+                            "name": "sequence: put_down(left_hand, outwardgripper, ring)",
+                            "children": [
+                                {
+                                    "summary": "A precondition is that the left hand is holding the outwardgripper",
+                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                },
+                                {
+                                    "summary": "A precondition is that the outwardgripper is empty",
+                                    "name": "precondition: hold(left_hand, outwardgripper, ring)",
+                                },
+                                {
+                                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
+                                    "name": "action: put_down(left_hand, outwardgripper, ring)",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "summary": "The action to change the tool in the left hand from outwardgripper to defaultgripper",
+                    "name": "action: change_tool(left_hand, outwardgripper, defaultgripper)",
+                },
+            ],
+        },
+    ],
+}
+
 
 def render_bt(bt_json: json):
     test_class = BehaviorTreeFactory()
@@ -1024,5 +1194,7 @@ def render_bt_fix_try(bt_json: json):
     )
 
 
+bt = {"summary": "selector to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the target that the lampbulb is screwed into the lampbase", "name": "target: is_screwed_to(lampbulb, lampbase)"}, {"summary": "sequence to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "selector to pick_up the lampbulb with the clampgripper in the left_hand", "name": "selector: pick_up(left_hand, clampgripper, lampbulb)"}, {"summary": "check the target that the clampgripper is holding the lampbulb", "name": "target: hold(clampgripper, lampbulb)"}, {"summary": "sequence to pick_up the lampbulb with the clampgripper in the left_hand", "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)", "children": [ {"summary": "check the precondition that the clampgripper is empty", "name": "precondition: is_empty(clampgripper)"}, {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "the action to pick_up the lampbulb with the clampgripper in the left_hand", "name": "action: pick_up(left_hand, clampgripper, lampbulb)"} ] } ]}, {"summary": "the action to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"} ] }
+
 # render_bt(result)
-render_bt_fix_try(bt)
+render_bt_fix_try(rec_exp_1)

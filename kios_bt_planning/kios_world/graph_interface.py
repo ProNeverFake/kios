@@ -16,7 +16,10 @@ from kios_utils.bblab_utils import setup_logger
 this is the current state holder of the world
 """
 
-gi_logger = setup_logger(__name__, logging.DEBUG)
+gi_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 class GraphInterface:

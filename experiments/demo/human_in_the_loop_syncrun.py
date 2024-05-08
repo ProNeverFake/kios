@@ -31,7 +31,29 @@ from langsmith import traceable
 load_dotenv()
 
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
+from kios_utils.bblab_utils import setup_logger
 
+import colorlog
+import logging
+
+kios_handler = colorlog.StreamHandler()
+kios_handler.setFormatter(
+    colorlog.ColoredFormatter(
+        "%(log_color)s(AI)---[%(name)s]:%(message)s",
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "light_blue",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white",
+        },
+    )
+)
+
+lg_logger = setup_logger("Langgraph", level=logging.INFO)
+kios_logger = setup_logger(
+    name="KIOS", level=logging.INFO, special_handler=kios_handler
+)
 time_stamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
 
@@ -85,7 +107,6 @@ behavior_tree_stewardship = BehaviorTreeStewardship(
 
 # * kios data prompt skeleton dir
 data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
-# print(data_dir)
 # prompt_sk_dir = os.path.join(data_dir, "prompt_skeletons")
 prompt_dir = os.path.join(data_dir, "prompts")
 
@@ -124,9 +145,10 @@ def user_input_step(state: PlanExecuteState):
     """
     get the input from the user
     """
-    print(f"-----user_input_step-----")
+    lg_logger.info(f"-----user_input_step-----")
 
-    user_input = input("Please provide your instructions:\n")
+    kios_logger.info(f"Please provide your instructions:")
+    user_input = input()
 
     return {
         "user_input": user_input,
@@ -138,7 +160,7 @@ def sequence_generate_step(state: PlanExecuteState):
     """
     generate the sequence based on the instruction
     """
-    print(f"-----sequence_generate_step-----")
+    lg_logger.info(f"-----sequence_generate_step-----")
 
     plan_goal = state["plan"][0]
     start_world_state = state["world_state"][-1]
@@ -147,10 +169,12 @@ def sequence_generate_step(state: PlanExecuteState):
     action_sequence = seq_planner_chain.invoke(
         {
             "start_world_state": start_world_state,
-            "task_instruction": plan_goal,  # TODO the naming method "user_instruction" is confusing. try to change it later.
+            "task_instruction": plan_goal,
             "user_feedback": user_feedback,
         }
     )
+
+    kios_logger.info(f"{action_sequence}")
 
     return {
         "action_sequence": action_sequence,
@@ -162,7 +186,7 @@ def behavior_tree_generate_step(state: PlanExecuteState):
     """
     generate the behavior tree based on the instruction
     """
-    print(f"-----behavior_tree_generate_step-----")
+    lg_logger.info(f"-----behavior_tree_generate_step-----")
 
     global user_feedback
 
@@ -185,9 +209,11 @@ def behavior_tree_generate_step(state: PlanExecuteState):
 
     render_bt(bt_skeleton)
 
-    user_feedback = input(
-        "What should I do to improve the behavior tree?\nPlease give me your hint: "
+    kios_logger.info(
+        f"What should I do to improve the behavior tree? Please give me your hint:"
     )
+
+    user_feedback = input()
 
     return {
         "last_behavior_tree": bt_skeleton,
@@ -200,7 +226,7 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     """
     execute the first step of the plan, append the result to the past steps
     """
-    print(f"-----behavior_tree_execute_step-----")
+    lg_logger.info(f"-----behavior_tree_execute_step-----")
     # * simulation shortcut. Uncomment the following line to use simulation instead of execution
     # return behavior_tree_simulation_step(state)
     this_step = state["plan"][0]
@@ -231,11 +257,14 @@ def behavior_tree_execute_step(state: PlanExecuteState):
     # # ! BB DIRTY FIX
     # behavior_tree_stewardship.refresh_scene_objects(scene_json_object)
 
-    pprint(tree_result.to_json())
-    pause = input("DEBUG: please check the tree result. Press enter to continue.")
+    # result_json = tree_result.to_json()
+    # lg_logger.info(f"KIOS: Tree execution summary: {tree_result.summary}")
+    # pause = input("DEBUG: please check the tree result. Press enter to continue.")
 
     # * check result
     if tree_result.result == "success":
+        kios_logger.info(f"Tree execution succeeded.")
+
         return {
             "BTExecutionHasSucceeded": True,
             "past_steps": (
@@ -246,6 +275,7 @@ def behavior_tree_execute_step(state: PlanExecuteState):
             "runtime_world_state": tree_result.world_state,  # * this is world_state for successful execution
         }
     else:
+        kios_logger.info(f"Tree execution failed!")
         return {
             "BTExecutionHasSucceeded": False,
             "world_state": [tree_result.world_state],
@@ -258,7 +288,7 @@ def behavior_tree_simulation_step(state: PlanExecuteState):
     """
     execute the first step of the plan, append the result to the past steps
     """
-    print(f"-----behavior_tree_simulation_step-----")
+    lg_logger.info(f"-----behavior_tree_simulation_step-----")
 
     this_step = state["plan"][0]
     behavior_tree_skeleton = state["last_behavior_tree"]
@@ -307,7 +337,7 @@ def planner_step(state: PlanExecuteState):
     """
     plan the steps based on user input and world state
     """
-    print(f"-----plan_step-----")
+    lg_logger.info(f"-----plan_step-----")
 
     plan = planner.invoke(
         {
@@ -315,6 +345,8 @@ def planner_step(state: PlanExecuteState):
             "world_state": state["world_state"],
         }
     )
+    kios_logger.info(f"The plan for your instruction: {plan.steps}")
+
     return {"plan": plan.steps}
 
 
@@ -324,7 +356,7 @@ def plan_updater_step(state: PlanExecuteState):
     if return a response, then success, response the use, end.
     otherwise, return the updated newplan (normally the same as the old plan with the first step popped out.
     """
-    print(f"-----plan_updater_step-----")
+    lg_logger.info(f"-----plan_updater_step-----")
 
     output = plan_updater.invoke(
         {
@@ -369,7 +401,7 @@ def user_feedback_should_end(state: PlanExecuteState):
     """
     router for user hint.
     """
-    print(f"-----user_feedback_should_end-----")
+    lg_logger.debug(f"-----user_feedback_should_end-----")
     global user_feedback
 
     if user_feedback == "" or not user_feedback:
@@ -414,14 +446,16 @@ def executor_should_end(state: PlanExecuteState):
     """
     end router
     """
-    print(f"-----executor_should_end-----")
+    lg_logger.debug(f"-----executor_should_end-----")
     global user_feedback
 
     if state["BTExecutionHasSucceeded"] == True:
         # ask for user confirmation and end, or go back to the behavior tree generator if the user wants to improve
-        user_feedback = input(
-            "the behavior tree has succeeded.\n Is the target of this step satisfied now? Is there anything wrong?\n"
+        kios_logger.info(f"The behavior tree has succeeded.")
+        kios_logger.info(
+            f"Is the target of this step satisfied now? Is there anything wrong?"
         )
+        user_feedback = input()
 
         if user_feedback == "" or not user_feedback:
             user_feedback = None  # clear the user feedback
@@ -430,9 +464,10 @@ def executor_should_end(state: PlanExecuteState):
         while True:
             route = executor_success_router(user_feedback)
             if route.name == None:
-                user_feedback = input(
-                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?\n"
+                kios_logger.info(
+                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?"
                 )
+                user_feedback = input()
             else:
                 break
 
@@ -447,20 +482,25 @@ def executor_should_end(state: PlanExecuteState):
     else:
         # ask for user hint and go back to the behavior tree generator
         # * router is unnecessary here
-        user_feedback = input(
-            "The behavior tree has failed in its execution.\nPlease give me a hint to improve it:\n"
+        kios_logger.info(f"The behavior tree has failed.")
+        kios_logger.info(
+            f"KIOS: Please give me a hint to improve the behavior tree, or tell me what should I do next."
         )
+        user_feedback = input()
         if user_feedback == "" or not user_feedback:
-            user_feedback = input(
-                "I don't understand your instruction if you leave the input empty.\nAt least you shoud tell me what should I do next.\n"
+            kios_logger.info(
+                "I don't understand your instruction if you leave the input empty."
             )
+            kios_logger.info("At least you shoud tell me what should I do next.")
+            user_feedback = input()
 
         while True:
             route = executor_failure_router(user_feedback)
             if route.name == None:
-                user_feedback = input(
-                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?\n"
+                kios_logger.info(
+                    "I don't understand your intention. Can you explain is the target satisfied, or is there something wrong?"
                 )
+                user_feedback = input()
             else:
                 break
 
@@ -491,14 +531,14 @@ def plan_updater_should_end(state: PlanExecuteState):
     """
     end router
     """
-    print(f"-----plan_updater_should_end-----")
+    lg_logger.debug(f"-----plan_updater_should_end-----")
 
     if state["plan"] == [] or len(state["plan"]) == 0:
-        print("The assembly plan has been finished.\n")
+        kios_logger.info("The assembly plan has been finished.")
         return True
     else:
-        print("The assembly plan has not been finished.\n")
-        print(f'Unfinished steps: {state["plan"]}')
+        kios_logger.info("The assembly plan has not been finished.")
+        kios_logger.info(f'Unfinished steps: {state["plan"]}')
         return False
 
 
@@ -519,15 +559,15 @@ def user_input_should_end(state: PlanExecuteState):
     """
     if the user input is empty, then end
     """
-    print(f"-----user_input_should_end-----")
+    lg_logger.debug(f"-----user_input_should_end-----")
 
     if not state["user_input"] or state["user_input"] == "":
         return True
 
     route = user_input_router(state["user_input"])
     if route.name == None:
-        print(
-            "I don't understand your instruction. Can you provide me with a new instruction?\n"
+        kios_logger.info(
+            "I don't understand your instruction. Can you provide me with a new instruction?"
         )
         return None
 
@@ -565,7 +605,8 @@ def core_run():
     ):
         for k, v in event.items():
             if k != "__end__":
-                pprint(v)
+                # pprint(v)
+                pass
 
 
 if __name__ == "__main__":

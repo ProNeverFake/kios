@@ -17,7 +17,10 @@ from kios_scene.mongodb_interface import MongoDBInterface
 
 from kios_utils.bblab_utils import bb_deprecated, setup_logger
 
-rp_logger = setup_logger(__name__, logging.DEBUG)
+rp_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 class RobotProprioceptor:

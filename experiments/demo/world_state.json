@@ -3,7 +3,7 @@
                     { "name": "clampgripper", "properties": ["is_empty"] },
                     { "name": "parallelgripper", "properties": ["is_empty"] },
                     { "name": "inwardgripper", "properties": ["is_empty"] },
-                    { "name": "outwardgripper", "properties": ["is_empty"] },
+                    { "name": "outwardgripper", "properties": [] },
                     { "name": "defaultgripper", "properties": ["is_empty"] },
                     { "name": "gear1", "properties": [] },
                     { "name": "gear2", "properties": [] },
@@ -48,7 +48,7 @@
                               "target": "gear2"
                     },
                     {
-                              "source": "defaultgripper",
+                              "source": "clampgripper",
                               "name": "can_manipulate",
                               "target": "gear3"
                     },
@@ -87,7 +87,12 @@
                     {
                               "source": "left_hand",
                               "name": "hold",
-                              "target": "defaultgripper"
+                              "target": "outwardgripper"
+                    },
+                    {
+                              "source": "outwardgripper",
+                              "name": "hold",
+                              "target": "lampshade"
                     }
           ]
 }

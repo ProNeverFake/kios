@@ -91,6 +91,27 @@ def create_rec_tree(level: str) -> py_trees.behaviour.Behaviour:
     return sel1
 
 
+def create_unit_tree(level: str) -> py_trees.behaviour.Behaviour:
+
+    # root = py_trees.composites.Selector(name="Demo Dot Graphs %s" % level, memory=False)
+    sel1 = py_trees.composites.Selector(name="Selector1", memory=False)
+    sel1.add_child(ConditionNodeViz("Target Condition 1"))
+    sq1 = py_trees.composites.Sequence(name="Sequence 1", memory=False)
+    sq1.add_child(ConditionNodeViz("Precondition 1"))
+
+    sel1.add_child(sq1)
+    sel2 = py_trees.composites.Selector(name="Selector2", memory=False)
+    sel2.add_child(ConditionNodeViz("Target Condition 2"))
+    sq2 = py_trees.composites.Sequence(name="Sequence 2", memory=False)
+    sq2.add_child(ConditionNodeViz("Precondition 2"))
+    sq2.add_child(ActionNodeViz("Action 2"))
+    sel2.add_child(sq2)
+
+    sq1.add_child(sel2)
+    sq1.add_child(ActionNodeViz("Action 1"))
+    return sel1
+
+
 ##############################################################################
 # Main
 ##############################################################################
@@ -100,7 +121,8 @@ def main() -> None:
     """Entry point for the demo script."""
     py_trees.logging.level = py_trees.logging.Level.DEBUG
 
-    root = create_rec_tree("DETAIL")
+    # root = create_rec_tree("DETAIL")
+    root = create_unit_tree("DETAIL")
     py_trees.display.render_dot_tree(root, py_trees.common.VisibilityLevel.DETAIL)
 
     # if py_trees.utilities.which("xdot"):

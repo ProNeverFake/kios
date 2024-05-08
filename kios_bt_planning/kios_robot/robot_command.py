@@ -5,7 +5,10 @@ from pprint import pprint
 
 import logging
 
-rc_logger = setup_logger(__name__, logging.DEBUG)
+rc_logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult

@@ -14,7 +14,10 @@ import time
 from kios_robot.robot_command import RobotCommand
 from kios_utils.bblab_utils import setup_logger
 
-logger = setup_logger(__name__, logging.DEBUG)
+logger = setup_logger(
+    __name__,
+    # logging.DEBUG,
+)
 
 
 def mios_monitor(

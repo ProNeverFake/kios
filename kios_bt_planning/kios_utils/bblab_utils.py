@@ -21,11 +21,15 @@ handler.setFormatter(
 bblogger = logging.getLogger(name="blackbird_logger")
 bblogger.addHandler(handler)
 bblogger.setLevel(logging.DEBUG)
+bblogger.propagate = False
 
 
-def setup_logger(name: str, level=logging.INFO):
+def setup_logger(name: str, level=logging.WARNING, special_handler=None):
     logger = logging.getLogger(name)
-    logger.addHandler(handler)
+    if special_handler is None:
+        logger.addHandler(handler)
+    else:
+        logger.addHandler(special_handler)
     logger.setLevel(level)
     logger.propagate = False
     return logger
@@ -48,7 +52,8 @@ def bb_deprecated(reason: str, can_run: bool = False):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            bblogger.warning(f"Function {func.__name__} is deprecated: {reason}")
+            # ! TODO uncomment this line
+            # bblogger.warning(f"Function {func.__name__} is deprecated: {reason}")
             return func(*args, **kwargs) if can_run else None
 
         return wrapper

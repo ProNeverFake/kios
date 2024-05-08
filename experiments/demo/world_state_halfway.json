@@ -48,7 +48,7 @@
                               "target": "gear2"
                     },
                     {
-                              "source": "clampgripper",
+                              "source": "defaultgripper",
                               "name": "can_manipulate",
                               "target": "gear3"
                     },

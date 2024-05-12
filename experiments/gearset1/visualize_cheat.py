@@ -1194,7 +1194,472 @@ def render_bt_fix_try(bt_json: json):
     )
 
 
-bt = {"summary": "selector to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the target that the lampbulb is screwed into the lampbase", "name": "target: is_screwed_to(lampbulb, lampbase)"}, {"summary": "sequence to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)", "children": [ {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "selector to pick_up the lampbulb with the clampgripper in the left_hand", "name": "selector: pick_up(left_hand, clampgripper, lampbulb)"}, {"summary": "check the target that the clampgripper is holding the lampbulb", "name": "target: hold(clampgripper, lampbulb)"}, {"summary": "sequence to pick_up the lampbulb with the clampgripper in the left_hand", "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)", "children": [ {"summary": "check the precondition that the clampgripper is empty", "name": "precondition: is_empty(clampgripper)"}, {"summary": "check the precondition that the left_hand is holding the clampgripper", "name": "precondition: hold(left_hand, clampgripper)"}, {"summary": "the action to pick_up the lampbulb with the clampgripper in the left_hand", "name": "action: pick_up(left_hand, clampgripper, lampbulb)"} ] } ]}, {"summary": "the action to screw the lampbulb into the lampbase with the clampgripper in the left_hand", "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)"} ] }
+bt = {
+    "summary": "selector to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+    "name": "selector: screw(left_hand, clampgripper, lampbulb, lampbase)",
+    "children": [
+        {
+            "summary": "check the target that the lampbulb is screwed into the lampbase",
+            "name": "target: is_screwed_to(lampbulb, lampbase)",
+        },
+        {
+            "summary": "sequence to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+            "name": "sequence: screw(left_hand, clampgripper, lampbulb, lampbase)",
+            "children": [
+                {
+                    "summary": "check the precondition that the left_hand is holding the clampgripper",
+                    "name": "precondition: hold(left_hand, clampgripper)",
+                },
+                {
+                    "summary": "selector to pick_up the lampbulb with the clampgripper in the left_hand",
+                    "name": "selector: pick_up(left_hand, clampgripper, lampbulb)",
+                },
+                {
+                    "summary": "check the target that the clampgripper is holding the lampbulb",
+                    "name": "target: hold(clampgripper, lampbulb)",
+                },
+                {
+                    "summary": "sequence to pick_up the lampbulb with the clampgripper in the left_hand",
+                    "name": "sequence: pick_up(left_hand, clampgripper, lampbulb)",
+                    "children": [
+                        {
+                            "summary": "check the precondition that the clampgripper is empty",
+                            "name": "precondition: is_empty(clampgripper)",
+                        },
+                        {
+                            "summary": "check the precondition that the left_hand is holding the clampgripper",
+                            "name": "precondition: hold(left_hand, clampgripper)",
+                        },
+                        {
+                            "summary": "the action to pick_up the lampbulb with the clampgripper in the left_hand",
+                            "name": "action: pick_up(left_hand, clampgripper, lampbulb)",
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            "summary": "the action to screw the lampbulb into the lampbase with the clampgripper in the left_hand",
+            "name": "action: screw(left_hand, clampgripper, lampbulb, lampbase)",
+        },
+    ],
+}
 
-# render_bt(result)
-render_bt_fix_try(rec_exp_1)
+
+video_tree_1 = {
+    "summary": "selector to insert gear3 into shaft3",
+    "name": "selector: insert(left_hand, parallelgripper, gear3, shaft3)",
+    "children": [
+        {
+            "summary": "check the target that gear3 is inserted into shaft3",
+            "name": "target: is_inserted_to(gear3, shaft3)",
+            "type_name": "target",
+        },
+        {
+            "summary": "sequence to insert gear3 into shaft3",
+            "name": "sequence: insert(left_hand, parallelgripper, gear3, shaft3)",
+            "children": [
+                {
+                    "summary": "selector to change the tool in left_hand from outwardgripper to clampgripper",
+                    "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left_hand is holding the clampgripper",
+                            "name": "target: hold(left_hand, clampgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to change the tool in left_hand from outwardgripper to clampgripper",
+                            "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left_hand is holding the outwardgripper",
+                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "check the precondition that the outwardgripper is empty",
+                                    "name": "precondition: is_empty(outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to change the tool in left_hand from outwardgripper to clampgripper",
+                                    "name": "action: change_tool(left_hand, outwardgripper, clampgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to pick up gear3 with clampgripper in left_hand",
+                    "name": "selector: pick_up(left_hand, clampgripper, gear3)",
+                    "children": [
+                        {
+                            "summary": "check the target that the clampgripper is holding the gear3",
+                            "name": "target: hold(clampgripper, gear3)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to pick up gear3 with clampgripper in left_hand",
+                            "name": "sequence: pick_up(left_hand, clampgripper, gear3)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the clampgripper is empty",
+                                    "name": "precondition: is_empty(clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to pick up gear3 with clampgripper in left_hand",
+                                    "name": "action: pick_up(left_hand, clampgripper, gear3)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to change the tool in left_hand from clampgripper to parallelgripper",
+                    "name": "selector: change_tool(left_hand, clampgripper, parallelgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left_hand is holding the parallelgripper",
+                            "name": "target: hold(left_hand, parallelgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to change the tool in left_hand from clampgripper to parallelgripper",
+                            "name": "sequence: change_tool(left_hand, clampgripper, parallelgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left_hand is holding the clampgripper",
+                                    "name": "precondition: hold(left_hand, clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "check the precondition that the clampgripper is holding gear3",
+                                    "name": "precondition: hold(clampgripper, gear3)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to change the tool in left_hand from clampgripper to parallelgripper",
+                                    "name": "action: change_tool(left_hand, clampgripper, parallelgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "the action to insert gear3 into shaft3",
+                    "name": "action: insert(left_hand, parallelgripper, gear3, shaft3)",
+                    "type_name": "action",
+                },
+            ],
+            "type_name": "sequence",
+        },
+    ],
+    "type_name": "selector",
+}
+
+video_tree_2 = {
+    "summary": "selector to insert gear3 into shaft3",
+    "name": "selector: insert(left_hand, clampgripper, gear3, shaft3)",
+    "children": [
+        {
+            "summary": "check the target that gear3 is inserted into shaft3",
+            "name": "target: is_inserted_to(gear3, shaft3)",
+            "type_name": "target",
+        },
+        {
+            "summary": "sequence to insert gear3 into shaft3",
+            "name": "sequence: insert(left_hand, clampgripper, gear3, shaft3)",
+            "children": [
+                {
+                    "summary": "selector to change the tool in left_hand from outwardgripper to clampgripper",
+                    "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left_hand is holding the clampgripper",
+                            "name": "target: hold(left_hand, clampgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to change the tool in left_hand from outwardgripper to clampgripper",
+                            "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left_hand is holding the outwardgripper",
+                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "check the precondition that the outwardgripper is empty",
+                                    "name": "precondition: is_empty(outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to change the tool in left_hand from outwardgripper to clampgripper",
+                                    "name": "action: change_tool(left_hand, outwardgripper, clampgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to pick up gear3 with clampgripper in left_hand",
+                    "name": "selector: pick_up(left_hand, clampgripper, gear3)",
+                    "children": [
+                        {
+                            "summary": "check the target that the clampgripper is holding the gear3",
+                            "name": "target: hold(clampgripper, gear3)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to pick up gear3 with clampgripper in left_hand",
+                            "name": "sequence: pick_up(left_hand, clampgripper, gear3)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the clampgripper is empty",
+                                    "name": "precondition: is_empty(clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to pick up gear3 with clampgripper in left_hand",
+                                    "name": "action: pick_up(left_hand, clampgripper, gear3)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "the action to insert gear3 into shaft3",
+                    "name": "action: insert(left_hand, clampgripper, gear3, shaft3)",
+                    "type_name": "action",
+                },
+            ],
+            "type_name": "sequence",
+        },
+    ],
+    "type_name": "selector",
+}
+
+
+video_tree_3 = {
+    "summary": "selector to insert gear3 into shaft3",
+    "name": "selector: insert(left_hand, clampgripper, gear3, shaft3)",
+    "children": [
+        {
+            "summary": "check the target that gear3 is inserted into shaft3",
+            "name": "target: is_inserted_to(gear3, shaft3)",
+            "type_name": "target",
+        },
+        {
+            "summary": "sequence to insert gear3 into shaft3",
+            "name": "sequence: insert(left_hand, clampgripper, gear3, shaft3)",
+            "children": [
+                {
+                    "summary": "selector to put down the lampshade with the outwardgripper",
+                    "name": "selector: put_down(left_hand, outwardgripper, lampshade)",
+                    "children": [
+                        {
+                            "summary": "check the target that the outwardgripper is empty",
+                            "name": "target: is_empty(outwardgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to put down the lampshade with the outwardgripper",
+                            "name": "sequence: put_down(left_hand, outwardgripper, lampshade)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the outwardgripper is holding the lampshade",
+                                    "name": "precondition: hold(outwardgripper, lampshade)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to put down the lampshade with the outwardgripper",
+                                    "name": "action: put_down(left_hand, outwardgripper, lampshade)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to change the tool in left_hand from outwardgripper to clampgripper",
+                    "name": "selector: change_tool(left_hand, outwardgripper, clampgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left_hand is holding the clampgripper",
+                            "name": "target: hold(left_hand, clampgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to change the tool in left_hand from outwardgripper to clampgripper",
+                            "name": "sequence: change_tool(left_hand, outwardgripper, clampgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left_hand is holding the outwardgripper",
+                                    "name": "precondition: hold(left_hand, outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "check the precondition that the outwardgripper is empty",
+                                    "name": "precondition: is_empty(outwardgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to change the tool in left_hand from outwardgripper to clampgripper",
+                                    "name": "action: change_tool(left_hand, outwardgripper, clampgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to pick up gear3 with clampgripper in left_hand",
+                    "name": "selector: pick_up(left_hand, clampgripper, gear3)",
+                    "children": [
+                        {
+                            "summary": "check the target that the clampgripper is holding the gear3",
+                            "name": "target: hold(clampgripper, gear3)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to pick up gear3 with clampgripper in left_hand",
+                            "name": "sequence: pick_up(left_hand, clampgripper, gear3)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the clampgripper is empty",
+                                    "name": "precondition: is_empty(clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to pick up gear3 with clampgripper in left_hand",
+                                    "name": "action: pick_up(left_hand, clampgripper, gear3)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "the action to insert gear3 into shaft3",
+                    "name": "action: insert(left_hand, clampgripper, gear3, shaft3)",
+                    "type_name": "action",
+                },
+            ],
+            "type_name": "sequence",
+        },
+    ],
+    "type_name": "selector",
+}
+
+video_tree_4 = {
+    "summary": "selector to insert gear3 into shaft3",
+    "name": "selector: insert(left_hand, defaultgripper, gear3, shaft3)",
+    "children": [
+        {
+            "summary": "check the target that gear3 is inserted into shaft3",
+            "name": "target: is_inserted_to(gear3, shaft3)",
+            "type_name": "target",
+        },
+        {
+            "summary": "sequence to insert gear3 into shaft3",
+            "name": "sequence: insert(left_hand, defaultgripper, gear3, shaft3)",
+            "children": [
+                {
+                    "summary": "selector to change the tool in left_hand from clampgripper to defaultgripper",
+                    "name": "selector: change_tool(left_hand, clampgripper, defaultgripper)",
+                    "children": [
+                        {
+                            "summary": "check the target that the left_hand is holding the defaultgripper",
+                            "name": "target: hold(left_hand, defaultgripper)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to change the tool in left_hand from clampgripper to defaultgripper",
+                            "name": "sequence: change_tool(left_hand, clampgripper, defaultgripper)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the left_hand is holding the clampgripper",
+                                    "name": "precondition: hold(left_hand, clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "check the precondition that the clampgripper is empty",
+                                    "name": "precondition: is_empty(clampgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to change the tool in left_hand from clampgripper to defaultgripper",
+                                    "name": "action: change_tool(left_hand, clampgripper, defaultgripper)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "selector to pick up gear3 with defaultgripper in left_hand",
+                    "name": "selector: pick_up(left_hand, defaultgripper, gear3)",
+                    "children": [
+                        {
+                            "summary": "check the target that the defaultgripper is holding the gear3",
+                            "name": "target: hold(defaultgripper, gear3)",
+                            "type_name": "target",
+                        },
+                        {
+                            "summary": "sequence to pick up gear3 with defaultgripper in left_hand",
+                            "name": "sequence: pick_up(left_hand, defaultgripper, gear3)",
+                            "children": [
+                                {
+                                    "summary": "check the precondition that the defaultgripper is empty",
+                                    "name": "precondition: is_empty(defaultgripper)",
+                                    "type_name": "precondition",
+                                },
+                                {
+                                    "summary": "the action to pick up gear3 with defaultgripper in left_hand",
+                                    "name": "action: pick_up(left_hand, defaultgripper, gear3)",
+                                    "type_name": "action",
+                                },
+                            ],
+                            "type_name": "sequence",
+                        },
+                    ],
+                    "type_name": "selector",
+                },
+                {
+                    "summary": "the action to insert gear3 into shaft3",
+                    "name": "action: insert(left_hand, defaultgripper, gear3, shaft3)",
+                    "type_name": "action",
+                },
+            ],
+            "type_name": "sequence",
+        },
+    ],
+    "type_name": "selector",
+}
+
+render_bt_fix_try(video_tree_4)

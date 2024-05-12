@@ -6,9 +6,11 @@
 
 This is a project for robot task planning and execution based on langchain agent (langgraph), LLM, behavior tree and robot expert skills.
 
-> A workshop paper based on this project is accepted by ICRA 2023. Please check the workshop paper [here](/workshop.pdf).
+> :star: A workshop paper based on this project is accepted by ICRA 2024. Please check the workshop paper [here](/workshop.pdf).
 
-> BB: The human-in-the-loop workflow tutorial is updated. Please check [here](#something-to-try) for more information.
+> :star2: An example of human-in-the-loop behavior tree generation is updated. Please click [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ) to watch.
+
+> :eyes: The human-in-the-loop workflow tutorial is updated. Please check [here](#something-to-try) for more information.
 
 - About the old version: 
 See project [kios_ros2](https://github.com/ProNeverFake/kios_ros2). The old version is based on ROS2 and is refactored according to the KISS principle. It is now deprecated.

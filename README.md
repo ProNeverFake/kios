@@ -4,29 +4,31 @@
 
 # KIOS --- Knowledge-based Intelligent Operation System
 
-This is a project for robot task planning and execution based on langchain agent (langgraph), LLM, behavior tree and robot expert skills.
+This is a project for robot task planning and execution based on langchain agent, LLM, behavior tree and robot expert skills.
 
-> :star: A workshop paper based on this project is accepted by ICRA 2024. Please check the workshop paper [here](/workshop.pdf).
+> :star: A workshop paper based on this project is accepted by ICRA 2024. Check it [here](/workshop.pdf).
 
-> :star2: An example of human-in-the-loop behavior tree generation is updated. Please click [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ) to watch.
+> 🎥 The video of human-in-the-loop behavior tree generation is updated. Check it [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ).
 
 > :eyes: The human-in-the-loop workflow tutorial is updated. Please check [here](#something-to-try) for more information.
 
 - About the old version: 
-See project [kios_ros2](https://github.com/ProNeverFake/kios_ros2). The old version is based on ROS2 and is refactored according to the KISS principle. It is now deprecated.
+See project [kios_ros2](https://github.com/ProNeverFake/kios_ros2). The old version is developed based on ROS2 and is refactored as this project for several technical reasons.
 
 - About the new version:
 The no-ros version, which aims at simplizing the system structure, is now actively developed.
-For this part see [kios_bt_planning](/kios_bt_planning).
+The python package for this project is [kios_bt_planning](/kios_bt_planning).
 
-- About robot interface:
-For people who don't have access to mios or want to use their own robot interface, you may deploy your own methods to generate `robot command` in `mios_task_factory.py` and your own methods to execute the commands in `robot_command.py`. You can also define your own command class, search for `MiosCall` and `KiosCall` in the project.
+- About the robot interface:
+This project is developed to cooperate with the robot interface [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios), which is the skill base developed by the [KI Fabrik](https://kifabrik.mirmi.tum.de/solutions/robot-learning/) team. Mios provides public [docker image](https://hub.docker.com/r/mirmi/mios), which however does not include the necessary modifications for this project (for example, the object grounding process is changed to optional for this project, and skills and kinematic settings for tool-based manipulation are newly developed).
+A mios docker image for this project will be packed up and published in the future. Currently, for running the demo, please uncomment the simulation-related code in the script to allow running dummy execution (check [here](#0-enable-the-dummy-execution)). 
+
+You could also may deploy your own methods to generate `robot command` in `mios_task_factory.py` and your own methods to execute the commands in `robot_command.py`. You can also define your own command class. Please search for `MiosCall` and `KiosCall` globally in the project for more details.
 
 ## Intro
 
-KIOS is a robot task planning system developed by BlackBird for his master thesis. The system is currently under development and is not ready for use. 
-
-The system is mainly written in python. The idea is to integrate the LLM (large language model) into the robot task planning system for automatic behaviortree generation and modification.
+KIOS is a LLM & behavior tree-based robot task planning system developed by BlackBird for his master thesis. 
+The system is written in python. The idea is to integrate LLMs into the robot task planning system for automatic behaviortree generation and modification.
 
 The LLM is used for generating the task plan in the form of behavior trees based on the provided domain knowledge (prompt engineering or RAG). The APIs for generating, modifying and executing the behavior trees are exposed to the LLM agent. With the feedback from the robot(also the nature language feedbacks from the user), the LLM agent can modify the behavior tree and generate new plans dynamically to finish the robotic assembly tasks.
 
@@ -46,7 +48,6 @@ The usecases are from the siemens robot assembly challenge and the furniture-ben
 * [Contribute](#contribute)
 * [License](#license)
 * [Sources](#sources)
-* [More](#more)
 
 ## What is KIOS?
 
@@ -178,11 +179,6 @@ Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongod
   - kios_utils: utility modules
   - tests: test files for the modules above.
 
-(old version packages)
-- kios_cpp: the behavior tree executor implemented in c++. discarded now.
-- kios_py: the behavior tree executor implemented in python. discarded now.
-- kios_cli: the command line interface for the project. discarded now.
-
 ### System Structure
 
 <div align="center">
@@ -190,6 +186,18 @@ Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongod
 </div>
 
 ### Something to try
+
+#### 0. Enable the dummy execution
+
+The docker image of mios is currently not available. You can enable the dummy execution by uncommenting the code in the demo script, which allows the execution to be simulated and the effects of the actions will be applied to the world state after the execution.
+
+The code for dummy execution is:
+
+```python
+return behavior_tree_simulation_step(state)
+```
+
+Uncommenting this line will call the simulation node of the langgraph to simulate the execution of the behavior tree and skip the interaction with the robot interface.
 
 #### 1. Runtime script for robot commands
 
@@ -272,9 +280,3 @@ MIT License
 - [neo4j](https://github.com/neo4j/neo4j-python-driver)
 - [websocketpp](https://github.com/zaphoyd/websocketpp)
 - [ros2](https://docs.ros.org/en/foxy/index.html)
-
-...
-
-## More
-
-The project is still under development. Please feel free to start an issue if you have any question or suggestion.

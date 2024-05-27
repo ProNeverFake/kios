@@ -4,6 +4,10 @@ import socket
 from runtime_script import n2_task as nx
 from runtime_script import sp2 as spx
 
+"""
+dynamic task scheduling
+"""
+
 # Create a queue to contain tasks
 task_queue = queue.Queue()
 

@@ -1031,6 +1031,7 @@ class MiosTaskFactory:
     I'm kind of pissed off. No suffer anymore from now.
     """
 
+    #! AIS
     def generate_insert_skill(
         self, parsed_action: dict[str, Any]
     ) -> list[MiosCall | MiosSkill]:

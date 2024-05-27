@@ -564,6 +564,21 @@ class MiosTaskFactory:
 
         return insert
 
+    def generate_update_load_m_call(self, tool_name: str) -> KiosCall:
+        """
+        update the load_m in the mongodb for mios to read and set load.
+        only for gravity compensation.
+        """
+
+        return KiosCall(
+            method=self.robot_interface.proprioceptor.update_load_mass_to_mongodb,
+            args=[self.task_scene, tool_name],
+        )
+        # return KiosCall(
+        #     method=MongoDBInterface().update_load_m,
+        #     args=[tool_name],
+        # )
+
     def generate_update_tool_call(self, tool_name: str = None) -> MiosCall:
         """let mios know the tool is loaded and it need to change EE_T_TCP.
 
@@ -644,7 +659,10 @@ class MiosTaskFactory:
             raise Exception("tool_name is not set!")
 
         if tool_name == "defaultgripper":
-            return [self.generate_update_tool_call(tool_name)]
+            return [
+                self.generate_update_tool_call(tool_name),
+                self.generate_update_load_m_call(tool_name),
+            ]
 
         payload = {
             "skill": {
@@ -689,10 +707,12 @@ class MiosTaskFactory:
         )
 
         update_tool = self.generate_update_tool_call(tool_name)
+        update_load_mass = self.generate_update_load_m_call(tool_name)
 
         return [
             load_tool,
             update_tool,
+            update_load_mass,
         ]
 
     def generate_unload_tool_skill(
@@ -745,6 +765,7 @@ class MiosTaskFactory:
         )
 
         update_tool = self.generate_update_tool_call(tool_name="defaultgripper")
+        update_load_mass = self.generate_update_load_m_call(tool_name="defaultgripper")
 
         task = []
 
@@ -752,6 +773,7 @@ class MiosTaskFactory:
             task.append(unload_tool)
 
         task.append(update_tool)
+        task.append(update_load_mass)
 
         return task
 

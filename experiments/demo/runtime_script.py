@@ -116,6 +116,9 @@ def set_tool(toolbox_name: str):
     )
     print(f"the number of tasks in the task list is {len(robot_command.task_list)}")
     robot_command.add_task(ri.mios_task_factory.generate_update_tool_call(toolbox_name))
+    robot_command.add_task(
+        ri.mios_task_factory.generate_update_load_m_call(tool_name=toolbox_name)
+    )
     robot_command.execute_task_list_sync()
     robot_command.clear_tasks()
 
@@ -716,9 +719,7 @@ def gear1():
     }
 
     robot_command.add_tasks(ri.mios_task_factory.generate_pick_up_skill(parsed_action))
-
     robot_command.execute_task_list_sync()
-
     robot_command.clear_tasks()
 
     #########################################

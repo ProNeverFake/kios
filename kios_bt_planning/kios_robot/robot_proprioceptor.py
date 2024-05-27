@@ -90,6 +90,28 @@ class RobotProprioceptor:
 
         return True
 
+    def update_load_mass_to_mongodb(
+        self,
+        scene: TaskScene,
+        tool_name: str,
+    ) -> bool:
+
+        try:
+            tool = scene.tool_map.get(tool_name)
+            if tool is None:
+                raise Exception(f"tool {tool_name} is not in the scene.")
+
+            self.mongodb_interface.update_mios_load_mass(tool.tool_mass)
+            # rp_logger.debug(
+            #     f"scene content {object_name}.x after: {scene.object_map[object_name].O_T_TCP[0][3]}"
+            # )
+
+        except Exception as e:
+            rp_logger.error(f"Error occurred in the update_scene_object_from_mios: {e}")
+            raise e
+
+        return True
+
     def update_scene_from_vision(self, scene: TaskScene):
         raise NotImplementedError
 

@@ -98,9 +98,10 @@ seq_planner_ppt_ppl = PipelinePromptTemplate(
 
 seq_planner_chain = (
     seq_planner_ppt_ppl
-    | ChatOpenAI(model="gpt-4-0125-preview", temperature=0)
+    # | ChatOpenAI(model="gpt-4-0125-preview", temperature=0)
     # | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
     # | ChatOpenAI(model="gpt-4-0613", temperature=0)
+    | ChatOpenAI(model="gpt-4o", temperature=0)
     | StrOutputParser()
 )
 
@@ -235,7 +236,10 @@ planner_ppt_ppl = PipelinePromptTemplate(
 )
 
 planner = create_structured_output_runnable(
-    Plan, ChatOpenAI(model="gpt-4-turbo-preview", temperature=0), planner_ppt_ppl
+    Plan,
+    # ChatOpenAI(model="gpt-4-turbo-preview", temperature=0),
+    ChatOpenAI(model="gpt-4o", temperature=0),
+    planner_ppt_ppl,
 )
 
 #########################################################################################
@@ -275,7 +279,10 @@ plan_updater_ppt_ppl = PipelinePromptTemplate(
 )
 
 plan_updater = create_structured_output_runnable(
-    Plan, ChatOpenAI(model="gpt-4-turbo-preview", temperature=0), plan_updater_ppt_ppl
+    Plan,
+    # ChatOpenAI(model="gpt-4-turbo-preview", temperature=0),
+    ChatOpenAI(model="gpt-4o", temperature=0),
+    plan_updater_ppt_ppl,
 )
 
 #########################################################################################
@@ -337,7 +344,8 @@ human_instruction_ppt_ppl = PipelinePromptTemplate(
 human_instruction_chain = (
     human_instruction_ppt_ppl
     # | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
-    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-4o", temperature=0)
     | JsonOutputParser()
 )
 human_instruction_chain_gpt3 = (
@@ -405,7 +413,8 @@ human_instruction_ppt_ppl_v2 = PipelinePromptTemplate(
 human_instruction_chain_v2 = (
     human_instruction_ppt_ppl_v2
     # | ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
-    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-4o", temperature=0)
     | JsonOutputParser()
 )
 
@@ -741,7 +750,8 @@ one_step_chain = (
     #     model="ft:gpt-3.5-turbo-0125:kifabrik-mirmi:kios-ut-gen-v2:8z2KbPsr",
     #     temperature=0,
     # )
-    | ChatOpenAI(model="gpt-4", temperature=0)
+    # | ChatOpenAI(model="gpt-4", temperature=0)
+    | ChatOpenAI(model="gpt-4o", temperature=0)
     | JsonOutputParser()
 )
 

@@ -118,6 +118,24 @@ class MongoDBInterface:
         target_collection = self.mios_collections.get("environment")
         target_collection.insert_many(documents)
 
+    def update_mios_load_mass(self, load_mass: float):
+
+        mios_parameters_collection = self.client["miosL"]["parameters"]
+        query = {"name": "user"}
+
+        document = mios_parameters_collection.find_one(query)
+
+        if document is None:
+            raise Exception("User not found in the database")
+        else:
+            document["load_m"] = load_mass
+
+            # Update the document in the database
+            update_query = {"_id": document["_id"]}
+            new_values = {"$set": document}
+
+            mios_parameters_collection.update_one(update_query, new_values)
+
     def update_mios_objects(self, documents: List[Dict]):
         target_collection = self.mios_collections.get("environment")
         for document in documents:
@@ -147,8 +165,7 @@ class MongoDBInterface:
 
 def test_query():
     interface = MongoDBInterface()
-    result = interface.query_mios_object("EndEffector")
-    print(result)
+    interface.update_mios_load_mass(2.0)
 
 
 if __name__ == "__main__":

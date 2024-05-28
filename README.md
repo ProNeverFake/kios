@@ -143,10 +143,18 @@ Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongod
     - scene
     - domain
     - problem
-  - gearset1... (in use now)
+  - gearset1... (for development and testing)
     - scene
     - domain
     - problem
+  - demo (for demo)
+    - human_in_the_loop_sync.py
+    - iterative_generation_sync.py
+    - one_step_generation_sync.py
+    - recursive_generation_sync.py
+    - world_state.json
+    - scene.json
+    - ...
 - kios_bt_planning
   - kios_agent: the agents for task planning and behavior tree generating
     - kios_llm_bt: prompt engineering files for end-to-end behavior tree generating
@@ -234,9 +242,11 @@ User_feedback: suggestions for the behavior tree (natural language).
 
 ```bash
 # in the virtual environment
-cd experiments/gearset1
+cd experiments/demo
 python human_in_the_loop_sync.py
 ```
+
+It is strongly recommended to watch the video [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ) to understand the workflow.
 
 ### Testing
 

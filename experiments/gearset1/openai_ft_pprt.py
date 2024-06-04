@@ -2,6 +2,10 @@ import os
 import json
 import dotenv
 
+'''
+prepare the date for openai finetuning
+'''
+
 dotenv.load_dotenv()
 
 from langchain.prompts.prompt import PromptTemplate

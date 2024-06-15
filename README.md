@@ -190,7 +190,7 @@ Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongod
 ### System Structure
 
 <div align="center">
-  <img src="/pic/TRI.png" alt="The Concept" width="90%">
+  <img src="/pic/CONCEPT.png" alt="The Concept" width="90%">
 </div>
 
 ### Something to try

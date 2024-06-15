@@ -266,6 +266,18 @@ conda install ipython
 
 You are welcome to contribute to the project by starting an issue or making a pull request.
 
+## Citation
+
+```
+@inproceedings{Ao2024workshop-LLM-BT,
+ author = {Ao, Jicong and Wu, Yansong and Wu, Fan and Haddadin, Sami},
+ booktitle = {ICRA 2024 Workshop Exploring Role Allocation in Human-Robot Co-Manipulation},
+ title = {Behavior Tree Generation using Large Language Models for Sequential
+Manipulation Planning with Human Instructions and Feedback},
+ year = {2024}
+}
+```
+
 ## License
 
 MIT License

@@ -3,6 +3,9 @@ import time
 from tabulate import tabulate
 from pprint import pprint
 
+'''
+just for backup. the implementation is dirty. Can remove this I guess.
+'''
 
 from kios_robot.robot_interface import RobotInterface
 from kios_robot.data_types import MiosInterfaceResponse, MiosTaskResult

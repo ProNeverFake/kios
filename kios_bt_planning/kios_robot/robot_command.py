@@ -17,23 +17,38 @@ from kios_robot.data_types import TaskScene
 
 from kios_utils.bblab_utils import bb_result_test
 
+'''
+A module for robot command execution. 
+Command pattern is applied here, for RobotCommand being the container of the skills and calls.
+'''
+
 
 class TrivialException(Exception):
+    # for tasks that are defined as trivial, their failure will not raise any reaction and will be skipped if failed.
     pass
 
 
 class RetryException(Exception):
+    # for tasks that are defined as retry, their failure will be retried after a certain time.
     pass
 
 
 class FailureException(Exception):
+    # for tasks that are defined as failure, their failure will raise an exception and stop the command.
     pass
 
 
 class RobotCommand:
+    """
+    A class to represent a robot command, which is a list of tasks to be executed by the robot.
+    you can add tasks to the command, and execute them in order.
+    Please be aware that the "task" is the abstraction, with the actual implementations are MiosSkill, MiosCall, and KiosCall.
+
+    """
+
     robot_address: str = None
     robot_port: int = None
-    shared_data = None
+    shared_data = None # this is reserved for sharing data between "tasks" in one action node, for there could be only one robot command in an action node.
 
     robot_interface: RobotInterface = None
 
@@ -92,7 +107,7 @@ class RobotCommand:
         call_method(self.robot_address, self.robot_port, "stop_task", payload=payload)
 
     def execute_task_list_sync(self) -> bool:
-        self.show_tasks()
+        self.show_tasks() # for debug
         for task_item in self.task_list:
             if not self.execute_task(task_item):
                 return False
@@ -101,6 +116,17 @@ class RobotCommand:
         return True
 
     def execute_task(self, task_item: MiosSkill | MiosCall | KiosCall) -> bool:
+        """core function. execute a task according to its type.
+
+        Args:
+            task_item (MiosSkill | MiosCall | KiosCall): just the "task" to be executed.
+
+        Raises:
+            Exception: Unknown task type
+
+        Returns:
+            bool: success or not
+        """
         while True:
             try:
                 if isinstance(task_item, MiosSkill):
@@ -118,7 +144,7 @@ class RobotCommand:
             except RetryException as e:
                 rc_logger.warning(f"Task {task_item} failed. Retry after 5 seconds...")
                 time.sleep(5)
-                continue
+                continue # next while loop
             except FailureException:
                 rc_logger.error(f"Task {task_item} failed. Stop and return failure...")
                 return False
@@ -146,7 +172,7 @@ class RobotCommand:
         """check response and raise exceptions accordingly
 
         Args:
-            response: can be a mios interface response so result is checker here, or a dict so this method checks if it is None.
+            response: can be a mios interface response so the result is checked here, or a dict so this method checks if it is None.
 
         Raises:
 
@@ -164,6 +190,7 @@ class RobotCommand:
             if response is None:
                 self.raise_exception_for_task(task_item)
 
+    # * methods to execute calls/skills of a specific type
     def execute_mios_skill(self, task_item: MiosSkill):
         mios_task = Task(self.robot_address)
         mios_task.add_skill(
@@ -208,6 +235,7 @@ class RobotCommand:
         elif result_bool == False:
             self.raise_exception_for_task(task_item)
 
+    # * methods to modify the task list
     def add_task(self, task: MiosSkill | MiosCall | KiosCall):
         self.task_list.append(task)
 

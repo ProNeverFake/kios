@@ -5,6 +5,7 @@ from kios_world.data_types import WorldNode, Relationship
 
 """
 currently this module is just for visulization.
+# ! DEPRECATED
 """
 
 

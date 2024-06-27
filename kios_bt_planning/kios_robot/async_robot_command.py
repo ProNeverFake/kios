@@ -12,7 +12,8 @@ from kios_robot.data_types import MiosSkill, MiosCall, KiosCall
 from kios_robot.data_types import TaskScene
 
 """
-! not in use yet
+this is for AIS project (multi-robot coordination)
+# ! not in use in the end. a task queue is applied instead.
 """
 
 

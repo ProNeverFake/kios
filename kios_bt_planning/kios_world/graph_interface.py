@@ -1,8 +1,7 @@
 """
 very simple interface to model the objects in the world and the states of them.
+This module is complete. You don't need to change anything here.
 """
-
-import logging
 
 import networkx as nx
 from typing import Set, Dict, List, Any
@@ -10,11 +9,7 @@ from typing import Set, Dict, List, Any
 from kios_world.neo4j_interface import Neo4jInterface
 from kios_world.data_types import WorldNode, Relationship
 
-from kios_utils.bblab_utils import setup_logger
-
-"""
-this is the current state holder of the world
-"""
+from kios_utils.bblab_utils import setup_logger, bb_deprecated
 
 gi_logger = setup_logger(
     __name__,
@@ -189,6 +184,10 @@ class GraphInterface:
         return json_data
 
     def refresh_neo4j(self):
+        '''
+        this method is for visualization purposes.
+        only call this for demo or testing.
+        '''
         self.neo4j.open_driver()
         self.neo4j.clear_database()
         self.neo4j.create_objects(list(self.nodes.keys()))
@@ -196,6 +195,7 @@ class GraphInterface:
         self.neo4j.create_relations(self.relations)
         self.neo4j.close_driver()
 
+    @bb_deprecated(reason = "networkx is not used in the current implementation")
     def refresh_networkx(self):
         self.graph.clear()
         for node_name, node in self.nodes.items():

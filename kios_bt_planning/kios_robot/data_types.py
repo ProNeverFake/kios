@@ -7,7 +7,12 @@ from kios_utils.math_utils import *
 from kios_utils.exceptions import SceneException
 from tabulate import tabulate
 
+'''
+# ! For developers: The Scene class should be moved to the kios_scene module.
+'''
 
+#####################################################################################
+# * Three types of "tasks": MiosSkill, MiosCall, KiosCall
 @dataclass
 class MiosSkill:
     skill_name: str
@@ -46,9 +51,9 @@ class KiosCall:
         return self.call_name
 
 
-# @dataclass
-
-
+#####################################################################################
+# * The definition of the object in mios. compliant with the content in mongoDB
+# * only use this for interacting with mios
 @dataclass
 class MiosObject:
     name: str
@@ -117,7 +122,7 @@ class MiosObject:
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
     @staticmethod
-    def generate_dummy(object_name: str) -> "MiosObject":
+    def generate_dummy(object_name: str) -> "MiosObject": # for testing
         return MiosObject(
             name=object_name,
             O_T_OB=np.eye(4),
@@ -132,7 +137,9 @@ class MiosObject:
             geometry=None,
         )
 
-
+#####################################################################################
+# * The definition of the response from mios. compliant with the content defined in mios
+# * well not really. could be buggy because the json response in mios is not consistent among different tasks.
 @dataclass
 class MiosInterfaceResponse:
     has_finished: (
@@ -173,7 +180,7 @@ class MiosInterfaceResponse:
         ]
         return tabulate(table, headers=["Attribute", "Value"], tablefmt="plain")
 
-
+# * The definition of the task result from mios. compliant with the content defined in mios
 @dataclass
 class MiosTaskResult:
     has_exception: bool
@@ -209,8 +216,8 @@ class MiosTaskResult:
 
 
 #####################################################################################
-
-
+# * The definition of the object in kios. only the necessary information is included.
+# * always use this for internal processing and querying
 @dataclass
 class KiosObject:
     name: str
@@ -274,8 +281,11 @@ class KiosObject:
             reference_object=relation.reference_object,
         )
 
-
-# ! BBWORK suspend here. need to figure out if using MiosObject is a good idea.
+#####################################################################################
+# * The definition of the reference relation in kios.
+# * This is preserved for future use.
+# * For example, defining only a base coordinate of the objects
+# * and defining the relative pose of the features on the object with respect to the base object.
 @dataclass
 class ReferenceRelation:
     name: str  # ! this is not unique!
@@ -319,7 +329,7 @@ class ReferenceRelation:
             relative_cartesian_pose=json["relative_cartesian_pose"],
         )
 
-
+# * The definition of the toolbox in kios. quite straightforward.
 @dataclass
 class Toolbox:
     name: str
@@ -388,7 +398,9 @@ class Toolbox:
             "EE_T_TCP": toolbox.EE_T_TCP.T.flatten().tolist(),
         }
 
-
+#####################################################################################
+# * The definition of the scene in kios.
+# TODO: move this to the kios_scene module.
 @dataclass
 class TaskScene:
     tool_map: Dict[str, Toolbox] = field(default_factory=dict)
@@ -424,7 +436,8 @@ class TaskScene:
             raise Exception(f"Tool {tool_name} is not in the scene!")
         return tool
 
-
+# * literally the state of the robot,
+# * this is only for interacting with mios (state reading)
 @dataclass
 class RobotState:
     joint_pose: List[float]
@@ -489,7 +502,9 @@ class RobotState:
             # "TF_T_EE_d": robot_state.TF_T_EE_d.T.flatten().tolist(),
         }
 
-
+# * The parsed action for generating the corresponding robot action
+# * including the action name and the arguments
+# * This should be parsed from an action in pddl style.
 @dataclass
 class ParsedAction:
     action_name: str

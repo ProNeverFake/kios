@@ -11,11 +11,13 @@ from kios_world.graph_interface import GraphInterface
 
 
 class WorldInterface:
-    neo4j: Neo4jInterface = None
-    blackboard: py_trees.blackboard.Client = None
-    graph_interface: GraphInterface = None
+    neo4j: Neo4jInterface = None # this is for visualization in neo4j
+    blackboard: py_trees.blackboard.Client = None # currently the blackboard from pytrees is not used
+    graph_interface: GraphInterface = None # the graph interface for the RDF-like world representation
 
-    check_point: Dict[str, dict] = {}
+    # this is for storing a check point of the current world state and restoring it later
+    check_point: Dict[str, dict] = {} 
+    
 
     def __init__(self, graph_interface=True, blackboard=False, neo4j=False) -> None:
         if graph_interface:
@@ -93,8 +95,11 @@ class WorldInterface:
         """
         return self.graph_interface.to_json()
 
-    # for action node
     def take_effect(self, action: Action):
+        '''
+        for action node.
+        call this method to make the action take effect in the world state
+        '''
         # to add/update
         to_update_list = action.effects
         for item in to_update_list:
@@ -118,8 +123,13 @@ class WorldInterface:
     def get_objects(self, object_name: str) -> Any:
         raise NotImplementedError
 
-    # for condition node
     def check_condition(self, condition: Condition) -> bool:
+        '''
+        for condition node.
+        call this method to check if a condition is satisfied in the world state.
+        this method assumes that a condition node can have a list of conditions to be checked.
+        if all conditions are satisfied, return True, otherwise return False.
+        '''
         condition_list = condition.conditions
         for item in condition_list:
             if not self.check_property(item):
@@ -129,7 +139,7 @@ class WorldInterface:
 
     def check_property(self, prop: ObjectProperty) -> bool:
         """
-        check if the property is in the same status as specified in the property object
+        check if a property (or a relation) is satisfied in the world state.
         """
         if prop.property_value is None:
             # this is a property

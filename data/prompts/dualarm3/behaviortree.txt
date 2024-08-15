@@ -11,7 +11,9 @@ Example:
 """
 1. Every node needs at least two keys:
     - "summary": a short interpretive description of the node. 
-    - "name": includes the node type and the formal form of the node according to the domain knowledge. Legal node types are "selector", "sequence", "condition" ("target", "precondition"), "action".
-2. The control flow nodes, namely "selector" and "sequence", can have the key "children", which is a list of children nodes.
-3. The "condition" nodes that are children of "selectors" are targets. Those that are children of "sequences" are preconditions.
-4. Use the actions in ROBOT_ACTION_LIST for the action nodes. If condition nodes are needed, use the predicates in PREDICATE_LIST.
+    - "name": includes the node type and the formal form of the node according to the domain knowledge. Legal node types are "selector", "sequence", "parallel", "condition" ("target", "precondition"), "action".
+2. The control flow nodes, namely "parallel", "selector", and "sequence", can have the key "children", which is a list of children nodes.
+3. Use the actions in ROBOT_ACTION_LIST for the action nodes. If condition nodes are needed, use the predicates in PREDICATE_LIST.
+4. If some subtrees(nodes) can be executed in parallel, use the "parallel" node as their parent node.
+5. If some subtrees(nodes) should be executed in sequence, use the "sequence" node as their parent node.
+6. If some subtrees(nodes) should be executed in a "either-or" manner, use the "selector" node as their parent node.

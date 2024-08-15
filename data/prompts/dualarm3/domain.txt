@@ -24,9 +24,9 @@ The actions are:
 "ROBOT_ACTION_LIST"
 - WAIT(<arm>): <arm> waits. An <arm> should always wait if the precondition of the next action is not satisfied.
 - REACH(<arm>, <location>): <arm> reach <location>, ready for grasping the object at <location>.
-- RETREAT(<arm>): <arm> retreats to a proper position so that the object <arm> is holding can interact with other objects or be further manipulated.
+- RETREAT(<arm>): <arm> retreats to a proper position so that the object, which is held by <arm>, is ready to interact with other objects or be further manipulated.
 - GRASP(<arm>, <object>): <arm> grasp <object>. As preconditions, <arm> should be holding nothing, and <arm> is supposed to have reached the location where the <object> is. 
 - RELEASE(<arm>, <object>): <arm> release <object>.
-- POUR(<arm>, <object1>, <object2>): <arm> pours the things in <object1> into <object2>. As preconditions, <arm> should be holding <object1>, and <object2> should be ready.
+- POUR(<arm>, <object1>, <object2>): <arm> pours the things in <object1> into <object2>. As preconditions, <object1> and <object2> should be ready.
 """
 the items in <> indicate the type of the instances.

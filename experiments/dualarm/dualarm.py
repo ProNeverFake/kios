@@ -4,12 +4,15 @@ import os
 """
 
 """
+# http proxy of the clash
+# os.environ["http_proxy"] = "http://127.0.0.1:7890"
+# os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 os.environ["LANGCHAIN_PROJECT"] = "kios_dualarm"
 
-os.environ["OPENAI_API_BASE"] = "https://gateway.ai.cloudflare.com/v1/08abfead72b07ac70f36a431a4a48c3d/bblab-gateway/openai"
+# os.environ["OPENAI_API_BASE"] = "https://gateway.ai.cloudflare.com/v1/08abfead72b07ac70f36a431a4a48c3d/bblab-gateway/openai"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
 from kios_scene.scene_factory import SceneFactory
@@ -167,18 +170,18 @@ dualarm_chain = (
     dualarm_ppt_ppl
     # | ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     # | ChatOpenAI(model="gpt-4o", temperature=0)
-    | ChatOpenAI(model="gpt-4o", temperature=0, openai_api_base="https://gateway.ai.cloudflare.com/v1/08abfead72b07ac70f36a431a4a48c3d/bblab-gateway/openai")
+    | ChatOpenAI(model="gpt-4o", temperature=0)
     | JsonOutputParser()
 )
 
 instruction = """
-The left arm gets the glass.
-The right arm gets the water bottle.
-The right arm then pours the water in the water bottle into the glass held by the left arm. If the glass has not been taken back, the right arm waits for it.
-After this, the left arm puts the glass on the table, and the right arm puts the water bottle back.
+The left arm reaches the glass on the table1, grasps it and retreats back.
+The right arm reaches the water bottle on the table2, grasps it and retreats back.
+The right arm then pours the water in the water bottle into the glass. 
+If the glass is not ready, the right arm waits for it.
+After this, the left arm reaches the table1 and release the glass. The right arm reaches the table2 and release the water bottle.
 """
 
-# @traceable(name="e2e_test_baselines")
 def rollout():
     bt = dualarm_chain.invoke(
         {
@@ -195,21 +198,9 @@ if __name__ == "__main__":
    
 
 '''
-TEST Instruction from BTGenBot:
-The behavior tree outlines a recovery mechanism for a robot's navigation system. If the robot encounters difficulties in navigating to a goal, it will attempt recovery actions up to 6 times. The recovery sequence involves recalculating the path to the goal and following the path, with each step having its own recovery fallback plan. If the path calculation or following fails, the robot will clear the costmaps and then execute additional recovery actions such as spinning, waiting, and backing up. These actions are designed to help the robot overcome obstacles or issues that may have caused the initial navigation problem. Overall, the behavior tree ensures that the robot can recover from navigation failures by attempting alternative paths, clearing costmaps, and executing specific recovery actions, ultimately enabling it to reach its intended destination.
-
-Snippets of the task:
-The left arm reaches the glass, picks it up, and takes it back.
-The right arm reaches the watter bottle, picks it up, and holds it back.
-The right arm then pours water into the glass held by the left arm. If the glass has not been taken back, the right arm waits for it.
-After this, the left arm puts the glass on the table, and the right arm puts the water bottle back.
-
-
-if xxx is not xxx, wait for xxx to be xxx.
-
-
-TRY Instruction from dualarm:
-
-The behavior tree outlines a task of a dual-arm robot to serve water to customers. 
-
+The left arm reaches the glass on the table1, grasps it and retreats back.
+The right arm reaches the water bottle on the table2, grasps it and retreats back.
+The right arm then pours the water in the water bottle into the glass. 
+If the glass is not ready, the right arm waits for it.
+After this, the left arm reaches the table1 and release the glass. The right arm reaches the table2 and release the water bottle.
 '''

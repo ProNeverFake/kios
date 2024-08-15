@@ -1,0 +1,5 @@
+Resume from the input below.
+"""
+instruction: {instruction}
+initial_state: {initial_state}
+""" 

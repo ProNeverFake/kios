@@ -1,0 +1,5 @@
+Information about the world state is in json dictionary format. It uses the definitions in the PREDICATE_LIST to describe the state of the world.
+
+It includes the following keys:
+- instances: a dictionary of the instance lists in the world, catagorized by type.
+- predicates: a list of predicates describing the state of the world.

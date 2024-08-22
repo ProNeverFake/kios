@@ -82,7 +82,7 @@ class BehaviorTreeFactory:
         """
         get the type od the node from the name
         """
-        pattern = r"(selector|sequence|target|precondition|condition|action)"
+        pattern = r"(selector|sequence|parallel|target|precondition|condition|action)"
         match = re.search(pattern, name)
         if match:
             return match.group(0)
@@ -116,6 +116,17 @@ class BehaviorTreeFactory:
         elif json_data["type_name"] == "sequence":
             control_flow_node = py_trees.composites.Sequence(
                 name=fix_node_name(json_data["name"]), memory=False
+            )
+            for child in json_data["children"]:
+                child_node = self.from_json_to_simple_bt(child)
+                control_flow_node.add_child(child_node)
+
+            return control_flow_node
+        
+        elif json_data["type_name"] == "parallel":
+            control_flow_node = py_trees.composites.Parallel(
+                name=fix_node_name(json_data["name"]),
+                policy=py_trees.common.ParallelPolicy.SuccessOnAll
             )
             for child in json_data["children"]:
                 child_node = self.from_json_to_simple_bt(child)

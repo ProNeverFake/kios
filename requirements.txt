@@ -8,8 +8,8 @@ python-dotenv
 py_trees==2.2.3
 
 # pddl classical planning
-unified-planning
-unified-planning[engines] # for solving the pddl problems
+# unified-planning
+# unified-planning[engines] # for solving the pddl problems
 
 # graph modules
 networkx
@@ -19,8 +19,8 @@ graphviz
 # openai
 openai # you may need to upgrade this after installing it
 # * see openai api change log for more info 
-tiktoken
-cohere
+# tiktoken
+# cohere
 langchain
 langchain-openai
 langgraph==0.0.24
@@ -32,14 +32,17 @@ semantic-router
 roboticstoolbox-python
 
 # vision
-opencv-python
-pyrealsense2
+# opencv-python
+# pyrealsense2
 
 # LLAMA
-torch
-fairscale
-fire
-sentencepiece
+# torch
+# fairscale
+# fire
+# sentencepiece
 
 # scene
 pymongo
+
+# others
+termcolor

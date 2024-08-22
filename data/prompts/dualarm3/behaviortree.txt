@@ -1,0 +1,19 @@
+The behavior tree should be in json dictionary format.
+Example:
+"""
+{
+    "summary": "selector to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
+    "name": "selector: insert(left_hand, parallel_box1, gear1, shaft1)",
+    "children": [
+        ...
+    ]
+}
+"""
+1. Every node needs at least two keys:
+    - "summary": a short interpretive description of the node. 
+    - "name": includes the node type and the formal form of the node according to the domain knowledge. Legal node types are "selector", "sequence", "parallel", "condition" ("target", "precondition"), "action".
+2. The control flow nodes, namely "parallel", "selector", and "sequence", can have the key "children", which is a list of children nodes.
+3. Use the actions in ROBOT_ACTION_LIST for the action nodes. If condition nodes are needed, use the predicates in PREDICATE_LIST.
+4. If some subtrees(nodes) can be executed in parallel, use the "parallel" node as their parent node.
+5. If some subtrees(nodes) should be executed in sequence, use the "sequence" node as their parent node.
+6. If some subtrees(nodes) should be executed in a "either-or" manner, use the "selector" node as their parent node.

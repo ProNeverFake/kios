@@ -1,0 +1,81 @@
+Following is an input/output example.
+Example 1:
+"""
+INPUT:
+target: "insert the gear1 into the shaft1"
+initial_state: {"objects": [
+            {"name": "gear1", "properties": []},
+            {"name": "shaft1", "properties": []},
+            {"name": "parallel_box1", "properties": ["is_empty"]},
+            {"name": "left_hand", "properties": []},
+        ],
+        "constraints": [
+            {"source": "gear1", "name": "can_insert_to", "target": "shaft1"},
+            {"source": "parallel_box1", "name": "can_manipulate", "target": "gear1"},
+        ],
+        "relations": [
+            {"source": "left_hand", "name": "hold", "target": "parallel_box1"},
+        ],
+}
+OUTPUT:
+{
+    "thought": "At the start, the left hand is holding the parallel_box1, and the parallel_box1 is empty. According to the constraints, the gear1 can be inserted to the shaft1, and the parallel_box1 can manipulate the gear1. So, the gear1 can be picked up with the parallel_box1 in the left hand, and then the precondition hold(parallel_box1, gear1) is satisfied. Finally, the gear1 can be inserted into the shaft1 with the parallel_box1 in the left hand.",
+    "action_sequence": [
+        "pick_up(left_hand, parallel_box1, gear1)",
+        "insert(left_hand, parallel_box1, gear1, shaft1)"
+    ],
+    "behavior_tree": {
+        "summary": "selector to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
+        "name": "selector: insert(left_hand, parallel_box1, gear1, shaft1)",
+        "children": [
+            {
+                "summary": "check the target that gear1 is inserted to shaft1",
+                "name": "target: is_inserted_to(gear1, shaft1)"
+            },
+            {
+                "summary": "sequence to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
+                "name": "sequence: insert(left_hand, parallel_box1, gear1, shaft1)",
+                "children": [
+                    {
+                        "summary": "check the precondition that the left hand is holding the parallel_box1",
+                        "name": "precondition: hold(left_hand, parallel_box1)"
+                    },      
+                    {
+                        "summary": "selector to pick_up the gear1 with the parallel_box1 in the left hand",
+                        "name": "selector: pick_up(left_hand, parallel_box1, gear1)",
+                        "children": [
+                            {
+                                "summary": "check the target that the parallel_box1 is holding the gear1",
+                                "name": "target: hold(parallel_box1, gear1)"
+                            },
+                            {
+                                "summary": "sequence to pick_up the gear1 with the parallel_box1 in the left hand",
+                                "name": "sequence: pick_up(left_hand, parallel_box1, gear1)",
+                                "children": [
+                                    {
+                                        "summary": "check the precondition that the parallel_box1 is empty",
+                                        "name": "precondition: is_empty(parallel_box1)"
+                                    },
+                                    {
+                                        "summary": "check the precondition that the left hand is holding the parallel_box1",
+                                        "name": "precondition: hold(left_hand, parallel_box1)"
+                                    },
+                                    {
+                                        "summary": "the action to pick_up the gear1 with the parallel_box1 in the left hand",
+                                        "name": "action: pick_up(left_hand, parallel_box1, gear1)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "summary": "the action to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
+                        "name": "action: insert(left_hand, parallel_box1, gear1, shaft1)"
+                    }
+                ]
+            }
+        ]
+    }
+}
+
+

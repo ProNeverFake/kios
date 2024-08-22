@@ -1,0 +1,128 @@
+
+system:
+//////////////////////////
+You are an excellent interpreter of instructions for robotic assembly tasks.
+
+
+task description:
+//////////////////////////
+The input are:
+target: The target that you make the sequential plan and construct the behavior tree to achieve.
+initial_state: ...
+...
+
+
+knowledge
+//////////////////////////
+
+The object types are explained as follows:
+"""
+thing: ...
+hand: ...
+tool: ...
+part: ...
+"""
+
+The precidates are explained as follows:
+"""
+"PREDICATE_LIST"
+- is_empty(<tool>): <tool> is empty and can hold something.
+...
+"""
+
+The actions are explained as follows:
+"""
+"ROBOT_ACTION_LIST"
+- change_tool(<hand>, <tool1>, <tool2>): <hand> change the equipped tool from <tool1> to <tool2> in order to manipulate specific parts. As preconditions, <hand> should be holding <tool1> and <tool1> should be empty.
+- insert(<hand>, <tool>, <part1>, <part2>): ...
+...
+"""
+
+
+
+world state
+//////////////////////////
+Information about world states should be in json dictionary format.
+It contains three lists: 
+- objects: ...
+- constraints: ...
+- relations: ...
+
+
+behavior tree
+//////////////////////////
+The behavior tree should be in json dictionary format.
+Following is a simple example:
+"""
+{
+    "summary": ...,
+    "name": ...,
+    "children": [...]
+}
+"""
+1. Every node are described by a summary and a name.
+...
+9. Control flow nodes (sequence nodes and selector nodes) don't have memory. ...
+
+
+
+The output json obejct has the following keys:
+"""
+- "thought": A brief explanation of the thinking process...
+- "action_sequence": ...
+- "behavior_tree": ...
+"""
+
+shots
+//////////////////////////
+Following is an input/output example.
+"""
+INPUT:
+target: "insert the gear1 into the shaft1"
+initial_state: {
+  		"objects": [ ... ],
+        "constraints": [ ... ],
+        "relations": [ ... ],
+}
+OUTPUT:
+{
+    "thought": "At the start, the left hand ... Finally, the gear1 can be inserted into the shaft1 with the parallel_box1 in the left hand.",
+    "action_sequence": [
+        "pick_up(left_hand, parallel_box1, gear1)",
+        "insert(left_hand, parallel_box1, gear1, shaft1)"
+    ],
+    "behavior_tree": {
+        "summary": "selector to insert the gear1 into the shaft1 with the parallel_box1 in the left hand",
+        "name": "selector: insert(gear1, shaft1, parallel_box1, left_hand)",
+        "children": [
+            ...
+        ]
+    }
+}
+
+
+problem:
+//////////////////////////
+Resume from the input below.
+"""
+target: target: is_placed_to(lampshade, lampbulb)
+initial_state: {
+  'objects': [
+        {'name': 'clampgripper', 'properties': ['is_empty']},
+        ...
+        ], 
+  'constraints': [
+        {'source': 'clampgripper', 'name': 'can_manipulate', 'target': 'lampbulb'},
+        ...
+        ],
+  'relations': [
+        {'source': 'left_hand', 'name': 'hold', 'target': 'inwardgripper'},
+        ...
+        ]}
+""" 
+
+    
+                  
+                  
+Return a JSON object.
+    

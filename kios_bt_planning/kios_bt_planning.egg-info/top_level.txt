@@ -5,6 +5,7 @@ kios_future
 kios_plan
 kios_robot
 kios_scene
+kios_service
 kios_utils
 kios_world
 tests

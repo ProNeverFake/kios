@@ -38,6 +38,7 @@ kios_robot/__init__.py
 kios_robot/async_robot_command.py
 kios_robot/backup_robot_command.py
 kios_robot/data_types.py
+kios_robot/demo_solution.py
 kios_robot/mios_async.py
 kios_robot/mios_task_factory.py
 kios_robot/robot_command.py
@@ -48,8 +49,12 @@ kios_scene/__init__.py
 kios_scene/mios_ltm_manipulator.py
 kios_scene/mongodb_interface.py
 kios_scene/scene_factory.py
+kios_service/__init__.py
+kios_service/clients.py
+kios_service/servers.py
 kios_utils/__init__.py
 kios_utils/bblab_utils.py
+kios_utils/exceptions.py
 kios_utils/math_utils.py
 kios_utils/parsers.py
 kios_utils/pddl_problem_parser.py
@@ -72,6 +77,7 @@ tests/graph_interface_test.py
 tests/multiprocess_test.py
 tests/neo4j_test.py
 tests/networkx_test.py
+tests/paper_work.py
 tests/pddl_interface_test.py
 tests/robot_interface_test.py
 tests/visualization_debug.py

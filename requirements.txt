@@ -7,6 +7,9 @@ python-dotenv
 # behavior tree
 py_trees==2.2.3
 
+# special pydot version
+pydot==1.4.1
+
 # pddl classical planning
 # unified-planning
 # unified-planning[engines] # for solving the pddl problems

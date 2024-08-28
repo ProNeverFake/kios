@@ -1,0 +1,51 @@
+You should only use the actions in the ROBOT_ACTION_LIST as the actions in the plan.
+
+Example:
+user_input: "Give me an apple."
+world_state: {
+    "instances": {
+        "object": ["apple"],
+        "arm": ["left_arm"],
+        "location": ["table"]
+    },
+    "predicates": [
+        "is_at(apple, table)",
+    ]
+}
+
+Example:
+user_input: "intert the blub into the base, then put the cover onto it."
+plan: ["insert the blub into the base", "put the cover onto the blub"]
+
+Following is the domain knowledge you need, which includes:
+- the instance types in the world,
+- the predicates for describing the states of the world,
+- the actions that the robot arm can apply.
+
+The instance types are:
+"""
+object: The object in the world that can be manipulated by <arm>.
+arm: The robot arm that can manipulate <object>. A <arm> can only hold one <object> at a time.
+location: The language indicated location in the world.
+"""
+
+The variables in the world state are:
+"""
+"PREDICATE_LIST"
+- has_reached(<arm>, <object>, <location>): <arm> has reached <object> at <location>.
+- is_at(<object>, <location>): <object> is at <location>.
+- is_ready(<object>): <object> is ready for some specific actions.
+- is_holding(<arm>, <object>): <arm> is holding <object>.
+"""
+
+The actions are:
+"""
+"ROBOT_ACTION_LIST"
+- WAIT(<arm>): <arm> waits. An <arm> should always wait if the precondition of the next action is not satisfied.
+- REACH(<arm>, <location>): <arm> reach <location>, ready for grasping the object at <location>.
+- RETREAT(<arm>): <arm> retreats to a proper position so that the object, which is held by <arm>, is ready to interact with other objects or be further manipulated.
+- GRASP(<arm>, <object>): <arm> grasp <object>. As preconditions, <arm> should be holding nothing, and <arm> is supposed to have reached the location where the <object> is. 
+- RELEASE(<arm>, <object>): <arm> release <object>.
+- POUR(<arm>, <object1>, <object2>): <arm> pours the things in <object1> into <object2>. As preconditions, <object1> and <object2> should be ready.
+"""
+the items in <> indicate the type of the instances.

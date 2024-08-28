@@ -1,0 +1,11 @@
+{
+    "instances": {
+        "object": ["watter_bottle", "glass"],
+        "arm": ["left_arm", "right_arm"],
+        "location": ["table1", "table2"]
+    },
+    "predicates": [
+        "is_at(watter_bottle, table2)",
+        "is_at(glass, table1)"
+    ]
+}

@@ -25,8 +25,8 @@ def low_pass_filter(data, cutoff, fs, order=5):
 
 def record_voice() -> np.int16:
     '''
+    press v to start recording, press v again to stop recording
     Record voice from the microphone and apply a high-pass filter with a cut-off frequency of 40 Hz.
-    copilot generated code.
     '''
 
     # * Sampling rate. whisper is trained with 16kHz so this is fixed
@@ -56,6 +56,8 @@ def record_voice() -> np.int16:
             pass
 
     # Start recording
+    print("Press 'v' to start recording.")
+
     stream = sd.InputStream(callback=callback, channels=1, samplerate=fs)
 
     # Collect events until released

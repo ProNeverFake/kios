@@ -7,98 +7,98 @@ edge [fontname="times-roman"];
  main_task" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
  main_task", shape=box, style=filled];
 "parallel:
- reach_grasp_retreat" [fillcolor=gold, fontcolor=black, fontsize=18, height=1.0, label="\"parallel:\n reach_grasp_retreat\"\ntype", shape=parallelogram, style=filled];
+ initial_reach_and_grasp" [fillcolor=gold, fontcolor=black, fontsize=18, height=1.0, label="\"parallel:\n initial_reach_and_grasp\"\ntype", shape=parallelogram, style=filled];
 "sequence:
  main_task" -> "parallel:
- reach_grasp_retreat";
+ initial_reach_and_grasp";
 "sequence:
- left_arm_glass" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- left_arm_glass", shape=box, style=filled];
+ left_arm_reach_and_grasp_glass" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ left_arm_reach_and_grasp_glass", shape=box, style=filled];
 "parallel:
- reach_grasp_retreat" -> "sequence:
- left_arm_glass";
+ initial_reach_and_grasp" -> "sequence:
+ left_arm_reach_and_grasp_glass";
 "action:
  REACH(left_arm, table1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  REACH(left_arm, table1)", shape=ellipse, style=filled];
 "sequence:
- left_arm_glass" -> "action:
+ left_arm_reach_and_grasp_glass" -> "action:
  REACH(left_arm, table1)";
 "action:
  GRASP(left_arm, glass)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  GRASP(left_arm, glass)", shape=ellipse, style=filled];
 "sequence:
- left_arm_glass" -> "action:
+ left_arm_reach_and_grasp_glass" -> "action:
  GRASP(left_arm, glass)";
 "action:
  RETREAT(left_arm)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  RETREAT(left_arm)", shape=ellipse, style=filled];
 "sequence:
- left_arm_glass" -> "action:
+ left_arm_reach_and_grasp_glass" -> "action:
  RETREAT(left_arm)";
 "sequence:
- right_arm_water_bottle" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- right_arm_water_bottle", shape=box, style=filled];
+ right_arm_reach_and_grasp_bottle" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ right_arm_reach_and_grasp_bottle", shape=box, style=filled];
 "parallel:
- reach_grasp_retreat" -> "sequence:
- right_arm_water_bottle";
+ initial_reach_and_grasp" -> "sequence:
+ right_arm_reach_and_grasp_bottle";
 "action:
  REACH(right_arm, table2)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  REACH(right_arm, table2)", shape=ellipse, style=filled];
 "sequence:
- right_arm_water_bottle" -> "action:
+ right_arm_reach_and_grasp_bottle" -> "action:
  REACH(right_arm, table2)";
 "action:
- GRASP(right_arm, water_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- GRASP(right_arm, water_bottle)", shape=ellipse, style=filled];
+ GRASP(right_arm, watter_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ GRASP(right_arm, watter_bottle)", shape=ellipse, style=filled];
 "sequence:
- right_arm_water_bottle" -> "action:
- GRASP(right_arm, water_bottle)";
+ right_arm_reach_and_grasp_bottle" -> "action:
+ GRASP(right_arm, watter_bottle)";
 "action:
  RETREAT(right_arm)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  RETREAT(right_arm)", shape=ellipse, style=filled];
 "sequence:
- right_arm_water_bottle" -> "action:
+ right_arm_reach_and_grasp_bottle" -> "action:
  RETREAT(right_arm)";
 "sequence:
- pour_water" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- pour_water", shape=box, style=filled];
+ right_arm_pour_water" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ right_arm_pour_water", shape=box, style=filled];
 "sequence:
  main_task" -> "sequence:
- pour_water";
+ right_arm_pour_water";
 "selector:
- check_glass_ready" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
- check_glass_ready", shape=octagon, style=filled];
+ wait_or_pour" [fillcolor=darkslategray2, fontcolor=black, fontsize=18, height=1.0, label="selector:
+ wait_or_pour", shape=octagon, style=filled];
 "sequence:
- pour_water" -> "selector:
- check_glass_ready";
+ right_arm_pour_water" -> "selector:
+ wait_or_pour";
 "condition:
  is_ready(glass)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="condition:
  is_ready(glass)", shape=ellipse, style=filled];
 "selector:
- check_glass_ready" -> "condition:
+ wait_or_pour" -> "condition:
  is_ready(glass)";
 "action:
  WAIT(right_arm)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
  WAIT(right_arm)", shape=ellipse, style=filled];
 "selector:
- check_glass_ready" -> "action:
+ wait_or_pour" -> "action:
  WAIT(right_arm)";
 "action:
- POUR(right_arm, water_bottle, glass)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- POUR(right_arm, water_bottle, glass)", shape=ellipse, style=filled];
+ POUR(right_arm, watter_bottle, glass)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ POUR(right_arm, watter_bottle, glass)", shape=ellipse, style=filled];
 "sequence:
- pour_water" -> "action:
- POUR(right_arm, water_bottle, glass)";
+ right_arm_pour_water" -> "action:
+ POUR(right_arm, watter_bottle, glass)";
 "parallel:
- release_objects" [fillcolor=gold, fontcolor=black, fontsize=18, height=1.0, label="\"parallel:\n release_objects\"\ntype", shape=parallelogram, style=filled];
+ final_release" [fillcolor=gold, fontcolor=black, fontsize=18, height=1.0, label="\"parallel:\n final_release\"\ntype", shape=parallelogram, style=filled];
 "sequence:
  main_task" -> "parallel:
- release_objects";
+ final_release";
 "sequence:
  left_arm_release_glass" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
  left_arm_release_glass", shape=box, style=filled];
 "parallel:
- release_objects" -> "sequence:
+ final_release" -> "sequence:
  left_arm_release_glass";
 "\"action:\n REACH(left_arm, table1)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n REACH(left_arm, table1)\"*", shape=ellipse, style=filled];
 "sequence:
@@ -110,18 +110,18 @@ edge [fontname="times-roman"];
  left_arm_release_glass" -> "action:
  RELEASE(left_arm, glass)";
 "sequence:
- right_arm_release_water_bottle" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- right_arm_release_water_bottle", shape=box, style=filled];
+ right_arm_release_bottle" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
+ right_arm_release_bottle", shape=box, style=filled];
 "parallel:
- release_objects" -> "sequence:
- right_arm_release_water_bottle";
+ final_release" -> "sequence:
+ right_arm_release_bottle";
 "\"action:\n REACH(right_arm, table2)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n REACH(right_arm, table2)\"*", shape=ellipse, style=filled];
 "sequence:
- right_arm_release_water_bottle" -> "\"action:\n REACH(right_arm, table2)\"*";
+ right_arm_release_bottle" -> "\"action:\n REACH(right_arm, table2)\"*";
 "action:
- RELEASE(right_arm, water_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- RELEASE(right_arm, water_bottle)", shape=ellipse, style=filled];
+ RELEASE(right_arm, watter_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
+ RELEASE(right_arm, watter_bottle)", shape=ellipse, style=filled];
 "sequence:
- right_arm_release_water_bottle" -> "action:
- RELEASE(right_arm, water_bottle)";
+ right_arm_release_bottle" -> "action:
+ RELEASE(right_arm, watter_bottle)";
 }

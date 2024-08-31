@@ -5,12 +5,12 @@ import os
 
 """
 # http proxy of the clash
-# os.environ["http_proxy"] = "http://127.0.0.1:7890"
-# os.environ["https_proxy"] = "http://127.0.0.1:7890"
+os.environ["http_proxy"] = "http://127.0.0.1:7890"
+os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 # MEGVII http_proxy transparent proxy
-os.environ["http_proxy"] = "http://127.0.0.1:80"
-os.environ["https_proxy"] = "https://127.0.0.1:443"
+# os.environ["http_proxy"] = "http://127.0.0.1:80"
+# os.environ["https_proxy"] = "https://127.0.0.1:443"
 
 # os.environ["LANGCHAIN_TRACING_V2"] = "false"
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
@@ -39,6 +39,7 @@ load_dotenv()
 
 from kios_utils.pybt_test import generate_bt_stewardship, render_dot_tree
 
+
 def render_bt(bt_json: dict):
     test_class = BehaviorTreeFactory()
     bt = test_class.from_json_to_simple_bt(bt_json)
@@ -48,40 +49,20 @@ def render_bt(bt_json: dict):
     render_dot_tree(bt_stewardship)
 
 
-def get_problem(problem_id: int) -> dict:
-    file_dir = os.path.dirname(os.path.abspath(__file__))
-    problem_dir = os.path.join(
-        file_dir, "problem_set", f"problem_{str(problem_id).zfill(3)}.json"
-    )
-    with open(problem_dir, "r") as file:
-        return json.load(file)
-
-
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))
-scene_path = os.path.join(current_dir, "scene.json")
-# bt_json_file_path = os.path.join(current_dir, "behavior_tree.json")
 world_state_path = os.path.join(current_dir, "world_state.json")
-domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
-
-####################### scene
-with open(scene_path, "r") as file:
-    scene_json_object = json.load(file)
-
-# scene = SceneFactory().create_scene_from_json(scene_json_object)
 
 ####################### world
 world_interface = WorldInterface()
 with open(world_state_path, "r") as file:
     world_state_json = json.load(file)
-    # world_interface.load_world_from_json(world_state_json)
 
 ####################### robot
 robot_interface = RobotInterface(
     robot_address="127.0.0.1",
     robot_port=12000,
 )
-# robot_interface.setup_scene(scene)
 
 ####################### bt_factory
 bt_factory = BehaviorTreeFactory(
@@ -123,13 +104,13 @@ with open(domain_file, "r") as f:
 with open(state_file, "r") as f:
     state_ppt = PromptTemplate.from_template(f.read())
 # with open(output_format_file, "r") as f:
-    # output_format_ppt = PromptTemplate.from_template(f.read())
+# output_format_ppt = PromptTemplate.from_template(f.read())
 with open(behaviortree_file, "r") as f:
     ppt_tmp = PromptTemplate.from_template("{input}")
     behaviortree_ppt = ppt_tmp.partial(input=f.read())
 # with open(example_file, "r") as f:
-    # ppt_tmp = PromptTemplate.from_template("{input}")
-    # example_ppt = ppt_tmp.partial(input=f.read())
+# ppt_tmp = PromptTemplate.from_template("{input}")
+# example_ppt = ppt_tmp.partial(input=f.read())
 
 full_template_ppt = ChatPromptTemplate.from_template(
     """{system}
@@ -176,19 +157,21 @@ dualarm_chain = (
     | JsonOutputParser()
 )
 
-instruction = """
-The left arm reaches the glass on the table1, grasps it and retreats back.
-The right arm reaches the water bottle on the table2, grasps it and retreats back.
-The right arm then pours the water in the water bottle into the glass. 
-If the glass is not ready, the right arm waits for it.
-After this, the left arm reaches the table1 and release the glass. The right arm reaches the table2 and release the water bottle.
-"""
+# instruction = """
+# The left arm reaches the glass on the table1, grasps it and retreats back.
+# The right arm reaches the water bottle on the table2, grasps it and retreats back.
+# The right arm then pours the water in the water bottle into the glass. 
+# If the glass is not ready, the right arm waits for it.
+# After this, the left arm reaches the table1 and release the glass. The right arm reaches the table2 and release the water bottle.
+# """
+
 
 def rollout():
 
     # record the voice and translate it into chinese
     from audio import record_and_transcribe
-    instruction = record_and_transcribe()
+
+    instruction = record_and_transcribe(lang="en")
 
     # invoke to generate the behavior tree
     bt = dualarm_chain.invoke(
@@ -203,18 +186,149 @@ def rollout():
 
     # send the behavior tree to localhost:8004
     from zmq_manager import ZMQManager
-    manager = ZMQManager()
+
+    manager = ZMQManager(host="127.0.0.1", port=8004)
     manager.send_json(bt)
 
 
 if __name__ == "__main__":
     rollout()
-   
 
-'''
+"""
+HERE THE INSTRUCTION FOR INPUT:
+
 The left arm reaches the glass on the table1, grasps it and retreats back.
 The right arm reaches the water bottle on the table2, grasps it and retreats back.
 The right arm then pours the water in the water bottle into the glass. 
 If the glass is not ready, the right arm waits for it.
 After this, the left arm reaches the table1 and release the glass. The right arm reaches the table2 and release the water bottle.
-'''
+"""
+
+from kios_utils.parsers import match_type
+
+def tree_to_queue(tree_node: dict, sequence_list: list) -> dict:
+    '''
+    tree: the behavior tree in json format
+    queue_dict:
+        {
+            left_queue: [],
+            right_queue: [],
+            normal_queue: []
+        }
+    
+    return: queue_dict
+    '''
+    node_type, node_body = match_type(tree_node)
+
+    if node_type == "sequence":
+        queue_dict["normal_queue"].append(tree_node)
+    
+
+
+
+example_bt = {
+    "summary": "sequence to perform the task of manipulating the glass and water bottle with left and right arms",
+    "name": "sequence: main_task",
+    "children": [
+        {
+            "summary": "parallel to perform initial reaching and grasping tasks",
+            "name": "parallel: initial_reach_and_grasp",
+            "children": [
+                {
+                    "summary": "sequence for left arm to reach and grasp the glass on table1",
+                    "name": "sequence: left_arm_reach_and_grasp_glass",
+                    "children": [
+                        {
+                            "summary": "left arm reaches the glass on table1",
+                            "name": "action: REACH(left_arm, table1)",
+                        },
+                        {
+                            "summary": "left arm grasps the glass",
+                            "name": "action: GRASP(left_arm, glass)",
+                        },
+                        {
+                            "summary": "left arm retreats with the glass",
+                            "name": "action: RETREAT(left_arm)",
+                        },
+                    ],
+                },
+                {
+                    "summary": "sequence for right arm to reach and grasp the water bottle on table2",
+                    "name": "sequence: right_arm_reach_and_grasp_bottle",
+                    "children": [
+                        {
+                            "summary": "right arm reaches the water bottle on table2",
+                            "name": "action: REACH(right_arm, table2)",
+                        },
+                        {
+                            "summary": "right arm grasps the water bottle",
+                            "name": "action: GRASP(right_arm, watter_bottle)",
+                        },
+                        {
+                            "summary": "right arm retreats with the water bottle",
+                            "name": "action: RETREAT(right_arm)",
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            "summary": "sequence for right arm to pour water into the glass",
+            "name": "sequence: right_arm_pour_water",
+            "children": [
+                {
+                    "summary": "right arm waits if the glass is not ready",
+                    "name": "selector: wait_or_pour",
+                    "children": [
+                        {
+                            "summary": "condition to check if the glass is ready",
+                            "name": "condition: is_ready(glass)",
+                        },
+                        {
+                            "summary": "right arm waits",
+                            "name": "action: WAIT(right_arm)",
+                        },
+                    ],
+                },
+                {
+                    "summary": "right arm pours water from the bottle into the glass",
+                    "name": "action: POUR(right_arm, watter_bottle, glass)",
+                },
+            ],
+        },
+        {
+            "summary": "parallel to perform final releasing tasks",
+            "name": "parallel: final_release",
+            "children": [
+                {
+                    "summary": "sequence for left arm to release the glass on table1",
+                    "name": "sequence: left_arm_release_glass",
+                    "children": [
+                        {
+                            "summary": "left arm reaches table1",
+                            "name": "action: REACH(left_arm, table1)",
+                        },
+                        {
+                            "summary": "left arm releases the glass",
+                            "name": "action: RELEASE(left_arm, glass)",
+                        },
+                    ],
+                },
+                {
+                    "summary": "sequence for right arm to release the water bottle on table2",
+                    "name": "sequence: right_arm_release_bottle",
+                    "children": [
+                        {
+                            "summary": "right arm reaches table2",
+                            "name": "action: REACH(right_arm, table2)",
+                        },
+                        {
+                            "summary": "right arm releases the water bottle",
+                            "name": "action: RELEASE(right_arm, watter_bottle)",
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

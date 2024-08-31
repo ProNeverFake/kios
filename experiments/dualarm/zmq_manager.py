@@ -9,7 +9,7 @@ class ZMQManager:
     def send(self, msg):
         self.socket.send_string(msg)
 
-    def senf_json(self, msg: dict):
+    def send_json(self, msg: dict):
         self.socket.send_json(msg)
 
     def receive(self):

@@ -3,7 +3,7 @@ from keyboard_record import record_voice
 
 # todo a class
 
-def record_and_transcribe() -> str:
+def record_and_transcribe(lang = 'en') -> str:
     # Record voice
     record_voice()
     
@@ -13,7 +13,7 @@ def record_and_transcribe() -> str:
     transcription = client.audio.transcriptions.create(
         model="whisper-1", 
         file=audio_file,
-        language="cmn-CN"
+        language=lang
     )
 
     print(transcription.text)

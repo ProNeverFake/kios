@@ -1,0 +1,7 @@
+scipy 
+numpy<2
+pynput 
+fastapi[standard]
+transformers 
+sounddevice 
+pydub

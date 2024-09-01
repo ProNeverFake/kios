@@ -5,15 +5,10 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts.chat import HumanMessagePromptTemplate, ChatPromptTemplate
 
-# import socket, socks
+os.environ["http_proxy"] = "http://127.0.0.1:7890"
+os.environ["https_proxy"] = "https://127.0.0.1:7890"
 
-# socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1080)
-# socket.socket = socks.socksocket
-
-# os.environ["http_proxy"] = "http://127.0.0.1:7890"
-# os.environ["https_proxy"] = "https://127.0.0.1:7890"
-
-os.environ["http_proxy"] = "http://localhost:80"
+# os.environ["http_proxy"] = "http://localhost:80"
 # os.environ["https_proxy"] = "https://localhost:443"
 
 # Function to encode a local image into data URL 
@@ -42,10 +37,7 @@ prompt_template =  HumanMessagePromptTemplate.from_template(
 
 summarize_image_prompt = ChatPromptTemplate.from_messages([prompt_template])
 
-model = ChatOpenAI(model= "gpt-4o"
-                #    , model_kwargs={"proxies": {'http': 'http://localhost:80','https': 'http://localhost:443'}},
-                #    , base_url="https://api.lingyiwanwu.com/v1"
-                   )
+model = ChatOpenAI(model= "gpt-4o")
 gpt4_image_chain = summarize_image_prompt | model 
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))

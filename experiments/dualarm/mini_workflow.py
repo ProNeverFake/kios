@@ -2,8 +2,9 @@ import json
 import os
 
 """
-
+currently not in use because of the proxy issue
 """
+
 # * http proxy of the clash
 # os.environ["http_proxy"] = "http://127.0.0.1:7890"
 # os.environ["https_proxy"] = "http://127.0.0.1:7890"

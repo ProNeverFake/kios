@@ -6,7 +6,6 @@ import numpy as np
 from IPython.display import HTML, display
 from PIL import Image
 
-
 # os.environ["http_proxy"] = "http://127.0.0.1:80"
 # os.environ["https_proxy"] = "https://127.0.0.1:443"
 

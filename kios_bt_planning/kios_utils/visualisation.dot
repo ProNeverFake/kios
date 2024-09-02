@@ -3,90 +3,13 @@ ordering=out;
 graph [fontname="times-roman"];
 node [fontname="times-roman"];
 edge [fontname="times-roman"];
-"sequence:
- pour_and_restore(left_arm, right_arm, water_bottle, glass, table1, table2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence:
- pour_and_restore(left_arm, right_arm, water_bottle, glass, table1, table2)", shape=box, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)", shape=box, style=filled];
-"sequence:
- pour_and_restore(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)";
-"action:
- REACH(right_arm, table2)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- REACH(right_arm, table2)", shape=ellipse, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- REACH(right_arm, table2)";
-"action:
- GRASP(right_arm, water_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- GRASP(right_arm, water_bottle)", shape=ellipse, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- GRASP(right_arm, water_bottle)";
-"action:
- RETREAT(right_arm)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- RETREAT(right_arm)", shape=ellipse, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- RETREAT(right_arm)";
-"action:
- REACH(left_arm, table1)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- REACH(left_arm, table1)", shape=ellipse, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- REACH(left_arm, table1)";
-"parallel:
- ensure_objects_ready(water_bottle, glass)" [fillcolor=gold, fontcolor=black, fontsize=18, height=1.0, label="\"parallel:\n ensure_objects_ready(water_bottle, glass)\"\ntype", shape=parallelogram, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "parallel:
- ensure_objects_ready(water_bottle, glass)";
-"condition:
- is_ready(water_bottle)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="condition:
- is_ready(water_bottle)", shape=ellipse, style=filled];
-"parallel:
- ensure_objects_ready(water_bottle, glass)" -> "condition:
- is_ready(water_bottle)";
-"condition:
- is_ready(glass)" [fillcolor=lightgoldenrod1, fontcolor=black, fontsize=18, height=1.0, label="condition:
- is_ready(glass)", shape=ellipse, style=filled];
-"parallel:
- ensure_objects_ready(water_bottle, glass)" -> "condition:
- is_ready(glass)";
-"action:
- POUR(right_arm, water_bottle, glass)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- POUR(right_arm, water_bottle, glass)", shape=ellipse, style=filled];
-"sequence:
- pour_water(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- POUR(right_arm, water_bottle, glass)";
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)", shape=box, style=filled];
-"sequence:
- pour_and_restore(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)";
-"action:
- RELEASE(right_arm, water_bottle)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- RELEASE(right_arm, water_bottle)", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- RELEASE(right_arm, water_bottle)";
-"\"action:\n REACH(right_arm, table2)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n REACH(right_arm, table2)\"*", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "\"action:\n REACH(right_arm, table2)\"*";
-"\"action:\n RELEASE(right_arm, water_bottle)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n RELEASE(right_arm, water_bottle)\"*", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "\"action:\n RELEASE(right_arm, water_bottle)\"*";
-"action:
- RELEASE(left_arm, glass)" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action:
- RELEASE(left_arm, glass)", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "action:
- RELEASE(left_arm, glass)";
-"\"action:\n REACH(left_arm, table1)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n REACH(left_arm, table1)\"*", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "\"action:\n REACH(left_arm, table1)\"*";
-"\"action:\n RELEASE(left_arm, glass)\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action:\n RELEASE(left_arm, glass)\"*", shape=ellipse, style=filled];
-"sequence:
- restore_objects(left_arm, right_arm, water_bottle, glass, table1, table2)" -> "\"action:\n RELEASE(left_arm, glass)\"*";
+"sequence" [fillcolor=chocolate1, fontcolor=black, fontsize=18, label="sequence", shape=box, style=filled];
+"\"sequence\"*" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="\"sequence\"*", shape=box, style=filled];
+"sequence" -> "\"sequence\"*";
+"action" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="action", shape=ellipse, style=filled];
+"\"sequence\"*" -> "action";
+"\"sequence\"**" [fillcolor=chocolate1, fontcolor=black, fontsize=18, height=1.0, label="\"sequence\"**", shape=box, style=filled];
+"sequence" -> "\"sequence\"**";
+"\"action\"*" [fillcolor=lightgreen, fontcolor=black, fontsize=18, height=1.0, label="\"action\"*", shape=ellipse, style=filled];
+"\"sequence\"**" -> "\"action\"*";
 }

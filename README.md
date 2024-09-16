@@ -27,8 +27,12 @@ You could also may deploy your own methods to generate `robot command` in `mios_
 
 ## Intro
 
+<div align="center">
+  <img src="/pic/headline.png" alt="headline" width="80%">
+</div>
+
 KIOS is a LLM & behavior tree-based robot task planning system developed by BlackBird for his master thesis. 
-The system is written in python. The idea is to integrate LLMs into the robot task planning system for automatic behaviortree generation and modification.
+The system is written in python. The idea is to integrate LLMs into the robot task planning system for automatic behavior tree generation and modification.
 
 The LLM is used for generating the task plan in the form of behavior trees based on the provided domain knowledge (prompt engineering or RAG). The APIs for generating, modifying and executing the behavior trees are exposed to the LLM agent. With the feedback from the robot(also the nature language feedbacks from the user), the LLM agent can modify the behavior tree and generate new plans dynamically to finish the robotic assembly tasks.
 
@@ -42,6 +46,9 @@ The usecases are from the siemens robot assembly challenge and the furniture-ben
   * [Install](#install)
   * [Packages](#packages)
   * [System Structure](#system-structure)
+    * [World State](#world-state)
+    * [Behavior Tree](#behavior-tree)
+    * [Prompt](#prompt)
   * [Something to try](#something-to-try)
   * [Testing](#testing)
   * [Development Log](#development-log)
@@ -102,14 +109,14 @@ After setting up the neo4j server, please change the autherization information i
 
 3. Set up the mios (branch = kios) and the franka robot.
 
+> BB: For MIRMI users, check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. The docker image's name is "mirmi/mios", but is not compatible with this project. The skills necessary for the robot manipulation in kios are still being actively developed. A new docker image will be released as soon as possible. 
+
 4. (skip this now) Install llama.cpp according to the [docs](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file#supported-backends). Please aware that you need to enable CUDA backend.
 
 ```bash
 # in the virtual environment
 CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
 ```
-
-> BB: Check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. The docker image's name is "mirmi/mios", but is not compatible with this project. The skills necessary for the robot manipulation in kios are still being actively developed. A new docker image will be released as soon as possible. 
 
 5. Set up your openai api-key.
 
@@ -193,6 +200,58 @@ Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongod
   <img src="/pic/CONCEPT.png" alt="The Concept" width="90%">
 </div>
 
+#### World State
+
+The world state in the framework is modeled with a dictionary-like structure and organized in a JSON object.
+Using JSON files as world representation leverages the rich JSON-related data in the pre-training phase.
+
+<div align="center">
+  <img src="/pic/world_state_modeling.png" alt="world state" width="45%">
+  <img src="/pic/world_model_vis.png" alt="world state vis" width="45%">
+</div>
+
+The key values in the world state are explained below:
+
+- Objects
+
+  A list of the objects in the world, including their names and the properties they have.
+
+
+- Properties
+
+  Properties are typically unary state variables that indicate object affordances and availability. These properties can change during task execution. For example, `is_available(tool1)` indicates that the tool is available for task execution, and this status may change when the tool is occupied.
+
+
+- Constraints
+
+  A list of constraints in the world that the user defines, including the constraint name and the two objects affected by the constraint. A constraint can be either a geometry constraint between two objects (e.g., a cylinder can be inserted into a round hole) or a form of user knowledge (e.g., a clamp-gripper can be used to manipulate a large-sized gear). Constraints are pre-defined knowledge and cannot be changed during the task process.
+
+- Relations
+
+  A list of relations in the world, including the relation name and the two objects involved. Most relations are geometry (e.g., a peg is inserted into a hole), while others are semantic (e.g., the hand is holding a clamp-gripper). The task target can be defined as relations that are changeable during the plan execution.
+
+
+#### Behavior Tree
+
+The BTs generated and utilized in the system are in JSON format.
+
+<div align="center">
+  <img src="/pic/bt_modeling.png" alt="behavior tree" width="45%">
+  <img src="/pic/bt_modeling_vis.png" alt="behaivor tree vis" width="45%">
+</div>
+
+In the JSON file of BTs, each node has a *summary* that provides a brief description and a *name* that reflects the node type and employs domain knowledge definitions of the name form. There are several node types, including *selector*, *sequence*, *condition* (which is further classified into *target* and *precondition*), and *action*. The *selector* and *sequence* nodes control the tick flow of BTs and contain a list of subsequent nodes called *children*. Condition nodes labeled as *target* are typically children of *selectors*, while those categorized as *preconditions* are found as children of *sequences*. It is crucial that all nodes align with their corresponding actions or predicates, as defined within the domain knowledge. Control flow nodes in BTs have no memory, which means each tick starts at the root and traverses through all nodes anew, disregarding previous states of the control flow nodes. The basic structure of a unit subtree includes a root *selector* node, a *target* condition node as its first child to verify target satisfaction, followed by a *sequence* node aimed at fulfilling the target condition. The *sequence* node starts with several *precondition* nodes that validate necessary conditions before executing an action, and it concludes with an *action* node. This *action* node is designed to achieve effects that satisfy the *target* node in the upper-level *selector*, ensuring the subtree's functional coherence and goal-directed behavior.
+
+
+#### Prompt
+
+Here is an overview of the prompt structure used in the project:
+
+<div align="center">
+  <img src="/pic/prompt.png" alt="behavior tree" width="80%">
+</div>
+
+
 ### Something to try
 
 #### 0. Enable the dummy execution
@@ -207,7 +266,7 @@ return behavior_tree_simulation_step(state)
 
 Uncommenting this line will call the simulation node of the langgraph to simulate the execution of the behavior tree and skip the interaction with the robot interface.
 
-#### 1. Runtime script for robot commands
+#### 1. Runtime script for robot commands (For MIRMI users)
 
 The scripts `runtime_script.py` (just search them in the project) are live scripts for modifying mios memory, teaching mios objects (check mios documentation to understand what are the objects in mios), quick environment setup and robot command testing.
 
@@ -226,7 +285,7 @@ ipython -i runtime_script.py
 
 Please check the script for more information about the functions.
 
-#### 2. Human-in-the-loop behavior tree generation
+#### 2. Human-in-the-loop behavior tree generation (For all users)
 
 The human-in-the-loop behavior tree generation is a process for generating behavior trees iteratively with the help of human feedback. User input is first passed to the assembly planner, which makes a high-level assembly plan including several product-concentrated assembly steps. Then the first step is passed to the sequential planner to generate an action sequence in natural language, which helps to generate the corresponding behavior tree in the behavior tree generator. The behavior tree is a mid-level plan about robot actions and condition checking. The user is asked to provide feedback to help improve or correct the beahvior tree in natural language. The feedback is then used to modify the behavior tree and generate a new plan(tree). The process is repeated until the user is satisfied with the behavior tree. Then the behavior tree is executed by the robot, which calls the robot interface to run low-level motion primitives or skills. The execution will stop when the tree gets a feedback and the user will be asked to provide feedback again. After successfully finishing the task, the plan updater will update the plan in the assembly planner and the process will be repeated for the next step until the whole assembly task is finished.
 

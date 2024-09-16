@@ -236,8 +236,11 @@ The key values in the world state are explained below:
 The BTs generated and utilized in the system are in JSON format.
 
 <div align="center">
-  <img src="/pic/bt_modeling.png" alt="behavior tree" width="45%">
-  <img src="/pic/bt_modeling_vis.png" alt="behaivor tree vis" width="45%">
+  <img src="/pic/bt_modeling.png" alt="behavior tree" width="60%">
+</div>
+
+<div align="center">
+  <img src="/pic/bt_modeling_vis.png" alt="behaivor tree vis" width="80%">
 </div>
 
 In the JSON file of BTs, each node has a *summary* that provides a brief description and a *name* that reflects the node type and employs domain knowledge definitions of the name form. There are several node types, including *selector*, *sequence*, *condition* (which is further classified into *target* and *precondition*), and *action*. The *selector* and *sequence* nodes control the tick flow of BTs and contain a list of subsequent nodes called *children*. Condition nodes labeled as *target* are typically children of *selectors*, while those categorized as *preconditions* are found as children of *sequences*. It is crucial that all nodes align with their corresponding actions or predicates, as defined within the domain knowledge. Control flow nodes in BTs have no memory, which means each tick starts at the root and traverses through all nodes anew, disregarding previous states of the control flow nodes. The basic structure of a unit subtree includes a root *selector* node, a *target* condition node as its first child to verify target satisfaction, followed by a *sequence* node aimed at fulfilling the target condition. The *sequence* node starts with several *precondition* nodes that validate necessary conditions before executing an action, and it concludes with an *action* node. This *action* node is designed to achieve effects that satisfy the *target* node in the upper-level *selector*, ensuring the subtree's functional coherence and goal-directed behavior.

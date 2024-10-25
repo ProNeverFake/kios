@@ -6,6 +6,8 @@
 
 This is a project for robot task planning and execution based on langchain agent, LLM, behavior tree and robot expert skills.
 
+> :star: A conference paper based on this project has been submitted to ICRA 2025. A preprint is available [here](https://arxiv.org/abs/2409.10444).
+
 > :star: A workshop paper based on this project is accepted by ICRA 2024. Check it [here](/workshop.pdf).
 
 > 🎥 The video of human-in-the-loop behavior tree generation is updated. Check it [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ).

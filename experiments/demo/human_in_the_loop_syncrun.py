@@ -11,7 +11,7 @@ os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 os.environ["LANGCHAIN_PROJECT"] = "human_in_the_loop_generation"
 
 from kios_bt.bt_stewardship import BehaviorTreeStewardship
-from kios_scene.scene_factory import SceneFactory
+# from kios_scene.scene_factory import SceneFactory # ! scene ceased
 from kios_bt.bt_factory import BehaviorTreeFactory
 from kios_robot.robot_interface import RobotInterface
 from kios_world.world_interface import WorldInterface
@@ -68,16 +68,15 @@ def render_bt(bt_json: json):
 
 ####################### dirs
 current_dir = os.path.dirname(os.path.abspath(__file__))
-scene_path = os.path.join(current_dir, "scene.json")
+# scene_path = os.path.join(current_dir, "scene.json") # ! scene ceased
 # bt_json_file_path = os.path.join(current_dir, "behavior_tree.json")
 world_state_path = os.path.join(current_dir, "world_state.json")
-# domain_knowledge_path = os.path.join(current_dir, "domain_knowledge.txt")
 
-####################### scene
-with open(scene_path, "r") as file:
-    scene_json_object = json.load(file)
+####################### scene # ! scene ceased
+# with open(scene_path, "r") as file:
+    # scene_json_object = json.load(file)
 
-scene = SceneFactory().create_scene_from_json(scene_json_object)
+# scene = SceneFactory().create_scene_from_json(scene_json_object) # ! scene ceased
 
 ####################### world
 world_interface = WorldInterface()
@@ -90,7 +89,7 @@ robot_interface = RobotInterface(
     robot_address="127.0.0.1",
     robot_port=12000,
 )
-robot_interface.setup_scene(scene)
+# robot_interface.setup_scene(scene) # ! scene ceased
 
 ####################### bt_factory
 # bt_factory = BehaviorTreeFactory(
@@ -106,8 +105,7 @@ behavior_tree_stewardship = BehaviorTreeStewardship(
 )
 
 # * kios data prompt skeleton dir
-data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin())
-# prompt_sk_dir = os.path.join(data_dir, "prompt_skeletons")
+data_dir = os.environ.get("KIOS_DATA_DIR").format(username=os.getlogin()) # TODO change this to your own username
 prompt_dir = os.path.join(data_dir, "prompts")
 
 
@@ -190,14 +188,6 @@ def behavior_tree_generate_step(state: PlanExecuteState):
 
     global user_feedback
 
-    # bt_skeleton = human_instruction_chain.invoke(
-    #     {
-    #         "world_state": state["world_state"][-1],
-    #         "user_feedback": user_feedback,
-    #         "last_behavior_tree": state["last_behavior_tree"],
-    #         "action_sequence": state["action_sequence"],
-    #     }
-    # )
     bt_skeleton = human_instruction_chain_v2.invoke(
         {
             # "world_state": state["world_state"][-1],

@@ -70,16 +70,9 @@ KIOS is a robot intelligent task planning system developed by BlackBird for his 
 
 ### Requirements
 
-**For the client (robot) side:**
-- Ubuntu 20.04 LTS
-- conan 1.59.0 (conan 2 is not compatible with the project mios)
-- linux Realtime kernal. This is the requirement of robot control interface (1000Hz control loop). For walkthrough please check [here](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel).
-
-**For the server side (for local LLMs, not deployed yet):**
-- Ubuntu 20.04 LTS
-- CUDA 12.1 or higher
-- RAM 32GB or higher
-- GPU 24GB or higher
+- Ubuntu 20.04 LTS (verified)
+- conan 1.59.0 (the requirements if you use MIOS, otherwise unnecessary)
+- linux Realtime kernal(the requirement of franka panda control interface, ignore this if you do not play any robot action). For walkthrough please check [here](https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel).
 
 ### Install
 
@@ -98,45 +91,41 @@ sudo apt-get install graphviz
 # install the package kios_bt_planning
 cd kios_bt_planning
 pip3 install -e .
-# this is for testing the project
+# for testing the code with livescript it is recommended to install ipython in this virtual environment.
 conda install ipython
 ```
 
-2. (Skip this if you do not need world state visualization) install neo4j.
+2. (This is only for world state visualization. Skip this if you do not need it.) install neo4j.
 
 The application can be downloaded from [here](https://github.com/neo4j/neo4j-python-driver).
 
 After setting up the neo4j server, please change the autherization information in `kios_bt_planning/kios_world/neo4j_interface.py`.
 
 
-3. Set up the mios (branch = kios) and the franka robot.
+3. (This is only for MIRMI users who want to play real robot actions with MIOS) Set up the mios (branch = kios) and the franka robot.
 
 > BB: For MIRMI users, check the project [mios](https://gitlab.lrz.de/ki_fabrik_integration/MIRMI-public/mios) for more information. The docker image's name is "mirmi/mios", but is not compatible with this project. The skills necessary for the robot manipulation in kios are still being actively developed. A new docker image will be released as soon as possible. 
 
-4. (skip this now) Install llama.cpp according to the [docs](https://github.com/abetlen/llama-cpp-python?tab=readme-ov-file#supported-backends). Please aware that you need to enable CUDA backend.
-
-```bash
-# in the virtual environment
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python
-```
-
-5. Set up your openai api-key.
+4. Set up your openai api-key.
 
 If you want to use the openai gpt models as your LLM, please set up your openai api-key globally according to this [link](https://platform.openai.com/docs/quickstart?context=python).
 
-Or you don't think it is annoying, then use `getpass` to input the api-key every time you run the project.
-
+```bash
+cd ~/
+nano ./.bashrc
+# just put this line into your .bashrc file in your home directory.
+export OPENAI_API_KEY='xxxxxx'
+# you need to start a new terminal to make it take effect.
+```
 > BB: Protect your api-key carefully and prevent any secret leakage.
 
-6. Set up langsmith.
+5. (This is only for langchain monitor and data collection) Set up langsmith.
 
 If you want to use langsmith to minitor the LLM queries, take a look at this [link](https://docs.smith.langchain.com/tracing) to set the api-key.
 
 You can also use something else like [langfuse](https://github.com/langfuse/langfuse) to monitor the LLM queries.
 
-7. Set up huggingface (skip this for now).
-
-8. Set up the mongoDB.
+6. (This is for MIOS operation. Skip this if you do not play real robot actions) Setup MongoDB.
 
 Please check this [link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/) to install the mongoDB. You should also start the mongoDB service after the installation!
 
@@ -263,7 +252,7 @@ Here is an overview of the prompt structure used in the project:
 
 The docker image of mios is currently not available. You can enable the dummy execution by uncommenting the code in the demo script, which allows the execution to be simulated and the effects of the actions will be applied to the world state after the execution.
 
-The code for dummy execution is:
+The code for dummy execution is (you can find it with ctrl+f):
 
 ```python
 return behavior_tree_simulation_step(state)
@@ -310,9 +299,9 @@ cd experiments/demo
 python human_in_the_loop_sync.py
 ```
 
-It is strongly recommended to watch the video [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ) to understand the workflow.
+It is strongly recommended to watch the video [here](https://www.youtube.com/watch?v=I4f-lSW6qdQ) to understand the workflow. You can also try the same inputs that are shown in the video.
 
-### Testing
+### Testing (with livescript and MIOS)
 
 For module testing please check the test folder in `kios_bt_planning`.
 
